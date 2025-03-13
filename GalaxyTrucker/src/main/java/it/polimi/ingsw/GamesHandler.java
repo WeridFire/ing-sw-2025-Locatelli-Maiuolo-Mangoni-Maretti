@@ -4,7 +4,7 @@ package it.polimi.ingsw;
  * Hello world!
  *
  */
-public class App 
+public class GamesHandler
 {
     public static void main( String[] args )
     {
