@@ -1,9 +1,11 @@
 package src.main.java.it.polimi.ingsw.shipboard;
 
+/* TEST imports
 import src.main.java.it.polimi.ingsw.enums.Rotation;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.Tile;
 
 import java.util.Arrays;
+*/
 
 public class ShipBoard {
 
