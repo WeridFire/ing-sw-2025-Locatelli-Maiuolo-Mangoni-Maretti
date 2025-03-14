@@ -7,12 +7,12 @@ public abstract class EnemyCard extends Card {
     /**
      * This enemy firepower
      */
-    int firePower;
+    private int firePower;
 
     /**
      * Days lost looting the wreckage of your enemy's ship
      */
-    int lostDays;
+    private int lostDays;
 
     /**
      * @param firePower firepower of this enemy
