@@ -5,13 +5,10 @@ import src.main.java.it.polimi.ingsw.enums.CargoType;
 import src.main.java.it.polimi.ingsw.enums.GameLevel;
 import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
 import src.main.java.it.polimi.ingsw.gamePhases.PlayableGamePhase;
-import src.main.java.it.polimi.ingsw.shipboard.ShipBoard;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.ILoadableItem;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.Tile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.UUID;
 
 public class GameData {
 

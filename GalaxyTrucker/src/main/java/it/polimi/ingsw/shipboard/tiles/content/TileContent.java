@@ -1,4 +1,4 @@
-package src.main.java.it.polimi.ingsw.shipboard.tiles;
+package src.main.java.it.polimi.ingsw.shipboard.tiles.content;
 
 import src.main.java.it.polimi.ingsw.enums.*;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.*;

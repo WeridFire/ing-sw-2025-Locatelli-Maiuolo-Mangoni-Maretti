@@ -1,4 +1,4 @@
-package src.main.java.it.polimi.ingsw.shipboard.tiles;
+package src.main.java.it.polimi.ingsw.shipboard.tiles.content;
 
 /**
  * Interface that enforces the implementation of methods that will be used
