@@ -126,27 +126,49 @@ public class TileContent {
     // Cargo content
 
     /**
-     * Returns the most valuable cargo items present on this tile, up to a given limit, in descending order.
-     * <p>
-     * By default, this method returns an empty list. Subclasses should override it if the tile can store cargo.
-     * </p>
-     *
-     * @param limit the maximum number of cargo items to return.
-     * @return a list of the most valuable cargo items, ordered by value in descending order.
+     * @see #getContrabandMostValuableItems(int limit)
+     * @param minimumContrabandValueExclusive the minimum contraband value (exclusive) to get items.
+     *        Any item with contraband value below or equal to
+     *        {@code minimumContrabandValueExclusive} is not considered.
+     * @throws IllegalArgumentException if {@code minimumContrabandValueExclusive < 0}
      */
-    public List<CargoType> getMostValuableCargo(int limit) {
+    public List<ILoadableItem> getContrabandMostValuableItems(int limit, int minimumContrabandValueExclusive)
+            throws IllegalArgumentException {
+        if (limit <= 0) {
+            throw new IllegalArgumentException("Limit must be greater than 0");
+        }
+        if (minimumContrabandValueExclusive < 0) {
+            throw new IllegalArgumentException("Minimum contraband value (exclusive) must be greater or equal to 0");
+        }
         return new ArrayList<>(0);
     }
 
     /**
-     * Calculates the total selling price of all cargo stored on this tile.
+     * Returns the most valuable loaded items present on this tile,
+     * for smugglers, up to a given limit, in descending order.
      * <p>
-     * By default, this method returns 0. Subclasses that store cargo should override it.
+     * By default, this method returns an empty list.
+     * Subclasses that store contraband items should override it.
      * </p>
      *
-     * @return the total selling price of the cargo.
+     * @param limit the maximum number of items to return.
+     * @return a list of the most valuable loaded items, ordered by value in descending order.
+     * @throws IllegalArgumentException if {@code limit <= 0}
      */
-    public int calculateCargoSellingPrice() {
+    public List<ILoadableItem> getContrabandMostValuableItems(int limit) throws IllegalArgumentException {
+        return getContrabandMostValuableItems(limit, 0);
+    }
+
+    /**
+     * Calculates the total selling price of all the loaded items present on this tile.
+     * <p>
+     * By default, this method returns 0.
+     * Subclasses that store saleable items should override it.
+     * </p>
+     *
+     * @return the total selling price of the loaded items.
+     */
+    public int calculateItemsSellingPrice() {
         return 0;
     }
 

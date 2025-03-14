@@ -7,7 +7,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * A container tile content that holds crew members.
+ * Represents a crew container within a tile, allowing storage and retrieval of crew items.
+ * This class extends {@link TileContentContainer}
+ * and provides specific implementations for managing crew items.
  */
 public class TileContentCrew extends TileContentContainer {
 
