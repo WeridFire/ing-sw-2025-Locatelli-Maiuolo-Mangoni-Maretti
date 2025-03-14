@@ -47,16 +47,21 @@ public class TileContent {
     }
 
     /**
-     * Ignores any loaded crew members and fills the content with the maximum number of specified crew members.
+     * Fills the content with the maximum number of specified crew members.
      * <p>
-     * By default, this operation is not supported and throws an exception.
+     * By default, this operation is not supported and throws {@code UnsupportedLoadableItemException}.
      * Subclasses that support crew should override this method.
      * </p>
      *
      * @param crewType the crew type of the members to fill the tile with.
      * @throws UnsupportedLoadableItemException if the tile does not support crew loading.
+     * @throws AlreadyInitializedCabinException if the tile does support crew loading
+     * but has already been initialized.
+     * @throws NotAllowedLoadableTypeException if the tile does support crew loading
+     * does not allow {@code crewType} crew members.
      */
-    public void fillCrew(CrewType crewType) throws UnsupportedLoadableItemException {
+    public void fillCrew(CrewType crewType) throws UnsupportedLoadableItemException, AlreadyInitializedCabinException,
+            NotAllowedLoadableTypeException {
         throw new UnsupportedLoadableItemException("This tile does not support Crew loading!");
     }
 
@@ -70,8 +75,10 @@ public class TileContent {
      * @param count the number of crew members to remove.
      * @throws NotEnoughItemsException if there are not enough crew members to remove.
      * @throws UnsupportedLoadableItemException if the tile does not support crew loading.
+     * @throws IllegalArgumentException if {@code count} is less than or equal to zero.
      */
-    public void removeCrew(int count) throws NotEnoughItemsException, UnsupportedLoadableItemException {
+    public void removeCrew(int count) throws NotEnoughItemsException, UnsupportedLoadableItemException,
+            IllegalArgumentException {
         throw new UnsupportedLoadableItemException("This tile does not support Crew loading!");
     }
 
@@ -83,9 +90,10 @@ public class TileContent {
      * </p>
      *
      * @param newAllowedCrew the set of allowed crew types.
+     * @return a list of all the crew members in this tile removed by this method.
      * @throws UnsupportedLoadableItemException if the tile does not support crew loading.
      */
-    public void updateAllowedCrew(Set<CrewType> newAllowedCrew) throws UnsupportedLoadableItemException {
+    public List<CrewType> updateAllowedCrew(Set<CrewType> newAllowedCrew) throws UnsupportedLoadableItemException {
         throw new UnsupportedLoadableItemException("This tile does not support Crew loading!");
     }
 

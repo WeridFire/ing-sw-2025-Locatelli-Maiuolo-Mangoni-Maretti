@@ -6,7 +6,7 @@ import java.util.*;
  * A container tile that holds loadable items on itself, enforcing capacity constraints and allowed item types.
  * Subclasses can extend this class to define specific behavior for managing tile content.
  */
-public abstract class TileContentContainer {
+public abstract class TileContentContainer extends TileContent {
     private Set<ILoadableItem> allowedItems;
     private final List<ILoadableItem> loadedItems;
     private int occupiedCapacity;
@@ -15,10 +15,12 @@ public abstract class TileContentContainer {
     /**
      * Constructs a TileContentContainer with the specified allowed items and maximum capacity.
      *
-     * @param allowedItems the set of item types that can be loaded into this container
-     * @param maxCapacity  the maximum capacity in terms of occupied space
+     * @param allowedItems the set of item types that can be loaded into this container.
+     *                     Any {@code null} values are not considered as allowed item
+     * @param maxCapacity the maximum capacity in terms of occupied space
      */
     protected TileContentContainer(Set<ILoadableItem> allowedItems, int maxCapacity) {
+        allowedItems.remove(null);
         this.allowedItems = allowedItems;
         this.maxCapacity = maxCapacity;
         this.loadedItems = new ArrayList<>(maxCapacity);
@@ -57,8 +59,21 @@ public abstract class TileContentContainer {
             return false;
         }
         occupiedCapacity += occupiedSpace;
-        loadedItems.add(item);
-        return true;
+        return loadedItems.add(item);
+    }
+
+    /**
+     * Add the same item to the container while space and allowance permit.
+     *
+     * @param item the item to add
+     */
+    protected void fillWith(ILoadableItem item) {
+        if (!isAllowed(item)) {
+            return;
+        }
+        int addedItems = getCapacityLeft() / item.getOccupiedSpace();
+        loadedItems.addAll(Collections.nCopies(addedItems, item));
+        occupiedCapacity += addedItems * item.getOccupiedSpace();
     }
 
     /**
@@ -125,12 +140,23 @@ public abstract class TileContentContainer {
     }
 
     /**
+     * Counts the occurrences of all the items in the container.
+     *
+     * @return the number of items loaded in the container
+     */
+    protected int countLoaded() {
+        return loadedItems.size();
+    }
+
+    /**
      * Updates the allowed items set and removes any currently loaded items that are no longer allowed.
      *
-     * @param newAllowedItems the new set of allowed items
+     * @param newAllowedItems the new set of allowed items.
+     *                        Any {@code null} values are not considered as allowed item
      * @return a list of items that were removed due to being disallowed
      */
     protected ArrayList<ILoadableItem> updateAllowedItems(Set<ILoadableItem> newAllowedItems) {
+        newAllowedItems.remove(null);
         this.allowedItems = newAllowedItems;
         ArrayList<ILoadableItem> removedItems = new ArrayList<>();
 
