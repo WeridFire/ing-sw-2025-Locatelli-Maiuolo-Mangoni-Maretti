@@ -6,7 +6,7 @@ import src.main.java.it.polimi.ingsw.enums.ConnectorType;
  * Represents a tile side that has a variant which can be either single or double.
  * This is useful for components such as engines or cannons that may have increased effects when doubled.
  */
-public class TileSideDoubleVariant extends TileSide {
+public abstract class TileSideDoubleVariant extends TileSide {
     /**
      * Indicates whether this tile side is in its double variant.
      */
