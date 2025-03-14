@@ -16,12 +16,4 @@ public interface ILoadableItem {
      * @return The selling price in cosmic credits for this item.
      */
     int getCreditsValue();
-
-    /**
-     * Overview: some items are valuable for smugglers.<p>
-     * Note: this value is only related to a single other contraband value for sorting purposes.<p>
-     * i.e.: 3 > 2, but it's not true that 3 < 2 + 2 (multiple items should not be compared with one item)
-     * @return The virtual value of this item for smugglers.
-     */
-    int getContrabandValue();
 }
