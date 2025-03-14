@@ -29,13 +29,13 @@ public enum LoadableItem implements ILoadableItem, IFlagEnum<LoadableItem> {
     // useful mix
     BATTERY_COMPONENT(BATTERY.value),
 
-    CARGO_HOLD(BLUE_GOODS.value + GREEN_GOODS.value + YELLOW_GOODS.value),
-    SPECIAL_CARGO_HOLD(CARGO_HOLD.value + RED_GOODS.value),
+    CARGO_HOLD(BLUE_GOODS.value | GREEN_GOODS.value | YELLOW_GOODS.value),
+    SPECIAL_CARGO_HOLD(CARGO_HOLD.value | RED_GOODS.value),
 
-    CONTRABAND_CARGO(SPECIAL_CARGO_HOLD.value + BATTERY_COMPONENT.value),
+    CONTRABAND_CARGO(SPECIAL_CARGO_HOLD.value | BATTERY_COMPONENT.value),
 
-    CREW(HUMAN.value + PURPLE_ALIEN.value + BROWN_ALIEN.value),
-    ALIENS(PURPLE_ALIEN.value + BROWN_ALIEN.value);
+    CREW(HUMAN.value | PURPLE_ALIEN.value | BROWN_ALIEN.value),
+    ALIENS(PURPLE_ALIEN.value | BROWN_ALIEN.value);
 
 
     private final int value;
