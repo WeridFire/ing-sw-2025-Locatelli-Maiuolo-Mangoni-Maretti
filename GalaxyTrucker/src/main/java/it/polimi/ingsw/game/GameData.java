@@ -1,5 +1,6 @@
 package src.main.java.it.polimi.ingsw.game;
 
+import src.main.java.it.polimi.ingsw.cards.Card;
 import src.main.java.it.polimi.ingsw.enums.CargoType;
 import src.main.java.it.polimi.ingsw.enums.GameLevel;
 import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
@@ -30,7 +31,7 @@ public class GameData {
 
     private int availableCredits;
 
-    //private ArrayList<AdventureCard> adventureCards;
+    private ArrayList<Card> cards;
 
     private ArrayList<Tile> tiles;
 
