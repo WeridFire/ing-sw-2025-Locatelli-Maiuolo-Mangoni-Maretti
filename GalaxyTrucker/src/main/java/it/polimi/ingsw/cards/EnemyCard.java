@@ -7,12 +7,12 @@ public abstract class EnemyCard extends Card {
     /**
      * This enemy firepower
      */
-    private int firePower;
+    private final int firePower;
 
     /**
      * Days lost looting the wreckage of your enemy's ship
      */
-    private int lostDays;
+    private final int lostDays;
 
     /**
      * @param firePower firepower of this enemy
@@ -45,6 +45,14 @@ public abstract class EnemyCard extends Card {
      */
     public int getFirePower() {
         return firePower;
+    }
+
+    /**
+     *
+     * @return necessary days to loot this enemy
+     */
+    public int getLostDays() {
+        return lostDays;
     }
 
     /**

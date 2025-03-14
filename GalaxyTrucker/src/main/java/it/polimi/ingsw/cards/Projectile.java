@@ -7,22 +7,22 @@ public class Projectile {
     /**
      * Determines if the projectile bounces on flat sides of the ship.
      */
-    private boolean bouncy;
+    private final boolean bouncy;
 
     /**
      * Determines if you can defend from the projectile with a shield.
      */
-    private boolean shieldDefendable;
+    private final boolean shieldDefendable;
 
     /**
      * Determines if you can defend from the projectile with a cannon.
      */
-    private boolean fireDefendable;
+    private final boolean fireDefendable;
 
     /**
      * Direction from which the projectile is coming from.
      */
-    private Direction direction;
+    private final Direction direction;
 
     /**
      * Private constructor, will be called by public factory methods to create specific projectiles
