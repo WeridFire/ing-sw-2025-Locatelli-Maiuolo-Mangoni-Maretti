@@ -7,7 +7,7 @@ import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.IncoherentBatter
 
 /**
  * Represents the side of a tile containing a cannon, which can be either single or double.
- * Cannon sides cannot be adjacent to other tiles and always have a smooth connector.
+ * Cannon sides cannot be adjacent to other tiles and always have a smooth side (non-connector).
  */
 public class TileSideCannon extends TileSideDoubleVariant {
 
