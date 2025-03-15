@@ -4,7 +4,6 @@ import src.main.java.it.polimi.ingsw.shipboard.tiles.Tile;
 import src.main.java.it.polimi.ingsw.shipboard.ShipBoard;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class Player {
