@@ -3,6 +3,7 @@ package src.main.java.it.polimi.ingsw.shipboard.tiles.side;
 import src.main.java.it.polimi.ingsw.enums.ConnectorType;
 import src.main.java.it.polimi.ingsw.enums.Direction;
 import src.main.java.it.polimi.ingsw.enums.PowerType;
+import src.main.java.it.polimi.ingsw.enums.TilesConnectionStatus;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.IncoherentBatteryUsageException;
 
 /**
@@ -52,8 +53,8 @@ public class TileSideCannon extends TileSideDoubleVariant {
      * @return Always {@code false}, as cannon sides must remain isolated.
      */
     @Override
-    public boolean isCompatibleWith(TileSide other) {
-        return false;
+    public TilesConnectionStatus getConnectionStatusWith(TileSide other) {
+        return TilesConnectionStatus.ERROR_TILE_CANNON;
     }
 }
 

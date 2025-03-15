@@ -16,34 +16,55 @@ public enum ConnectorType {
     }
 
     /**
-     * Check if {@code this} and {@code other} connectors are compatible with each other.
-     * They can be:
-     * <ul>
-     *     <li>Smooth & Smooth</li>
-     *     <li>Connector & Connector of the same type</li>
-     *     <li>Connector & Universal Connector</li>
-     * </ul>
+     * Determines if this connector can be welded with another connector,
+     * meaning they can form a valid connection between two adjacent tiles.
      *
-     * @param other the other connector to check {@code this} with
-     * @return {@code true} if the connectors are compatible with each other, {@code false} otherwise
+     * @param other the other connector to check against.
+     * @return {@code true} if the connectors can be welded together, {@code false} otherwise.
      */
-    public boolean isCompatibleWith(ConnectorType other) {
-        if (value == other.value) {
-            return true;
+    private boolean isWeldableWith(ConnectorType other) {
+        return (this.value & other.value) != 0;
+    }
+
+    /**
+     * Determines the type of invalid connection when {@code this} connector is incompatible with {@code other}.
+     *
+     * @param other the other connector being compared: non-weldable with and non-equal to {@code this}.
+     * @return a {@link TilesConnectionStatus} representing the specific error type.
+     */
+    private TilesConnectionStatus calculateInvalidConnectionStatus(ConnectorType other) {
+        // Ensure consistent ordering: always compare the smaller ordinal first
+        if (this.ordinal() > other.ordinal()) {
+            return other.calculateInvalidConnectionStatus(this);
         }
-        else {
-            return canBeWeldedWith(other);
+
+        // Determine the specific error case
+        if (this == SMOOTH) {
+            // other > SMOOTH: other = SINGLE, DOUBLE or UNIVERSAL -> Connector with Smooth-Side error
+            return TilesConnectionStatus.ERROR_CONNECTOR_SMOOTH;
+        } else if (this == SINGLE) {
+            // other > SINGLE && other != UNIVERSAL (or else they would have been weldable):
+            // other = DOUBLE -> Single Connector with Double Connector error
+            return TilesConnectionStatus.ERROR_CONNECTOR_SINGLE_DOUBLE;
+        } else {
+            return TilesConnectionStatus.UNIMPLEMENTED_ERROR; // Should never happen
         }
     }
 
     /**
-     * Check if {@code this} and {@code other} connectors can be welded together,
-     * i.e. can provide a connection between two adjacent tiles.
+     * Determines the connection status between this connector and another.
      *
-     * @param other the other connector to check {@code this} with
-     * @return {@code true} if the connectors are weldable with each other, {@code false} otherwise
+     * @param other the other connector to check compatibility with.
+     * @return a {@link TilesConnectionStatus} indicating whether the connectors can be welded,
+     *         are compatible but not weldable, or result in a specific error.
      */
-    public boolean canBeWeldedWith(ConnectorType other) {
-        return (value & other.value) != 0;
+    public TilesConnectionStatus getConnectionStatus(ConnectorType other) {
+        if (isWeldableWith(other)) {
+            return TilesConnectionStatus.WELDABLE;
+        } else if (this == other) {
+            return TilesConnectionStatus.COMPATIBLE_NOT_WELDABLE;
+        } else {
+            return calculateInvalidConnectionStatus(other);
+        }
     }
 }
