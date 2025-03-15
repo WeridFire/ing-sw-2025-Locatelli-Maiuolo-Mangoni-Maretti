@@ -35,7 +35,7 @@ public class TileContentCrew extends TileContentContainer {
     /**
      * Default constructor for a cabin: Humans as allowed loadable items and capacity = 2.
      */
-    protected TileContentCrew() {
+    public TileContentCrew() {
         super(new HashSet<>(List.of(CrewType.HUMAN)), 2);
     }
 

@@ -113,8 +113,8 @@ public class TileContent {
     /**
      * Checks if this tile represents the main cabin of the ship.
      * <p>
-     * By default, this method returns {@code false}. Subclasses should override this method
-     * if the tile serves as the main cabin.
+     * By default, this method returns {@code false}.
+     * Subclasses should override this method if the tile serves as the main cabin.
      * </p>
      *
      * @return {@code true} if this tile is the main cabin, {@code false} otherwise.
@@ -186,5 +186,36 @@ public class TileContent {
     public void removeCargo(CargoType cargo) throws NotEnoughItemsException, UnsupportedLoadableItemException {
         throw new UnsupportedLoadableItemException("This tile does not support Cargo loading!");
     }
+
+    /**
+     * Checks if there is at least one battery of the specified type stored in the container.
+     * <p>
+     * By default, this method returns {@code false}.
+     * Subclasses should override this method if the tile can contain some battery type.
+     * </p>
+     *
+     * @param batteryType the type of battery to check.
+     * @return {@code true} if at least one battery of the specified type is present, {@code false} otherwise.
+     */
+    public boolean hasBattery(BatteryType batteryType) {
+        return false;
+    }
+
+    /**
+     * Removes one unit of the specified battery type from the container.
+     * <p>
+     * By default, this operation is not supported and throws an exception.
+     * Subclasses that support battery should override this method.
+     * </p>
+     *
+     * @param battery the type of battery to remove.
+     * @throws NotEnoughItemsException if there are no batteries of the specified type available for removal.
+     * @throws UnsupportedLoadableItemException if the tile does not support battery loading.
+     */
+    public void removeBattery(BatteryType battery) throws NotEnoughItemsException, UnsupportedLoadableItemException {
+        throw new UnsupportedLoadableItemException("This tile does not support Battery loading!");
+    }
+
+
 }
 

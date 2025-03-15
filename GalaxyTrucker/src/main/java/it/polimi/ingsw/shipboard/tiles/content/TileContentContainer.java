@@ -1,5 +1,7 @@
 package src.main.java.it.polimi.ingsw.shipboard.tiles.content;
 
+import src.main.java.it.polimi.ingsw.util.ContrabandCalculator;
+
 import java.util.*;
 
 /**
@@ -173,5 +175,28 @@ public abstract class TileContentContainer extends TileContent {
         occupiedCapacity = loadedItems.stream().mapToInt(ILoadableItem::getOccupiedSpace).sum();
 
         return removedItems;
+    }
+
+    @Override
+    public List<ILoadableItem> getContrabandMostValuableItems(int limit, int minimumContrabandValueExclusive)
+            throws IllegalArgumentException {
+        if (limit <= 0) {
+            throw new IllegalArgumentException("Limit must be greater than 0");
+        }
+        if (minimumContrabandValueExclusive < 0) {
+            throw new IllegalArgumentException("Minimum contraband value (exclusive) must be greater or equal to 0");
+        }
+        return getLoadedItems().stream()
+                .filter(item -> ContrabandCalculator.getContrabandValue(item) > minimumContrabandValueExclusive)
+                .sorted(ContrabandCalculator.CONTRABAND_COMPARATOR)
+                .limit(limit)
+                .toList();
+    }
+
+    @Override
+    public int calculateItemsSellingPrice() {
+        return getLoadedItems().stream()
+                .mapToInt(ILoadableItem::getCreditsValue)
+                .sum();
     }
 }

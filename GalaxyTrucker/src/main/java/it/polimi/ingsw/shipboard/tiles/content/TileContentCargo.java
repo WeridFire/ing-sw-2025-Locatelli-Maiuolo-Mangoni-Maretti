@@ -2,7 +2,6 @@ package src.main.java.it.polimi.ingsw.shipboard.tiles.content;
 
 import src.main.java.it.polimi.ingsw.enums.CargoType;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
-import src.main.java.it.polimi.ingsw.util.ContrabandCalculator;
 
 import java.util.HashSet;
 import java.util.List;
@@ -61,30 +60,6 @@ public class TileContentCargo extends TileContentContainer {
                         CargoType.RED_GOODS
                 )),
                 maxCapacity);
-    }
-
-
-    @Override
-    public List<ILoadableItem> getContrabandMostValuableItems(int limit, int minimumContrabandValueExclusive)
-            throws IllegalArgumentException {
-        if (limit <= 0) {
-            throw new IllegalArgumentException("Limit must be greater than 0");
-        }
-        if (minimumContrabandValueExclusive < 0) {
-            throw new IllegalArgumentException("Minimum contraband value (exclusive) must be greater or equal to 0");
-        }
-        return getLoadedItems().stream()
-                .filter(item -> ContrabandCalculator.getContrabandValue(item) > minimumContrabandValueExclusive)
-                .sorted(ContrabandCalculator.CONTRABAND_COMPARATOR)
-                .limit(limit)
-                .toList();
-    }
-
-    @Override
-    public int calculateItemsSellingPrice() {
-        return getLoadedItems().stream()
-                .mapToInt(ILoadableItem::getCreditsValue)
-                .sum();
     }
 
     @Override
