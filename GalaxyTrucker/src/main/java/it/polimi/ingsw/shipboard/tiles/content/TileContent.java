@@ -1,4 +1,4 @@
-package src.main.java.it.polimi.ingsw.shipboard.tiles;
+package src.main.java.it.polimi.ingsw.shipboard.tiles.content;
 
 import src.main.java.it.polimi.ingsw.enums.*;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.*;
@@ -47,16 +47,21 @@ public class TileContent {
     }
 
     /**
-     * Ignores any loaded crew members and fills the content with the maximum number of specified crew members.
+     * Fills the content with the maximum number of specified crew members.
      * <p>
-     * By default, this operation is not supported and throws an exception.
+     * By default, this operation is not supported and throws {@code UnsupportedLoadableItemException}.
      * Subclasses that support crew should override this method.
      * </p>
      *
      * @param crewType the crew type of the members to fill the tile with.
      * @throws UnsupportedLoadableItemException if the tile does not support crew loading.
+     * @throws AlreadyInitializedCabinException if the tile does support crew loading
+     * but has already been initialized.
+     * @throws NotAllowedLoadableTypeException if the tile does support crew loading
+     * does not allow {@code crewType} crew members.
      */
-    public void fillCrew(CrewType crewType) throws UnsupportedLoadableItemException {
+    public void fillCrew(CrewType crewType) throws UnsupportedLoadableItemException, AlreadyInitializedCabinException,
+            NotAllowedLoadableTypeException {
         throw new UnsupportedLoadableItemException("This tile does not support Crew loading!");
     }
 
@@ -70,8 +75,10 @@ public class TileContent {
      * @param count the number of crew members to remove.
      * @throws NotEnoughItemsException if there are not enough crew members to remove.
      * @throws UnsupportedLoadableItemException if the tile does not support crew loading.
+     * @throws IllegalArgumentException if {@code count} is less than or equal to zero.
      */
-    public void removeCrew(int count) throws NotEnoughItemsException, UnsupportedLoadableItemException {
+    public void removeCrew(int count) throws NotEnoughItemsException, UnsupportedLoadableItemException,
+            IllegalArgumentException {
         throw new UnsupportedLoadableItemException("This tile does not support Crew loading!");
     }
 
@@ -83,9 +90,10 @@ public class TileContent {
      * </p>
      *
      * @param newAllowedCrew the set of allowed crew types.
+     * @return a list of all the crew members in this tile removed by this method.
      * @throws UnsupportedLoadableItemException if the tile does not support crew loading.
      */
-    public void updateAllowedCrew(Set<CrewType> newAllowedCrew) throws UnsupportedLoadableItemException {
+    public List<CrewType> updateAllowedCrew(Set<CrewType> newAllowedCrew) throws UnsupportedLoadableItemException {
         throw new UnsupportedLoadableItemException("This tile does not support Crew loading!");
     }
 
@@ -118,27 +126,49 @@ public class TileContent {
     // Cargo content
 
     /**
-     * Returns the most valuable cargo items present on this tile, up to a given limit, in descending order.
-     * <p>
-     * By default, this method returns an empty list. Subclasses should override it if the tile can store cargo.
-     * </p>
-     *
-     * @param limit the maximum number of cargo items to return.
-     * @return a list of the most valuable cargo items, ordered by value in descending order.
+     * @see #getContrabandMostValuableItems(int limit)
+     * @param minimumContrabandValueExclusive the minimum contraband value (exclusive) to get items.
+     *        Any item with contraband value below or equal to
+     *        {@code minimumContrabandValueExclusive} is not considered.
+     * @throws IllegalArgumentException if {@code minimumContrabandValueExclusive < 0}
      */
-    public List<CargoType> getMostValuableCargo(int limit) {
+    public List<ILoadableItem> getContrabandMostValuableItems(int limit, int minimumContrabandValueExclusive)
+            throws IllegalArgumentException {
+        if (limit <= 0) {
+            throw new IllegalArgumentException("Limit must be greater than 0");
+        }
+        if (minimumContrabandValueExclusive < 0) {
+            throw new IllegalArgumentException("Minimum contraband value (exclusive) must be greater or equal to 0");
+        }
         return new ArrayList<>(0);
     }
 
     /**
-     * Calculates the total selling price of all cargo stored on this tile.
+     * Returns the most valuable loaded items present on this tile,
+     * for smugglers, up to a given limit, in descending order.
      * <p>
-     * By default, this method returns 0. Subclasses that store cargo should override it.
+     * By default, this method returns an empty list.
+     * Subclasses that store contraband items should override it.
      * </p>
      *
-     * @return the total selling price of the cargo.
+     * @param limit the maximum number of items to return.
+     * @return a list of the most valuable loaded items, ordered by value in descending order.
+     * @throws IllegalArgumentException if {@code limit <= 0}
      */
-    public int calculateCargoSellingPrice() {
+    public List<ILoadableItem> getContrabandMostValuableItems(int limit) throws IllegalArgumentException {
+        return getContrabandMostValuableItems(limit, 0);
+    }
+
+    /**
+     * Calculates the total selling price of all the loaded items present on this tile.
+     * <p>
+     * By default, this method returns 0.
+     * Subclasses that store saleable items should override it.
+     * </p>
+     *
+     * @return the total selling price of the loaded items.
+     */
+    public int calculateItemsSellingPrice() {
         return 0;
     }
 
