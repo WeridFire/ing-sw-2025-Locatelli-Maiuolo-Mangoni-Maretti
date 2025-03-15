@@ -1,6 +1,7 @@
 package src.main.java.it.polimi.ingsw.shipboard.tiles.side;
 
 import src.main.java.it.polimi.ingsw.enums.*;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.IncoherentBatteryUsageException;
 
 /**
  * Represents one side of a tile, defining its connector type and orientation.
@@ -102,8 +103,10 @@ public class TileSide {
      * @param powerType the type of power being calculated
      * @param batteryUsage {@code true} if battery usage should be considered, {@code false} otherwise
      * @return the amount of power provided by this tile side
+     * @throws IncoherentBatteryUsageException if {@code batteryUsage} is different from
+     * what is expected by the tile (i.e. {@link #isBatteryNeeded()})
      */
-    public float calculatePower(PowerType powerType, boolean batteryUsage) {
+    public float calculatePower(PowerType powerType, boolean batteryUsage) throws IncoherentBatteryUsageException {
         return 0f;
     }
 }
