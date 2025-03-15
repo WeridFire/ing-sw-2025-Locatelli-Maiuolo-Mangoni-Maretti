@@ -61,4 +61,5 @@ public abstract class EnemyCard extends Card {
      */
     public void playEffect(){
     }
+
 }
