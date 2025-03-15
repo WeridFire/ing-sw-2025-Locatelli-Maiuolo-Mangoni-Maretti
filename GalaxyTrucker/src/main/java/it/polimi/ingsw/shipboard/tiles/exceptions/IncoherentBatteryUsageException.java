@@ -1,6 +1,6 @@
 package src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions;
 
-public class IncoherentBatteryUsageException extends RuntimeException {
+public class IncoherentBatteryUsageException extends Exception {
     public IncoherentBatteryUsageException(String message) {
         super(message);
     }
