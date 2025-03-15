@@ -1,5 +1,6 @@
 package src.main.java.it.polimi.ingsw.shipboard.tiles;
 
+import src.main.java.it.polimi.ingsw.GamesHandler;
 import src.main.java.it.polimi.ingsw.enums.ConnectorType;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.content.TileContentBattery;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.side.TileSide;
@@ -17,7 +18,7 @@ public class TilesFactory {
     private record TileData(Tile tile, String graphicReference) {}
 
 
-    private static final TilesFactory INSTANCE = new TilesFactory();
+    private static TilesFactory instance = new TilesFactory();
     private final AtomicInteger idCounter = new AtomicInteger(0);
     private final Map<Integer, TileData> tileRegistry = new HashMap<>();
 
@@ -41,7 +42,10 @@ public class TilesFactory {
      * @return the singleton instance of TileFactory.
      */
     public static TilesFactory getInstance() {
-        return INSTANCE;
+        if (instance == null) {
+            instance = new TilesFactory();
+        }
+        return instance;
     }
 
     private void registerTile(Tile tile, String graphicReference) {
