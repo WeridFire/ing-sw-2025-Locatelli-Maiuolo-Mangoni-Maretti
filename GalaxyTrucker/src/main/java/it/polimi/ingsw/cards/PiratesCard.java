@@ -1,4 +1,6 @@
-package it.polimi.ingsw.cards;
+package src.main.java.it.polimi.ingsw.cards;
+
+import src.main.java.it.polimi.ingsw.player.Player;
 
 public class PiratesCard extends EnemyCard{
 
