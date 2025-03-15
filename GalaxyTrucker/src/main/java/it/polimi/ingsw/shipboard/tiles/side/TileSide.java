@@ -30,17 +30,6 @@ public class TileSide {
     }
 
     /**
-     * Checks if two tile sides are mutually compatible.
-     *
-     * @param s1 the first tile side
-     * @param s2 the adjacent tile side to check
-     * @return {@code true} if both sides are compatible with each other, {@code false} otherwise
-     */
-    public static boolean areSidesCompatible(TileSide s1, TileSide s2) {
-        return s1.isCompatibleWith(s2) && s2.isCompatibleWith(s1);
-    }
-
-    /**
      * Gets the connector type of this tile side.
      *
      * @return the connector type
@@ -59,22 +48,40 @@ public class TileSide {
     }
 
     /**
-     * Determines whether this tile side is compatible with another tile side.
-     * By default, compatibility is determined by the connector type.
+     * Determines the overall connection status between two tile sides.
      * <p>
-     * This is a boolean non-symmetric relation R.
-     * If aRb, it's not sure whether bRa.
-     * This is to permit new behaviors with custom TileSides extensions
+     * The connection status is calculated by considering both directions of compatibility
+     * between the two tile sides. The worst (most restrictive) status between the two is returned.
      * </p>
      *
-     * @param other the other tile side to check compatibility with
-     * @return {@code true} if the sides are compatible, {@code false} otherwise
-     *
-     * @see #areSidesCompatible(TileSide, TileSide) areSidesCompatible <==> aRb AND bRa
+     * @param s1 the first tile side.
+     * @param s2 the adjacent tile side to check against.
+     * @return the worst connection status between the two sides.
      */
-    public boolean isCompatibleWith(TileSide other) {
-        return connector.isCompatibleWith(other.connector);
+    public static TilesConnectionStatus calculateConnectionStatus(TileSide s1, TileSide s2) {
+        return TilesConnectionStatus.getWorst(s1.getConnectionStatusWith(s2), s2.getConnectionStatusWith(s1));
     }
+
+    /**
+     * Determines the connection status of this tile side with another tile side.
+     * <p>
+     * By default, the compatibility is determined by the connector type.
+     * However, this method allows custom behaviors for subclasses of {@code TileSide}.
+     * </p>
+     * <p>
+     * This relation is <b>non-symmetric</b>: if {@code this.getConnectionStatusWith(other)}
+     * returns a status, it does not guarantee that {@code other.getConnectionStatusWith(this)}
+     * will return the same status. This enables special behaviors in custom tile side implementations.
+     * </p>
+     *
+     * @param other the other tile side to check compatibility with.
+     * @return the connection status between the two tile sides.
+     * @see #calculateConnectionStatus(TileSide, TileSide) for checking mutual compatibility.
+     */
+    public TilesConnectionStatus getConnectionStatusWith(TileSide other) {
+        return connector.getConnectionStatus(other.connector);
+    }
+
 
     /**
      * Determines whether a battery is required for this tile side power.
