@@ -1,5 +1,6 @@
 package src.main.java.it.polimi.ingsw.game;
 
+import src.main.java.it.polimi.ingsw.TilesFactory;
 import src.main.java.it.polimi.ingsw.cards.Card;
 import src.main.java.it.polimi.ingsw.enums.CargoType;
 import src.main.java.it.polimi.ingsw.enums.GameLevel;
@@ -238,7 +239,6 @@ public class GameData {
      * @return A list of default covered tiles.
      */
     private ArrayList<Tile> initDefaultTiles(){
-        // TBD waiting factory
-        return new ArrayList<>();
+        return new ArrayList<>(TilesFactory.createPileTiles());
     }
 }
