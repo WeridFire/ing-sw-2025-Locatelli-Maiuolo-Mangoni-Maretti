@@ -188,17 +188,17 @@ public class TileContent {
     }
 
     /**
-     * Checks if there is at least one battery of the specified type stored in the container.
+     * Checks if there are batteries of the specified type stored in the container.
      * <p>
-     * By default, this method returns {@code false}.
+     * By default, this method returns {@code 0}.
      * Subclasses should override this method if the tile can contain some battery type.
      * </p>
      *
      * @param batteryType the type of battery to check.
-     * @return {@code true} if at least one battery of the specified type is present, {@code false} otherwise.
+     * @return The number of batteries of the specified type stored in the container.
      */
-    public boolean hasBattery(BatteryType batteryType) {
-        return false;
+    public int countBatteries(BatteryType batteryType) {
+        return 0;
     }
 
     /**
