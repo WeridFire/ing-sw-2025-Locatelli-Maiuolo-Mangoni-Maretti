@@ -3,6 +3,7 @@ package src.main.java.it.polimi.ingsw.gamePhases;
 import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
 import src.main.java.it.polimi.ingsw.enums.GameState;
 import src.main.java.it.polimi.ingsw.game.GameData;
+import src.main.java.it.polimi.ingsw.timer.TimerBehavior;
 
 import java.util.UUID;
 
@@ -10,7 +11,7 @@ import java.util.UUID;
  * Represents an abstract playable game phase.
  * Defines the structure for different game phases that can be played.
  */
-public abstract class PlayableGamePhase {
+public abstract class PlayableGamePhase implements TimerBehavior {
 
     /** The type of the game phase. */
     GamePhaseType gamePhaseType;
