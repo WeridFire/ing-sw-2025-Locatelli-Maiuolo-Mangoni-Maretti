@@ -42,6 +42,15 @@ public class Game {
     }
 
     /**
+     * Returns the timer of this game.
+     *
+     * @return the {@code Timer} of the game
+     */
+    public Timer getTimer() {
+        return timer;
+    }
+
+    /**
      * Starts and manages the game loop.
      * <p>
      * This method is currently a placeholder and needs to be implemented.
