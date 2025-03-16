@@ -2,6 +2,8 @@ package src.main.java.it.polimi.ingsw.util;
 
 import src.main.java.it.polimi.ingsw.enums.Direction;
 
+import java.util.Objects;
+
 /**
  * Represents a coordinate in a grid-based system.
  * Each coordinate is defined by a row and a column and is uniquely identified by an ID.
@@ -85,6 +87,26 @@ public class Coordinates {
     @Override
     public String toString() {
         return "(" + row + "; " + column + ")";
+    }
+
+    /* implementation of equals and hashCode needed to work with new coordinates object but have the same behavior.
+    Example:
+        board.put(new Coordinates(5, 5), new Tile());
+        Tile t = board.get(new Coordinates(5, 5));
+    -> tile t will be the tile put in the line above!
+     */
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Coordinates that = (Coordinates) obj;
+        return row == that.row && column == that.column;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(row, column);
     }
 }
 

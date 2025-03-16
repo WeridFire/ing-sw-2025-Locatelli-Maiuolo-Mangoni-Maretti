@@ -40,8 +40,8 @@ public class TileContentBattery extends TileContentContainer {
     }
 
     @Override
-    public boolean hasBattery(BatteryType batteryType) {
-        return countLoaded(batteryType) > 0;
+    public int countBatteries(BatteryType batteryType) {
+        return countLoaded(batteryType);
     }
 
     @Override

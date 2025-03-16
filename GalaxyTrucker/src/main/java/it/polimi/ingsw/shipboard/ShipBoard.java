@@ -13,25 +13,85 @@ import java.util.*;
 
 /**
  * Represents a ship board where tiles can be placed according to the game level's constraints.
- * Each tile is mapped to specific coordinates, ensuring valid placement (following the rules) and retrieval.
- * Other methods must be implemented.
+ * It provides methods to retrieve and update tiles while ensuring the validity of placements.
+ * <p>
+ * The board also maintains an instance of {@link ShipStatistics} to automatically track relevant statistics,
+ * like different power sources, crew members, and goods value.
+ * Additionally, it supports an observer pattern to notify listeners when the board state changes.
  */
 public class ShipBoard {
 
     /** The game level, which defines the board's constraints. */
     private final GameLevel level;
 
-    /** A mapping between coordinate IDs and the corresponding tiles placed on the board. */
-    private final HashMap<Integer, Tile> board;
+    /** A mapping between coordinates and the corresponding tiles placed on the board.
+     * Ensures that values are never null.
+     */
+    private final HashMap<Coordinates, Tile> board;
+
+    /** The statistics tracker for this ship board. */
+    private final ShipStatistics statistics;
+
+    /** A list of listeners observing changes to the board. */
+    private final List<ShipBoardListener> listeners = new ArrayList<>();
 
     /**
      * Constructs a new ship board for the given game level.
+     * Initializes an empty board and its corresponding statistics tracker.
      *
      * @param level The game level defining the board's constraints.
      */
     public ShipBoard(GameLevel level) {
         this.level = level;
         board = new HashMap<>();
+        statistics = new ShipStatistics(this);
+    }
+
+    /**
+     * Adds a listener that will be notified when the board state changes.
+     *
+     * @param listener The listener to add.
+     */
+    public void addListener(ShipBoardListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * Notifies all registered listeners that the board state has been updated.
+     */
+    private void notifyListeners() {
+        for (ShipBoardListener listener : listeners) {
+            listener.onShipBoardUpdated();
+        }
+    }
+
+    /**
+     * Retrieves the statistics tracker for this board.
+     *
+     * @return The {@link ShipStatistics} instance associated with this board.
+     */
+    public ShipStatistics getStatistics() {
+        return statistics;
+    }
+
+    /**
+     * Retrieves the set of coordinates that are currently occupied by tiles on the board.
+     * The returned set is unmodifiable to prevent external modifications.
+     *
+     * @return An unmodifiable set of coordinates where tiles are placed.
+     */
+    public Set<Coordinates> getOccupiedCoordinates() {
+        return Collections.unmodifiableSet(board.keySet());
+    }
+
+    /**
+     * Retrieves a set of all tiles currently placed on the board, mapped to their coordinates.
+     * The returned set is unmodifiable to prevent external modifications.
+     *
+     * @return An unmodifiable set of map entries, each containing a coordinate and the associated tile.
+     */
+    public Set<Map.Entry<Coordinates, Tile>> getTilesOnBoard() {
+        return Collections.unmodifiableSet(board.entrySet());
     }
 
     /**
@@ -46,7 +106,7 @@ public class ShipBoard {
         if (!BoardCoordinates.isOnBoard(level, coordinates)) {
             throw new OutOfBuildingAreaException(level, coordinates);
         }
-        Tile result = board.get(coordinates.getID());
+        Tile result = board.get(coordinates);
         if (result == null) {
             throw new NoTileFoundException(coordinates);
         }
@@ -70,10 +130,11 @@ public class ShipBoard {
         if (!BoardCoordinates.isOnBoard(level, coordinates)) {
             throw new OutOfBuildingAreaException(level, coordinates);
         }
-        if (board.containsKey(coordinates.getID())) {
-            throw new TileAlreadyPresentException(coordinates, board.get(coordinates.getID()));
+        if (board.containsKey(coordinates)) {
+            throw new TileAlreadyPresentException(coordinates, board.get(coordinates));
         }
-        board.put(coordinates.getID(), tile);
+        board.put(coordinates, tile);
     }
+
 }
 
