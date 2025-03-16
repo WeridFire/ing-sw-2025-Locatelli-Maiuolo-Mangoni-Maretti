@@ -53,5 +53,5 @@ public abstract class PlayableGamePhase implements TimerBehavior {
      * Defines the main gameplay loop for this phase.
      * To be implemented by subclasses.
      */
-    public void playLoop(){}
+    public abstract void playLoop();
 }
