@@ -2,6 +2,8 @@ package src.main.java.it.polimi.ingsw.cards;
 
 import src.main.java.it.polimi.ingsw.player.Player;
 
+import java.util.UUID;
+
 public abstract class EnemyCard extends Card {
 
     /**
@@ -18,9 +20,10 @@ public abstract class EnemyCard extends Card {
      * @param lostDays days required to loot this enemy
      * @param textureName the texture of the card
      * @param level the level this card is part of
+     * @param gameId the ID of the game this card is part of.
      */
-    public EnemyCard(int firePower, int lostDays, String textureName, int level) {
-        super(textureName, level);
+    public EnemyCard(int firePower, int lostDays, String textureName, int level, UUID gameId) {
+        super(textureName, level, gameId);
         this.firePower = firePower;
         this.lostDays = lostDays;
     }

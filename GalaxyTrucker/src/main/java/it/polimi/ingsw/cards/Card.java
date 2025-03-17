@@ -12,11 +12,18 @@ public abstract class Card {
      * The texture associated with this card.
      */
     private String textureName;
+    private UUID gameId;
 
-
-    public Card(String textureName, int level){
+    /**
+     * Instances a card.
+     * @param textureName The name of the texture of the card.
+     * @param level The level of this card.
+     * @param gameId The ID of the game this card is part of.
+     */
+    public Card(String textureName, int level, UUID gameId){
         this.textureName = textureName;
         this.level = level;
+        this.gameId = gameId;
     };
 
     /**

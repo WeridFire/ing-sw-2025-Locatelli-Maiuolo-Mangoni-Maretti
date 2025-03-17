@@ -2,6 +2,8 @@ package src.main.java.it.polimi.ingsw.cards;
 
 import src.main.java.it.polimi.ingsw.GamesHandler;
 import src.main.java.it.polimi.ingsw.cards.projectile.Projectile;
+import src.main.java.it.polimi.ingsw.enums.PowerType;
+import src.main.java.it.polimi.ingsw.game.Game;
 import src.main.java.it.polimi.ingsw.player.Player;
 
 import java.util.UUID;
@@ -18,8 +20,9 @@ public class PiratesCard extends EnemyCard{
     private Projectile[] punishHits;
 
 
-    public PiratesCard(int prizeBounty, Projectile[] punishHits, int firePower, int lostDays, String textureName, int level){
-		super(firePower, lostDays, textureName, level);
+    public PiratesCard(int prizeBounty, Projectile[] punishHits, int firePower,
+                       int lostDays, String textureName, int level, UUID gameId){
+		super(firePower, lostDays, textureName, level, gameId);
         this.prizeBounty = prizeBounty;
         this.punishHits = punishHits;
 
@@ -42,6 +45,13 @@ public class PiratesCard extends EnemyCard{
      */
     @Override
     public void playEffect(UUID gameId) {
-        //TBD
+        for(Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers()){
+            if(p.getShipBoard().getStatistics().getFreePower(PowerType.FIRE) > getFirePower()){
+                givePrize(p);
+                break;
+            }else if(p.getShipBoard().getStatistics().getFreePower(PowerType.FIRE) < getFirePower()){
+                applyPunishment(p);
+            }
+        }
     }
 }
