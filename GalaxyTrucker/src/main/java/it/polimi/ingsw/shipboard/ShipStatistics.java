@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
  *
  * <p> Other functions can be implemented here for the retrieval of other shipboard statistics. </p>
  *
- * <p>The statistics are cached for performance reasons and are automatically invalidated when the shipboard
- * updates (via the {@link ShipBoardListener} interface).</p>
+ * <p> The statistics are cached for performance reasons and are automatically invalidated when the shipboard
+ * updates (via the {@link ShipBoardListener} interface). </p>
  */
 public class ShipStatistics implements ShipBoardListener {
     /**
@@ -50,6 +50,29 @@ public class ShipStatistics implements ShipBoardListener {
      * This value is computed lazily and cached until invalidated.
      */
     private Integer crewMembersCount = null;
+    /* TODO: PROBLEM! what if I retrieve the Tile content and change it directly?
+      This behavior will not trigger any invalidation...
+      -> E.g. crew members will be removed but not listened from ShipStatistics
+      * reflection would solve this (call directly from tiles when modified,
+        maybe only OnContentChange to recalculate only content and not for example the exposed connectors)
+      * OR should we not be able to directly access tiles but only through the shipboard?
+      ---
+      Instead of exposing Tile directly, we could force all modifications to go through ShipBoard,
+      ensuring proper invalidation. How?
+        * Make getTile(Coordinates) return an unmodifiable version of the Tile.
+        * Instead of tile.getContent().removeCrewMember(),
+          force usage of shipBoard.modifyTileContent(coordinate, Consumer<Tile> action).
+        Example:
+        public class ShipBoard {
+            public void modifyTileContent(Coordinates coord, Consumer<Tile> action) {
+                try {
+                    Tile tile = getTile(coord);
+                    action.accept(tile);
+                    notifyListeners();
+                } catch(...) {}
+            }
+        }
+     */
 
     /**
      * A cached mapping of crew member distribution on the ship.
@@ -327,16 +350,18 @@ public class ShipStatistics implements ShipBoardListener {
      */
     private int calculateExposedConnectors() {
         int value = 0;
+        // iterate all the tiles onto the shipboard
         for (Map.Entry<Coordinates, Tile> tileOnBoard : shipBoard.getTilesOnBoard()) {
             Coordinates tileCoordinates = tileOnBoard.getKey();
             Tile tile = tileOnBoard.getValue();
+            // for each tile iterate its neighbors
             for (Map.Entry<Direction, Tile> neighbor : shipBoard.getNeighborTiles(tileCoordinates)) {
                 Tile neighborTile = neighbor.getValue();
                 if (neighborTile == null) {  // no neighbor in that direction
                     Direction directionNotANeighbor = neighbor.getKey();
                     if (tile.getSide(directionNotANeighbor).getConnector() != ConnectorType.SMOOTH) {
                         // exposed connector (not a smooth side)
-                        // in the direction of a neighbor tile place without a tile placed
+                        // in the direction of a neighbor tile space without a tile placed
                         value++;
                     }
                 }
