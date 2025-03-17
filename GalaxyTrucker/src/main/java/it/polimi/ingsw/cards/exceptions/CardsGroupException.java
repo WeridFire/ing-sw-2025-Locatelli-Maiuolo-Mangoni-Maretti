@@ -1,6 +1,6 @@
 package src.main.java.it.polimi.ingsw.cards.exceptions;
 
-public class CardsGroupException extends RuntimeException {
+public class CardsGroupException extends Exception {
     public CardsGroupException(String message) {
         super(message);
     }

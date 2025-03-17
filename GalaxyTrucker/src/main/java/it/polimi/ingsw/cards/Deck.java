@@ -18,7 +18,15 @@ public class Deck {
      * @param level The deck level.
      */
     public Deck(int level){
+        switch(level){
+            case 0:
 
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+        }
     }
 
     /**

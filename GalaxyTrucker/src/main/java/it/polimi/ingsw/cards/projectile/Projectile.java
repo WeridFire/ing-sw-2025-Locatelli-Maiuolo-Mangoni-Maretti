@@ -1,4 +1,4 @@
-package src.main.java.it.polimi.ingsw.cards;
+package src.main.java.it.polimi.ingsw.cards.projectile;
 
 import src.main.java.it.polimi.ingsw.enums.Direction;
 
