@@ -1,6 +1,5 @@
 package src.main.java.it.polimi.ingsw.shipboard;
 
-import src.main.java.it.polimi.ingsw.enums.Direction;
 import src.main.java.it.polimi.ingsw.enums.GameLevel;
 import src.main.java.it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
 import src.main.java.it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
