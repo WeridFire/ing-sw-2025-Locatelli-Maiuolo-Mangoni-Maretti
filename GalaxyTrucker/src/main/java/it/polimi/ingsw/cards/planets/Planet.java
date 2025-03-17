@@ -12,8 +12,6 @@ public class Planet {
 	 */
 	private List<CargoType> availableGoods;
 
-
-
 	/**
 	 * The player currently landed on the planet.
 	 */

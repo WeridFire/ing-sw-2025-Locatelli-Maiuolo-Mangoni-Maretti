@@ -37,7 +37,7 @@ public class PlanetsCard extends Card {
 	 */
 	public Planet getPlanet(int i) throws PlanetsCardException{
 		if(i<0 || i >= planets.length){
-			throw new PlanetsCardException("Could not find a planet with this index.")
+			throw new PlanetsCardException("Could not find a planet with this index.");
 		}
 		return planets[i];
 	}
@@ -52,10 +52,13 @@ public class PlanetsCard extends Card {
 		for (Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers()){
 			//TODO: ask player if they wanna land. We should get here directly the reference to the planet to land on.
 			//TODO: the check that ID is valid AND the planet is free should be handled in the controller.
-
-			Planet planet = getPlanet(0);
-			planet.landPlayer(p);
-
+			Planet planet = null;
+			try {
+				planet = getPlanet(0);
+				planet.landPlayer(p);
+			} catch (PlanetsCardException e) {
+				//TODO: get singleton of controller for the game, send message of error to player.
+			}
 		}
 		for(Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers().reversed()){
 			Planet landedPlanet = Arrays.stream(planets)
