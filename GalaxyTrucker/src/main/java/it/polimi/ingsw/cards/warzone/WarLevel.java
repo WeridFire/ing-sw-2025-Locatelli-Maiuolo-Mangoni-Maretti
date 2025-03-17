@@ -8,19 +8,42 @@ import java.util.function.Consumer;
 
 public class WarLevel {
 
+	/**
+	 * The criteria used to select the worst player in this level.
+	 */
 	private WarCriteria warCriteria;
+
+	/**
+	 * The function applied to the worst player, the punishment.
+	 */
 	private Consumer<Player> punishmentFunction;
 
+	/**
+	 * Instances a war level. Multiple war levels build up to a war zone.
+	 * @param warCriteria Use a warfactory to generate this. A criteria to decide the worst player to punish.
+	 * @param punishmentFunction Use a warfactory to generate this. The punishment function to
+	 *                              apply to the selected player
+	 */
 	public WarLevel(WarCriteria warCriteria, Consumer<Player> punishmentFunction) {
 		this.warCriteria = warCriteria;
 		this.punishmentFunction = punishmentFunction;
 	}
 
+	/**
+	 * Selects the worst player out of the players in the game instance. Uses the warcriteria declared in building
+	 * of the instance
+	 * @param gameId
+	 * @return
+	 */
 	public Player getWorstPlayer(UUID gameId) {
 		return GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers()
 				.stream().min(warCriteria.getComparator()).orElse(null);
 	}
 
+	/**
+	 * Applies the punishment associated to this war level to a player.
+	 * @param p
+	 */
 	public void applyPunishment(Player p) {
 		punishmentFunction.accept(p);
 	}
