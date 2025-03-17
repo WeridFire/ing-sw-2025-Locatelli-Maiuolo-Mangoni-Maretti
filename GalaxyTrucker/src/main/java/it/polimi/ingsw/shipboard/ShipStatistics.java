@@ -2,6 +2,7 @@ package src.main.java.it.polimi.ingsw.shipboard;
 
 import src.main.java.it.polimi.ingsw.enums.BatteryType;
 import src.main.java.it.polimi.ingsw.enums.PowerType;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.Tile;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
 import java.util.*;
@@ -67,10 +68,16 @@ public class ShipStatistics implements ShipBoardListener {
     private Map<Coordinates, Integer> batteriesLocationQuantity = null;
 
     /**
-     * The total monetary value of all goods stored in the ship.
+     * The total monetary value (in cosmic credits) of all goods stored in the ship.
      * This value is computed lazily and cached until invalidated.
      */
     private Integer goodsValue = null;
+
+    /**
+     * The total count of exposed connectors.
+     * This value is computed lazily and cached until invalidated.
+     */
+    private Integer exposedConnectors = null;
 
 
     /**
@@ -109,6 +116,7 @@ public class ShipStatistics implements ShipBoardListener {
         batteriesLocationQuantity = null;
 
         goodsValue = null;
+        exposedConnectors = null;
     }
 
     /**
@@ -211,6 +219,19 @@ public class ShipStatistics implements ShipBoardListener {
         return goodsValue;
     }
 
+    /**
+     * Returns the number of exposed connectors on the ship.
+     * If the value is not cached, it is computed and stored.
+     *
+     * @return the number of exposed connectors
+     */
+    public int getExposedConnectors() {
+        if (exposedConnectors == null) {
+            exposedConnectors = calculateExposedConnectors();
+        }
+        return exposedConnectors;
+    }
+
     // Private methods to calculate statistics
 
     /**
@@ -293,6 +314,16 @@ public class ShipStatistics implements ShipBoardListener {
         return shipBoard.getTilesOnBoard().stream()
                 .map(entry -> entry.getValue().getContent().calculateItemsSellingPrice())
                 .reduce(0, Integer::sum);
+    }
+
+    /**
+     * Count the total number of exposed connectors.
+     *
+     * @return The total number of exposed connectors.
+     */
+    private int calculateExposedConnectors() {
+        // TODO: calculate exposed connectors
+        return 0;
     }
 }
 
