@@ -19,7 +19,6 @@ public class PiratesCard extends EnemyCard{
      */
     private Projectile[] punishHits;
 
-
     public PiratesCard(int prizeBounty, Projectile[] punishHits, int firePower,
                        int lostDays, String textureName, int level, UUID gameId){
 		super(firePower, lostDays, textureName, level, gameId);
@@ -35,7 +34,7 @@ public class PiratesCard extends EnemyCard{
 
     @Override
     public void applyPunishment(Player player) {
-
+        //TO BE DONE
     }
 
     /**
@@ -46,6 +45,7 @@ public class PiratesCard extends EnemyCard{
     @Override
     public void playEffect(UUID gameId) {
         for(Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers()){
+            //TBD Implement logic of asking player what power they wanna use
             if(p.getShipBoard().getStatistics().getFreePower(PowerType.FIRE) > getFirePower()){
                 givePrize(p);
                 break;
