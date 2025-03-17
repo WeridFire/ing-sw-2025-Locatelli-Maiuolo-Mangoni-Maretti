@@ -50,7 +50,7 @@ public class EpidemicCard extends Card{
 				try {
 					tile.getContent().removeCrew(1);
 				} catch (UnsupportedLoadableItemException e) {
-					//TODO: ignore error as we know the tile is valid
+					//TODO: ignore error as we know the tile is valid, find a clean way to do this.
 				}
 			});
 		}
