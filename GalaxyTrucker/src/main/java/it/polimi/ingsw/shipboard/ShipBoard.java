@@ -1,5 +1,6 @@
 package src.main.java.it.polimi.ingsw.shipboard;
 
+import src.main.java.it.polimi.ingsw.enums.Direction;
 import src.main.java.it.polimi.ingsw.enums.GameLevel;
 import src.main.java.it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
 import src.main.java.it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
@@ -75,25 +76,34 @@ public class ShipBoard {
     }
 
     /**
-     * Retrieves the set of coordinates that are currently occupied by tiles on the board.
-     * The returned set is unmodifiable to prevent external modifications.
-     *
-     * @return An unmodifiable set of coordinates where tiles are placed.
-     */
-    public Set<Coordinates> getOccupiedCoordinates() {
-        return Collections.unmodifiableSet(board.keySet());
-    }
-
-    /**
      * Retrieves a set of all tiles currently placed on the board, mapped to their coordinates.
      * The returned set is unmodifiable to prevent external modifications.
      *
      * @return An unmodifiable set of map entries, each containing a coordinate and the associated tile.
      */
     public Set<Map.Entry<Coordinates, Tile>> getTilesOnBoard() {
-        return Collections.unmodifiableSet(board.entrySet());
+        return Set.copyOf(board.entrySet());
     }
 
+    /**
+     * Retrieves the set of coordinates that are currently occupied by tiles on the board.
+     * The returned set is unmodifiable to prevent external modifications.
+     *
+     * @return An unmodifiable set of coordinates where tiles are placed.
+     */
+    public Set<Coordinates> getOccupiedCoordinates() {
+        return Set.copyOf(board.keySet());
+    }
+
+    /**
+     * Retrieves a set of all the tiles currently placed on the board.
+     * The returned set is unmodifiable to prevent external modifications.
+     *
+     * @return An unmodifiable set of all and only the tiles placed onto the shipboard.
+     */
+    public Set<Tile> getTiles() {
+        return Set.copyOf(board.values());
+    }
 
     /**
      * Retrieves only the tiles placed in the provided coordinates.
@@ -102,7 +112,7 @@ public class ShipBoard {
      * @param coordinates The coordinates to check to retrieve tiles.
      * @return All and only the tiles placed onto the shipboard which share the position with the provided coordinates.
      */
-    public Set<Tile> getPlacedTiles(Set<Coordinates> coordinates) {
+    public Set<Tile> getTiles(Set<Coordinates> coordinates) {
         Set<Tile> placedTiles = new HashSet<>();
         for (Coordinates coordinate : coordinates) {
             try {
@@ -112,6 +122,37 @@ public class ShipBoard {
             }
         }
         return placedTiles;
+    }
+
+    /**
+     * Retrieves a set of mapping of neighboring tiles relative to the given coordinates.
+     * <p>
+     * This method checks all adjacent coordinates and attempts to retrieve the tiles at those positions.
+     * If a tile is not found or is outside the valid building area, that direction is associated to a null tile.
+     * </p>
+     *
+     * @param coordinates The coordinates for which to retrieve neighboring tiles.
+     * @return A {@code HashMap} where:
+     * <ul>
+     *     <li>keys are directions</li>
+     *     <li>values are the corresponding tiles (or {@code null} if there is no tile in that place).</li>
+     * </ul>
+     */
+    public Set<Map.Entry<Direction, Tile>> getNeighborTiles(Coordinates coordinates) {
+        HashMap<Direction, Tile> neighborTiles = new HashMap<>();
+
+        for (Map.Entry<Direction, Coordinates> entry : coordinates.neighbors()) {
+            Direction direction = entry.getKey();
+            Coordinates coords = entry.getValue();
+
+            try {
+                neighborTiles.put(direction, getTile(coords));
+            } catch (NoTileFoundException | OutOfBuildingAreaException e) {
+                neighborTiles.put(direction, null);
+            }
+        }
+
+        return neighborTiles.entrySet();
     }
 
     /**
