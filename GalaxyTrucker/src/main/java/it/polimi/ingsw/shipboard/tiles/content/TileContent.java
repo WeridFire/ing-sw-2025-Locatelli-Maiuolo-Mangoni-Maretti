@@ -4,7 +4,6 @@ import src.main.java.it.polimi.ingsw.enums.*;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.*;
 import src.main.java.it.polimi.ingsw.util.ContrabandCalculator;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
