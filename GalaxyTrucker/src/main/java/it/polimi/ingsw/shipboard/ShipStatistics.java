@@ -1,6 +1,8 @@
 package src.main.java.it.polimi.ingsw.shipboard;
 
 import src.main.java.it.polimi.ingsw.enums.BatteryType;
+import src.main.java.it.polimi.ingsw.enums.ConnectorType;
+import src.main.java.it.polimi.ingsw.enums.Direction;
 import src.main.java.it.polimi.ingsw.enums.PowerType;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.Tile;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
@@ -318,12 +320,29 @@ public class ShipStatistics implements ShipBoardListener {
 
     /**
      * Count the total number of exposed connectors.
+     * Check each tile and count its exposed connectors (iff it's a non-smooth side facing an empty tile-space),
+     * summing all the partial values to get the total result.
      *
      * @return The total number of exposed connectors.
      */
     private int calculateExposedConnectors() {
-        // TODO: calculate exposed connectors
-        return 0;
+        int value = 0;
+        for (Map.Entry<Coordinates, Tile> tileOnBoard : shipBoard.getTilesOnBoard()) {
+            Coordinates tileCoordinates = tileOnBoard.getKey();
+            Tile tile = tileOnBoard.getValue();
+            for (Map.Entry<Direction, Tile> neighbor : shipBoard.getNeighborTiles(tileCoordinates)) {
+                Tile neighborTile = neighbor.getValue();
+                if (neighborTile == null) {  // no neighbor in that direction
+                    Direction directionNotANeighbor = neighbor.getKey();
+                    if (tile.getSide(directionNotANeighbor).getConnector() != ConnectorType.SMOOTH) {
+                        // exposed connector (not a smooth side)
+                        // in the direction of a neighbor tile place without a tile placed
+                        value++;
+                    }
+                }
+            }
+        }
+        return value;
     }
 }
 
