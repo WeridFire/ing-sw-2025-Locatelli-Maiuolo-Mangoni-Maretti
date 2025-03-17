@@ -1,5 +1,6 @@
 package src.main.java.it.polimi.ingsw.shipboard;
 
+import src.main.java.it.polimi.ingsw.enums.Direction;
 import src.main.java.it.polimi.ingsw.enums.GameLevel;
 import src.main.java.it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
 import src.main.java.it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
@@ -92,6 +93,26 @@ public class ShipBoard {
      */
     public Set<Map.Entry<Coordinates, Tile>> getTilesOnBoard() {
         return Collections.unmodifiableSet(board.entrySet());
+    }
+
+
+    /**
+     * Retrieves only the tiles placed in the provided coordinates.
+     * If a coordinate value is not associated with a tile (no tile found) it is simply not considered.
+     *
+     * @param coordinates The coordinates to check to retrieve tiles.
+     * @return All and only the tiles placed onto the shipboard which share the position with the provided coordinates.
+     */
+    public Set<Tile> getPlacedTiles(Set<Coordinates> coordinates) {
+        Set<Tile> placedTiles = new HashSet<>();
+        for (Coordinates coordinate : coordinates) {
+            try {
+                placedTiles.add(getTile(coordinate));
+            } catch (OutOfBuildingAreaException | NoTileFoundException e) {
+                // do nothing: ok
+            }
+        }
+        return placedTiles;
     }
 
     /**
