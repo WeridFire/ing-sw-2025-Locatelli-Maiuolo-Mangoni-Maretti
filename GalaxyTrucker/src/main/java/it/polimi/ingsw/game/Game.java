@@ -51,6 +51,12 @@ public class Game {
     }
 
     /**
+     * Returns the game data of this game.
+     * @return the {@code GameData} of the game.
+     */
+    public GameData getGameData() {return gameData;}
+
+    /**
      * Starts and manages the game loop.
      * <p>
      * This method is currently a placeholder and needs to be implemented.
@@ -72,4 +78,5 @@ public class Game {
         this.gameData = gameData;
         return true;
     }
+
 }
