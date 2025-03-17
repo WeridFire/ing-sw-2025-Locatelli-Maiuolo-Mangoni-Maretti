@@ -1,12 +1,17 @@
 package src.main.java.it.polimi.ingsw.shipboard;
 
+import src.main.java.it.polimi.ingsw.enums.CargoType;
 import src.main.java.it.polimi.ingsw.enums.Direction;
 import src.main.java.it.polimi.ingsw.enums.GameLevel;
 import src.main.java.it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
 import src.main.java.it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import src.main.java.it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.Tile;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.content.ILoadableItem;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import src.main.java.it.polimi.ingsw.util.BoardCoordinates;
+import src.main.java.it.polimi.ingsw.util.ContrabandCalculator;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
 import java.util.*;
@@ -195,6 +200,60 @@ public class ShipBoard {
             throw new TileAlreadyPresentException(coordinates, board.get(coordinates));
         }
         board.put(coordinates, tile);
+    }
+
+
+
+    /**
+     * Removes the most valuable contraband cargo from the ship.
+     * The removal prioritizes the highest-value contraband items when the given quantity is reached.
+     *
+     * @param quantity The number of cargo items to remove.
+     */
+    public void removeMostValuableCargo(int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than zero: " + quantity + " provided.");
+        }
+
+        // priority queue to store cargo sorted by value in ascending order (head is the minimum)
+        PriorityQueue<Map.Entry<Coordinates, CargoType>> priorityQueue = new PriorityQueue<>(quantity + 1,
+                (e1, e2) -> ContrabandCalculator.ascendingContrabandComparator.compare(e1.getValue(), e2.getValue()));
+        int minimumContrabandValue = 0;
+
+        // iterate over all the tiles and retrieve contraband cargo
+        for (Map.Entry<Coordinates, Tile> tilesOnBoard : getTilesOnBoard()) {
+            Coordinates coordinates = tilesOnBoard.getKey();
+            Tile tile = tilesOnBoard.getValue();
+
+            PriorityQueue<ILoadableItem> cargo =
+                    tile.getContent().getContrabandMostValuableItems(quantity, minimumContrabandValue);
+
+            while (!cargo.isEmpty()) {
+                CargoType mostValuableCargo = (CargoType) cargo.poll();
+                priorityQueue.offer(Map.entry(coordinates, mostValuableCargo));
+
+                // update minimum contraband value to optimize next iteration
+                minimumContrabandValue = ContrabandCalculator.getContrabandValue(priorityQueue.peek().getValue());
+
+                // keep the size within quantity by removing the least valuable item (head)
+                if (priorityQueue.size() > quantity) {
+                    priorityQueue.poll();
+                }
+            }
+        }
+
+        // remove cargo from ship
+        while (!priorityQueue.isEmpty()) {
+            Map.Entry<Coordinates, CargoType> cargoToRemove = priorityQueue.poll();
+            try {
+                getTile(cargoToRemove.getKey()).getContent().removeCargo(cargoToRemove.getValue());
+            } catch (NotEnoughItemsException | UnsupportedLoadableItemException | OutOfBuildingAreaException |
+                     NoTileFoundException e) {
+                // should never happen, but just in case...
+                System.err.println("Failed to remove cargo " + cargoToRemove.getValue() +
+                        " at " + cargoToRemove.getKey() + ": " + e.getMessage());
+            }
+        }
     }
 
 }
