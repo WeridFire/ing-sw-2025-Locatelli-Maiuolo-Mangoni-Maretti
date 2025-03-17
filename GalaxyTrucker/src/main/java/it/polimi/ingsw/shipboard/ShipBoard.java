@@ -94,6 +94,26 @@ public class ShipBoard {
         return Collections.unmodifiableSet(board.entrySet());
     }
 
+
+    /**
+     * Retrieves only the tiles placed in the provided coordinates.
+     * If a coordinate value is not associated with a tile (no tile found) it is simply not considered.
+     *
+     * @param coordinates The coordinates to check to retrieve tiles.
+     * @return All and only the tiles placed onto the shipboard which share the position with the provided coordinates.
+     */
+    public Set<Tile> getPlacedTiles(Set<Coordinates> coordinates) {
+        Set<Tile> placedTiles = new HashSet<>();
+        for (Coordinates coordinate : coordinates) {
+            try {
+                placedTiles.add(getTile(coordinate));
+            } catch (OutOfBuildingAreaException | NoTileFoundException e) {
+                // do nothing: ok
+            }
+        }
+        return placedTiles;
+    }
+
     /**
      * Retrieves the tile located at the given coordinates.
      *

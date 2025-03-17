@@ -2,7 +2,9 @@ package src.main.java.it.polimi.ingsw.util;
 
 import src.main.java.it.polimi.ingsw.enums.Direction;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Represents a coordinate in a grid-based system.
@@ -82,6 +84,19 @@ public class Coordinates {
             default -> column;
         };
         return new Coordinates(newRow, newColumn);
+    }
+
+    /**
+     * Retrieves the neighbors of this coordinates going in all the possible directions.
+     *
+     * @return The neighbors of this coordinates going in all the possible directions.
+     */
+    public Set<Coordinates> getNeighbors() {
+        Set<Coordinates> neighbors = new HashSet<>();
+        for (Direction direction : Direction.values()) {
+            neighbors.add(getNext(direction));
+        }
+        return neighbors;
     }
 
     @Override
