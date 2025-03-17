@@ -19,6 +19,8 @@ public class SmugglersCard extends EnemyCard {
 	 * @param textureName the texture of the card
 	 * @param level       the level this card is part of
 	 * @param gameId      the ID of the game this card is part of.
+	 * @param punishCargo the amount of cargo to be removed from the player that is beaten by this card
+	 * @param prizeGoods The goods earned by the player that beats this card.
 	 */
 	public SmugglersCard(int punishCargo, CargoType[] prizeGoods, int firePower, int lostDays, String textureName, int level, UUID gameId) {
 		super(firePower, lostDays, textureName, level, gameId);
