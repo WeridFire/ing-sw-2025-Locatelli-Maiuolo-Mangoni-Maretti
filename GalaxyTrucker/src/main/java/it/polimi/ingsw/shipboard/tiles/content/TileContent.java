@@ -77,7 +77,7 @@ public class TileContent {
      * @throws UnsupportedLoadableItemException if the tile does not support crew loading.
      * @throws IllegalArgumentException if {@code count} is less than or equal to zero.
      */
-    public void removeCrew(int count) throws NotEnoughItemsException, UnsupportedLoadableItemException,
+    public void removeCrew(int count) throws UnsupportedLoadableItemException,
             IllegalArgumentException {
         throw new UnsupportedLoadableItemException("This tile does not support Crew loading!");
     }

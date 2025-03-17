@@ -102,14 +102,11 @@ public class ShipBoard {
      * @throws OutOfBuildingAreaException If the coordinates are outside the valid building area.
      * @throws NoTileFoundException If no tile is found at the given coordinates.
      */
-    public Tile getTile(Coordinates coordinates) throws OutOfBuildingAreaException, NoTileFoundException {
+    public Tile getTile(Coordinates coordinates) throws OutOfBuildingAreaException {
         if (!BoardCoordinates.isOnBoard(level, coordinates)) {
             throw new OutOfBuildingAreaException(level, coordinates);
         }
         Tile result = board.get(coordinates);
-        if (result == null) {
-            throw new NoTileFoundException(coordinates);
-        }
         return result;
     }
 
