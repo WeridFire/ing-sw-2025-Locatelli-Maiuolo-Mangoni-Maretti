@@ -1,5 +1,8 @@
-package src.main.java.it.polimi.ingsw.cards;
+package src.main.java.it.polimi.ingsw.cards.enemy;
 
+import src.main.java.it.polimi.ingsw.GamesHandler;
+import src.main.java.it.polimi.ingsw.cards.Card;
+import src.main.java.it.polimi.ingsw.enums.PowerType;
 import src.main.java.it.polimi.ingsw.player.Player;
 
 import java.util.UUID;
@@ -56,5 +59,17 @@ public abstract class EnemyCard extends Card {
         return lostDays;
     }
 
+    @Override
+    public void playEffect(UUID gameId) {
+        for(Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers()){
+            //TODO: Implement logic of asking player what power they wanna use
+            if(p.getShipBoard().getStatistics().getFreePower(PowerType.FIRE) > getFirePower()){
+                givePrize(p);
 
+                break;
+            }else if(p.getShipBoard().getStatistics().getFreePower(PowerType.FIRE) < getFirePower()){
+                applyPunishment(p);
+            }
+        }
+    }
 }

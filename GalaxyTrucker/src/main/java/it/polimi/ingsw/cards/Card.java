@@ -1,5 +1,7 @@
 package src.main.java.it.polimi.ingsw.cards;
 
+import src.main.java.it.polimi.ingsw.player.Player;
+
 import java.util.UUID;
 
 public abstract class Card {
@@ -28,10 +30,10 @@ public abstract class Card {
 
     /**
      * Given a player and an amount of positions, handles the movement of it on the game board.
-     * @param playerName The string name of the player.
+     * @param player The string name of the player.
      * @param position The amount of positions (or days) to move.
      */
-    public void movePlayer(String playerName, int position){
+    public void movePlayer(Player player, int position){
         //TBD - Implement the logic of moving the players.
     }
 
