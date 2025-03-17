@@ -43,15 +43,15 @@ public class Projectile {
         return new Projectile(true, true, false, direction);
     }
 
-    private static Projectile createBigMeteor(Direction direction) {
+    private static Projectile createLargeMeteor(Direction direction) {
         return new Projectile(false, false, true, direction);
     }
 
-    private static Projectile createSmallLaser(Direction direction) {
+    private static Projectile createLightCannonFire(Direction direction) {
         return new Projectile(false, true, false, direction);
     }
 
-    private static Projectile createBigLaser(Direction direction) {
+    private static Projectile createHeavyCannonFire(Direction direction) {
         return new Projectile(false, false, false, direction);
     }
 
