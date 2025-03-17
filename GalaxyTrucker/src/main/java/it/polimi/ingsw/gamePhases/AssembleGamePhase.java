@@ -35,7 +35,7 @@ public class AssembleGamePhase extends PlayableGamePhase{
         if (gameData.getLevel().equals(GameLevel.TESTFLIGHT)){
             this.howManyTimerRotationsLeft = -1;
         } else if (gameData.getLevel().equals(GameLevel.TWO)){
-            this.howManyTimerRotationsLeft = 2;
+            this.howManyTimerRotationsLeft = 3;
         }
 
         this.timer = GamesHandler.getInstance().getGame(gameId).getTimer();
@@ -49,7 +49,7 @@ public class AssembleGamePhase extends PlayableGamePhase{
         }
         // level two game logic
         timer.start();
-
+        howManyTimerRotationsLeft--;
     }
 
     @Override
@@ -61,16 +61,13 @@ public class AssembleGamePhase extends PlayableGamePhase{
     public void onTimerEnd() {
         if (howManyTimerRotationsLeft == 0){
             gameState = GameState.ENDED;
-            return;
         }
-        howManyTimerRotationsLeft--;
     }
 
     private void resetTimer() {
-        if (howManyTimerRotationsLeft < 0){
+        if (howManyTimerRotationsLeft == 0){
             throw new NoMoreTimerResetLeftException("No more timer reset");
         }
-        howManyTimerRotationsLeft--;
         timer.restart();
     }
 
