@@ -82,7 +82,7 @@ public class ShipStatistics implements ShipBoardListener {
     public ShipStatistics(ShipBoard shipBoard) {
         this.shipBoard = shipBoard;
         shipBoard.addListener(this);  // Register as listener
-        invalidateCache();  // Initialize cached values
+        invalidateCache();  // Initialize values as to be checked
     }
 
     /**
