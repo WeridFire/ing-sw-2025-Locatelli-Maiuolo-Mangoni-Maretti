@@ -2,9 +2,11 @@ package src.main.java.it.polimi.ingsw.shipboard.tiles.content;
 
 import src.main.java.it.polimi.ingsw.enums.*;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.*;
+import src.main.java.it.polimi.ingsw.util.ContrabandCalculator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 /**
@@ -134,7 +136,7 @@ public class TileContent {
      *        {@code minimumContrabandValueExclusive} is not considered.
      * @throws IllegalArgumentException if {@code minimumContrabandValueExclusive < 0}
      */
-    public List<ILoadableItem> getContrabandMostValuableItems(int limit, int minimumContrabandValueExclusive)
+    public PriorityQueue<ILoadableItem> getContrabandMostValuableItems(int limit, int minimumContrabandValueExclusive)
             throws IllegalArgumentException {
         if (limit <= 0) {
             throw new IllegalArgumentException("Limit must be greater than 0");
@@ -142,22 +144,22 @@ public class TileContent {
         if (minimumContrabandValueExclusive < 0) {
             throw new IllegalArgumentException("Minimum contraband value (exclusive) must be greater or equal to 0");
         }
-        return new ArrayList<>(0);
+        return new PriorityQueue<>(0, ContrabandCalculator.descendingContrabandComparator);
     }
 
     /**
      * Returns the most valuable loaded items present on this tile,
      * for smugglers, up to a given limit, in descending order.
      * <p>
-     * By default, this method returns an empty list.
+     * By default, this method returns an empty queue.
      * Subclasses that store contraband items should override it.
      * </p>
      *
      * @param limit the maximum number of items to return.
-     * @return a list of the most valuable loaded items, ordered by value in descending order.
+     * @return a priority queue of the most valuable loaded items, ordered by value in descending order.
      * @throws IllegalArgumentException if {@code limit <= 0}
      */
-    public List<ILoadableItem> getContrabandMostValuableItems(int limit) throws IllegalArgumentException {
+    public PriorityQueue<ILoadableItem> getContrabandMostValuableItems(int limit) throws IllegalArgumentException {
         return getContrabandMostValuableItems(limit, 0);
     }
 
