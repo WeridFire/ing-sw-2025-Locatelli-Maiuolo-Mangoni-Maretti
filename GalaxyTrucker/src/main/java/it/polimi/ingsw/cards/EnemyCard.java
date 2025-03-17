@@ -5,39 +5,37 @@ import src.main.java.it.polimi.ingsw.player.Player;
 public abstract class EnemyCard extends Card {
 
     /**
-     * This enemy firepower
+     * How many days are removed upon taking the prize of this enemy.
      */
-    private final int firePower;
-
+    private int lostDays;
     /**
-     * Days lost looting the wreckage of your enemy's ship
+     * The fire power necessary to beat this enemy.
      */
-    private final int lostDays;
+    private int firePower;
 
     /**
      * @param firePower firepower of this enemy
      * @param lostDays days required to loot this enemy
+     * @param textureName the texture of the card
+     * @param level the level this card is part of
      */
-    public EnemyCard(int firePower, int lostDays) {
+    public EnemyCard(int firePower, int lostDays, String textureName, int level) {
+        super(textureName, level);
         this.firePower = firePower;
         this.lostDays = lostDays;
     }
 
     /**
      * Method to assign the loot of the defeated ship to a player
-     * !!!Needs Implementation!!!
      * @param player player that is getting the loot
      */
-    public void givePrize(Player player){
-    }
+    public abstract void givePrize(Player player);
 
     /**
      * Method to punish the player that gets defeated by this enemy
-     * !!!Needs Implementation!!!
      * @param player player on which the method is currently acting upon
      */
-    public void applyPunishment(Player player){
-    }
+    public abstract void applyPunishment(Player player);
 
     /**
      *
@@ -55,11 +53,5 @@ public abstract class EnemyCard extends Card {
         return lostDays;
     }
 
-    /**
-     * Contains the card effect
-     * !!!Needs Implementation!!!
-     */
-    public void playEffect(){
-    }
 
 }

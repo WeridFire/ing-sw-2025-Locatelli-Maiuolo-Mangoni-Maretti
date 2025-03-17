@@ -1,32 +1,47 @@
 package src.main.java.it.polimi.ingsw.cards;
 
+import src.main.java.it.polimi.ingsw.GamesHandler;
+import src.main.java.it.polimi.ingsw.cards.projectile.Projectile;
 import src.main.java.it.polimi.ingsw.player.Player;
+
+import java.util.UUID;
 
 public class PiratesCard extends EnemyCard{
 
     /**
-     * Bounty awarded to the player defeating the pirates
+     * The amount of cash bounty given to the player that defeats this pirate.
      */
-    private final int prizeBounty;
-
+    private int prizeBounty;
     /**
-     * Hits hitting the players that were defeated by the pirateship
+     * The projectiles that punish the player when they are beaten by this pirate.
      */
-    private final Projectile[] projectile;
+    private Projectile[] punishHits;
 
-    public PiratesCard(int firePower, int lostDays, int prizeBounty, Projectile[] projectile) {
-        super(firePower, lostDays);
+
+    public PiratesCard(int prizeBounty, Projectile[] punishHits, int firePower, int lostDays, String textureName, int level){
+		super(firePower, lostDays, textureName, level);
         this.prizeBounty = prizeBounty;
-        this.projectile = projectile;
-    }
+        this.punishHits = punishHits;
+
+	}
 
     @Override
     public void givePrize(Player player) {
-        super.givePrize(player);
+        player.addCredits(prizeBounty);
     }
 
     @Override
     public void applyPunishment(Player player) {
-        super.applyPunishment(player);
+
+    }
+
+    /**
+     * Iterates through each player and checks if they can beat the pirate. If so awards the prize and stops.
+     * If not applies punishment to player and proceeds to the next player.
+     * @param gameId The UUID of the game associated to this card, to access the game handler.
+     */
+    @Override
+    public void playEffect(UUID gameId) {
+        //TBD
     }
 }
