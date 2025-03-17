@@ -31,6 +31,7 @@ public class Deck {
             case 2:
                 break;
         }
+        //TODO: implement extracting cards from pool and splitting them in subgroups
     }
 
     /**
