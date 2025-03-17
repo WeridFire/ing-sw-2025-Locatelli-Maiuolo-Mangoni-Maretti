@@ -59,9 +59,14 @@ public class TileContentCrew extends TileContentContainer {
     }
 
     @Override
-    public void removeCrew(int count) throws IllegalArgumentException {
+    public void removeCrew(int count) throws NotEnoughItemsException, IllegalArgumentException {
         if (count <= 0) {
             throw new IllegalArgumentException("Attempt to remove crew members less than or equal to zero!");
+        }
+        int loadedMembers = countLoaded(loadedCrewType);
+        if (loadedMembers < count) {
+            throw new NotEnoughItemsException("Attempt to remove " + count
+                    + " crew members where there are " + loadedMembers + "!");
         }
         removeAny(count);
     }

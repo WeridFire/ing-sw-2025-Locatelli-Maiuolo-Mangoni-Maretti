@@ -3,6 +3,7 @@ package src.main.java.it.polimi.ingsw.cards;
 import src.main.java.it.polimi.ingsw.GamesHandler;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.Tile;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
@@ -49,7 +50,7 @@ public class EpidemicCard extends Card{
 			valid.forEach(tile -> {
 				try {
 					tile.getContent().removeCrew(1);
-				} catch (UnsupportedLoadableItemException e) {
+				} catch (UnsupportedLoadableItemException | NotEnoughItemsException e) {
 					//TODO: ignore error as we know the tile is valid, find a clean way to do this.
 				}
 			});
