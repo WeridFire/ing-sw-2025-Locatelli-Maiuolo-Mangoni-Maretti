@@ -2,6 +2,7 @@ package src.main.java.it.polimi.ingsw.cards;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Deck {
     /**
@@ -17,14 +18,15 @@ public class Deck {
     /**
      * Instance a deck with randomly selected cards, based on a level.
      * @param level The deck level.
+     * @param gameId The id of the associated game.
      */
-    public Deck(int level){
-
+    public Deck(int level, UUID gameId){
         switch(level){
             case 0:
-
+                this.deck = DeckFactory.createTutorialDeck(gameId);
                 break;
             case 1:
+                this.deck = DeckFactory.createLevelOneDeck(gameId);
                 break;
             case 2:
                 break;
