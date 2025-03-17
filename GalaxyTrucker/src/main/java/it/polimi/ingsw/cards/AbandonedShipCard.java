@@ -6,48 +6,50 @@ import src.main.java.it.polimi.ingsw.player.Player;
 
 import java.util.UUID;
 
-public class AbandonedStationCard extends Card{
+public class AbandonedShipCard extends Card{
+
 	/**
-	 * Cargo available on the ship. TODO: consider if to convert to dynamic?
+	 * The crew that is required and will be taken away when taking the ship.
 	 */
-	private CargoType[] availableCargo;
+	private int requiredCrew;
 	/**
-	 * The days removed when looting the station.
+	 * The days removed when taking the ship.
 	 */
 	private int lostDays;
 	/**
-	 * The crew required to access the station.
+	 * The credits earned upon fixing and selling the ship.
 	 */
-	private int requiredCrew;
+	private int sellPrice;
 
 	/**
 	 * Instances a card.
-	 * @param availableCargo the cargo available on the abandoned ship.
-	 * @param lostDays the lost days in case of ship looting.
-	 * @param requiredCrew the amount of crew required to loot the station.
+	 * @param requiredCrew the crew that is required and will be taken away when selling the ship.
+	 * @param lostDays the days removed when taking the ship.
+	 * @param sellPrice the credits earned upon fixing and selling the ship.
 	 * @param textureName The name of the texture of the card.
 	 * @param level       The level of this card.
 	 * @param gameId      The ID of the game this card is part of.
 	 */
-	public AbandonedStationCard(CargoType[] availableCargo, int lostDays, int requiredCrew, String textureName, int level, UUID gameId) {
+	public AbandonedShipCard(int requiredCrew, int lostDays, int sellPrice, String textureName, int level, UUID gameId) {
 		super(textureName, level, gameId);
-		this.availableCargo = availableCargo;
-		this.lostDays = lostDays;
 		this.requiredCrew = requiredCrew;
+		this.lostDays = lostDays;
+		this.sellPrice = sellPrice;
 	}
 
 	/**
-	 * Iterates through each player, looking for the first one that can (and wants) to take over the station.
+	 * Iterates through each player, checking if they can take the ship. If they can (and want), removes crew from their
+	 * ship and awards the credits.
 	 * @param gameId The UUID of the game associated to this card, to access the game handler.
 	 */
 	@Override
 	public void playEffect(UUID gameId) {
 		for(Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers()){
 			if(p.getShipBoard().getStatistics().getCrewMembersCount() >= requiredCrew){
-				//TODO: ask player if they want to actually take over the station.
+				//TODO: ask player if they want to actually take the ship.
 				if(true){ //meaning they accepted to do it
-					for(CargoType c : availableCargo){
-						//TODO: asks player where they want to put each single cargo.
+					for(int i=0; i<requiredCrew; i++){
+						//TODO: asks player where they want to remove crew from
 					}
 					movePlayer(p, lostDays);
 					break;
