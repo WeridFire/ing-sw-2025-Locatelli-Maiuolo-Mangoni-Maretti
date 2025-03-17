@@ -15,7 +15,7 @@ public class ContrabandCalculator {
     /**
      * Map of ILoadableItem to their contraband importance as Integer.
       */
-    private static final Map<ILoadableItem, Integer> ORDERED_ITEMS = calculateOrderedItems();
+    private static final Map<ILoadableItem, Integer> orderedItems = calculateOrderedItems();
     private static Map<ILoadableItem, Integer> calculateOrderedItems() {
         Map<ILoadableItem, Integer> orderedItems = new HashMap<>();
         orderedItems.put(BatteryType.BATTERY, 1);
@@ -34,13 +34,19 @@ public class ContrabandCalculator {
      * @return the virtual contraband value. Non-contraband items will have a value of zero (0).
      */
     public static int getContrabandValue(ILoadableItem item) {
-        return ORDERED_ITEMS.getOrDefault(item, 0);
+        return orderedItems.getOrDefault(item, 0);
     }
+
+    /**
+     * Comparator that orders ILoadableItem by predefined contraband importance in ascending order.
+     */
+    public static final Comparator<ILoadableItem> ascendingContrabandComparator =
+            Comparator.comparingInt(ContrabandCalculator::getContrabandValue);
 
     /**
      * Comparator that orders ILoadableItem by predefined contraband importance in descending order.
      */
-    public static final Comparator<ILoadableItem> CONTRABAND_COMPARATOR =
-            Comparator.comparingInt(ContrabandCalculator::getContrabandValue).reversed();
+    public static final Comparator<ILoadableItem> descendingContrabandComparator =
+            ascendingContrabandComparator.reversed();
 
 }
