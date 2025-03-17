@@ -63,6 +63,7 @@ public class TileContentCrew extends TileContentContainer {
         if (count <= 0) {
             throw new IllegalArgumentException("Attempt to remove crew members less than or equal to zero!");
         }
+        removeAny(count);
     }
 
     @Override
