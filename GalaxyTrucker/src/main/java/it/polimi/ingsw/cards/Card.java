@@ -33,7 +33,7 @@ public abstract class Card {
      * @param player The string name of the player.
      * @param position The amount of positions (or days) to move.
      */
-    public void movePlayer(Player player, int position){
+    public static void movePlayer(Player player, int position){
         //TBD - Implement the logic of moving the players.
     }
 
