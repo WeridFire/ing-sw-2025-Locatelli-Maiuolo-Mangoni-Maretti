@@ -1,5 +1,6 @@
 package src.main.java.it.polimi.ingsw.cards;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Deck {
@@ -18,6 +19,7 @@ public class Deck {
      * @param level The deck level.
      */
     public Deck(int level){
+
         switch(level){
             case 0:
 

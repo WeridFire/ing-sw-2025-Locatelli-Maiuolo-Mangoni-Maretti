@@ -43,4 +43,19 @@ public abstract class Card {
      */
     public abstract void playEffect(UUID gameId);
 
+    /**
+     * Updates the level of the card.
+     * @param level the new level of the card.
+     */
+    public void setLevel(int level){
+        this.level = level;
+    }
+
+    /**
+     *
+     * @return The texture associated to this card.
+     */
+    public String getTextureName(){
+        return this.textureName;
+    }
 }

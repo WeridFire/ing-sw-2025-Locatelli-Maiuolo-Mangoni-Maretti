@@ -39,19 +39,19 @@ public class Projectile {
      * @param direction Direction from which the projectile is coming from
      * @return a Projectile type object with the specified parameters
      */
-    private static Projectile createSmallMeteor(Direction direction) {
+    public static Projectile createSmallMeteor(Direction direction) {
         return new Projectile(true, true, false, direction);
     }
 
-    private static Projectile createLargeMeteor(Direction direction) {
+    public static Projectile createLargeMeteor(Direction direction) {
         return new Projectile(false, false, true, direction);
     }
 
-    private static Projectile createLightCannonFire(Direction direction) {
+    public static Projectile createLightCannonFire(Direction direction) {
         return new Projectile(false, true, false, direction);
     }
 
-    private static Projectile createHeavyCannonFire(Direction direction) {
+    public static Projectile createHeavyCannonFire(Direction direction) {
         return new Projectile(false, false, false, direction);
     }
 
