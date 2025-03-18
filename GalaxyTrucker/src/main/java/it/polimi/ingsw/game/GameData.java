@@ -2,6 +2,8 @@ package src.main.java.it.polimi.ingsw.game;
 
 import src.main.java.it.polimi.ingsw.TilesFactory;
 import src.main.java.it.polimi.ingsw.cards.Card;
+import src.main.java.it.polimi.ingsw.cards.Deck;
+import src.main.java.it.polimi.ingsw.cards.DeckFactory;
 import src.main.java.it.polimi.ingsw.enums.CargoType;
 import src.main.java.it.polimi.ingsw.enums.GameLevel;
 import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
@@ -41,8 +43,8 @@ public class GameData {
     /** Mapping of available cargo goods and their quantities. */
     private HashMap<CargoType, Integer> availableGoods;
 
-    /** List of game cards. */
-    private ArrayList<Card> cards;
+    /** List of game deck. */
+    private Deck deck;
 
     /** List of covered tiles in the game. */
     private ArrayList<Tile> coveredTiles;
@@ -106,12 +108,12 @@ public class GameData {
     }
 
     /**
-     * Gets the list of game cards.
+     * Gets the list of game deck.
      *
-     * @return The list of cards.
+     * @return The list of deck.
      */
-    public ArrayList<Card> getCards() {
-        return cards;
+    public Deck getDeck() {
+        return deck;
     }
 
     /**
@@ -154,12 +156,12 @@ public class GameData {
     }
 
     /**
-     * Sets the list of game cards.
+     * Sets the list of game deck.
      *
-     * @param cards The new list of cards.
+     * @param deck The new list of deck.
      */
-    public void setCards(ArrayList<Card> cards) {
-        this.cards = cards;
+    public void setDeck(Deck deck) {
+        this.deck = deck;
     }
 
     /**
@@ -216,22 +218,23 @@ public class GameData {
     }
 
     /**
-     * Initializes default game settings, including covered tiles and cards.
+     * Initializes default game settings, including covered tiles and deck.
      */
     public void initDefaults(){
         this.coveredTiles = initDefaultTiles();
-        this.cards = initDefaultCards();
+        this.deck = initDefaultCards();
     }
 
     /**
-     * Initializes default game cards.
+     * Initializes default game deck.
      *
-     * @return A list of default game cards.
+     * @return A list of default game deck.
      */
-    private ArrayList<Card> initDefaultCards(){
-        // TBD waiting factory
-        return new ArrayList<>();
-    }
+    /**
+     * // TODO: davide appena sistemi, sistema
+     * private Deck initDefaultCards(){
+        return new Deck(GameLevel);
+    }**/
 
     /**
      * Initializes default covered tiles.
