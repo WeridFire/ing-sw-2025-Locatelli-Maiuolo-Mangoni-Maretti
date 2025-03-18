@@ -4,6 +4,7 @@ import src.main.java.it.polimi.ingsw.enums.BatteryType;
 import src.main.java.it.polimi.ingsw.enums.ConnectorType;
 import src.main.java.it.polimi.ingsw.enums.Direction;
 import src.main.java.it.polimi.ingsw.enums.PowerType;
+import src.main.java.it.polimi.ingsw.shipboard1.tiles.Tile;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
 import java.util.*;
