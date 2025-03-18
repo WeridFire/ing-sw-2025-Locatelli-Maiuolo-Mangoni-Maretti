@@ -1,8 +1,8 @@
 package src.main.java.it.polimi.ingsw.player;
 
 import src.main.java.it.polimi.ingsw.player.exceptions.TooManyReservedTilesException;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.Tile;
-import src.main.java.it.polimi.ingsw.shipboard.ShipBoard;
+import src.main.java.it.polimi.ingsw.shipboard1.tiles.Tile;
+import src.main.java.it.polimi.ingsw.shipboard1.ShipBoard;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -150,8 +150,8 @@ public class DeckFactory {
 		deckPool.add(new AbandonedStationCard(new CargoType[]{
 				CargoType.RED_GOODS,
 				CargoType.RED_GOODS}, 1, 6, "GT-cards_I_IT_0120.jpg", 1, gameId));
-
-
 		return deckPool;
 	}
+
+
 }

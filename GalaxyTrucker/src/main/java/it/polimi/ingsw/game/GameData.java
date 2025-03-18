@@ -9,8 +9,8 @@ import src.main.java.it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameExceptio
 import src.main.java.it.polimi.ingsw.game.exceptions.PlayerNotInGameException;
 import src.main.java.it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import src.main.java.it.polimi.ingsw.player.Player;
-import src.main.java.it.polimi.ingsw.shipboard.ShipBoard;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.Tile;
+import src.main.java.it.polimi.ingsw.shipboard1.ShipBoard;
+import src.main.java.it.polimi.ingsw.shipboard1.tiles.Tile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
