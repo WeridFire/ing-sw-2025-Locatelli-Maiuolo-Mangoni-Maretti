@@ -25,6 +25,10 @@ public class ContrabandCalculator {
         orderedItems.put(CargoType.RED_GOODS, 5);
         return orderedItems;
     }
+    public static final int maxCargoValue = calculateMaxContrabandValue();
+    private static int calculateMaxContrabandValue() {
+        return orderedItems.values().stream().max(Comparator.naturalOrder()).orElse(0);
+    }
 
     /**
      * Retrieve the importance of specified item for smugglers as an Integer representing its contraband value.<br>
