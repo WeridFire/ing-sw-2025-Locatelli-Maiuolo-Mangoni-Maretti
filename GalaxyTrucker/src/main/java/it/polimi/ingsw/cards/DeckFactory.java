@@ -1,5 +1,6 @@
 package src.main.java.it.polimi.ingsw.cards;
 
+import src.main.java.it.polimi.ingsw.cards.Card;
 import src.main.java.it.polimi.ingsw.cards.enemy.PiratesCard;
 import src.main.java.it.polimi.ingsw.cards.enemy.SlaversCard;
 import src.main.java.it.polimi.ingsw.cards.enemy.SmugglersCard;
@@ -13,9 +14,11 @@ import src.main.java.it.polimi.ingsw.cards.warzone.WarZoneCard;
 import src.main.java.it.polimi.ingsw.enums.CargoType;
 import src.main.java.it.polimi.ingsw.enums.Direction;
 
+import javax.swing.text.BadLocationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 public class DeckFactory {
 	public static ArrayList<Card> createTutorialDeck(UUID gameId) {
@@ -151,6 +154,140 @@ public class DeckFactory {
 				CargoType.RED_GOODS,
 				CargoType.RED_GOODS}, 1, 6, "GT-cards_I_IT_0120.jpg", 1, gameId));
 
+
+		return deckPool;
+	}
+
+	public static ArrayList<Card> createLevelTwoDeck(UUID gameId){
+		ArrayList<Card> deckPool = new ArrayList<>();
+		deckPool.stream();
+		deckPool.add(new WarZoneCard(new WarLevel[]{
+				new WarLevel(WarFactory.createFireCriteria(), WarFactory.createLostDaysPunishment(4)),
+				new WarLevel(WarFactory.createThrustCriteria(), WarFactory.createLostGoodsPunishment(3)),
+				new WarLevel(WarFactory.createCrewCriteria(), WarFactory.createProjectilePunishment(
+						new Projectile[] {
+								Projectile.createLightCannonFire(Direction.NORTH),
+								Projectile.createLightCannonFire(Direction.EAST),
+								Projectile.createLightCannonFire(Direction.WEST),
+								Projectile.createHeavyCannonFire(Direction.SOUTH)
+						}))
+		}, "GT-cards_II_IT_0116.jpg", 2, gameId));
+		deckPool.add(new PlanetsCard(new Planet[] {
+				new Planet(List.of(new CargoType[]{
+						CargoType.GREEN_GOODS,
+						CargoType.GREEN_GOODS,
+						CargoType.GREEN_GOODS,
+						CargoType.GREEN_GOODS
+				})),
+				new Planet(List.of(new CargoType[]{
+						CargoType.YELLOW_GOODS,
+						CargoType.YELLOW_GOODS
+				})),
+				new Planet(List.of(new CargoType[]{
+						CargoType.BLUE_GOODS,
+						CargoType.BLUE_GOODS,
+						CargoType.BLUE_GOODS,
+						CargoType.BLUE_GOODS
+				}))
+		},3, "GT-cards_II_IT_0115.jpg", 2, gameId));
+		deckPool.add(new PlanetsCard(new Planet[]{
+				new Planet(List.of(new CargoType[]{
+						CargoType.RED_GOODS,
+						CargoType.RED_GOODS
+				})),
+				new Planet(List.of(new CargoType[]{
+						CargoType.GREEN_GOODS,
+						CargoType.GREEN_GOODS,
+						CargoType.GREEN_GOODS,
+						CargoType.GREEN_GOODS
+				}))
+		}, 3 , "GT-cards_II_IT_0113.jpg", 2, gameId));
+		deckPool.add(new PlanetsCard(new Planet[]{
+				new Planet(List.of(new CargoType[]{
+						CargoType.RED_GOODS,
+						CargoType.RED_GOODS,
+						CargoType.RED_GOODS,
+						CargoType.YELLOW_GOODS
+				})),
+				new Planet(List.of(new CargoType[]{
+						CargoType.RED_GOODS,
+						CargoType.RED_GOODS,
+						CargoType.GREEN_GOODS,
+						CargoType.GREEN_GOODS
+				})),
+				new Planet(List.of(new CargoType[]{
+						CargoType.RED_GOODS,
+						CargoType.BLUE_GOODS,
+						CargoType.BLUE_GOODS,
+						CargoType.BLUE_GOODS,
+						CargoType.BLUE_GOODS
+				}))
+		}, 4, "GT-cards_II_IT_0112.jpg", 2, gameId));
+		deckPool.add(new PlanetsCard(new Planet[]{
+				new Planet(List.of(new CargoType[]{
+						CargoType.RED_GOODS,
+						CargoType.YELLOW_GOODS
+				})),
+				new Planet(List.of(new CargoType[]{
+						CargoType.YELLOW_GOODS,
+						CargoType.GREEN_GOODS,
+						CargoType.BLUE_GOODS
+				})),
+				new Planet(List.of(new CargoType[]{
+						CargoType.GREEN_GOODS,
+						CargoType.GREEN_GOODS
+				})),
+				new Planet(List.of(new CargoType[]{
+						CargoType.YELLOW_GOODS
+				}))
+		},2, "GT-cards_II_IT_0114.jpg", 2, gameId));
+		deckPool.add(new OpenSpaceCard("GT-cards_II_IT_016.jpg", 2, gameId));
+		deckPool.add(new OpenSpaceCard("GT-cards_II_IT_017.jpg", 2, gameId));
+		deckPool.add(new OpenSpaceCard("GT-cards_II_IT_018.jpg", 2, gameId));
+		deckPool.add(new EpidemicCard("GT-cards_II_IT_015.jpg", 2, gameId));
+		deckPool.add(new StarDustCard("GT-cards_II_IT_014.jpg", 2, gameId));
+		deckPool.add(new PiratesCard(7, new Projectile[]{
+				Projectile.createHeavyCannonFire(Direction.NORTH),
+				Projectile.createLightCannonFire(Direction.NORTH),
+				Projectile.createHeavyCannonFire(Direction.NORTH),
+		}, 6, 2, "GT-cards_II_IT_013.jpg", 2, gameId));
+		deckPool.add(new SlaversCard(4,8,7, 2, "GT-cards_II_IT_01.jpg", 2 , gameId));
+		deckPool.add(new SmugglersCard(3, new CargoType[]{
+				CargoType.RED_GOODS,
+				CargoType.YELLOW_GOODS,
+				CargoType.YELLOW_GOODS
+		} , 8, 1, "GT-cards_II_IT_012.jpg", 2, gameId));
+		deckPool.add(new MeteorStormCard(new Projectile[]{
+				Projectile.createSmallMeteor(Direction.NORTH),
+				Projectile.createSmallMeteor(Direction.NORTH),
+				Projectile.createLargeMeteor(Direction.WEST),
+				Projectile.createSmallMeteor(Direction.WEST),
+				Projectile.createSmallMeteor(Direction.WEST)
+		}, "GT-cards_II_IT_019.jpg", 2, gameId));
+		deckPool.add(new MeteorStormCard(new Projectile[] {
+				Projectile.createLargeMeteor(Direction.NORTH),
+				Projectile.createLargeMeteor(Direction.NORTH),
+				Projectile.createSmallMeteor(Direction.SOUTH),
+				Projectile.createSmallMeteor(Direction.SOUTH)
+		}, "GT-cards_II_IT_0110.jpg", 2, gameId));
+		deckPool.add(new MeteorStormCard(new Projectile[]{
+				Projectile.createSmallMeteor(Direction.NORTH),
+				Projectile.createSmallMeteor(Direction.NORTH),
+				Projectile.createLargeMeteor(Direction.EAST),
+				Projectile.createSmallMeteor(Direction.EAST),
+				Projectile.createSmallMeteor(Direction.EAST)
+		},"GT-cards_II_IT_0111.jpg", 2, gameId));
+		deckPool.add(new AbandonedStationCard(new CargoType[] {
+				CargoType.YELLOW_GOODS,
+				CargoType.YELLOW_GOODS,
+				CargoType.GREEN_GOODS
+		}, 2, 8, "GT-cards_II_IT_0120.jpg", 2, gameId));
+		deckPool.add(new AbandonedStationCard(new CargoType[] {
+				CargoType.RED_GOODS,
+				CargoType.YELLOW_GOODS
+		}, 1, 7, "GT-cards_II_IT_0119.jpg", 2, gameId));
+		deckPool.add(new AbandonedShipCard(5, 2, 8, "GT-cards_II_IT_0118.jpg", 2, gameId));
+		deckPool.add(new AbandonedShipCard(4,1,6, "GT-cards_II_IT_0117.jpg", 2, gameId));
 
 		return deckPool;
 	}
