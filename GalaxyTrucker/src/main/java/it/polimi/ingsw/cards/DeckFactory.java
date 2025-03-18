@@ -14,11 +14,9 @@ import src.main.java.it.polimi.ingsw.cards.warzone.WarZoneCard;
 import src.main.java.it.polimi.ingsw.enums.CargoType;
 import src.main.java.it.polimi.ingsw.enums.Direction;
 
-import javax.swing.text.BadLocationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 public class DeckFactory {
 	public static ArrayList<Card> createTutorialDeck(UUID gameId) {
