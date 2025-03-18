@@ -222,7 +222,7 @@ public class GameData {
      */
     public void initDefaults(){
         this.coveredTiles = initDefaultTiles();
-        this.deck = initDefaultCards();
+        //this.deck = initDefaultCards();
     }
 
     /**
