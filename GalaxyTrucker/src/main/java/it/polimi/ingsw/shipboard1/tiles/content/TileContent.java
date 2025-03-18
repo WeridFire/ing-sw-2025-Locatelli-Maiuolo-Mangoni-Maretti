@@ -1,7 +1,7 @@
-package src.main.java.it.polimi.ingsw.shipboard.tiles.content;
+package src.main.java.it.polimi.ingsw.shipboard1.tiles.content;
 
 import src.main.java.it.polimi.ingsw.enums.*;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.*;
+import src.main.java.it.polimi.ingsw.shipboard1.tiles.exceptions.*;
 import src.main.java.it.polimi.ingsw.util.ContrabandCalculator;
 
 import java.util.List;

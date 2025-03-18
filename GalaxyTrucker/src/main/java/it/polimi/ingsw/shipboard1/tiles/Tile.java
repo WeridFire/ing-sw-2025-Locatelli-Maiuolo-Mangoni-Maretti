@@ -5,6 +5,8 @@ import src.main.java.it.polimi.ingsw.shipboard1.tiles.content.TileContent;
 import src.main.java.it.polimi.ingsw.shipboard1.tiles.exceptions.IncoherentBatteryUsageException;
 import src.main.java.it.polimi.ingsw.shipboard1.tiles.side.TileSide;
 
+import java.io.Serializable;
+
 /**
  * Represents a tile in the game, which consists of four sides and a main content.
  * <p>
@@ -16,7 +18,7 @@ import src.main.java.it.polimi.ingsw.shipboard1.tiles.side.TileSide;
  * @see TileSide
  * @see TileContent
  */
-public class Tile extends TileSkeleton<TileSide, TileContent> {
+public class Tile extends TileSkeleton<TileSide, TileContent> implements Serializable {
 
     /**
      * Constructs a new tile with four specified sides and a content.

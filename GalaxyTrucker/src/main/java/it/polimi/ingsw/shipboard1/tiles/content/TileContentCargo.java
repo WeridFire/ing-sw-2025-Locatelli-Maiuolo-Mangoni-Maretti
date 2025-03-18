@@ -1,9 +1,9 @@
-package src.main.java.it.polimi.ingsw.shipboard.tiles.content;
+package src.main.java.it.polimi.ingsw.shipboard1.tiles.content;
 
 import src.main.java.it.polimi.ingsw.enums.CargoType;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotAllowedLoadableTypeException;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
+import src.main.java.it.polimi.ingsw.shipboard1.tiles.exceptions.NotAllowedLoadableTypeException;
+import src.main.java.it.polimi.ingsw.shipboard1.tiles.exceptions.NotEnoughItemsException;
+import src.main.java.it.polimi.ingsw.shipboard1.tiles.exceptions.TooMuchLoadException;
 
 import java.util.HashSet;
 import java.util.List;
