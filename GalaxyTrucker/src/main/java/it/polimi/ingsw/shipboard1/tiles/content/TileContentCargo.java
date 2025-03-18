@@ -1,7 +1,9 @@
-package src.main.java.it.polimi.ingsw.shipboard1.tiles.content;
+package src.main.java.it.polimi.ingsw.shipboard.tiles.content;
 
 import src.main.java.it.polimi.ingsw.enums.CargoType;
-import src.main.java.it.polimi.ingsw.shipboard1.tiles.exceptions.NotEnoughItemsException;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotAllowedLoadableTypeException;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -60,6 +62,25 @@ public class TileContentCargo extends TileContentContainer {
                         CargoType.RED_GOODS
                 )),
                 maxCapacity);
+    }
+
+    @Override
+    public void addCargo(List<CargoType> cargo) throws TooMuchLoadException, NotAllowedLoadableTypeException {
+        int capacityLeft = getCapacityLeft();
+        for (CargoType cargoToAdd : cargo) {
+            if (!isAllowed(cargoToAdd)) {
+                throw new NotAllowedLoadableTypeException(cargoToAdd + " not allowed here");
+            } else {
+                capacityLeft -= cargoToAdd.getOccupiedSpace();
+            }
+        }
+        if (capacityLeft < 0) {
+            throw new TooMuchLoadException("Attempt to add too much cargo in one container");
+        }
+        // if here: no problems in loading cargo
+        for (CargoType cargoToAdd : cargo) {
+            add(cargoToAdd);
+        }
     }
 
     @Override

@@ -178,7 +178,7 @@ public abstract class TileContentContainer extends TileContent {
     }
 
     @Override
-    public List<ILoadableItem> getContrabandMostValuableItems(int limit, int minimumContrabandValueExclusive)
+    public PriorityQueue<ILoadableItem> getContrabandMostValuableItems(int limit, int minimumContrabandValueExclusive)
             throws IllegalArgumentException {
         if (limit <= 0) {
             throw new IllegalArgumentException("Limit must be greater than 0");
@@ -186,11 +186,20 @@ public abstract class TileContentContainer extends TileContent {
         if (minimumContrabandValueExclusive < 0) {
             throw new IllegalArgumentException("Minimum contraband value (exclusive) must be greater or equal to 0");
         }
-        return getLoadedItems().stream()
-                .filter(item -> ContrabandCalculator.getContrabandValue(item) > minimumContrabandValueExclusive)
-                .sorted(ContrabandCalculator.CONTRABAND_COMPARATOR)
-                .limit(limit)
-                .toList();
+
+        PriorityQueue<ILoadableItem> queue =
+                new PriorityQueue<>(limit, ContrabandCalculator.descendingContrabandComparator);
+        int queueSize = 0;
+        for (ILoadableItem item : getLoadedItems()) {
+            if (ContrabandCalculator.getContrabandValue(item) > minimumContrabandValueExclusive) {
+                queue.add(item);
+                queueSize++;
+                if (queueSize >= limit) {
+                    break;
+                }
+            }
+        }
+        return queue;
     }
 
     @Override

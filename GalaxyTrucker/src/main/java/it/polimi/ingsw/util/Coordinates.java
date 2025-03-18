@@ -2,9 +2,7 @@ package src.main.java.it.polimi.ingsw.util;
 
 import src.main.java.it.polimi.ingsw.enums.Direction;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents a coordinate in a grid-based system.
@@ -87,6 +85,24 @@ public class Coordinates {
     }
 
     /**
+     * Returns a set of map entries of neighboring coordinates indexed by their respective directions from this.
+     * <p>
+     * This method provides a mapping between each possible movement direction and the corresponding adjacent coordinate.
+     * It allows for structured iteration over all possible neighbors, with direct knowledge of their relative direction.
+     * </p>
+     *
+     * @return a map where the keys are movement directions, and the values are the corresponding neighboring coordinates.
+     */
+    public Set<Map.Entry<Direction, Coordinates>> neighbors() {
+        Map<Direction, Coordinates> neighbors = new EnumMap<>(Direction.class);
+        for (Direction direction : Direction.values()) {
+            neighbors.put(direction, getNext(direction));
+        }
+        return neighbors.entrySet();
+    }
+
+
+    /**
      * Retrieves the neighbors of this coordinates going in all the possible directions.
      *
      * @return The neighbors of this coordinates going in all the possible directions.
@@ -115,8 +131,8 @@ public class Coordinates {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        Coordinates that = (Coordinates) obj;
-        return row == that.row && column == that.column;
+        Coordinates other = (Coordinates) obj;
+        return row == other.row && column == other.column;
     }
 
     @Override

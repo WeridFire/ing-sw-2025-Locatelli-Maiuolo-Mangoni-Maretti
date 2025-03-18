@@ -1,10 +1,11 @@
-package src.main.java.it.polimi.ingsw.shipboard1.tiles.content;
+package src.main.java.it.polimi.ingsw.shipboard.tiles.content;
 
 import src.main.java.it.polimi.ingsw.enums.*;
-import src.main.java.it.polimi.ingsw.shipboard1.tiles.exceptions.*;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.*;
+import src.main.java.it.polimi.ingsw.util.ContrabandCalculator;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 /**
@@ -22,8 +23,8 @@ public class TileContent {
     /**
      * Returns the type of crew that receives life support from this tile when placed in an adjacent cabin.
      * <p>
-     * By default, no life support is provided. Subclasses can override this method
-     * to specify life support for certain crew types.
+     * By default, no life support is provided (return {@code null}).
+     * Subclasses can override this method to specify life support for certain crew types.
      * </p>
      *
      * @return the {@link CrewType} that receives life support, or {@code null} if none.
@@ -37,7 +38,8 @@ public class TileContent {
     /**
      * Returns the number of crew members present on this tile.
      * <p>
-     * By default, this method returns 0. Subclasses should override it if the tile can hold crew.
+     * By default, this method returns {@code 0}.
+     * Subclasses should override it if the tile can hold crew.
      * </p>
      *
      * @return the number of crew members on this tile.
@@ -49,7 +51,7 @@ public class TileContent {
     /**
      * Fills the content with the maximum number of specified crew members.
      * <p>
-     * By default, this operation is not supported and throws {@code UnsupportedLoadableItemException}.
+     * By default, this operation is not supported and throws an exception: {@link UnsupportedLoadableItemException}.
      * Subclasses that support crew should override this method.
      * </p>
      *
@@ -68,7 +70,7 @@ public class TileContent {
     /**
      * Removes a specified number of crew members from this tile.
      * <p>
-     * By default, this operation is not supported and throws an exception.
+     * By default, this operation is not supported and throws an exception: {@link UnsupportedLoadableItemException}.
      * Subclasses that support crew should override this method.
      * </p>
      *
@@ -77,7 +79,7 @@ public class TileContent {
      * @throws UnsupportedLoadableItemException if the tile does not support crew loading.
      * @throws IllegalArgumentException if {@code count} is less than or equal to zero.
      */
-    public void removeCrew(int count) throws UnsupportedLoadableItemException,
+    public void removeCrew(int count) throws NotEnoughItemsException, UnsupportedLoadableItemException,
             IllegalArgumentException {
         throw new UnsupportedLoadableItemException("This tile does not support Crew loading!");
     }
@@ -85,7 +87,7 @@ public class TileContent {
     /**
      * Updates the allowed crew types for this tile.
      * <p>
-     * By default, this operation is not supported and throws an exception.
+     * By default, this operation is not supported and throws an exception: {@link UnsupportedLoadableItemException}.
      * Subclasses that allow crew should override this method.
      * </p>
      *
@@ -100,7 +102,8 @@ public class TileContent {
     /**
      * Returns the bonus power provided by this tile for a given power type.
      * <p>
-     * By default, no bonus power is provided. Subclasses tiles that give power should override this method.
+     * By default, no bonus power is provided (return {@code 0}).
+     * Subclasses tiles that give power should override this method.
      * </p>
      *
      * @param powerType the type of power.
@@ -132,7 +135,7 @@ public class TileContent {
      *        {@code minimumContrabandValueExclusive} is not considered.
      * @throws IllegalArgumentException if {@code minimumContrabandValueExclusive < 0}
      */
-    public List<ILoadableItem> getContrabandMostValuableItems(int limit, int minimumContrabandValueExclusive)
+    public PriorityQueue<ILoadableItem> getContrabandMostValuableItems(int limit, int minimumContrabandValueExclusive)
             throws IllegalArgumentException {
         if (limit <= 0) {
             throw new IllegalArgumentException("Limit must be greater than 0");
@@ -140,22 +143,22 @@ public class TileContent {
         if (minimumContrabandValueExclusive < 0) {
             throw new IllegalArgumentException("Minimum contraband value (exclusive) must be greater or equal to 0");
         }
-        return new ArrayList<>(0);
+        return new PriorityQueue<>(0, ContrabandCalculator.descendingContrabandComparator);
     }
 
     /**
      * Returns the most valuable loaded items present on this tile,
      * for smugglers, up to a given limit, in descending order.
      * <p>
-     * By default, this method returns an empty list.
+     * By default, this method returns an empty queue.
      * Subclasses that store contraband items should override it.
      * </p>
      *
      * @param limit the maximum number of items to return.
-     * @return a list of the most valuable loaded items, ordered by value in descending order.
+     * @return a priority queue of the most valuable loaded items, ordered by value in descending order.
      * @throws IllegalArgumentException if {@code limit <= 0}
      */
-    public List<ILoadableItem> getContrabandMostValuableItems(int limit) throws IllegalArgumentException {
+    public PriorityQueue<ILoadableItem> getContrabandMostValuableItems(int limit) throws IllegalArgumentException {
         return getContrabandMostValuableItems(limit, 0);
     }
 
@@ -173,9 +176,26 @@ public class TileContent {
     }
 
     /**
+     * Attempts to add cargo to this tile.
+     * <p>
+     * By default, this operation is not supported and throws an exception: {@link UnsupportedLoadableItemException}.
+     * Subclasses that support cargo should override this method.
+     * </p>
+     *
+     * @param cargo The list of cargo items to be added.
+     * @throws TooMuchLoadException If the cargo exceeds the allowed load capacity (only applicable in overriding implementations).
+     * @throws NotAllowedLoadableTypeException If the cargo type is not allowed (only applicable in overriding implementations).
+     * @throws UnsupportedLoadableItemException If this tile does not support cargo loading.
+     */
+    public void addCargo(List<CargoType> cargo) throws TooMuchLoadException, NotAllowedLoadableTypeException,
+            UnsupportedLoadableItemException {
+        throw new UnsupportedLoadableItemException("This tile does not support Cargo loading!");
+    }
+
+    /**
      * Removes a specified cargo item from this tile.
      * <p>
-     * By default, this operation is not supported and throws an exception.
+     * By default, this operation is not supported and throws an exception: {@link UnsupportedLoadableItemException}.
      * Subclasses that support cargo should override this method.
      * </p>
      *
@@ -204,7 +224,7 @@ public class TileContent {
     /**
      * Removes one unit of the specified battery type from the container.
      * <p>
-     * By default, this operation is not supported and throws an exception.
+     * By default, this operation is not supported and throws an exception: {@link UnsupportedLoadableItemException}.
      * Subclasses that support battery should override this method.
      * </p>
      *
