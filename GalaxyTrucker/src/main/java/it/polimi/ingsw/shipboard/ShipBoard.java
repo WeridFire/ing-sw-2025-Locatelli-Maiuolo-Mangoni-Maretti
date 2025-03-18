@@ -209,6 +209,7 @@ public class ShipBoard {
      * The removal prioritizes the highest-value contraband items when the given quantity is reached.
      *
      * @param quantity The number of cargo items to remove.
+     * @throws IllegalArgumentException if {@code quantity <= 0}
      */
     public void removeMostValuableCargo(int quantity) {
         if (quantity <= 0) {
@@ -217,14 +218,16 @@ public class ShipBoard {
 
         // priority queue to store cargo sorted by value in ascending order (head is the minimum)
         PriorityQueue<Map.Entry<Coordinates, CargoType>> priorityQueue = new PriorityQueue<>(quantity + 1,
-                (e1, e2) -> ContrabandCalculator.ascendingContrabandComparator.compare(e1.getValue(), e2.getValue()));
+                (e1, e2)
+                        -> ContrabandCalculator.ascendingContrabandComparator.compare(e1.getValue(), e2.getValue()));
         int minimumContrabandValue = 0;
 
-        // iterate over all the tiles and retrieve contraband cargo
+        // iterate over all the tiles
         for (Map.Entry<Coordinates, Tile> tilesOnBoard : getTilesOnBoard()) {
             Coordinates coordinates = tilesOnBoard.getKey();
             Tile tile = tilesOnBoard.getValue();
 
+            // retrieve contraband cargo loaded onto this tile (in descending order of contraband value)
             PriorityQueue<ILoadableItem> cargo =
                     tile.getContent().getContrabandMostValuableItems(quantity, minimumContrabandValue);
 
@@ -232,13 +235,24 @@ public class ShipBoard {
                 CargoType mostValuableCargo = (CargoType) cargo.poll();
                 priorityQueue.offer(Map.entry(coordinates, mostValuableCargo));
 
-                // update minimum contraband value to optimize next iteration
-                minimumContrabandValue = ContrabandCalculator.getContrabandValue(priorityQueue.peek().getValue());
-
                 // keep the size within quantity by removing the least valuable item (head)
                 if (priorityQueue.size() > quantity) {
                     priorityQueue.poll();
+                    // update minimum contraband value to optimize next iteration
+                    minimumContrabandValue = ContrabandCalculator.getContrabandValue(priorityQueue.peek().getValue());
+                    /* interrupt cargo parsing if this element is already "worse" (in cargo value)
+                    of the minimum removed, since cargo is sorted in descending order and
+                    no next value will ever be strictly better than the minimum (until next cargo in another tile)
+                    */
+                    if (ContrabandCalculator.getContrabandValue(mostValuableCargo) <= minimumContrabandValue) {
+                        break;
+                    }
                 }
+            }
+
+            // stop if the minimum value is already the maximum possible
+            if (minimumContrabandValue == ContrabandCalculator.maxCargoValue) {
+                break;
             }
         }
 
@@ -254,6 +268,9 @@ public class ShipBoard {
                         " at " + cargoToRemove.getKey() + ": " + e.getMessage());
             }
         }
+
+        // need to notify the change in the content for the ship
+        notifyListeners();  // maybe it's possible to notify only for subsets, in this case: only load distribution
     }
 
 }
