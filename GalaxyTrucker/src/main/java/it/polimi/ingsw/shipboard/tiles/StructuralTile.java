@@ -1,23 +1,33 @@
 package src.main.java.it.polimi.ingsw.shipboard.tiles;
 
+import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.visitors.TileVisitor;
 
-// TODO: change String to a valid TileSide implemented for this shipboard version
-public class StructuralTile extends TileSkeleton<String> {
+/**
+ * Represents a structural tile, which defines the shape and connectivity
+ * of a structure but does not provide additional functionality.
+ */
+public class StructuralTile extends TileSkeleton<SideType> {
 
     /**
-     * Construct the tile with specified parameters.
+     * Constructs a StructuralTile with the specified sides.
      *
-     * @param sides An array of sides, where for each Direction {@code d},
-     *              its value {@code d.v <- d.getValue()} is used as index to specify the related side:
-     *              {@code sides[d.v]} is the tile's side in direction {@code d}.
+     * @param sides An array defining the sides of the tile.
+     *              Each index corresponds to a direction {@code d},
+     *              where {@code sides[d.v]} represents the tile's side in that direction.
      */
-    public StructuralTile(String[] sides) {
+    public StructuralTile(SideType[] sides) {
         super(sides);
     }
 
+    /**
+     * Accepts a visitor for processing this tile.
+     *
+     * @param visitor The visitor handling this tile.
+     */
     @Override
     public void accept(TileVisitor visitor) {
         visitor.visitStructural(this);
     }
 }
+
