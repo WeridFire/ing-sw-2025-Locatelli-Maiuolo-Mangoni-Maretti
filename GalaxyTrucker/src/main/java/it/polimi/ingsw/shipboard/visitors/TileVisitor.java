@@ -53,6 +53,13 @@ public interface TileVisitor {
      */
     void visitEngine(EngineTile tile);
 
+    /**
+     * What to do when visiting the provided shield generator tile.
+     * To be implemented in each visitor.
+     * @param tile The visited shield generator tile.
+     */
+    void visitShieldGenerator(ShieldGeneratorTile tile);
+
 
     // TODO: add all the other concrete Tiles
 }
