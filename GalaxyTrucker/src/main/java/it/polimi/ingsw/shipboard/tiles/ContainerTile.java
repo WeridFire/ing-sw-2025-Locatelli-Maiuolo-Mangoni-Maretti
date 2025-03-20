@@ -12,6 +12,9 @@ import java.util.*;
  * Each container has a defined capacity and a set of allowed items.
  */
 public abstract class ContainerTile extends TileSkeleton<SideType> {
+
+    private final Set<LoadableType> maxAllowedItems;
+
     private final int capacity;
     private Set<LoadableType> allowedItems;
     private final List<LoadableType> loadedItems;
@@ -20,13 +23,22 @@ public abstract class ContainerTile extends TileSkeleton<SideType> {
     /**
      * Constructs a ContainerTile with specified sides, allowed items, and capacity.
      *
-     * @param sides        An array of sides defining the structure of the tile.
-     * @param allowedItems The set of items that are allowed to be stored in this container.
-     * @param capacity     The maximum capacity of the container.
+     * @param sides An array of sides defining the structure of the tile.
+     * @param maxAllowedItems The set of items that are allowed to be stored in this kind of container.
+     *                        Even a {@link #setAllowedItems(Set)} will have to obey this constraint.
+     * @param allowedItems The set of items that are allowed to be stored in this container instance.
+     * @param capacity The maximum capacity of the container.
      */
-    public ContainerTile(SideType[] sides, Set<LoadableType> allowedItems, int capacity) {
+    public ContainerTile(SideType[] sides, Set<LoadableType> maxAllowedItems,
+                         Set<LoadableType> allowedItems, int capacity) {
         super(sides);
-        this.allowedItems = allowedItems;
+        this.maxAllowedItems = maxAllowedItems;
+        try {
+            setAllowedItems(allowedItems);
+        } catch (UnsupportedLoadableItemException e) {
+            // should never happen because constructors should be solidly programmed -> RuntimeException
+            throw new RuntimeException(e);
+        }
         this.capacity = capacity;
         this.loadedItems = new ArrayList<>(capacity);
     }
@@ -37,7 +49,14 @@ public abstract class ContainerTile extends TileSkeleton<SideType> {
      * @param allowedItems The new set of allowed items.
      * @return A list of items that were removed because they were no longer allowed.
      */
-    public List<LoadableType> setAllowedItems(Set<LoadableType> allowedItems) {
+    public List<LoadableType> setAllowedItems(Set<LoadableType> allowedItems) throws UnsupportedLoadableItemException {
+        if (!maxAllowedItems.containsAll(allowedItems)) {
+            throw new UnsupportedLoadableItemException("Attempt to modify the allowed items"
+                    + " with a non-subset of the allowed items for this kind of container: "
+                    + allowedItems + " is not a subset of " + maxAllowedItems
+                    + ". This would result in undesired and unsignaled exceptions.");
+        }
+
         this.allowedItems = allowedItems;
         List<LoadableType> removedItems = new ArrayList<>(loadedItems.size());
 

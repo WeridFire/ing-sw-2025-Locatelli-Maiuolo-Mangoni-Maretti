@@ -20,7 +20,10 @@ public class CargoHoldTile extends ContainerTile {
      * @param capacity The maximum capacity of the cargo hold.
      */
     protected CargoHoldTile(SideType[] sides, Set<LoadableType> allowedCargo, int capacity) {
-        super(sides, allowedCargo, capacity);
+        super(sides,
+                Set.of(LoadableType.BLUE_GOODS, LoadableType.GREEN_GOODS,
+                        LoadableType.YELLOW_GOODS, LoadableType.RED_GOODS),
+                allowedCargo, capacity);
     }
 
     /**
