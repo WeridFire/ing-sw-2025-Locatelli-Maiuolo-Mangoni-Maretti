@@ -37,15 +37,13 @@ public abstract class TileSkeleton<SideType> implements Tile {
      * <p>
      * Sides are affected by this rotation.
      * Subclasses that manages the rotation should override this function
-     * keeping the {@code super.rotateTile(rotation)}
+     * keeping the {@code super.rotateTile(rotation)} and following the implementation note.
      * @param rotation The rotation to apply.
+     * @implNote uses {@link Rotation#applyTo(Object[])} to rotate sides.
      */
     public void rotateTile(Rotation rotation) {
-        SideType[] oldSides = sides.clone();
-        for (Direction direction : Direction.values()) {
-            sides[direction.getRotated(rotation).getValue()] = oldSides[direction.getValue()];
-        }
         appliedRotation = appliedRotation.composedRotation(rotation);
+        rotation.applyTo(sides);
     }
 
     /**

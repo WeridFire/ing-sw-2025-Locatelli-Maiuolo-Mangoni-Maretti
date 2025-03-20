@@ -29,7 +29,7 @@ public enum Rotation {
 
     /**
      * Calculate the reverse rotation:
-     * a rotation that composed with <code>this</code> would give the <code>NONE</code> Rotation.
+     * a rotation that composed with {@code this} would give the {@code NONE} Rotation.
      * @return Reverse rotation.
      */
     public Rotation reversed() {
@@ -37,13 +37,30 @@ public enum Rotation {
     }
 
     /**
-     * Calculate the composition of two rotations: <code>this</code> and the specified one.
+     * Calculate the composition of two rotations: {@code this} and the specified one.
      * It is a commutative operation.
-     * @param rotation Rotation to compose <code>this</code> with.
+     * @param rotation Rotation to compose {@code this} with.
      * @return Calculated composition of rotations.
      */
     public Rotation composedRotation(Rotation rotation) {
         return VALUES[(value + rotation.value) % 4];
+    }
+
+    /**
+     * Applies {@code this} rotation to an array of elements, rearranging them according to the rotated directions.
+     * <p>
+     * This method takes an array where each index corresponds to a {@link Direction} and reorders its elements
+     * based on how the directions are rotated.
+     * </p>
+     *
+     * @param <T> The type of elements in the array.
+     * @param sides An array representing elements associated with each {@link Direction}.
+     */
+    public <T> void applyTo(T[] sides) {
+        T[] oldSides = sides.clone();
+        for (Direction direction : Direction.values()) {
+            sides[direction.getRotated(this).getValue()] = oldSides[direction.getValue()];
+        }
     }
 }
 
@@ -85,6 +102,8 @@ public enum Rotation {
         }
         throw new IllegalStateException("Invalid reversed rotation computation");
     }
+
+    // ...
 }
 
 */
