@@ -24,7 +24,7 @@ public class CargoHoldTile extends ContainerTile {
     }
 
     /**
-     * Constructs a standard CargoHoldTile with specified sides and capacity.
+     * Constructs a Standard CargoHoldTile with specified sides and capacity.
      * This cargo hold can contain Blue, Yellow and Green goods.
      *
      * @param sides An array of sides defining the structure of the tile.
