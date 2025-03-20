@@ -25,6 +25,13 @@ public interface TileVisitor {
      */
     void visitCargoHold(CargoHoldTile tile);
 
+    /**
+     * What to do when visiting the provided cabin tile (can be the main cabin).
+     * To be implemented in each visitor.
+     * @param tile The visited (eventually main) cabin tile.
+     */
+    void visitCabin(CabinTile tile);
+
     // TODO: add all the other concrete Tiles
     // example -> void visitEngine(EngineTile engine); ...
 }
