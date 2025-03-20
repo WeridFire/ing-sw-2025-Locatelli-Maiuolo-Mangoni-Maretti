@@ -32,6 +32,13 @@ public interface TileVisitor {
      */
     void visitCabin(CabinTile tile);
 
+    /**
+     * What to do when visiting the provided battery component tile.
+     * To be implemented in each visitor.
+     * @param tile The visited battery component tile.
+     */
+    void visitBatteryComponent(BatteryComponentTile tile);
+
     // TODO: add all the other concrete Tiles
     // example -> void visitEngine(EngineTile engine); ...
 }

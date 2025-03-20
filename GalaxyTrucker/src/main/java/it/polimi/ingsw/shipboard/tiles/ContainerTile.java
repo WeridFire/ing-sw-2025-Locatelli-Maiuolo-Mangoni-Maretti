@@ -2,6 +2,7 @@ package src.main.java.it.polimi.ingsw.shipboard.tiles;
 
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 import src.main.java.it.polimi.ingsw.shipboard.SideType;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 
@@ -75,9 +76,9 @@ public abstract class ContainerTile extends TileSkeleton<SideType> {
     /**
      * Loads a specified quantity of an item into the container.
      *
-     * @param item     The item to load.
+     * @param item The item to load.
      * @param quantity The number of units to load.
-     * @throws TooMuchLoadException          If there is not enough capacity for the items.
+     * @throws TooMuchLoadException If there is not enough capacity for the items.
      * @throws UnsupportedLoadableItemException If the item is not allowed in this container.
      */
     public void loadItems(LoadableType item, int quantity) throws TooMuchLoadException,
@@ -96,6 +97,36 @@ public abstract class ContainerTile extends TileSkeleton<SideType> {
 
         occupiedCapacity -= requiredCapacity;
         loadedItems.addAll(Collections.nCopies(quantity, item));
+    }
+
+    /**
+     * Removes a specified quantity of an item from the container.
+     *
+     * @param item The item to remove.
+     * @param quantity The number of units to remove.
+     *
+     * @throws IllegalArgumentException If {@code quantity <= 0}.
+     * @throws UnsupportedLoadableItemException If the item is not allowed in this container.
+     * @throws NotEnoughItemsException If {@code quantity} is greater than the count of loaded items to remove.
+     */
+    public void removeItems(LoadableType item, int quantity) throws
+            UnsupportedLoadableItemException, NotEnoughItemsException {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than zero, " + quantity + " provided");
+        }
+
+        if (!allowedItems.contains(item)) {
+            throw new UnsupportedLoadableItemException("Attempt to remove " + item +
+                    " in a container which allows only the following items: " + allowedItems);
+        }
+
+        long loadedCount = loadedItems.stream().filter(it -> it == item).count();
+        if (loadedCount < quantity) {
+            throw new NotEnoughItemsException("Attempt to remove " + quantity + " " + item
+                    + " from a container with only " + loadedCount + " of them");
+        }
+
+        loadedItems.removeAll(Collections.nCopies(quantity, item));
     }
 
     /**
