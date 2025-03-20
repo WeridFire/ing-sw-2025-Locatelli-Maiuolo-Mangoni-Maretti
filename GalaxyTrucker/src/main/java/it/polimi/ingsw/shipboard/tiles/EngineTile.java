@@ -6,41 +6,41 @@ import src.main.java.it.polimi.ingsw.shipboard.visitors.TileVisitor;
 
 import java.util.Arrays;
 
-public class CannonTile extends PowerableTile {
+public class EngineTile extends PowerableTile {
 
     private static final Float[] maskDirectionsMultiplier =
-            Direction.sortedArray(0.5f, 1f, 0.5f, 0.5f).toArray(Float[]::new);
+            Direction.sortedArray(0f, 0f, 0f, 1f).toArray(Float[]::new);
 
     /**
-     * Constructs a cannon tile with the specified sides, and if it needs battery to be used.
+     * Constructs an engine tile with the specified sides, and if it needs battery to be used.
      *
      * @param sides         An array defining the sides of the tile.
      *                      Each index corresponds to a direction {@code d},
      *                      where {@code sides[d.v]} represents the tile's side in that direction.
-     *                      Use {@link SideType#CANNON} to notify the presence of a cannon in that direction.
-     * @param batteryNeeded Indicates if the cannon needs battery to be used ({@code true}) or not ({@code false}).
-     *                      Note: the cannon needs battery if and only if it's a double cannon.
+     *                      Use {@link SideType#ENGINE} to notify the presence of a cannon in that direction.
+     * @param batteryNeeded Indicates if the engine needs battery to be used ({@code true}) or not ({@code false}).
+     *                      Note: the engine needs battery if and only if it's a double engine.
      */
-    public CannonTile(SideType[] sides, boolean batteryNeeded) {
+    public EngineTile(SideType[] sides, boolean batteryNeeded) {
         super(sides,
                 Arrays.stream(sides)
-                .map(side -> (side == SideType.CANNON))
-                .toArray(Boolean[]::new),
+                        .map(side -> (side == SideType.ENGINE))
+                        .toArray(Boolean[]::new),
                 batteryNeeded);
     }
 
     @Override
     public void accept(TileVisitor visitor) {
-        visitor.visitCannon(this);
+        visitor.visitEngine(this);
     }
 
     /**
-     * Calculates the firepower of this cannon tile,
+     * Calculates the thrust power of this cannon tile,
      * taking in consideration direction and if it's its double version (if and only if it needs battery).
      *
-     * @return This cannon firepower.
+     * @return This engine thrust power.
      */
-    public float calculateFirePower() {
+    public float calculateThrustPower() {
         float basePower = 0;
         for (Direction direction : Direction.values()) {
             basePower += hasPower(direction) ? maskDirectionsMultiplier[direction.getValue()] : 0;

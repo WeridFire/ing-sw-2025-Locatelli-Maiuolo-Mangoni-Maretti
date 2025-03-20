@@ -46,6 +46,13 @@ public interface TileVisitor {
      */
     void visitCannon(CannonTile tile);
 
+    /**
+     * What to do when visiting the provided engine tile (can be double engine).
+     * To be implemented in each visitor.
+     * @param tile The visited (eventually double) engine tile.
+     */
+    void visitEngine(EngineTile tile);
+
+
     // TODO: add all the other concrete Tiles
-    // example -> void visitEngine(EngineTile engine); ...
 }
