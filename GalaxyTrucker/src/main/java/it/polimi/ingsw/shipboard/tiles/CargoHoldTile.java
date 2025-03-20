@@ -13,13 +13,25 @@ import java.util.Set;
 public class CargoHoldTile extends ContainerTile {
 
     /**
-     * Constructs a CargoHoldTile with specified sides and capacity.
+     * Constructs a CargoHoldTile with specified sides, capacity and allowed cargo.
      *
-     * @param sides    An array of sides defining the structure of the tile.
+     * @param sides An array of sides defining the structure of the tile.
+     * @param allowedCargo The set of all the cargo types loadable onto this tile.
+     * @param capacity The maximum capacity of the cargo hold.
+     */
+    protected CargoHoldTile(SideType[] sides, Set<LoadableType> allowedCargo, int capacity) {
+        super(sides, allowedCargo, capacity);
+    }
+
+    /**
+     * Constructs a standard CargoHoldTile with specified sides and capacity.
+     * This cargo hold can contain Blue, Yellow and Green goods.
+     *
+     * @param sides An array of sides defining the structure of the tile.
      * @param capacity The maximum capacity of the cargo hold.
      */
     public CargoHoldTile(SideType[] sides, int capacity) {
-        super(sides, Set.of(LoadableType.BLUE_GOODS, LoadableType.GREEN_GOODS, LoadableType.YELLOW_GOODS), capacity);
+        this(sides, Set.of(LoadableType.BLUE_GOODS, LoadableType.GREEN_GOODS, LoadableType.YELLOW_GOODS), capacity);
     }
 
     /**

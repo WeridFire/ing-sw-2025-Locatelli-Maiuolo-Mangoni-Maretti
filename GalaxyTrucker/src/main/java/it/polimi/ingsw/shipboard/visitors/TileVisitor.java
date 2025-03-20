@@ -19,9 +19,9 @@ public interface TileVisitor {
     void visitLifeSupportSystem(LifeSupportSystemTile tile);
 
     /**
-     * What to do when visiting the provided cargo hold tile.
+     * What to do when visiting the provided cargo hold tile (or special cargo hold tile).
      * To be implemented in each visitor.
-     * @param tile The visited cargo hold tile.
+     * @param tile The visited (eventually special) cargo hold tile.
      */
     void visitCargoHold(CargoHoldTile tile);
 
