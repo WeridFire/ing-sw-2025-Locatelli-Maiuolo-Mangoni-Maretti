@@ -1,9 +1,7 @@
 package src.main.java.it.polimi.ingsw.game;
 
 import src.main.java.it.polimi.ingsw.TilesFactory;
-import src.main.java.it.polimi.ingsw.cards.Card;
 import src.main.java.it.polimi.ingsw.cards.Deck;
-import src.main.java.it.polimi.ingsw.cards.DeckFactory;
 import src.main.java.it.polimi.ingsw.enums.CargoType;
 import src.main.java.it.polimi.ingsw.enums.GameLevel;
 import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
@@ -16,6 +14,8 @@ import src.main.java.it.polimi.ingsw.shipboard1.tiles.Tile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents the game data.
@@ -33,6 +33,12 @@ public class GameData {
 
     /** List of players in the game. */
     private ArrayList<Player> players;
+
+    /** Player's positions (absolute values)    */
+    Set<Integer> playerPositions = new HashSet<>();
+
+    /** Number of positions in 1 lap */
+    private int lapSize;
 
     /** The player whose turn it is. */
     private Player turn;
@@ -243,5 +249,39 @@ public class GameData {
      */
     private ArrayList<Tile> initDefaultTiles(){
         return new ArrayList<>(TilesFactory.createPileTiles());
+    }
+
+    /**
+     * Moves a player on the board, accounting for players he may pass
+     * @param playerToMove player that is going to move
+     * @param steps number of steps the player is moving
+     */
+    public void movePlayer(Player playerToMove, int steps) {
+
+        // HashSet for fast position lookup
+        Set<Integer> occupiedPositions = new HashSet<>();
+        for (Player player : players) {
+            if (!player.getUsername().equals(playerToMove.getUsername())) {
+                occupiedPositions.add(player.getPosition());
+            }
+        }
+
+        int newPosition = playerToMove.getPosition() + steps;
+        int bonusSteps = 0;
+
+        // Count players that you are about to pass
+        for (int i = playerToMove.getPosition() + 1; i <= newPosition; i++) {
+            if (occupiedPositions.contains(i)) {
+                bonusSteps++;
+            }
+        }
+        newPosition += bonusSteps;
+
+        // Check if you landed on another player
+        while (occupiedPositions.contains(newPosition)) {
+            newPosition++;
+        }
+
+        playerToMove.setPosition(newPosition);
     }
 }
