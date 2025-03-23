@@ -252,11 +252,11 @@ public class GameData {
     }
 
     /**
-     * Moves a player on the board, accounting for players he may pass
+     * Moves a player forward on the board, accounting for players he may pass
      * @param playerToMove player that is going to move
      * @param steps number of steps the player is moving
      */
-    public void movePlayer(Player playerToMove, int steps) {
+    public void movePlayerForward(Player playerToMove, int steps) {
 
         // HashSet for fast position lookup
         Set<Integer> occupiedPositions = new HashSet<>();
@@ -266,20 +266,48 @@ public class GameData {
             }
         }
 
-        int newPosition = playerToMove.getPosition() + steps;
-        int bonusSteps = 0;
+        int newPosition = playerToMove.getPosition();
+        int stepsLeft = steps;
 
-        // Count players that you are about to pass
-        for (int i = playerToMove.getPosition() + 1; i <= newPosition; i++) {
-            if (occupiedPositions.contains(i)) {
-                bonusSteps++;
+        while (stepsLeft > 0) {
+            newPosition++; // Move one step back
+            stepsLeft--;   // Decrease steps left
+
+            // Add a step if a player is passed
+            if (occupiedPositions.contains(newPosition)) {
+                stepsLeft++;
             }
         }
-        newPosition += bonusSteps;
 
-        // Check if you landed on another player
-        while (occupiedPositions.contains(newPosition)) {
-            newPosition++;
+        playerToMove.setPosition(newPosition);
+    }
+
+    /**
+     * Moves a player backwards on the board, accounting for players he may pass
+     * @param playerToMove player that is going to move
+     * @param steps number of steps the player is moving
+     */
+    public void movePlayerBackward(Player playerToMove, int steps) {
+
+        // HashSet for fast position lookup
+        Set<Integer> occupiedPositions = new HashSet<>();
+        for (Player player : players) {
+            if (!player.getUsername().equals(playerToMove.getUsername())) {
+                occupiedPositions.add(player.getPosition());
+            }
+        }
+
+        int newPosition = playerToMove.getPosition();
+        int stepsLeft = steps;
+
+        while (stepsLeft > 0) {
+            newPosition--; // Move one step back
+            stepsLeft--;   // Decrease steps left
+
+            // Add a step if a player is passed
+            if (occupiedPositions.contains(newPosition)) {
+                stepsLeft++;
+            }
         }
 
         playerToMove.setPosition(newPosition);
