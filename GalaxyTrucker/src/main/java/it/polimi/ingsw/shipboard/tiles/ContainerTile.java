@@ -5,6 +5,7 @@ import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
+import src.main.java.it.polimi.ingsw.util.ContrabandCalculator;
 
 import java.util.*;
 
@@ -146,6 +147,45 @@ public abstract class ContainerTile extends TileSkeleton<SideType> {
      */
     public List<LoadableType> getLoadedItems() {
         return new ArrayList<>(loadedItems);
+    }
+
+    /**
+     * Returns the most valuable loaded items present on this tile,
+     * for smugglers, up to a given limit, in descending order.
+     * <p>
+     * By default, this method returns an empty queue.
+     * Subclasses that store contraband items should override it.
+     * </p>
+     *
+     * @param limit the maximum number of items to return.
+     * @param minimumContrabandValueExclusive the minimum contraband value (exclusive) to get items.
+     *        Any item with contraband value below or equal to
+     *        {@code minimumContrabandValueExclusive} is not considered.
+     * @return a priority queue of the most valuable loaded items, ordered by value in descending order.
+     * @throws IllegalArgumentException if {@code limit <= 0} or {@code minimumContrabandValueExclusive < 0}
+     */
+    public PriorityQueue<LoadableType> getContrabandMostValuableItems(int limit, int minimumContrabandValueExclusive)
+            throws IllegalArgumentException {
+        if (limit <= 0) {
+            throw new IllegalArgumentException("Limit must be greater than 0");
+        }
+        if (minimumContrabandValueExclusive < 0) {
+            throw new IllegalArgumentException("Minimum contraband value (exclusive) must be greater or equal to 0");
+        }
+
+        PriorityQueue<LoadableType> queue =
+                new PriorityQueue<>(limit, ContrabandCalculator.descendingContrabandComparator);
+        int queueSize = 0;
+        for (LoadableType item : getLoadedItems()) {
+            if (ContrabandCalculator.getContrabandValue(item) > minimumContrabandValueExclusive) {
+                queue.add(item);
+                queueSize++;
+                if (queueSize >= limit) {
+                    break;
+                }
+            }
+        }
+        return queue;
     }
 
     /**
