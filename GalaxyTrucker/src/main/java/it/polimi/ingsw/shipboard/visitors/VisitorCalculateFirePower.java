@@ -5,7 +5,6 @@ import src.main.java.it.polimi.ingsw.shipboard.tiles.*;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
