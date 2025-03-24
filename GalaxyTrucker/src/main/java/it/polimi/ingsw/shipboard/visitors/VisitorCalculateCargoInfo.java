@@ -44,6 +44,11 @@ public class VisitorCalculateCargoInfo implements TileVisitor {
     }
 
     @Override
+    public void visitMainCabin(CabinTile tile) {
+        visitCabin(tile);
+    }
+
+    @Override
     public void visitBatteryComponent(BatteryComponentTile tile) {
         try {
             infoBatteries.visit(tile);

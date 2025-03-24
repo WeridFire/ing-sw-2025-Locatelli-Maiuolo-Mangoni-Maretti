@@ -46,6 +46,11 @@ public class VisitorCalculateFirePower implements TileVisitor {
     }
 
     @Override
+    public void visitMainCabin(CabinTile tile) {
+        visitCabin(tile);
+    }
+
+    @Override
     public void visitCannon(CannonTile tile) {
         if (tile.isDoubleCannon()) {
             try {

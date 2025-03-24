@@ -26,11 +26,18 @@ public interface TileVisitor {
     void visitCargoHold(CargoHoldTile tile);
 
     /**
-     * What to do when visiting the provided cabin tile (can be the main cabin).
+     * What to do when visiting the provided cabin tile (can NOT be the main cabin).
      * To be implemented in each visitor.
-     * @param tile The visited (eventually main) cabin tile.
+     * @param tile The visited (NOT-main) cabin tile.
      */
     void visitCabin(CabinTile tile);
+
+    /**
+     * What to do when visiting the provided main cabin tile.
+     * To be implemented in each visitor.
+     * @param tile The visited main cabin tile.
+     */
+    void visitMainCabin(CabinTile tile);
 
     /**
      * What to do when visiting the provided battery component tile.

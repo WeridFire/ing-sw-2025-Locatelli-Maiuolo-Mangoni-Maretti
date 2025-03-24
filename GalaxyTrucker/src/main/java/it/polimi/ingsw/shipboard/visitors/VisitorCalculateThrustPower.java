@@ -46,6 +46,11 @@ public class VisitorCalculateThrustPower implements TileVisitor {
     }
 
     @Override
+    public void visitMainCabin(CabinTile tile) {
+        visitCabin(tile);
+    }
+
+    @Override
     public void visitEngine(EngineTile tile) {
         if (tile.isDoubleEngine()) {
             try {

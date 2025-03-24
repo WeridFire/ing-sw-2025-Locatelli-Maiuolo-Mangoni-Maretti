@@ -20,6 +20,8 @@ public class VisitorCalculateShieldedSides implements TileVisitor {
     @Override
     public void visitCabin(CabinTile tile) { }
     @Override
+    public void visitMainCabin(CabinTile tile) { }
+    @Override
     public void visitBatteryComponent(BatteryComponentTile tile) { }
     @Override
     public void visitCannon(CannonTile tile) { }

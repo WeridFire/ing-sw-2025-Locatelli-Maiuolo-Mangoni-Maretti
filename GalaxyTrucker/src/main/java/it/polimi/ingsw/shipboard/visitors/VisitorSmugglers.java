@@ -42,6 +42,8 @@ public class VisitorSmugglers implements TileVisitor {
     @Override
     public void visitCabin(CabinTile tile) { }
     @Override
+    public void visitMainCabin(CabinTile tile) { }
+    @Override
     public void visitCannon(CannonTile tile) { }
     @Override
     public void visitEngine(EngineTile tile) { }
