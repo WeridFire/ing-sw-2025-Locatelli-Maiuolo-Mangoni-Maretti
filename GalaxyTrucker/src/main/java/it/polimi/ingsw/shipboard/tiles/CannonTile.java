@@ -48,4 +48,12 @@ public class CannonTile extends PowerableTile {
         return basePower * (isBatteryNeeded() ? 2f : 1f);
     }
 
+    /**
+     * Retrieve info about whether this is a double cannon or not.
+     * @return {@code true} if this cannon is double, {@code false} if is single.
+     */
+    public boolean isDoubleCannon() {
+        return isBatteryNeeded();
+    }
+
 }

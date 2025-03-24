@@ -48,4 +48,12 @@ public class EngineTile extends PowerableTile {
         return basePower * (isBatteryNeeded() ? 2f : 1f);
     }
 
+    /**
+     * Retrieve info about whether this is a double engine or not.
+     * @return {@code true} if this engine is double, {@code false} if is single.
+     */
+    public boolean isDoubleEngine() {
+        return isBatteryNeeded();
+    }
+
 }
