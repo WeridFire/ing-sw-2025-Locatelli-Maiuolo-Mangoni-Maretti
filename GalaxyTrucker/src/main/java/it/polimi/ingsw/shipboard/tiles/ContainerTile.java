@@ -143,7 +143,7 @@ public abstract class ContainerTile extends TileSkeleton<SideType> {
     /**
      * Retrieves a list of currently loaded items.
      *
-     * @return A list of items currently in the container.
+     * @return A (copy of the) list of items currently in the container.
      */
     public List<LoadableType> getLoadedItems() {
         return new ArrayList<>(loadedItems);
