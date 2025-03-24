@@ -2,6 +2,9 @@ package src.main.java.it.polimi.ingsw.shipboard.tiles;
 
 import src.main.java.it.polimi.ingsw.enums.Direction;
 import src.main.java.it.polimi.ingsw.enums.Rotation;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
+import src.main.java.it.polimi.ingsw.util.Coordinates;
 
 /**
  * Generic structure of a Tile.
@@ -10,6 +13,7 @@ import src.main.java.it.polimi.ingsw.enums.Rotation;
 public abstract class TileSkeleton<SideType> implements Tile {
     protected SideType[] sides;
     protected Rotation appliedRotation;
+    protected Coordinates fixedAt;
 
     /**
      * Construct the tile with specified parameters.
@@ -20,6 +24,7 @@ public abstract class TileSkeleton<SideType> implements Tile {
     public TileSkeleton(SideType[] sides) {
         this.sides = sides;
         this.appliedRotation = Rotation.NONE;
+        fixedAt = null;
     }
 
     /**
@@ -33,15 +38,42 @@ public abstract class TileSkeleton<SideType> implements Tile {
     }
 
     /**
+     * Retrieve {@code this} tile's coordinates.
+     * @return {@code this} tile's coordinates.
+     * @throws NotFixedTileException If {@code this} tile has not been placed yet.
+     * @see #place(Coordinates)
+     */
+    public Coordinates getCoordinates() throws NotFixedTileException {
+        if (fixedAt == null) {
+            throw new NotFixedTileException("Attempt to retrieve unplaced tile's coordinates.");
+        }
+
+        return fixedAt;
+    }
+
+    /**
+     * Set {@code this} tile fixed at specified coordinates
+     * @param coordinates Where the tile is placed.
+     */
+    public void place(Coordinates coordinates) {
+        fixedAt = coordinates;
+    }
+
+    /**
      * Apply the specified rotation to the tile.
      * <p>
      * Sides are affected by this rotation.
      * Subclasses that manages the rotation should override this function
      * keeping the {@code super.rotateTile(rotation)} and following the implementation note.
      * @param rotation The rotation to apply.
+     * @throws FixedTileException If the tile has been already fixed.
      * @implNote uses {@link Rotation#applyTo(Object[])} to rotate sides.
      */
-    public void rotateTile(Rotation rotation) {
+    public void rotateTile(Rotation rotation) throws FixedTileException {
+        if (fixedAt != null) {
+            throw new FixedTileException("Attempt to rotate tile already fixed at coordinates " + fixedAt);
+        }
+
         appliedRotation = appliedRotation.composedRotation(rotation);
         rotation.applyTo(sides);
     }
@@ -49,18 +81,20 @@ public abstract class TileSkeleton<SideType> implements Tile {
     /**
      * Reset the tile rotation to its instantiation state.
      * Subclasses should not override this.
+     * @throws FixedTileException If the tile has been already fixed.
      */
-    public void resetRotation() {
+    public void resetRotation() throws FixedTileException {
         rotateTile(appliedRotation.reversed());
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        for (Direction direction : Direction.values()) {
-            sb.append(direction).append(" -> ").append(sides[direction.getValue()]).append("; ");
+        Direction[] directions = Direction.values();
+        sb.append("[").append(directions[0]).append(" -> ").append(sides[directions[0].getValue()]);
+        for (int i = 1; i < directions.length; i++) {
+            sb.append("; ").append(directions[i]).append(" -> ").append(sides[directions[i].getValue()]);
         }
-        return sb.toString();
+        return sb.append("]").toString();
     }
 }

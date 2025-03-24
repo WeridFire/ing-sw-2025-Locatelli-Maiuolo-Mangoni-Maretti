@@ -3,6 +3,7 @@ package src.main.java.it.polimi.ingsw.shipboard.tiles;
 import src.main.java.it.polimi.ingsw.enums.Direction;
 import src.main.java.it.polimi.ingsw.enums.Rotation;
 import src.main.java.it.polimi.ingsw.shipboard.SideType;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 
 public abstract class PowerableTile extends TileSkeleton<SideType> {
     private final Boolean[] sidesWithPower;
@@ -44,7 +45,7 @@ public abstract class PowerableTile extends TileSkeleton<SideType> {
     }
 
     @Override
-    public void rotateTile(Rotation rotation) {
+    public void rotateTile(Rotation rotation) throws FixedTileException {
         super.rotateTile(rotation);
         rotation.applyTo(sidesWithPower);
     }
