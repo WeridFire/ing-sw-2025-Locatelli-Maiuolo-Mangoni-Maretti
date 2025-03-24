@@ -7,6 +7,7 @@ import src.main.java.it.polimi.ingsw.util.Coordinates;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This class is responsible for gathering and analyzing cargo-related information from container tiles in a shipboard.
@@ -56,14 +57,24 @@ public class CalculatorCargoInfo {
     }
 
     /**
-     * Checks whether there are at least a given quantity of a specific loadable item in the visited container tiles.
+     * Counts the occurrences of a specific loadable item among the visited container tiles.
      *
-     * @param item The type of loadable item to check for.
-     * @param quantity The minimum quantity required.
-     * @return {@code true} if there are at least {@code quantity} items of the given type, {@code false} otherwise.
+     * @param item The type of loadable item to count.
+     * @return The number of occurrences of the specified item.
      */
-    public boolean hasAtLeast(LoadableType item, int quantity) {
-        return totalLoadedItems.stream().filter(e -> e == item).count() >= quantity;
+    public int count(LoadableType item) {
+        return (int) totalLoadedItems.stream().filter(e -> e == item).count();
+    }
+
+    /**
+     * Counts the total occurrences of any loadable item that belongs to the specified set of item types
+     * among the visited container tiles.
+     *
+     * @param itemTypes A set of loadable item types to be counted.
+     * @return The total number of occurrences of the specified item types.
+     */
+    public int countAll(Set<LoadableType> itemTypes) {
+        return (int) totalLoadedItems.stream().filter(itemTypes::contains).count();
     }
 
     /**
