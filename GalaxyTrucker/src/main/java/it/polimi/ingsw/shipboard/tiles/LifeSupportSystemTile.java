@@ -1,6 +1,5 @@
 package src.main.java.it.polimi.ingsw.shipboard.tiles;
 
-import src.main.java.it.polimi.ingsw.enums.CrewType;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.visitors.TileVisitor;

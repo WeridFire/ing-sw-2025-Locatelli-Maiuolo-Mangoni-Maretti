@@ -141,12 +141,17 @@ public class Coordinates {
     -> tile t will be the tile put in the line above!
      */
 
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Coordinates other = (Coordinates) obj;
-        return row == other.row && column == other.column;
+        try {
+            Coordinates other = (Coordinates) obj;
+            return row == other.row && column == other.column;
+        }
+        catch (ClassCastException e) {
+            return false;
+        }
     }
 
     @Override

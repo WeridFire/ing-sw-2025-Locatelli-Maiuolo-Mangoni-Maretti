@@ -1,6 +1,5 @@
 package src.main.java.it.polimi.ingsw.cards.enemy;
 
-import src.main.java.it.polimi.ingsw.enums.CargoType;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 

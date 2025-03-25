@@ -1,6 +1,5 @@
 package src.main.java.it.polimi.ingsw.cards;
 
-import src.main.java.it.polimi.ingsw.cards.Card;
 import src.main.java.it.polimi.ingsw.cards.enemy.PiratesCard;
 import src.main.java.it.polimi.ingsw.cards.enemy.SlaversCard;
 import src.main.java.it.polimi.ingsw.cards.enemy.SmugglersCard;
@@ -11,7 +10,6 @@ import src.main.java.it.polimi.ingsw.cards.projectile.Projectile;
 import src.main.java.it.polimi.ingsw.cards.warzone.WarFactory;
 import src.main.java.it.polimi.ingsw.cards.warzone.WarLevel;
 import src.main.java.it.polimi.ingsw.cards.warzone.WarZoneCard;
-import src.main.java.it.polimi.ingsw.enums.CargoType;
 import src.main.java.it.polimi.ingsw.enums.Direction;
 
 import java.util.ArrayList;

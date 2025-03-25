@@ -1,6 +1,5 @@
 package src.main.java.it.polimi.ingsw.cards.enemy;
 
-import src.main.java.it.polimi.ingsw.enums.CargoType;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.ContainerTile;
@@ -47,6 +46,10 @@ public class SlaversCard extends EnemyCard {
 		movePlayer(player, getLostDays());
 	}
 
+	/**
+	 *
+	 * @param player player on which the method is currently acting upon
+	 */
 	@Override
 	public void applyPunishment(Player player) {
 		Map<Coordinates, List<LoadableType>> itemsPosition = player.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().getCoordinatesMask();

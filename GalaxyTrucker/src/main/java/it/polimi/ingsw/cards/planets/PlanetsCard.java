@@ -10,11 +10,8 @@ import java.util.UUID;
 
 public class PlanetsCard extends Card {
 
-
-
 	private Planet[] planets;
 	private int lostDays;
-
 
 	/**
 	 * Instances a card.
@@ -32,7 +29,7 @@ public class PlanetsCard extends Card {
 	/**
 	 * Gets, given an index, the corresponding planet.
 	 * @param i the index of the planet.
-	 * @throws PlanetsCardException the planet does not exists in the list of planetsi n the card.
+	 * @throws PlanetsCardException the planet does not exists in the list of planets n the card.
 	 * @return
 	 */
 	public Planet getPlanet(int i) throws PlanetsCardException{

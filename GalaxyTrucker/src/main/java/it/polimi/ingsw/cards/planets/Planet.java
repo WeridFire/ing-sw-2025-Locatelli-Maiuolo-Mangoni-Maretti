@@ -1,7 +1,6 @@
 package src.main.java.it.polimi.ingsw.cards.planets;
 
 import src.main.java.it.polimi.ingsw.cards.exceptions.PlanetsCardException;
-import src.main.java.it.polimi.ingsw.enums.CargoType;
 import src.main.java.it.polimi.ingsw.player.Player;
 
 import java.util.List;

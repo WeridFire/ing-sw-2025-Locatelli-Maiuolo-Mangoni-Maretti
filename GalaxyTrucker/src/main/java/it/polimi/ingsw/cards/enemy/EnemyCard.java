@@ -65,7 +65,6 @@ public abstract class EnemyCard extends Card {
             //TODO: Implement logic of asking player what power they wanna use
             if(p.getShipBoard().getStatistics().getFreePower(PowerType.FIRE) > getFirePower()){
                 givePrize(p);
-
                 break;
             }else if(p.getShipBoard().getStatistics().getFreePower(PowerType.FIRE) < getFirePower()){
                 applyPunishment(p);

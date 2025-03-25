@@ -1,7 +1,7 @@
 package src.main.java.it.polimi.ingsw;
 
-import src.main.java.it.polimi.ingsw.enums.ConnectorType;
-import src.main.java.it.polimi.ingsw.enums.CrewType;
+// TODO: redo
+
 import src.main.java.it.polimi.ingsw.shipboard1.tiles.Tile;
 import src.main.java.it.polimi.ingsw.shipboard1.tiles.content.*;
 import src.main.java.it.polimi.ingsw.shipboard1.tiles.side.TileSide;
