@@ -2,23 +2,24 @@ package src.main.java.it.polimi.ingsw.shipboard;
 
 import src.main.java.it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.Tile;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents a cluster of connected tiles, with an optional main tile.
  * A tile cluster groups tiles that are considered part of the same unit (e.g. all and only those welded together).
  */
 public class TileCluster {
-    private final List<Tile> tiles;
-    private Tile mainTile;
+    private final Set<TileSkeleton<SideType>> tiles;
+    private TileSkeleton<SideType> mainTile;
 
     /**
      * Creates an empty tile cluster with no main tile.
      */
     public TileCluster() {
-        tiles = new ArrayList<>();
+        tiles = new HashSet<>();
         mainTile = null;
     }
 
@@ -27,8 +28,8 @@ public class TileCluster {
      *
      * @param mainTile the tile to be set as the main tile
      */
-    public TileCluster(Tile mainTile) {
-        tiles = new ArrayList<>();
+    public TileCluster(TileSkeleton<SideType> mainTile) {
+        tiles = new HashSet<>();
         tiles.add(mainTile);
         this.mainTile = mainTile;
     }
@@ -39,22 +40,18 @@ public class TileCluster {
      *
      * @param tiles the list of tiles to be added to the cluster
      */
-    public TileCluster(List<Tile> tiles) {
-        this.tiles = new ArrayList<>(tiles);
+    public TileCluster(Set<TileSkeleton<SideType>> tiles) {
+        this.tiles = new HashSet<>(tiles);
         mainTile = null;
     }
 
     /**
      * Adds a tile to the cluster.
+     * If the tile is already part of the cluster, does nothing.
      *
      * @param tile the tile to be added
-     * @throws TileAlreadyPresentException if the tile is already part of the cluster
      */
-    public void addTile(Tile tile) throws TileAlreadyPresentException {
-        if (tiles.contains(tile)) {
-            throw new TileAlreadyPresentException("Attempt to add a tile already present in the cluster");
-        }
-
+    public void addTile(TileSkeleton<SideType> tile) {
         tiles.add(tile);
     }
 
@@ -64,7 +61,7 @@ public class TileCluster {
      * @param tile the tile to be set as the main tile
      * @throws TileAlreadyPresentException if there is already a main tile in the cluster
      */
-    public void addAsMainTile(Tile tile) throws TileAlreadyPresentException {
+    public void addAsMainTile(TileSkeleton<SideType> tile) throws TileAlreadyPresentException {
         if (mainTile != null) {
             throw new TileAlreadyPresentException(
                     "Attempt to add a tile as main tile in a cluster with an already set main tile");
@@ -95,9 +92,18 @@ public class TileCluster {
     /**
      * Retrieves the list of tiles in the cluster.
      *
-     * @return a list of tiles in the cluster
+     * @return a set of tiles in the cluster
      */
-    public List<Tile> getTiles() {
+    public Set<TileSkeleton<SideType>> getTiles() {
         return tiles;
+    }
+
+    /**
+     * Merge all the tiles from {@code otherCluster} in this cluster.
+     * If this cluster does not have a main tile: the main tile becomes the {@code otherCluster}'s,
+     * otherwise it does not change.
+     */
+    public void merge(TileCluster otherCluster) {
+        tiles.addAll(otherCluster.getTiles());
     }
 }
