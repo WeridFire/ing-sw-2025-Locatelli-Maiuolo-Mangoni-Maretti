@@ -1,9 +1,7 @@
 package src.main.java.it.polimi.ingsw.game;
 
 import src.main.java.it.polimi.ingsw.TilesFactory;
-import src.main.java.it.polimi.ingsw.cards.Card;
 import src.main.java.it.polimi.ingsw.cards.Deck;
-import src.main.java.it.polimi.ingsw.cards.DeckFactory;
 import src.main.java.it.polimi.ingsw.enums.CargoType;
 import src.main.java.it.polimi.ingsw.enums.GameLevel;
 import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
@@ -11,11 +9,13 @@ import src.main.java.it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameExceptio
 import src.main.java.it.polimi.ingsw.game.exceptions.PlayerNotInGameException;
 import src.main.java.it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import src.main.java.it.polimi.ingsw.player.Player;
-import src.main.java.it.polimi.ingsw.shipboard.ShipBoard;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.Tile;
+import src.main.java.it.polimi.ingsw.shipboard1.ShipBoard;
+import src.main.java.it.polimi.ingsw.shipboard1.tiles.Tile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents the game data.
@@ -33,6 +33,12 @@ public class GameData {
 
     /** List of players in the game. */
     private ArrayList<Player> players;
+
+    /** Player's positions (absolute values)    */
+    Set<Integer> playerPositions = new HashSet<>();
+
+    /** Number of positions in 1 lap */
+    private int lapSize;
 
     /** The player whose turn it is. */
     private Player turn;
@@ -243,5 +249,67 @@ public class GameData {
      */
     private ArrayList<Tile> initDefaultTiles(){
         return new ArrayList<>(TilesFactory.createPileTiles());
+    }
+
+    /**
+     * Moves a player forward on the board, accounting for players he may pass
+     * @param playerToMove player that is going to move
+     * @param steps number of steps the player is moving
+     */
+    public void movePlayerForward(Player playerToMove, int steps) {
+
+        // HashSet for fast position lookup
+        Set<Integer> occupiedPositions = new HashSet<>();
+        for (Player player : players) {
+            if (!player.getUsername().equals(playerToMove.getUsername())) {
+                occupiedPositions.add(player.getPosition());
+            }
+        }
+
+        int newPosition = playerToMove.getPosition();
+        int stepsLeft = steps;
+
+        while (stepsLeft > 0) {
+            newPosition++; // Move one step back
+            stepsLeft--;   // Decrease steps left
+
+            // Add a step if a player is passed
+            if (occupiedPositions.contains(newPosition)) {
+                stepsLeft++;
+            }
+        }
+
+        playerToMove.setPosition(newPosition);
+    }
+
+    /**
+     * Moves a player backwards on the board, accounting for players he may pass
+     * @param playerToMove player that is going to move
+     * @param steps number of steps the player is moving
+     */
+    public void movePlayerBackward(Player playerToMove, int steps) {
+
+        // HashSet for fast position lookup
+        Set<Integer> occupiedPositions = new HashSet<>();
+        for (Player player : players) {
+            if (!player.getUsername().equals(playerToMove.getUsername())) {
+                occupiedPositions.add(player.getPosition());
+            }
+        }
+
+        int newPosition = playerToMove.getPosition();
+        int stepsLeft = steps;
+
+        while (stepsLeft > 0) {
+            newPosition--; // Move one step back
+            stepsLeft--;   // Decrease steps left
+
+            // Add a step if a player is passed
+            if (occupiedPositions.contains(newPosition)) {
+                stepsLeft++;
+            }
+        }
+
+        playerToMove.setPosition(newPosition);
     }
 }

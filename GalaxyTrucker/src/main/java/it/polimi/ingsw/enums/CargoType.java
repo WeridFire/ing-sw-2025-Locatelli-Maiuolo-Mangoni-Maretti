@@ -1,6 +1,6 @@
 package src.main.java.it.polimi.ingsw.enums;
 
-import src.main.java.it.polimi.ingsw.shipboard.tiles.content.ILoadableItem;
+import src.main.java.it.polimi.ingsw.shipboard1.tiles.content.ILoadableItem;
 
 /**
  * Enum of cargo tokens.

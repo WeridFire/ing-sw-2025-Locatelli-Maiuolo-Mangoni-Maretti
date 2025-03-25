@@ -1,4 +1,4 @@
-package src.main.java.it.polimi.ingsw.shipboard.exceptions;
+package src.main.java.it.polimi.ingsw.shipboard1.exceptions;
 
 import src.main.java.it.polimi.ingsw.shipboard1.tiles.Tile;
 import src.main.java.it.polimi.ingsw.util.Coordinates;

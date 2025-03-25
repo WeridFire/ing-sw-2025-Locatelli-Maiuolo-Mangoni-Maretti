@@ -2,12 +2,12 @@ package src.main.java.it.polimi.ingsw;
 
 import src.main.java.it.polimi.ingsw.enums.ConnectorType;
 import src.main.java.it.polimi.ingsw.enums.CrewType;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.Tile;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.content.*;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.side.TileSide;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.side.TileSideCannon;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.side.TileSideEngine;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.side.TileSideShield;
+import src.main.java.it.polimi.ingsw.shipboard1.tiles.Tile;
+import src.main.java.it.polimi.ingsw.shipboard1.tiles.content.*;
+import src.main.java.it.polimi.ingsw.shipboard1.tiles.side.TileSide;
+import src.main.java.it.polimi.ingsw.shipboard1.tiles.side.TileSideCannon;
+import src.main.java.it.polimi.ingsw.shipboard1.tiles.side.TileSideEngine;
+import src.main.java.it.polimi.ingsw.shipboard1.tiles.side.TileSideShield;
 
 import java.util.*;
 import java.util.function.Supplier;
