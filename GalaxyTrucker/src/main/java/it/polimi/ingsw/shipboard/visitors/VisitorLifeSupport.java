@@ -19,7 +19,7 @@ public class VisitorLifeSupport implements TileVisitor {
 	/**
 	 * Instances a visitor to update the life supports of cabin tiles.
 	 */
-	VisitorLifeSupport() {
+	public VisitorLifeSupport() {
 		lifeSupportSystems = new ArrayList<>();
 		cabinTiles = new ArrayList<>();
 	}

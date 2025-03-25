@@ -20,7 +20,7 @@ public class VisitorEpidemic implements TileVisitor {
 	/**
 	 * Creates a visitor that handles the application of the epidemic card effect.
 	 */
-	VisitorEpidemic() {
+	public VisitorEpidemic() {
 		nonEmptyCabins = new ArrayList<>();
 	}
 

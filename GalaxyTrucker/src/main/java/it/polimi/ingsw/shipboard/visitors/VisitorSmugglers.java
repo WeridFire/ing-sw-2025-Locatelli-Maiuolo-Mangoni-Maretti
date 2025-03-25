@@ -21,7 +21,7 @@ public class VisitorSmugglers implements TileVisitor {
      * @param maxRemovableItems The maximum number of items to remove.
      * @throws IllegalArgumentException If {@code maxRemovableItems <= 0}.
      */
-    VisitorSmugglers(int maxRemovableItems) {
+    public VisitorSmugglers(int maxRemovableItems) {
         if (maxRemovableItems <= 0) {
             throw new IllegalArgumentException("maxRemovableItems (provided: " + maxRemovableItems
                     + ") must be greater than 0");

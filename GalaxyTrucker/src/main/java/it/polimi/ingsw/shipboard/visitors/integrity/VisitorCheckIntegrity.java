@@ -21,7 +21,7 @@ public class VisitorCheckIntegrity implements TileVisitor {
     private final Set<TileSkeleton<SideType>> intrinsicallyWrongTiles;
     private final List<Pair<TileSkeleton<SideType>, TileSkeleton<SideType>>> illegallyWeldedTiles;
 
-    VisitorCheckIntegrity() {
+    public VisitorCheckIntegrity() {
         visitedTiles = new HashMap<>();
         clusters = new ArrayList<>();
         intrinsicallyWrongTiles = new HashSet<>();
@@ -30,41 +30,42 @@ public class VisitorCheckIntegrity implements TileVisitor {
 
     @Override
     public void visitStructural(StructuralTile tile) {
-
+        addToClusters(tile);
     }
 
     @Override
     public void visitLifeSupportSystem(LifeSupportSystemTile tile) {
-
+        addToClusters(tile);
     }
 
     @Override
     public void visitCargoHold(CargoHoldTile tile) {
-
+        addToClusters(tile);
     }
 
     @Override
     public void visitCabin(CabinTile tile) {
-
+        addToClusters(tile);
     }
 
     @Override
     public void visitMainCabin(CabinTile tile) {
-
+        addToClusters(tile);
     }
 
     @Override
     public void visitBatteryComponent(BatteryComponentTile tile) {
-
+        addToClusters(tile);
     }
 
     @Override
     public void visitCannon(CannonTile tile) {
-
+        addToClusters(tile);
     }
 
     @Override
     public void visitEngine(EngineTile tile) {
+        addToClusters(tile);
         if (tile.hasPower(Direction.EAST) || tile.hasPower(Direction.WEST) || tile.hasPower(Direction.NORTH)) {
             intrinsicallyWrongTiles.add(tile);
         }
@@ -72,7 +73,7 @@ public class VisitorCheckIntegrity implements TileVisitor {
 
     @Override
     public void visitShieldGenerator(ShieldGeneratorTile tile) {
-
+        addToClusters(tile);
     }
 
     private static boolean areDirectlyWelded(TileSkeleton<SideType> tile1, TileSkeleton<SideType> tile2) {
