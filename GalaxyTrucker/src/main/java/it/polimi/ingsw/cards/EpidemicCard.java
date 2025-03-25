@@ -5,6 +5,7 @@ import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.Tile;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
+import src.main.java.it.polimi.ingsw.shipboard.visitors.VisitorEpidemic;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
 import java.util.HashSet;
@@ -32,28 +33,12 @@ public class EpidemicCard extends Card{
 	 */
 	@Override
 	public void playEffect(UUID gameId) {
-		Set<Tile> valid = new HashSet<>(); // Initialize a modifiable set
-
 		for (Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers()) {
-			// Filters to access only the tiles where there's a crew
-			Set<Map.Entry<Coordinates, Tile>> crewTiles = p.getShipBoard().getTilesOnBoard()
-					.stream()
-					.filter(entry -> entry.getValue().getContent().countCrew() > 0)
-					.collect(Collectors.toSet());
-
-			for (Map.Entry<Coordinates, Tile> entry : crewTiles) {
-				// TODO: Implement logic to check if nearby tiles contain a valid crew cabin
-				valid.add(entry.getValue());
+			VisitorEpidemic visitorEpidemic = new VisitorEpidemic();
+			for(Tile t : p.getShipBoard().getTiles()){
+				t.accept(visitorEpidemic);
 			}
-
-			// Process each valid tile (Replace the incomplete lambda logic)
-			valid.forEach(tile -> {
-				try {
-					tile.getContent().removeCrew(1);
-				} catch (UnsupportedLoadableItemException | NotEnoughItemsException e) {
-					//TODO: ignore error as we know the tile is valid, find a clean way to do this.
-				}
-			});
+			visitorEpidemic.applyEpidemicEffect(p.getShipBoard().getTilesOnBoard());
 		}
 	}
 
