@@ -1,10 +1,13 @@
 package src.main.java.it.polimi.ingsw.shipboard.visitors.integrity;
 
-import src.main.java.it.polimi.ingsw.shipboard.tiles.Tile;
+import javafx.util.Pair;
+import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.TileCluster;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
+import src.main.java.it.polimi.ingsw.util.Coordinates;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Represents an integrity issue with a shipboard configuration.
@@ -53,71 +56,85 @@ public class IntegrityProblem {
         this.clustersToKeep = clustersToKeep;
     }
 
-    /**
-     * Creates an integrity problem for an intrinsically incorrect tile.
-     * <p>
-     * This problem occurs after welding the shipboard when a tile is inherently misplaced
-     * and must be removed while keeping the rest of the ship intact.
-     * </p>
-     *
-     * @param wrongTile the tile that is incorrectly placed
-     * @param allTiles the complete list of tiles on the shipboard
-     * @return an {@code IntegrityProblem} instance representing the issue
-     */
-    public static IntegrityProblem createIntrinsicallyWrongProblem(Tile wrongTile, List<Tile> allTiles) {
-        List<Tile> otherTiles = new ArrayList<>(allTiles);
-        otherTiles.remove(wrongTile);
 
-        return new IntegrityProblem(List.of(new TileCluster(wrongTile)), List.of(new TileCluster(otherTiles)));
-    }
+    public IntegrityProblem(Map<Coordinates, TileSkeleton<SideType>> visitedTiles,
+                            List<TileCluster> clusters,
+                            Set<TileSkeleton<SideType>> intrinsicallyWrongTiles,
+                            List<Pair<TileSkeleton<SideType>, TileSkeleton<SideType>>> illegallyWeldedTiles) {
 
-    /**
-     * Creates an integrity problem due to an illegal welding between two conflicting tiles.
-     * <p>
-     * This problem arises after welding the shipboard when two tiles create an invalid connection.
-     * The solution involves creating two possible ship configurations, each removing one of the conflicting tiles.
-     * </p>
-     *
-     * @param conflictingTile1 the first tile involved in the illegal welding
-     * @param conflictingTile2 the second tile involved in the illegal welding
-     * @param allTiles the complete list of tiles on the shipboard
-     * @return an {@code IntegrityProblem} instance representing the issue
-     */
-    public static IntegrityProblem createIllegalWeldingProblem(Tile conflictingTile1, Tile conflictingTile2,
-                                                               List<Tile> allTiles) {
-        /* TODO:
-         * Create two clusters to keep:
-         * 1. The first containing all the tiles except those that would be disconnected from the main cabin
-         *    if conflictingTile2 was removed.
-         * 2. The second containing all the tiles except those that would be disconnected from the main cabin
-         *    if conflictingTile1 was removed.
+        this.clustersToRemove = new ArrayList<>();
+        this.clustersToKeep = new ArrayList<>();
+
+        // add intrinsically wrong tiles as 1-tile clusters to remove
+        for (TileSkeleton<SideType> intrinsicallyWrongTile : intrinsicallyWrongTiles) {
+            clustersToRemove.add(new TileCluster(intrinsicallyWrongTile));
+        }
+
+        // add multiple clusters as clusters to keep -> only one will be kept: ok
+        clustersToKeep.addAll(clusters);
+
+        /* BFS tree search all the clusters for badly connected tiles (one way and the other)
+            add all the clusters as to keep -> only one will be kept: ok
+            note: with implementation that keeps intersection of clusters to keep, is ok to mask with
+            previously set clusters.
          */
-        List<TileCluster> clustersToKeep = new ArrayList<>();
-
-        return new IntegrityProblem(new ArrayList<>(0), clustersToKeep);
+        for (Pair<TileSkeleton<SideType>, TileSkeleton<SideType>> illegallyWeldedTile : illegallyWeldedTiles) {
+            clustersToKeep.add(exploreCluster(visitedTiles,
+                    illegallyWeldedTile.getKey(), illegallyWeldedTile.getValue()));
+            clustersToKeep.add(exploreCluster(visitedTiles,
+                    illegallyWeldedTile.getValue(), illegallyWeldedTile.getKey()));
+        }
     }
+
 
     /**
-     * Creates an integrity problem where the ship is split into separate parts.
-     * <p>
-     * This problem can occur after welding the shipboard or during the flight phase.
-     * If parts of the ship become disconnected, the ones without human crew will be removed,
-     * while the others must be kept.
-     * </p>
+     * Explores a connected cluster of tiles using Breadth-First Search (BFS).
      *
-     * @param separatedShipParts a list of tile clusters representing separate parts of the ship
-     * @return an {@code IntegrityProblem} instance representing the issue
+     * @param visitedTiles A map of coordinates to their corresponding tiles.
+     * @param startingTile The tile where exploration begins.
+     * @param tileToIgnore A tile to be ignored during exploration (can be null).
+     * @return The updated TileCluster containing all connected tiles.
+     * @throws RuntimeException If the tile's neighbors cannot be determined.
      */
-    public static IntegrityProblem createSeparateShipPartsProblem(List<TileCluster> separatedShipParts) {
-        /* TODO:
-         * Parse ship parts and determine:
-         * - Clusters without human crew should be added to 'clustersToRemove'.
-         * - The remaining clusters should be added to 'clustersToKeep'.
-         */
-        List<TileCluster> clustersToRemove = new ArrayList<>();
-        List<TileCluster> clustersToKeep = new ArrayList<>();
+    private TileCluster exploreCluster(Map<Coordinates, TileSkeleton<SideType>> visitedTiles,
+                                       TileSkeleton<SideType> startingTile, TileSkeleton<SideType> tileToIgnore) {
 
-        return new IntegrityProblem(clustersToRemove, clustersToKeep);
+        TileCluster cluster = new TileCluster(startingTile);
+
+        // Use a queue to explore tiles iteratively (BFS)
+        Queue<TileSkeleton<SideType>> queue = new LinkedList<>();
+        queue.add(startingTile);
+
+        while (!queue.isEmpty()) {
+            TileSkeleton<SideType> tile = queue.poll();
+
+            // Skip if already processed
+            if (cluster.getTiles().contains(tile)) {
+                continue;
+            }
+
+            // Add the tile to the cluster
+            cluster.addTile(tile);
+
+            Set<Coordinates> neighborsLocations;
+            try {
+                // Retrieve the coordinates of neighboring tiles
+                neighborsLocations = tile.getCoordinates().getNeighbors();
+            } catch (NotFixedTileException e) {
+                throw new RuntimeException(e);  // should never happen -> runtime error
+            }
+
+            // Collect valid neighbors (tiles that exist and are not ignored)
+            for (Coordinates coord : neighborsLocations) {
+                TileSkeleton<SideType> neighbor = visitedTiles.get(coord);
+                if (neighbor != null && neighbor != tileToIgnore && !cluster.getTiles().contains(neighbor)) {
+                    queue.add(neighbor);
+                }
+            }
+        }
+
+        return cluster;
     }
+
 }
 

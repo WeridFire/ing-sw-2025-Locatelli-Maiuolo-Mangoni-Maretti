@@ -20,5 +20,21 @@ public enum SideType {
     CANNON,
 
     /** A side equipped with an engine (no connectors). */
-    ENGINE
+    ENGINE;
+
+
+    public static boolean areWeldable(SideType s1, SideType s2) {
+        if (s1 == SINGLE) {
+            return (s2 == SINGLE || s2 == UNIVERSAL);
+        }
+        else if (s1 == DOUBLE) {
+            return (s2 == DOUBLE || s2 == UNIVERSAL);
+        }
+        else if (s1 == UNIVERSAL) {
+            return (s2 == SINGLE || s2 == DOUBLE || s2 == UNIVERSAL);
+        }
+        else {
+            return false;
+        }
+    }
 }

@@ -54,8 +54,12 @@ public abstract class TileSkeleton<SideType> implements Tile {
     /**
      * Set {@code this} tile fixed at specified coordinates
      * @param coordinates Where the tile is placed.
+     * @throws FixedTileException If the tile is already fixed.
      */
-    public void place(Coordinates coordinates) {
+    public void place(Coordinates coordinates) throws FixedTileException {
+        if (fixedAt != null) {
+            throw new FixedTileException("Attempt to place an already fixed tile.");
+        }
         fixedAt = coordinates;
     }
 
@@ -85,6 +89,17 @@ public abstract class TileSkeleton<SideType> implements Tile {
      */
     public void resetRotation() throws FixedTileException {
         rotateTile(appliedRotation.reversed());
+    }
+
+    /**
+     * Get info about tiles adjacency.
+     * @param neighbor The tile to check for adjacency.
+     * @return {@code null} if this tile is not placed adjacent to {@code other} tile,
+     * otherwise the direction to go from this tile to the {@code other}.
+     */
+    public Direction getNeighborDirection(TileSkeleton<SideType> neighbor) {
+        if (fixedAt == null) return null;
+        return fixedAt.getNeighborDirection(neighbor.fixedAt);
     }
 
     @Override
