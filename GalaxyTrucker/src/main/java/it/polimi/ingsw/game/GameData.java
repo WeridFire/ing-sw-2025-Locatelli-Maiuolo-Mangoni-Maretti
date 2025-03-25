@@ -8,6 +8,8 @@ import src.main.java.it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameExceptio
 import src.main.java.it.polimi.ingsw.game.exceptions.PlayerNotInGameException;
 import src.main.java.it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import src.main.java.it.polimi.ingsw.player.Player;
+import src.main.java.it.polimi.ingsw.shipboard.SideType;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import src.main.java.it.polimi.ingsw.shipboard1.ShipBoard;
 import src.main.java.it.polimi.ingsw.shipboard1.tiles.Tile;
 
@@ -246,7 +248,7 @@ public class GameData {
      *
      * @return A list of default covered tiles.
      */
-    private ArrayList<Tile> initDefaultTiles(){
+    private ArrayList<TileSkeleton<SideType>> initDefaultTiles(){
         return new ArrayList<>(TilesFactory.createPileTiles());
     }
 
