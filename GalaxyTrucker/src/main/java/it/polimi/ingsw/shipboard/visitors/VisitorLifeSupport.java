@@ -16,6 +16,9 @@ public class VisitorLifeSupport implements TileVisitor {
 	private final List<LifeSupportSystemTile> lifeSupportSystems;
 	private final List<CabinTile> cabinTiles;
 
+	/**
+	 * Instances a visitor to update the life supports of cabin tiles.
+	 */
 	VisitorLifeSupport() {
 		lifeSupportSystems = new ArrayList<>();
 		cabinTiles = new ArrayList<>();
