@@ -5,9 +5,7 @@ import src.main.java.it.polimi.ingsw.shipboard.tiles.*;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class is responsible for gathering and analyzing cargo-related information from container tiles in a shipboard.
@@ -20,15 +18,15 @@ public class CalculatorCargoInfo {
     /** A list of all loadable items currently stored in the visited container tiles. */
     private final List<LoadableType> totalLoadedItems;
 
-    /** A list of coordinates representing the locations of the visited container tiles. */
-    private final List<Coordinates> containerLocations;
+    /** A map of coordinates and items contained in these coordinates. */
+    private final Map<Coordinates, List<LoadableType>> containerLocations;
 
     /**
      * Constructs an empty {@code CalculatorCargoInfo} instance, initializing lists and setting capacity to zero.
      */
     CalculatorCargoInfo() {
         totalLoadedItems = new ArrayList<>();
-        containerLocations = new ArrayList<>();
+        containerLocations = new HashMap<>();
         capacityLeft = 0;
     }
 
@@ -42,9 +40,10 @@ public class CalculatorCargoInfo {
      */
     protected void visit(ContainerTile tile) throws NotFixedTileException {
         Coordinates coordinates = tile.getCoordinates();
+
         capacityLeft += tile.getCapacityLeft();
         totalLoadedItems.addAll(tile.getLoadedItems());
-        containerLocations.add(coordinates);
+        containerLocations.put(coordinates, tile.getLoadedItems());
     }
 
     /**
@@ -78,11 +77,11 @@ public class CalculatorCargoInfo {
     }
 
     /**
-     * Returns a list of coordinates representing the locations of the visited container tiles.
+     * Returns a map of coordinates and items contained at these coordinates.
      *
-     * @return A (copy of the) list containing the coordinates of all visited containers.
+     * @return A (copy of the) map of coordinates and items contained at these coordinates.
      */
-    public List<Coordinates> getCoordinatesMask() {
-        return new ArrayList<>(containerLocations);
+    public Map<Coordinates, List<LoadableType>> getCoordinatesMask() {
+        return new HashMap<>(containerLocations);
     }
 }

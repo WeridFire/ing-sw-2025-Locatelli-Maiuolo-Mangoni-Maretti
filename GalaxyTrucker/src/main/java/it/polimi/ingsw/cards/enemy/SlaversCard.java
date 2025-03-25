@@ -2,8 +2,12 @@ package src.main.java.it.polimi.ingsw.cards.enemy;
 
 import src.main.java.it.polimi.ingsw.enums.CargoType;
 import src.main.java.it.polimi.ingsw.player.Player;
+import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class SlaversCard extends EnemyCard {
@@ -42,8 +46,7 @@ public class SlaversCard extends EnemyCard {
 
 	@Override
 	public void applyPunishment(Player player) {
-		for(int i=0; i<punishCrewAmount; i++){
-			//TODO: ask player where he wants to remove the crew member from.
-		}
+		Map<Coordinates, List<LoadableType>> itemsPosition = player.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().getCoordinatesMask();
+		//TODO: send these coords to user, ask user
 	}
 }
