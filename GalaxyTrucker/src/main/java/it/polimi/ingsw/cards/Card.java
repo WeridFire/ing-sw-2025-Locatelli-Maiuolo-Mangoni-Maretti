@@ -1,6 +1,7 @@
 package src.main.java.it.polimi.ingsw.cards;
 
 import src.main.java.it.polimi.ingsw.player.Player;
+import src.main.java.it.polimi.ingsw.GamesHandler;
 
 import java.util.UUID;
 
@@ -35,6 +36,28 @@ public abstract class Card {
      */
     public static void movePlayer(Player player, int position){
         //TBD - Implement the logic of moving the players.
+        for(Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers())
+        {//calcolo dei giocatori superati
+            if(p != player){ //funziona se sono ordinati nell'array
+                if(player.getDistFromFirst() - p.getDistFromFirst() < position){
+                    position =+ 1;
+                }
+            }
+        }
+        if(player.getDistFromFirst() = 0){ //il player è primo
+            for(Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers())
+                if(p != player){
+                    p.setDistFromFirst(-1*position); //"arretra" tutti gli altri giocatori di position posizioni
+                }
+        }
+        elseif(player.getDistFromFirst() < position){ //il player supera il primo
+            tmp = player.getDistFromFirst();
+            player.setDistFromFirst(tmp); //è meglio se lo salvo nel game, in modo da non dover chiamare ogni player ogni volta
+            movePlayer(player, position-tmp);
+        }
+        else{ //tutto il resto
+            player.setDistFromFirst(position);
+        }
     }
 
     /**
