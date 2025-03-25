@@ -115,6 +115,20 @@ public class Coordinates {
         return neighbors;
     }
 
+    /**
+     * Get info about coordinates adjacency.
+     * @param neighbor The other coordinates to check for adjacency.
+     * @return {@code null} if this and {@code other} coordinates are not adjacent,
+     * otherwise the direction to go from this tile to the {@code other}.
+     */
+    public Direction getNeighborDirection(Coordinates neighbor) {
+        if (neighbor == null) return null;
+        for (Direction direction : Direction.values()) {
+            if (getNext(direction).equals(neighbor)) return direction;
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         return "(" + row + "; " + column + ")";

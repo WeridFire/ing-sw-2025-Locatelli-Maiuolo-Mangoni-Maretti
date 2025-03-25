@@ -2,8 +2,15 @@ package src.main.java.it.polimi.ingsw.cards.enemy;
 
 import src.main.java.it.polimi.ingsw.enums.CargoType;
 import src.main.java.it.polimi.ingsw.player.Player;
+import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.ContainerTile;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class SlaversCard extends EnemyCard {
@@ -42,8 +49,19 @@ public class SlaversCard extends EnemyCard {
 
 	@Override
 	public void applyPunishment(Player player) {
-		for(int i=0; i<punishCrewAmount; i++){
-			//TODO: ask player where he wants to remove the crew member from.
-		}
+		Map<Coordinates, List<LoadableType>> itemsPosition = player.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().getCoordinatesMask();
+		//TODO: send the map of positions and content to the player, wait for them to return
+		// a similar map that will contain the items that the user desires to remove from each coordinate.
+		Map<Coordinates, List<LoadableType>> itemsToRemove = new HashMap<>();
+		itemsToRemove.forEach((coords, items) -> {
+			ContainerTile tile = (ContainerTile) player.getShipBoard().get(coords);
+			for(LoadableType l : items){
+				try {
+					tile.loadItems(l, 1);
+				} catch (TooMuchLoadException | UnsupportedLoadableItemException e) {
+					//TODO: Contact player to notify failure, and retry
+				}
+			}
+		});
 	}
 }
