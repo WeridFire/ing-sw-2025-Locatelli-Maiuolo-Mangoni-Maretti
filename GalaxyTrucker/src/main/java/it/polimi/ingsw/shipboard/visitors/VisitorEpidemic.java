@@ -20,7 +20,7 @@ public class VisitorEpidemic implements TileVisitor {
 	/**
 	 * Creates a visitor that handles the application of the epidemic card effect.
 	 */
-	VisitorEpidemic() {
+	public VisitorEpidemic() {
 		nonEmptyCabins = new ArrayList<>();
 	}
 
@@ -66,7 +66,7 @@ public class VisitorEpidemic implements TileVisitor {
 	 * The method accepts a hashmap of the shipboard map, but never edits it.
 	 * It removes crew from the cabins based on the rule of the game. It will not update itself after the execution,
 	 * so the whole visitor should be recalculated at the end.
-	 * @param shipBoard
+	 * @param shipBoard as coordinate-tile entries in the shipboard
 	 */
 	public void applyEpidemicEffect(Map<Coordinates, TileSkeleton<SideType>> shipBoard){
 		Set<Coordinates> result = new HashSet<>();

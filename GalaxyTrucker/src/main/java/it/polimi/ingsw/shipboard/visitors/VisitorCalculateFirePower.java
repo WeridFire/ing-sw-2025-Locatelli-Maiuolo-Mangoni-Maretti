@@ -13,7 +13,7 @@ public class VisitorCalculateFirePower implements TileVisitor {
     private float baseFirePower;
     private final Map<Coordinates, Float> doubleCannons;
 
-    VisitorCalculateFirePower() {
+    public VisitorCalculateFirePower() {
         bonus = false;
         baseFirePower = 0;
         doubleCannons = new HashMap<>();

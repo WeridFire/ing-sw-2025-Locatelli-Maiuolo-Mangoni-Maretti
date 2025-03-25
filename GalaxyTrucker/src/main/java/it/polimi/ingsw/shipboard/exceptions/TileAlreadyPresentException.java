@@ -1,6 +1,7 @@
 package src.main.java.it.polimi.ingsw.shipboard.exceptions;
 
-import src.main.java.it.polimi.ingsw.shipboard1.tiles.Tile;
+import src.main.java.it.polimi.ingsw.shipboard.SideType;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
 public class TileAlreadyPresentException extends Exception {
@@ -8,7 +9,7 @@ public class TileAlreadyPresentException extends Exception {
         super(message);
     }
 
-    public TileAlreadyPresentException(Coordinates coordinates, Tile tile) {
+    public TileAlreadyPresentException(Coordinates coordinates, TileSkeleton<SideType> tile) {
         super("Tile " + tile + " already present at coordinates " + coordinates);
     }
 }

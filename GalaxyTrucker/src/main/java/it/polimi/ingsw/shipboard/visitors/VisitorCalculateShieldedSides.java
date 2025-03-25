@@ -6,7 +6,7 @@ import src.main.java.it.polimi.ingsw.shipboard.tiles.*;
 public class VisitorCalculateShieldedSides implements TileVisitor {
     private final Boolean[] protectedSides;
 
-    VisitorCalculateShieldedSides() {
+    public VisitorCalculateShieldedSides() {
         protectedSides = Direction.sortedArray(false, false, false, false)
                 .toArray(Boolean[]::new);
     }

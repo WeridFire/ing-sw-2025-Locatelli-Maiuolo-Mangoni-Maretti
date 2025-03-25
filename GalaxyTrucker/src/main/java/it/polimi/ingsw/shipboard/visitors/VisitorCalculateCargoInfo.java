@@ -8,7 +8,7 @@ public class VisitorCalculateCargoInfo implements TileVisitor {
     private final CalculatorCargoInfo infoGoods;
     private final CalculatorCargoInfo infoBatteries;
 
-    VisitorCalculateCargoInfo() {
+    public VisitorCalculateCargoInfo() {
         infoCrew = new CalculatorCargoInfo();
         infoGoods = new CalculatorCargoInfo();
         infoBatteries = new CalculatorCargoInfo();

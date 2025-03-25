@@ -1,10 +1,7 @@
 package src.main.java.it.polimi.ingsw.shipboard.visitors;
 
-import src.main.java.it.polimi.ingsw.enums.CrewType;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
-import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.*;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
@@ -19,7 +16,7 @@ public class VisitorLifeSupport implements TileVisitor {
 	/**
 	 * Instances a visitor to update the life supports of cabin tiles.
 	 */
-	VisitorLifeSupport() {
+	public VisitorLifeSupport() {
 		lifeSupportSystems = new ArrayList<>();
 		cabinTiles = new ArrayList<>();
 	}

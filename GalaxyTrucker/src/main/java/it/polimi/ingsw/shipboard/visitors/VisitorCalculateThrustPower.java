@@ -13,7 +13,7 @@ public class VisitorCalculateThrustPower implements TileVisitor {
     private float baseThrustPower;
     private final Map<Coordinates, Float> doubleEngines;
 
-    VisitorCalculateThrustPower() {
+    public VisitorCalculateThrustPower() {
         bonus = false;
         baseThrustPower = 0;
         doubleEngines = new HashMap<>();
