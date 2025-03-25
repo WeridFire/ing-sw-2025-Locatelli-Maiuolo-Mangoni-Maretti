@@ -39,7 +39,7 @@ public class Player {
     /**
      * The player's distance from 1st place
      */
-    private int distFromFirst;
+    private int position;
 
     public Player(String username) {
         this.username = username;
@@ -137,15 +137,15 @@ public class Player {
         return credits;
     }
 
-    public int getDistFromFirst() {
-        return distFromFirst;
-    }
-
     /**
      *
      * @param position number of position the player is moving
      */
-    public void setDistFromFirst(int position) {
-        this.distFromFirst =- position;
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position){
+        this.position = position;
     }
 }
