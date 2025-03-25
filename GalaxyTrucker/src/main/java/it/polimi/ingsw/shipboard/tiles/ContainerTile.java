@@ -196,5 +196,13 @@ public abstract class ContainerTile extends TileSkeleton<SideType> {
     public int getCapacityLeft() {
         return capacity - occupiedCapacity;
     }
+
+    /**
+     * Returns the set of allowed items onto the tile.
+     * @return the set of allowed items on the tile.
+     */
+    public Set<LoadableType> getAllowedItems(){
+        return allowedItems;
+    }
 }
 

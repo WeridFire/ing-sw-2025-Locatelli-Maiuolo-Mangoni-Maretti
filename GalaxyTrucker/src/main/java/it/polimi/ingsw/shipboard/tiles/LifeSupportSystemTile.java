@@ -1,6 +1,7 @@
 package src.main.java.it.polimi.ingsw.shipboard.tiles;
 
 import src.main.java.it.polimi.ingsw.enums.CrewType;
+import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.visitors.TileVisitor;
 
@@ -10,7 +11,7 @@ import src.main.java.it.polimi.ingsw.shipboard.visitors.TileVisitor;
  */
 public class LifeSupportSystemTile extends TileSkeleton<SideType> {
 
-    private final CrewType providedLifeSupport;
+    private final LoadableType providedLifeSupport;
 
     /**
      * Constructs a LifeSupportSystemTile with the specified sides and provided life support type.
@@ -18,8 +19,12 @@ public class LifeSupportSystemTile extends TileSkeleton<SideType> {
      * @param sides               An array of sides defining the structure of the tile.
      * @param providedLifeSupport The type of crew that benefits from this life support system.
      */
-    public LifeSupportSystemTile(SideType[] sides, CrewType providedLifeSupport) {
+    public LifeSupportSystemTile(SideType[] sides, LoadableType providedLifeSupport) {
         super(sides);
+        if(providedLifeSupport != LoadableType.BROWN_ALIEN &&
+        providedLifeSupport != LoadableType.PURPLE_ALIEN){
+            throw new IllegalArgumentException("The life support should be for either a brown or a purple alien.");
+        }
         this.providedLifeSupport = providedLifeSupport;
     }
 
@@ -38,7 +43,7 @@ public class LifeSupportSystemTile extends TileSkeleton<SideType> {
      *
      * @return The crew type benefiting from the life support system.
      */
-    public CrewType getProvidedLifeSupport() {
+    public LoadableType getProvidedLifeSupport() {
         return providedLifeSupport;
     }
 }
