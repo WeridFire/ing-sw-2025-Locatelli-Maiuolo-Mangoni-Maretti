@@ -29,6 +29,7 @@ public class Deck {
                 this.deck = DeckFactory.createLevelOneDeck(gameId);
                 break;
             case 2:
+                this.deck = DeckFactory.createLevelTwoDeck(gameId);
                 break;
         }
         //TODO: implement extracting cards from pool and splitting them in subgroups

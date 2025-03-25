@@ -2,6 +2,8 @@ package src.main.java.it.polimi.ingsw.cards.enemy;
 
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
+import src.main.java.it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
+import src.main.java.it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.ContainerTile;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
@@ -57,7 +59,12 @@ public class SlaversCard extends EnemyCard {
 		// a similar map that will contain the items that the user desires to remove from each coordinate.
 		Map<Coordinates, List<LoadableType>> itemsToRemove = new HashMap<>();
 		itemsToRemove.forEach((coords, items) -> {
-			ContainerTile tile = (ContainerTile) player.getShipBoard().get(coords);
+			ContainerTile tile = null;
+			try {
+				tile = (ContainerTile) player.getShipBoard().getTile(coords);
+			} catch (OutOfBuildingAreaException | NoTileFoundException e) {
+				throw new RuntimeException(e);
+			}
 			for(LoadableType l : items){
 				try {
 					tile.loadItems(l, 1);

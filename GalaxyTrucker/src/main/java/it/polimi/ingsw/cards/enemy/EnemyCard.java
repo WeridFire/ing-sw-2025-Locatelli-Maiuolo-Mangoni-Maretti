@@ -63,10 +63,10 @@ public abstract class EnemyCard extends Card {
     public void playEffect(UUID gameId) {
         for(Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers()){
             //TODO: Implement logic of asking player what power they wanna use
-            if(p.getShipBoard().getStatistics().getFreePower(PowerType.FIRE) > getFirePower()){
+            if(p.getShipBoard().getVisitorCalculateFirePower().getFirePower() > getFirePower()){
                 givePrize(p);
                 break;
-            }else if(p.getShipBoard().getStatistics().getFreePower(PowerType.FIRE) < getFirePower()){
+            }else if(p.getShipBoard().getVisitorCalculateFirePower().getFirePower()< getFirePower()){
                 applyPunishment(p);
             }
         }

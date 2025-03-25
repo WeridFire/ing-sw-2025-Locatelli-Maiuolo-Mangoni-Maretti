@@ -50,10 +50,10 @@ public class ShipBoard {
 	 * Retrieves a set of all tiles currently placed on the board, mapped to their coordinates.
 	 * The returned set is unmodifiable to prevent external modifications.
 	 *
-	 * @return An unmodifiable set of map entries, each containing a coordinate and the associated tile.
+	 * @return A copy of the board.
 	 */
-	public Set<Map.Entry<Coordinates, TileSkeleton<SideType>>> getTilesOnBoard() {
-		return Set.copyOf(board.entrySet());
+	public Map<Coordinates, TileSkeleton<SideType>> getTilesOnBoard() {
+		return Map.copyOf(board);
 	}
 
 	/**
