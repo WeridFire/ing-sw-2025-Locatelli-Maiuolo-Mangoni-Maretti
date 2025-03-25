@@ -62,8 +62,6 @@ public class IntegrityProblem {
                             Set<TileSkeleton<SideType>> intrinsicallyWrongTiles,
                             List<Pair<TileSkeleton<SideType>, TileSkeleton<SideType>>> illegallyWeldedTiles) {
 
-        // TODO: perform calculations to retrieve info about clusters to remove and clusters to keep
-        //  from the provided.
         this.clustersToRemove = new ArrayList<>();
         this.clustersToKeep = new ArrayList<>();
 
