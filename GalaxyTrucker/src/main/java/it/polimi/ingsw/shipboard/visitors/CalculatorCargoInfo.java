@@ -73,16 +73,49 @@ public class CalculatorCargoInfo {
     }
 
     /**
-     * Calculates a map with only taking in consideration the containers with at least {@code minAvailableSpace}
+     * Calculates a map taking in consideration just the containers with at least {@code minAvailableSpace}
      * available space to store items.
      *
      * @param minAvailableSpace the target minimum available space
      * @return The calculated map of (coordinates -> visited container tile with enough available space) entries.
+     * @throws IllegalArgumentException If {@code minAvailableSpace <= 0}.
      */
     public Map<Coordinates, ContainerTile> getLocationsWithAvailableSpace(int minAvailableSpace) {
+        if (minAvailableSpace <= 0) {
+            throw new IllegalArgumentException("Minimum available space must be greater than zero (provided: "
+                    + ((minAvailableSpace == 0)
+                    ? "zero. In this case simply call getLocations() instead)"
+                    : minAvailableSpace + ")") );
+        }
+
         Map<Coordinates, ContainerTile> result = new HashMap<>();
         for (Map.Entry<Coordinates, ContainerTile> entry : containerLocations.entrySet()) {
             if (entry.getValue().getCapacityLeft() >= minAvailableSpace) {
+                result.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Calculates a map taking in consideration just the containers with at least {@code minLoadedItems}
+     * loaded items (of any type) onto them.
+     *
+     * @param minLoadedItems the target minimum loaded items (of any type)
+     * @return The calculated map of (coordinates -> visited container tile with enough loaded items) entries.
+     * @throws IllegalArgumentException If {@code minLoadedItems <= 0}.
+     */
+    public Map<Coordinates, ContainerTile> getLocationsWithLoadedItems(int minLoadedItems) {
+        if (minLoadedItems <= 0) {
+            throw new IllegalArgumentException("Minimum loaded items must be greater than zero (provided: "
+                    + ((minLoadedItems == 0)
+                    ? "zero. In this case simply call getLocations() instead)"
+                    : minLoadedItems + ")") );
+        }
+
+        Map<Coordinates, ContainerTile> result = new HashMap<>();
+        for (Map.Entry<Coordinates, ContainerTile> entry : containerLocations.entrySet()) {
+            if (entry.getValue().getLoadedItems().size() >= minLoadedItems) {
                 result.put(entry.getKey(), entry.getValue());
             }
         }
