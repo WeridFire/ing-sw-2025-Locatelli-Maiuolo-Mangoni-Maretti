@@ -8,7 +8,7 @@ import java.util.UUID;
 public class SmugglersCard extends EnemyCard {
 
 
-	private CargoType[] prizeGoods;
+	private LoadableType[] prizeGoods;
 	private int punishCargo;
 
 
@@ -21,7 +21,7 @@ public class SmugglersCard extends EnemyCard {
 	 * @param punishCargo the amount of cargo to be removed from the player that is beaten by this card
 	 * @param prizeGoods The goods earned by the player that beats this card.
 	 */
-	public SmugglersCard(int punishCargo, CargoType[] prizeGoods, int firePower, int lostDays, String textureName, int level, UUID gameId) {
+	public SmugglersCard(int punishCargo, LoadableType[] prizeGoods, int firePower, int lostDays, String textureName, int level, UUID gameId) {
 		super(firePower, lostDays, textureName, level, gameId);
 		this.punishCargo = punishCargo;
 		this.prizeGoods = prizeGoods;
@@ -29,7 +29,7 @@ public class SmugglersCard extends EnemyCard {
 
 	@Override
 	public void givePrize(Player player) {
-		for(CargoType c : prizeGoods){
+		for(LoadableType c : prizeGoods){
 			//TODO: ask player what they want to do for each cargo. Here we get coordinates, but we can assume we will
 			//just get a Tile object, and we'll be able to add the cargo on it.
 			Coordinates coordinates = new Coordinates(0, 0);

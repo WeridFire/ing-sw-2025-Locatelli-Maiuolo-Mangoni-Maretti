@@ -8,10 +8,10 @@ import src.main.java.it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameExceptio
 import src.main.java.it.polimi.ingsw.game.exceptions.PlayerNotInGameException;
 import src.main.java.it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import src.main.java.it.polimi.ingsw.player.Player;
+import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
-import src.main.java.it.polimi.ingsw.shipboard1.ShipBoard;
-import src.main.java.it.polimi.ingsw.shipboard1.tiles.Tile;
+import src.main.java.it.polimi.ingsw.shipboard.ShipBoard;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,13 +48,13 @@ public class GameData {
     private HashMap<Player, ShipBoard> shipFromPlayer;
 
     /** Mapping of available cargo goods and their quantities. */
-    private HashMap<CargoType, Integer> availableGoods;
+    private HashMap<LoadableType, Integer> availableGoods;
 
     /** List of game deck. */
     private Deck deck;
 
     /** List of covered tiles in the game. */
-    private ArrayList<Tile> coveredTiles;
+    private ArrayList<TileSkeleton<SideType>> coveredTiles;
 
     /**
      * Constructs a new GameData object with the specified game level.
@@ -66,7 +66,7 @@ public class GameData {
         this.players = new ArrayList<>();
         this.shipFromPlayer = new HashMap<>();
         this.availableGoods = new HashMap<>();
-        this.coveredTiles = new ArrayList<>();
+        this.coveredTiles = new ArrayList<TileSkeleton<SideType>>();
     }
 
     /**
@@ -128,7 +128,7 @@ public class GameData {
      *
      * @return The list of covered tiles.
      */
-    public ArrayList<Tile> getCoveredTiles() {
+    public ArrayList<TileSkeleton<SideType>> getCoveredTiles() {
         return coveredTiles;
     }
 
@@ -145,11 +145,11 @@ public class GameData {
     /**
      * Gets the quantity of a specific cargo type.
      *
-     * @param cargoType The type of cargo.
+     * @param LoadableType The type of cargo.
      * @return The quantity of the specified cargo type.
      */
-    public Integer getCargo(CargoType cargoType) {
-        return availableGoods.get(cargoType);
+    public Integer getCargo(LoadableType LoadableType) {
+        return availableGoods.get(LoadableType);
     }
 
     /**
@@ -176,7 +176,7 @@ public class GameData {
      *
      * @param coveredTiles The new list of covered tiles.
      */
-    public void setCoveredTiles(ArrayList<Tile> coveredTiles) {
+    public void setCoveredTiles(ArrayList<TileSkeleton<SideType>> coveredTiles) {
         this.coveredTiles = coveredTiles;
     }
 

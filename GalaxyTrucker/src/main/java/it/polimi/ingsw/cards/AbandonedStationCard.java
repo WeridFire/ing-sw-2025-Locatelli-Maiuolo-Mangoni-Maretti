@@ -9,7 +9,7 @@ public class AbandonedStationCard extends Card{
 	/**
 	 * Cargo available on the ship. TODO: consider if to convert to dynamic?
 	 */
-	private CargoType[] availableCargo;
+	private LoadableType[] availableCargo;
 	/**
 	 * The days removed when looting the station.
 	 */
@@ -28,7 +28,7 @@ public class AbandonedStationCard extends Card{
 	 * @param level       The level of this card.
 	 * @param gameId      The ID of the game this card is part of.
 	 */
-	public AbandonedStationCard(CargoType[] availableCargo, int lostDays, int requiredCrew, String textureName, int level, UUID gameId) {
+	public AbandonedStationCard(LoadableType[] availableCargo, int lostDays, int requiredCrew, String textureName, int level, UUID gameId) {
 		super(textureName, level, gameId);
 		this.availableCargo = availableCargo;
 		this.lostDays = lostDays;
@@ -45,7 +45,7 @@ public class AbandonedStationCard extends Card{
 			if(p.getShipBoard().getStatistics().getCrewMembersCount() >= requiredCrew){
 				//TODO: ask player if they want to actually take over the station.
 				if(true){ //meaning they accepted to do it
-					for(CargoType c : availableCargo){
+					for(LoadableType c : availableCargo){
 						//TODO: asks player where they want to put each single cargo.
 					}
 					movePlayer(p, lostDays);

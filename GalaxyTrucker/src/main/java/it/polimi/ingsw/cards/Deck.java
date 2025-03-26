@@ -1,6 +1,9 @@
 package src.main.java.it.polimi.ingsw.cards;
 
+import src.main.java.it.polimi.ingsw.gamePhases.exceptions.NoMoreCardsException;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,6 +12,11 @@ public class Deck {
      * The list of cards present in the deck.
      */
     private List<Card> deck;
+
+    /**
+     * current index of the list
+     */
+    private int currentIndex = 0;
 
     /**
      * The list of cardsgroup, for the ship assembly phase.
@@ -33,6 +41,8 @@ public class Deck {
                 break;
         }
         //TODO: implement extracting cards from pool and splitting them in subgroups
+
+        shuffle();
     }
 
     /**
@@ -44,5 +54,17 @@ public class Deck {
         return cardsGroups.get(index);
     }
 
+    public Card getTopCard() {
+        currentIndex++;
+        try{
+            return deck.get(currentIndex-1);
+        } catch (IndexOutOfBoundsException e){
+            throw new NoMoreCardsException("No more cards");
+        }
 
+    }
+
+    public void shuffle(){
+        Collections.shuffle(deck);
+    }
 }

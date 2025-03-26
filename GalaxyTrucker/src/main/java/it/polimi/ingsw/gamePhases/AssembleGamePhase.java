@@ -48,6 +48,12 @@ public class AssembleGamePhase extends PlayableGamePhase{
             return;
         }
         // level two game logic
+        // metto server in ascolto
+
+        //possono arrivare 2 cose:
+            //gira clessidra
+            //pacchetti relativi al mettere e togliere tessere dalla shipboard
+
         timer.start();
         howManyTimerRotationsLeft--;
     }
@@ -60,6 +66,7 @@ public class AssembleGamePhase extends PlayableGamePhase{
     @Override
     public void onTimerEnd() {
         if (howManyTimerRotationsLeft == 0){
+            //close server logic
             gameState = GameState.ENDED;
         }
     }
