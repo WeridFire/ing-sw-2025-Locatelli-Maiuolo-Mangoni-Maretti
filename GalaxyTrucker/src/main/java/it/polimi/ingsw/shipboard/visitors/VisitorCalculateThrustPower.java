@@ -66,10 +66,25 @@ public class VisitorCalculateThrustPower implements TileVisitor {
     }
 
     /**
-     * @return The ships thrust power (not counting double engines).
+     * @return the base thrust power value
      */
-    public float getThrustPower() {
-        return baseThrustPower + ((bonus && (baseThrustPower > 0)) ? 2f : 0f);
+    public float getBaseThrustPower() {
+        return baseThrustPower;
+    }
+
+    /**
+     * @return {@code true} if it's possible to use the thrust power bonus, {@code false} otherwise
+     */
+    public boolean hasBonus() {
+        return bonus;
+    }
+
+    /**
+     * @return a map of coordinates where double engines are located, along with their respective thrust power values.
+     * @implNote The returned map is a copy to ensure encapsulation and prevent unintended modifications.
+     */
+    public Map<Coordinates, Float> getDoubleEngines() {
+        return new HashMap<>(doubleEngines);
     }
 
 }

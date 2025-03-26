@@ -120,7 +120,7 @@ public class VisitorSmugglers implements TileVisitor {
             ContainerTile tile = entry.getKey();
             LoadableType mostValuableCargo = entry.getValue();
             try {
-                // ensure view will be updated
+                // TODO: ensure view will be updated
                 tile.removeItems(mostValuableCargo, 1);
             } catch (UnsupportedLoadableItemException | NotEnoughItemsException e) {
                 throw new RuntimeException(e);  // should never happen -> runtime error
