@@ -12,22 +12,15 @@ import java.util.*;
  * It tracks the remaining capacity, the types of items loaded, and the locations of cargo containers.
  */
 public class CalculatorCargoInfo {
-    /** The total remaining cargo capacity available across visited container tiles. */
-    private int capacityLeft;
 
-    /** A list of all loadable items currently stored in the visited container tiles. */
-    private final List<LoadableType> totalLoadedItems;
-
-    /** A map of coordinates and items contained in these coordinates. */
-    private final Map<Coordinates, List<LoadableType>> containerLocations;
+    /** A map of coordinates and container tiles in these coordinates. Also empty containers are saved. */
+    private final Map<Coordinates, ContainerTile> containerLocations;
 
     /**
      * Constructs an empty {@code CalculatorCargoInfo} instance, initializing lists and setting capacity to zero.
      */
     CalculatorCargoInfo() {
-        totalLoadedItems = new ArrayList<>();
         containerLocations = new HashMap<>();
-        capacityLeft = 0;
     }
 
     /**
@@ -40,19 +33,7 @@ public class CalculatorCargoInfo {
      */
     protected void visit(ContainerTile tile) throws NotFixedTileException {
         Coordinates coordinates = tile.getCoordinates();
-
-        capacityLeft += tile.getCapacityLeft();
-        totalLoadedItems.addAll(tile.getLoadedItems());
-        containerLocations.put(coordinates, tile.getLoadedItems());
-    }
-
-    /**
-     * Returns the total remaining cargo capacity across all visited container tiles.
-     *
-     * @return The available cargo capacity.
-     */
-    public int getCapacityLeft() {
-        return capacityLeft;
+        containerLocations.put(coordinates, tile);
     }
 
     /**
@@ -62,7 +43,11 @@ public class CalculatorCargoInfo {
      * @return The number of occurrences of the specified item.
      */
     public int count(LoadableType item) {
-        return (int) totalLoadedItems.stream().filter(e -> e == item).count();
+        return containerLocations.values().stream()
+                .mapToInt(c -> (int) c.getLoadedItems().stream()
+                        .filter(i -> i.equals(item))
+                        .count())
+                .sum();
     }
 
     /**
@@ -73,15 +58,34 @@ public class CalculatorCargoInfo {
      * @return The total number of occurrences of the specified item types.
      */
     public int countAll(Set<LoadableType> itemTypes) {
-        return (int) totalLoadedItems.stream().filter(itemTypes::contains).count();
+        return containerLocations.values().stream()
+                .mapToInt(c -> (int) c.getLoadedItems().stream()
+                        .filter(itemTypes::contains)
+                        .count())
+                .sum();
     }
 
     /**
-     * Returns a map of coordinates and items contained at these coordinates.
-     *
-     * @return A (copy of the) map of coordinates and items contained at these coordinates.
+     * @return A map of (coordinates -> visited container tile) entries.
      */
-    public Map<Coordinates, List<LoadableType>> getCoordinatesMask() {
+    public Map<Coordinates, ContainerTile> getLocations() {
         return new HashMap<>(containerLocations);
+    }
+
+    /**
+     * Calculates a map with only taking in consideration the containers with at least {@code minAvailableSpace}
+     * available space to store items.
+     *
+     * @param minAvailableSpace the target minimum available space
+     * @return The calculated map of (coordinates -> visited container tile with enough available space) entries.
+     */
+    public Map<Coordinates, ContainerTile> getLocationsWithAvailableSpace(int minAvailableSpace) {
+        Map<Coordinates, ContainerTile> result = new HashMap<>();
+        for (Map.Entry<Coordinates, ContainerTile> entry : containerLocations.entrySet()) {
+            if (entry.getValue().getCapacityLeft() >= minAvailableSpace) {
+                result.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return result;
     }
 }
