@@ -66,11 +66,25 @@ public class VisitorCalculateFirePower implements TileVisitor {
     }
 
     /**
-     * @return The ship's firepower (not counting double cannons)
+     * @return the base firepower value
      */
-    public float getFirePower() {
-        return baseFirePower + ((bonus && (baseFirePower > 0)) ? 2f : 0f);
+    public float getBaseFirePower() {
+        return baseFirePower;
     }
 
+    /**
+     * @return {@code true} if it's possible to use the firepower bonus, {@code false} otherwise
+     */
+    public boolean hasBonus() {
+        return bonus;
+    }
+
+    /**
+     * @return a map of coordinates where double cannons are located, along with their respective firepower values.
+     * @implNote The returned map is a copy to ensure encapsulation and prevent unintended modifications.
+     */
+    public Map<Coordinates, Float> getDoubleCannons() {
+        return new HashMap<>(doubleCannons);
+    }
 
 }
