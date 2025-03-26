@@ -46,6 +46,26 @@ public class ShipBoard {
 		}
 	}
 
+	public VisitorCalculateCargoInfo getVisitorCalculateCargoInfo() {
+		return visitorCalculateCargoInfo;
+	}
+
+	public VisitorCalculateFirePower getVisitorCalculateFirePower() {
+		return visitorCalculateFirePower;
+	}
+
+	public VisitorCalculateThrustPower getVisitorCalculateThrustPower() {
+		return visitorCalculateThrustPower;
+	}
+
+	public VisitorCalculateShieldedSides getVisitorCalculateShieldedSides() {
+		return visitorCalculateShieldedSides;
+	}
+
+	public VisitorCheckIntegrity getVisitorCheckIntegrity() {
+		return visitorCheckIntegrity;
+	}
+
 	/**
 	 * Retrieves a set of all tiles currently placed on the board, mapped to their coordinates.
 	 * The returned set is unmodifiable to prevent external modifications.
@@ -170,27 +190,5 @@ public class ShipBoard {
 		// Remove the tile and reset visitors
 		board.remove(coordinates);
 		resetVisitors();
-	}
-
-	public VisitorCalculateCargoInfo getVisitorCalculateCargoInfo() {
-		// TODO: understand if it's ok for performance to recalculate every time.
-		//  else: problem when shipboard.getTile(coord) is modified.
-		return visitorCalculateCargoInfo;
-	}
-
-	public VisitorCalculateFirePower getVisitorCalculateFirePower() {
-		return visitorCalculateFirePower;
-	}
-
-	public VisitorCalculateThrustPower getVisitorCalculateThrustPower() {
-		return visitorCalculateThrustPower;
-	}
-
-	public VisitorCalculateShieldedSides getVisitorCalculateShieldedSides() {
-		return visitorCalculateShieldedSides;
-	}
-
-	public VisitorCheckIntegrity getVisitorCheckIntegrity() {
-		return visitorCheckIntegrity;
 	}
 }
