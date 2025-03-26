@@ -66,16 +66,10 @@ public class VisitorCalculateThrustPower implements TileVisitor {
     }
 
     /**
-     * Delegated to ask player which double engines to activate.
-     * Then calculates the total thrust power based on that info.
-     * @return The calculated thrust power.
+     * @return The ships thrust power (not counting double engines).
      */
     public float getThrustPower() {
-        // TODO: ask the player which double engines to activate
-        float doubleEnginesPower = 0f;  // suppose no double engine is activated
-        // the following is correct
-        float enginesPower = baseThrustPower + doubleEnginesPower;
-        return enginesPower + ((bonus && (enginesPower > 0)) ? 2f : 0f);
+        return baseThrustPower + ((bonus && (baseThrustPower > 0)) ? 2f : 0f);
     }
 
 }

@@ -66,16 +66,10 @@ public class VisitorCalculateFirePower implements TileVisitor {
     }
 
     /**
-     * Delegated to ask player which double cannons to activate.
-     * Then calculates the total firepower based on that info.
-     * @return The calculated firepower
+     * @return The ship's firepower (not counting double cannons)
      */
     public float getFirePower() {
-        // TODO: ask the player which double cannons to activate
-        float doubleCannonsPower = 0f;  // suppose no double cannon is activated
-        // the following is correct
-        float cannonsPower = baseFirePower + doubleCannonsPower;
-        return cannonsPower + ((bonus && (cannonsPower > 0)) ? 2f : 0f);
+        return baseFirePower + ((bonus && (baseFirePower > 0)) ? 2f : 0f);
     }
 
 
