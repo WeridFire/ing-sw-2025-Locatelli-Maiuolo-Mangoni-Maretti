@@ -24,4 +24,9 @@ public class SocketClient implements IClient {
 	public void notifyError(String error) {
 		System.out.println(error);
 	}
+
+	@Override
+	public void showUpdate(String update) {
+		System.out.println(update);
+	}
 }

@@ -28,13 +28,12 @@ public class GameClient {
 			Registry registry = LocateRegistry.getRegistry(host, port);
 			RmiServer server = (RmiServer) registry.lookup(serverName);
 			rmiClient = new RmiClient(server);
+			rmiClient.getServer().connect(rmiClient);
 		}else{
-
 			Socket serverSocket = new Socket(host, port);
 			InputStreamReader socketRx = new InputStreamReader(serverSocket.getInputStream());
 			OutputStreamWriter socketTx = new OutputStreamWriter(serverSocket.getOutputStream());
 			socketClient = new SocketClient(new BufferedReader(socketRx), new BufferedWriter(socketTx));
-
 		}
 		runCli();
 	}
@@ -54,12 +53,9 @@ public class GameClient {
 			int command = scan.nextInt();
 			switch(command) {
 				case 0:
-					getClient().getServer().connect(getClient());
+					getClient().getServer().sendAvailableGamesToClient(getClient());
 					break;
 				case 1:
-					getClient().getServer().getGames();
-					break;
-				case 2:
 					getClient().getServer().joinGame(UUID.fromString("UUID HERE"), "placeholder");
 					break;
 			}

@@ -9,7 +9,6 @@ import src.main.java.it.polimi.ingsw.network.IServer;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class RmiServer implements IServer {
 
@@ -27,12 +26,12 @@ public class RmiServer implements IServer {
 	}
 
 	@Override
-	public Set<Game> getGames() {
-		return new HashSet<>(gamesHandler.getGames());
+	public void sendAvailableGamesToClient(IClient client) {
+		client.showUpdate((new HashSet<>(gamesHandler.getGames())).toString());
 	}
 
 	@Override
-	public Game joinGame(UUID gameId, String username) {
-		return gamesHandler.joinGame(username, gameId);
+	public void joinGame(UUID gameId, String username) {
+		gamesHandler.joinGame(username, gameId);
 	}
 }

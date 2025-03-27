@@ -1,6 +1,5 @@
 package src.main.java.it.polimi.ingsw.network.socket;
 
-import src.main.java.it.polimi.ingsw.game.Game;
 import src.main.java.it.polimi.ingsw.network.IClient;
 import src.main.java.it.polimi.ingsw.network.IServer;
 import src.main.java.it.polimi.ingsw.network.rmi.RmiServer;
@@ -8,16 +7,15 @@ import src.main.java.it.polimi.ingsw.network.rmi.RmiServer;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Set;
 import java.util.UUID;
 
-public class ClientSocketAdapter implements IClient {
+public class ClientSocketToRMIAdapter implements IClient {
 
 	final RmiServer server;
 	final BufferedReader input;
 	final PrintWriter output;
 
-	public ClientSocketAdapter(RmiServer server, BufferedReader input, PrintWriter output) {
+	public ClientSocketToRMIAdapter(RmiServer server, BufferedReader input, PrintWriter output) {
 		this.server = server;
 		this.input = input;
 		this.output = output;
@@ -27,11 +25,13 @@ public class ClientSocketAdapter implements IClient {
 	public void runVirtualView() throws IOException {
 		String line;
 		while ((line = input.readLine()) != null) {
-			// Trovare un modo più corretto per invocare metodi
-			// sul controller in base al messaggio che arriva!!!
+			// TODO: add serialization and deserialization!
 			switch (line) {
 				case "getGames":
-					output.println(server.getGames());
+					server.sendAvailableGamesToClient(this);
+					break;
+				case "joinGame":
+					server.joinGame(UUID.fromString("should be parsed"), "should be parsed");
 					break;
 			}
 		}
@@ -39,11 +39,18 @@ public class ClientSocketAdapter implements IClient {
 
 	@Override
 	public IServer getServer() {
-		return server;
+		return null;
+		//We can return null, as the server will never call "getServer" on the virtual client. Maybe we can
+		//make this nicer with multiple interfaces?
 	}
 
 	@Override
 	public void notifyError(String error) {
-		output.println(error);
+		output.println("[ERROR] " + error);
+	}
+
+	@Override
+	public void showUpdate(String update) {
+		output.println("[UPDATE] " + update);
 	}
 }

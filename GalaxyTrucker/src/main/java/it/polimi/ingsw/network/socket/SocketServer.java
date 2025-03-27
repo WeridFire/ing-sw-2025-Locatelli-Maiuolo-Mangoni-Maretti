@@ -22,7 +22,7 @@ public class SocketServer {
 			InputStreamReader socketRx = new InputStreamReader(clientSocket.getInputStream());
 			OutputStreamWriter socketTx = new OutputStreamWriter(clientSocket.getOutputStream());
 
-			ClientSocketAdapter handler = new ClientSocketAdapter(gameServer.getRmiServer(),
+			ClientSocketToRMIAdapter handler = new ClientSocketToRMIAdapter(gameServer.getRmiServer(),
 																	new BufferedReader(socketRx),
 																	new PrintWriter(socketTx));
 			gameServer.registerClient(handler);
