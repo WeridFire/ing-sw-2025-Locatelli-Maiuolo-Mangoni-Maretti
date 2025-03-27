@@ -1,5 +1,6 @@
 package src.main.java.it.polimi.ingsw.network;
 
+import src.main.java.it.polimi.ingsw.GamesHandler;
 import src.main.java.it.polimi.ingsw.network.rmi.RmiClient;
 import src.main.java.it.polimi.ingsw.network.rmi.RmiServer;
 import src.main.java.it.polimi.ingsw.network.socket.ClientSocketToRMIAdapter;
@@ -7,6 +8,7 @@ import src.main.java.it.polimi.ingsw.network.socket.SocketServer;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -19,11 +21,17 @@ import java.util.concurrent.Executors;
 
 public class GameServer{
 
+	private static int rmiPort;
+	private static int socketPort;
 	private SocketServer socketServer;
 	private RmiServer rmiServer;
 	private final Map<UUID, IClient> clients = new HashMap<>();
 	private final ExecutorService executor = Executors.newFixedThreadPool(2);
-
+	/**
+	 * Logic for the server. Starts both the Socket and the RMI servers, on different ports.
+	 * @param rmiPort The port for the RMI server.
+	 * @param socketPort The port for the SOCKET server.
+	 */
 	public GameServer(int rmiPort, int socketPort) {
 		//Start the RMI server on a separate thread.
 		executor.submit(() -> {
@@ -52,16 +60,30 @@ public class GameServer{
 		});
 	}
 
+	/**
+	 * Registers a connection (either RMI or SOCKET) to the database. Assigns an UUID to it.
+	 * @param client The client to register and keep track of.
+	 * @return The assigned UUID.
+	 */
 	public UUID registerClient(IClient client) {
 		UUID clientUUID = UUID.randomUUID();
 		this.clients.put(clientUUID, client);
 		return clientUUID;
 	}
 
+	/**
+	 * A reference to the RMI server, on which server functions can be executed.
+	 * @return
+	 */
 	public RmiServer getRmiServer() {
 		return rmiServer;
 	}
 
+	/**
+	 * Looks in the clients database for the correspondent connection, and returns the UUID.
+	 * @param client the client connection
+	 * @return The UUID of the connection in the database.
+	 */
 	public UUID getUUIDbyConnection(IClient client){
 		return clients.entrySet()
 				.stream()
@@ -69,5 +91,6 @@ public class GameServer{
 				.map(Map.Entry::getKey)
 				.findFirst().orElseThrow(() -> new RuntimeException("Could not find an UUID with the given connection."));
 	}
+
 
 }

@@ -15,7 +15,7 @@ import java.rmi.registry.Registry;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class GameClient {
+public class GameClient implements IClient{
 
 	private boolean useRMI;
 	private RmiClient rmiClient = null;
@@ -54,17 +54,13 @@ public class GameClient {
 			int command = scan.nextInt();
 			switch(command) {
 				case 0:
-					getClient().getServer().requestUpdate(getClient());
+					getServer().requestUpdate(getClient());
 					break;
 				case 1:
-					getClient().getServer().joinGame(getConnectionUUID(), UUID.fromString("UUID HERE"), "placeholder");
+					getServer().joinGame(getClient(), UUID.fromString("UUID HERE"), "placeholder");
 					break;
 			}
 		}
-	}
-
-	public UUID getConnectionUUID() {
-		return connectionUUID;
 	}
 
 	public void setConnectionUUID(UUID connectionUUID) {
@@ -73,5 +69,17 @@ public class GameClient {
 
 	public static void main(String[] args) throws IOException, NotBoundException {
 		new GameClient(Boolean.parseBoolean(args[0]), args[1], Integer.parseInt(args[2]));
+	}
+
+	@Override
+	public IServer getServer() {
+		return getClient().getServer();
+	}
+
+	@Override
+	public void updateClient(ClientUpdate clientUpdate) {
+		//Process new update received from the server.
+		setConnectionUUID(clientUpdate.getClientUUID());
+		System.out.println(clientUpdate);
 	}
 }

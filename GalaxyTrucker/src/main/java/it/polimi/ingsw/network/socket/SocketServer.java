@@ -13,11 +13,24 @@ public class SocketServer {
 	final ServerSocket listenSocket;
 	final GameServer gameServer;
 
-	public SocketServer(ServerSocket listenSocket, GameServer gameServer) {
+	/**
+	 * Creates a socket server. The socket server will occupy a thread and constantly listen for incoming connections.
+	 * Whenever a connection is detected it instances a new thread that handles it.
+	 * @param listenSocket The socket object.
+	 * @param gameServer A reference to the generic game server.
+	 * @throws IOException
+	 */
+	public SocketServer(ServerSocket listenSocket, GameServer gameServer) throws IOException {
 		this.listenSocket = listenSocket;
 		this.gameServer = gameServer;
+		run();
 	}
 
+	/**
+	 * The socket server on a separate thread will listen to all incoming connections. For each connection it will
+	 * allocate a new thread and an handler for it. Also each connection gets registered on the gameserver with a uuid.
+	 * @throws IOException
+	 */
 	private void run() throws IOException {
 		Socket clientSocket = null;
 		while ((clientSocket = this.listenSocket.accept()) != null) {
