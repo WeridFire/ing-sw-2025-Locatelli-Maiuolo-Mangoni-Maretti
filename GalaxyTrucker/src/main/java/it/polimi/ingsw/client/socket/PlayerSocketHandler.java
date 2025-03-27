@@ -26,8 +26,10 @@ public class PlayerSocketHandler {
 	public void runVirtualView() throws IOException {
 		String line;
 		while ((line = input.readLine()) != null) {
-			server.getRmiJunction().processSocket(new SocketMessage("PARSE IN HERE",
-					List.of("MESSAGES")), this);
+			server.getRmiJunction().processSocket(
+					new SocketMessage("PARSE IN HERE",
+					List.of("MESSAGES")),
+					this);
 		}
 	}
 

@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-public class RmiServer implements Remote {
+public class RmiServer implements VirtualServer {
 
 	final Map<UUID, VirtualView> clients = new HashMap<>();
 	final GamesHandler gamesHandler;
@@ -22,6 +22,7 @@ public class RmiServer implements Remote {
 	}
 
 
+	@Override
 	public void connect(VirtualView client) throws RemoteException{
 		synchronized (this.clients) {
 			this.clients.put(UUID.randomUUID(), client);
