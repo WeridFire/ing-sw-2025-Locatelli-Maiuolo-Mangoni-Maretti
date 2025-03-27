@@ -1,8 +1,7 @@
-package src.main.java.it.polimi.ingsw.client;
+package src.main.java.it.polimi.ingsw.network;
 
-import src.main.java.it.polimi.ingsw.client.rmi.RmiServer;
-import src.main.java.it.polimi.ingsw.client.rmi.VirtualServer;
-import src.main.java.it.polimi.ingsw.client.socket.SocketServer;
+import src.main.java.it.polimi.ingsw.network.rmi.RmiServer;
+import src.main.java.it.polimi.ingsw.network.socket.SocketServer;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -10,22 +9,26 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class GameServer {
+public class GameServer{
 
-	private VirtualServer rmiServer;
 	private SocketServer socketServer;
+	private RmiServer rmiServer;
+	private final Map<UUID, IClient> clients = new HashMap<>();
 	private final ExecutorService executor = Executors.newFixedThreadPool(2);
 
 	public GameServer(int rmiPort, int socketPort) {
 		//Start the RMI server on a separate thread.
 		executor.submit(() -> {
 			final String serverName = "GalaxyTruckerServer";
-			rmiServer = new RmiServer();
+			rmiServer = new RmiServer(this);
 			try {
-				VirtualServer stub = (RmiServer) UnicastRemoteObject.exportObject(rmiServer, 0);
+				RmiServer stub = (RmiServer) UnicastRemoteObject.exportObject(rmiServer, 0);
 				Registry registry = LocateRegistry.createRegistry(rmiPort);
 				registry.rebind(serverName, stub);
 				System.out.println("RMI server bound.");
@@ -34,22 +37,24 @@ public class GameServer {
 			}
 		});
 
+
 		//Start the ServerSocket on a separate thread,
 		executor.submit(() -> {
 			int port = socketPort;
 			try {
 				ServerSocket listenSocket = new ServerSocket(port);
-				socketServer = new SocketServer(listenSocket);
-				socketServer.run();
+				socketServer = new SocketServer(listenSocket, this);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		});
 	}
 
+	public void registerClient(IClient client) {
+		this.clients.put(UUID.randomUUID(), client);
+	}
 
-
-	public static void main(String[] args) throws RemoteException {
-		new GameServer(1234, 8080);
+	public RmiServer getRmiServer() {
+		return rmiServer;
 	}
 }
