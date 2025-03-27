@@ -1,9 +1,12 @@
 package src.main.java.it.polimi.ingsw;
 
 import src.main.java.it.polimi.ingsw.game.Game;
+import src.main.java.it.polimi.ingsw.player.Player;
 
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Singleton class for managing game creation and retrieval.
@@ -67,5 +70,26 @@ public class GamesHandler {
             }
         }
         return null;
+    }
+
+    public Game joinGame(String username, UUID gameId){
+        Game target = getGame(gameId);
+        if(target == null){
+            target = newGame();
+            return joinGame(username, target.getId());
+        }
+        Set<String> usernames = target.getGameData().getPlayers().stream()
+                                                            .map(Player::getUsername)
+                                                            .collect(Collectors.toSet());
+        if(!usernames.contains(username)){
+            target.getGameData().addPlayer(new Player(username));
+            return target;
+        }
+        return null;
+
+    }
+
+    public ArrayList<Game> getGames() {
+        return games;
     }
 }
