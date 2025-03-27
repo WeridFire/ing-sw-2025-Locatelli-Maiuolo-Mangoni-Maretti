@@ -72,17 +72,17 @@ public class GamesHandler {
         return null;
     }
 
-    public Game joinGame(String username, UUID gameId){
+    public Game joinGame(String username, UUID gameId, UUID connectionUUID){
         Game target = getGame(gameId);
         if(target == null){
             target = newGame();
-            return joinGame(username, target.getId());
+            return joinGame(username, target.getId(), connectionUUID);
         }
         Set<String> usernames = target.getGameData().getPlayers().stream()
                                                             .map(Player::getUsername)
                                                             .collect(Collectors.toSet());
         if(!usernames.contains(username)){
-            target.getGameData().addPlayer(new Player(username));
+            target.getGameData().addPlayer(new Player(username, connectionUUID));
             return target;
         }
         return null;

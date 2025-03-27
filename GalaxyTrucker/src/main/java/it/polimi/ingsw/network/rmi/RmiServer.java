@@ -1,13 +1,11 @@
 package src.main.java.it.polimi.ingsw.network.rmi;
 
 import src.main.java.it.polimi.ingsw.GamesHandler;
-import src.main.java.it.polimi.ingsw.game.Game;
+import src.main.java.it.polimi.ingsw.network.ClientUpdate;
 import src.main.java.it.polimi.ingsw.network.GameServer;
 import src.main.java.it.polimi.ingsw.network.IClient;
 import src.main.java.it.polimi.ingsw.network.IServer;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 public class RmiServer implements IServer {
@@ -22,16 +20,19 @@ public class RmiServer implements IServer {
 
 	@Override
 	public void connect(IClient client) {
-		gamesServer.registerClient(client);
+		UUID clientUUID = gamesServer.registerClient(client);
+		//Confirm connection and notify the assigned UUID.
+		client.updateClient(new ClientUpdate(clientUUID));
 	}
 
 	@Override
-	public void sendAvailableGamesToClient(IClient client) {
-		client.showUpdate((new HashSet<>(gamesHandler.getGames())).toString());
+	public void requestUpdate(IClient client) {
+		client.updateClient(new ClientUpdate(gamesServer.getUUIDbyConnection(client)));
 	}
 
 	@Override
-	public void joinGame(UUID gameId, String username) {
-		gamesHandler.joinGame(username, gameId);
+	public void joinGame(UUID connectionUUID, UUID gameId, String username) {
+		gamesHandler.joinGame(username, gameId, connectionUUID);
+		//after the user has been added into the game, we can notify the
 	}
 }

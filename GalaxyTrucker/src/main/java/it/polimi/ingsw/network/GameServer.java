@@ -1,6 +1,8 @@
 package src.main.java.it.polimi.ingsw.network;
 
+import src.main.java.it.polimi.ingsw.network.rmi.RmiClient;
 import src.main.java.it.polimi.ingsw.network.rmi.RmiServer;
+import src.main.java.it.polimi.ingsw.network.socket.ClientSocketToRMIAdapter;
 import src.main.java.it.polimi.ingsw.network.socket.SocketServer;
 
 import java.io.IOException;
@@ -50,11 +52,22 @@ public class GameServer{
 		});
 	}
 
-	public void registerClient(IClient client) {
-		this.clients.put(UUID.randomUUID(), client);
+	public UUID registerClient(IClient client) {
+		UUID clientUUID = UUID.randomUUID();
+		this.clients.put(clientUUID, client);
+		return clientUUID;
 	}
 
 	public RmiServer getRmiServer() {
 		return rmiServer;
 	}
+
+	public UUID getUUIDbyConnection(IClient client){
+		return clients.entrySet()
+				.stream()
+				.filter(entry -> entry.getValue().equals(client))
+				.map(Map.Entry::getKey)
+				.findFirst().orElseThrow(() -> new RuntimeException("Could not find an UUID with the given connection."));
+	}
+
 }

@@ -7,10 +7,12 @@ import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Player {
 
     private final String username;
+    private UUID connectionUUID;
 
     /**
      * Tile currently held by the player
@@ -42,10 +44,11 @@ public class Player {
      */
     private int position;
 
-    public Player(String username) {
+    public Player(String username, UUID connectionUUID) {
         this.username = username;
         this.reservedTiles = new ArrayList<>(2);
         this.discardedTiles = new ArrayList<>();
+        this.connectionUUID = connectionUUID;
         credits = 0;
     }
 
@@ -55,6 +58,10 @@ public class Player {
      */
     public String getUsername() {
         return username;
+    }
+
+    public UUID getConnectionUUID() {
+        return connectionUUID;
     }
 
     /**

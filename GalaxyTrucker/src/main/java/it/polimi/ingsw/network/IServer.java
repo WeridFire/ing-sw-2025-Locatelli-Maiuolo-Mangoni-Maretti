@@ -7,7 +7,7 @@ public interface IServer extends Remote {
 
 	void connect(IClient client);
 
-	void sendAvailableGamesToClient(IClient client);
+	void requestUpdate(IClient client);
 
-	void joinGame(UUID gameId, String username);
+	void joinGame(UUID connectionUUID, UUID gameId, String username);
 }

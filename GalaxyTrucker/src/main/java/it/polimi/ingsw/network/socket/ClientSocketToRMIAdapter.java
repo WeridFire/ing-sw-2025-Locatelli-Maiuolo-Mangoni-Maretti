@@ -1,8 +1,6 @@
 package src.main.java.it.polimi.ingsw.network.socket;
 
-import src.main.java.it.polimi.ingsw.network.IClient;
-import src.main.java.it.polimi.ingsw.network.IServer;
-import src.main.java.it.polimi.ingsw.network.rmi.RmiServer;
+import src.main.java.it.polimi.ingsw.network.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,27 +9,29 @@ import java.util.UUID;
 
 public class ClientSocketToRMIAdapter implements IClient {
 
-	final RmiServer server;
+	final GameServer gameServer;
 	final BufferedReader input;
 	final PrintWriter output;
 
-	public ClientSocketToRMIAdapter(RmiServer server, BufferedReader input, PrintWriter output) {
-		this.server = server;
+	public ClientSocketToRMIAdapter(GameServer gameServer, BufferedReader input, PrintWriter output) {
+		this.gameServer = gameServer;
 		this.input = input;
 		this.output = output;
 	}
 
-	//HANDLES INCOMING MESSAGES
+	//HANDLES MESSAGES FROM CLIENT TO SERVER
 	public void runVirtualView() throws IOException {
 		String line;
 		while ((line = input.readLine()) != null) {
 			// TODO: add serialization and deserialization!
 			switch (line) {
 				case "getGames":
-					server.sendAvailableGamesToClient(this);
+					//we delegate the RmiServer to handle the request. We pass ourself, so that if the RMI
+					//needs to update the client, it will use us to update via socket.
+					getServer().requestUpdate(this);
 					break;
 				case "joinGame":
-					server.joinGame(UUID.fromString("should be parsed"), "should be parsed");
+					getServer().joinGame(gameServer.getUUIDbyConnection(this), UUID.fromString("should be parsed"), "should be parsed");
 					break;
 			}
 		}
@@ -39,18 +39,13 @@ public class ClientSocketToRMIAdapter implements IClient {
 
 	@Override
 	public IServer getServer() {
-		return null;
-		//We can return null, as the server will never call "getServer" on the virtual client. Maybe we can
-		//make this nicer with multiple interfaces?
+		return gameServer.getRmiServer();
 	}
 
 	@Override
-	public void notifyError(String error) {
-		output.println("[ERROR] " + error);
+	public void updateClient(ClientUpdate clientUpdate) {
+		//TODO: IMPLEMENT PROPER SERIALIZATION
+		output.println(clientUpdate.toString());
 	}
 
-	@Override
-	public void showUpdate(String update) {
-		output.println("[UPDATE] " + update);
-	}
 }

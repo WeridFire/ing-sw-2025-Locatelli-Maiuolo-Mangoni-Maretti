@@ -28,12 +28,12 @@ public class ServerSocketAdapter implements IServer {
 	}
 
 	@Override
-	public void sendAvailableGamesToClient(IClient client) {
+	public void requestUpdate(IClient client) {
 		output.println("getGames");
 	}
 
 	@Override
-	public void joinGame(UUID gameId, String username) {
+	public void joinGame(UUID connectionUUID, UUID gameId, String username) {
 		output.println("joinGame|gameId|username"); //TODO: this has to be reviewed definetely
 	}
 }

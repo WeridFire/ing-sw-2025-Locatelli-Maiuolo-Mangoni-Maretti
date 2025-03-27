@@ -20,6 +20,7 @@ public class GameClient {
 	private boolean useRMI;
 	private RmiClient rmiClient = null;
 	private SocketClient socketClient = null;
+	private UUID connectionUUID;
 
 	public GameClient(boolean useRMI, String host, Integer port) throws IOException, NotBoundException {
 		this.useRMI = useRMI;
@@ -27,13 +28,13 @@ public class GameClient {
 			final String serverName = "GalaxyTruckerServer";
 			Registry registry = LocateRegistry.getRegistry(host, port);
 			RmiServer server = (RmiServer) registry.lookup(serverName);
-			rmiClient = new RmiClient(server);
+			rmiClient = new RmiClient(server, this);
 			rmiClient.getServer().connect(rmiClient);
 		}else{
 			Socket serverSocket = new Socket(host, port);
 			InputStreamReader socketRx = new InputStreamReader(serverSocket.getInputStream());
 			OutputStreamWriter socketTx = new OutputStreamWriter(serverSocket.getOutputStream());
-			socketClient = new SocketClient(new BufferedReader(socketRx), new BufferedWriter(socketTx));
+			socketClient = new SocketClient(new BufferedReader(socketRx), new BufferedWriter(socketTx), this);
 		}
 		runCli();
 	}
@@ -53,13 +54,21 @@ public class GameClient {
 			int command = scan.nextInt();
 			switch(command) {
 				case 0:
-					getClient().getServer().sendAvailableGamesToClient(getClient());
+					getClient().getServer().requestUpdate(getClient());
 					break;
 				case 1:
-					getClient().getServer().joinGame(UUID.fromString("UUID HERE"), "placeholder");
+					getClient().getServer().joinGame(getConnectionUUID(), UUID.fromString("UUID HERE"), "placeholder");
 					break;
 			}
 		}
+	}
+
+	public UUID getConnectionUUID() {
+		return connectionUUID;
+	}
+
+	public void setConnectionUUID(UUID connectionUUID) {
+		this.connectionUUID = connectionUUID;
 	}
 
 	public static void main(String[] args) throws IOException, NotBoundException {
