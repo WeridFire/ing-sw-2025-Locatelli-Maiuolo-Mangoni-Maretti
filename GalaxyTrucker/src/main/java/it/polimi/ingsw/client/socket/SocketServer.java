@@ -23,10 +23,11 @@ public class SocketServer {
 		this.gamesHandler = GamesHandler.getInstance();
 		this.listenSocket = listenSocket;
 		this.rmiJunction = new RmiJunction();
-		run();
 	}
 
-	private void run() throws IOException {
+	public void run() throws IOException {
+		//Maybe we should make run private, and where this is called pass in the executor the whole class for it to be
+		//run automatically?
 		Socket clientSocket = null;
 		while ((clientSocket = this.listenSocket.accept()) != null) {
 			InputStreamReader socketRx = new InputStreamReader(clientSocket.getInputStream());

@@ -40,6 +40,7 @@ public class GameServer {
 			try {
 				ServerSocket listenSocket = new ServerSocket(port);
 				socketServer = new SocketServer(listenSocket);
+				socketServer.run();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
