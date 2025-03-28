@@ -42,7 +42,7 @@ public class GameServer{
 				RmiServer stub = (RmiServer) UnicastRemoteObject.exportObject(rmiServer, 0);
 				Registry registry = LocateRegistry.createRegistry(rmiPort);
 				registry.rebind(serverName, stub);
-				System.out.println("RMI server bound.");
+				System.out.println("RMI server bound on port " + rmiPort + " with name " + serverName + ".");
 			} catch (RemoteException e) {
 				throw new RuntimeException(e);
 			}
@@ -54,6 +54,7 @@ public class GameServer{
 			try {
 				ServerSocket listenSocket = new ServerSocket(port);
 				socketServer = new SocketServer(listenSocket);
+				System.out.println("Socket server bound on port " + port + ".");
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}

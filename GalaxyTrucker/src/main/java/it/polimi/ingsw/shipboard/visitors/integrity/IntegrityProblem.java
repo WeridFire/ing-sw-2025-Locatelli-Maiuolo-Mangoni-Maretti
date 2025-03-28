@@ -1,6 +1,6 @@
 package src.main.java.it.polimi.ingsw.shipboard.visitors.integrity;
 
-import javafx.util.Pair;
+import java.util.Pair;
 import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.TileCluster;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;

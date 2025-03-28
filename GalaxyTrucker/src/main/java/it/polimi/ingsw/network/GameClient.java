@@ -20,7 +20,6 @@ public class GameClient implements IClient{
 	private boolean useRMI;
 	private RmiClient rmiClient = null;
 	private SocketClient socketClient = null;
-	private UUID connectionUUID;
 
 	public GameClient(boolean useRMI, String host, Integer port) throws IOException, NotBoundException {
 		this.useRMI = useRMI;
@@ -54,7 +53,7 @@ public class GameClient implements IClient{
 			int command = scan.nextInt();
 			switch(command) {
 				case 0:
-					getServer().requestUpdate(getClient());
+					getServer().ping(getClient());
 					break;
 				case 1:
 					getServer().joinGame(getClient(), UUID.fromString("UUID HERE"), "placeholder");
@@ -63,9 +62,6 @@ public class GameClient implements IClient{
 		}
 	}
 
-	public void setConnectionUUID(UUID connectionUUID) {
-		this.connectionUUID = connectionUUID;
-	}
 
 	@Override
 	public IServer getServer() {
@@ -74,8 +70,7 @@ public class GameClient implements IClient{
 
 	@Override
 	public void updateClient(ClientUpdate clientUpdate) {
-		//Process new update received from the server.
-		setConnectionUUID(clientUpdate.getClientUUID());
+
 		System.out.println(clientUpdate);
 	}
 

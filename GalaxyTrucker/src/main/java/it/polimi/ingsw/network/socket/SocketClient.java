@@ -7,6 +7,7 @@ import src.main.java.it.polimi.ingsw.network.IServer;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 
 public class SocketClient implements IClient {
 	final BufferedReader input;
@@ -20,6 +21,18 @@ public class SocketClient implements IClient {
 		this.server = new ServerSocketAdapter(output);
 		this.gameClient = gameClient;
 	}
+
+	private void runVirtualServer() throws IOException {
+		String line;
+
+		while ((line = input.readLine()) != null) {
+			System.out.println(line);
+			//Here we should parse line into a ClientUpdate, and call updateClient.
+		}
+	}
+
+
+
 
 	@Override
 	public IServer getServer() {

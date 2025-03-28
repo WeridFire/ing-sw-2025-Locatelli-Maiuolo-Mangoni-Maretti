@@ -37,14 +37,8 @@ public class ClientSocketToRMIAdapter implements IClient {
 		while ((line = input.readLine()) != null) {
 			// TODO: add serialization and deserialization!
 			switch (line) {
-				case "getGames":
-					//TODO: CREATE A NEW THREAD FOR EACH MESSAGE, TO BECOME EXACT SAME AS RMI!
-					//we delegate the RmiServer to handle the request. We pass ourself, so that if the RMI
-					//needs to update the client, it will use us to update via socket.
-					getServer().requestUpdate(this);
-					break;
-				case "joinGame":
-					getServer().joinGame(this, UUID.fromString("should be parsed"), "should be parsed");
+				case "ping":
+					getServer().ping(this);
 					break;
 			}
 		}

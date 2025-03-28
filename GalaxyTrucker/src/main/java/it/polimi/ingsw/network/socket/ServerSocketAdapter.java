@@ -49,4 +49,9 @@ public class ServerSocketAdapter implements IServer {
 	public void drawComponent(IClient client) {
 
 	}
+
+	@Override
+	public void ping(IClient client) {
+		output.println("ping");
+	}
 }

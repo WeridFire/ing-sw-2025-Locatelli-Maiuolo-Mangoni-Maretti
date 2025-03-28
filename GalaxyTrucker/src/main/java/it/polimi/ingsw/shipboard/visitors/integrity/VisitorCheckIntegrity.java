@@ -1,6 +1,6 @@
 package src.main.java.it.polimi.ingsw.shipboard.visitors.integrity;
 
-import javafx.util.Pair;
+
 import src.main.java.it.polimi.ingsw.enums.Direction;
 import src.main.java.it.polimi.ingsw.enums.Rotation;
 import src.main.java.it.polimi.ingsw.shipboard.SideType;
@@ -11,6 +11,7 @@ import src.main.java.it.polimi.ingsw.shipboard.visitors.TileVisitor;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
 import java.util.*;
+
 
 /**
  * Visitor to check for integrity problems. The first encountered must be resolved.
