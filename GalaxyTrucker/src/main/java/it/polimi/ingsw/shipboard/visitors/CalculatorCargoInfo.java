@@ -11,10 +11,10 @@ import java.util.*;
  * This class is responsible for gathering and analyzing cargo-related information from container tiles in a shipboard.
  * It tracks the remaining capacity, the types of items loaded, and the locations of cargo containers.
  */
-public class CalculatorCargoInfo {
+public class CalculatorCargoInfo<ContainerType extends ContainerTile> {
 
     /** A map of coordinates and container tiles in these coordinates. Also empty containers are saved. */
-    private final Map<Coordinates, ContainerTile> containerLocations;
+    private final Map<Coordinates, ContainerType> containerLocations;
 
     /**
      * Constructs an empty {@code CalculatorCargoInfo} instance, initializing lists and setting capacity to zero.
@@ -31,7 +31,7 @@ public class CalculatorCargoInfo {
      * @throws NotFixedTileException If the tile is not fixed in a position.
      * @implSpec {@code protected} to access only from this package.
      */
-    protected void visit(ContainerTile tile) throws NotFixedTileException {
+    protected void visit(ContainerType tile) throws NotFixedTileException {
         Coordinates coordinates = tile.getCoordinates();
         containerLocations.put(coordinates, tile);
     }
@@ -68,7 +68,7 @@ public class CalculatorCargoInfo {
     /**
      * @return A map of (coordinates -> visited container tile) entries.
      */
-    public Map<Coordinates, ContainerTile> getLocations() {
+    public Map<Coordinates, ContainerType> getLocations() {
         return new HashMap<>(containerLocations);
     }
 
@@ -80,7 +80,7 @@ public class CalculatorCargoInfo {
      * @return The calculated map of (coordinates -> visited container tile with enough available space) entries.
      * @throws IllegalArgumentException If {@code minAvailableSpace <= 0}.
      */
-    public Map<Coordinates, ContainerTile> getLocationsWithAvailableSpace(int minAvailableSpace) {
+    public Map<Coordinates, ContainerType> getLocationsWithAvailableSpace(int minAvailableSpace) {
         if (minAvailableSpace <= 0) {
             throw new IllegalArgumentException("Minimum available space must be greater than zero (provided: "
                     + ((minAvailableSpace == 0)
@@ -88,8 +88,8 @@ public class CalculatorCargoInfo {
                     : minAvailableSpace + ")") );
         }
 
-        Map<Coordinates, ContainerTile> result = new HashMap<>();
-        for (Map.Entry<Coordinates, ContainerTile> entry : containerLocations.entrySet()) {
+        Map<Coordinates, ContainerType> result = new HashMap<>();
+        for (Map.Entry<Coordinates, ContainerType> entry : containerLocations.entrySet()) {
             if (entry.getValue().getCapacityLeft() >= minAvailableSpace) {
                 result.put(entry.getKey(), entry.getValue());
             }
@@ -105,7 +105,7 @@ public class CalculatorCargoInfo {
      * @return The calculated map of (coordinates -> visited container tile with enough loaded items) entries.
      * @throws IllegalArgumentException If {@code minLoadedItems <= 0}.
      */
-    public Map<Coordinates, ContainerTile> getLocationsWithLoadedItems(int minLoadedItems) {
+    public Map<Coordinates, ContainerType> getLocationsWithLoadedItems(int minLoadedItems) {
         if (minLoadedItems <= 0) {
             throw new IllegalArgumentException("Minimum loaded items must be greater than zero (provided: "
                     + ((minLoadedItems == 0)
@@ -113,9 +113,30 @@ public class CalculatorCargoInfo {
                     : minLoadedItems + ")") );
         }
 
-        Map<Coordinates, ContainerTile> result = new HashMap<>();
-        for (Map.Entry<Coordinates, ContainerTile> entry : containerLocations.entrySet()) {
+        Map<Coordinates, ContainerType> result = new HashMap<>();
+        for (Map.Entry<Coordinates, ContainerType> entry : containerLocations.entrySet()) {
             if (entry.getValue().getLoadedItems().size() >= minLoadedItems) {
+                result.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Calculates a map taking in consideration just the containers with at least ALL the {@code allowedItemTypes}
+     * as allowed items.
+     *
+     * @param allowedItemTypes the target allowed content
+     * @return The calculated map of (coordinates -> visited container tile with allowed items) entries.
+     */
+    public Map<Coordinates, ContainerType> getLocationsWithAllowedContent(Set<LoadableType> allowedItemTypes) {
+        if (allowedItemTypes == null || allowedItemTypes.isEmpty()) {
+            return getLocations();
+        }
+
+        Map<Coordinates, ContainerType> result = new HashMap<>();
+        for (Map.Entry<Coordinates, ContainerType> entry : containerLocations.entrySet()) {
+            if (entry.getValue().getAllowedItems().containsAll(allowedItemTypes)) {
                 result.put(entry.getKey(), entry.getValue());
             }
         }

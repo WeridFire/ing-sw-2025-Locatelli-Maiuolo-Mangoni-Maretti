@@ -4,14 +4,14 @@ import src.main.java.it.polimi.ingsw.shipboard.tiles.*;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
 
 public class VisitorCalculateCargoInfo implements TileVisitor {
-    private final CalculatorCargoInfo infoCrew;
-    private final CalculatorCargoInfo infoGoods;
-    private final CalculatorCargoInfo infoBatteries;
+    private final CalculatorCargoInfo<CabinTile> infoCrew;
+    private final CalculatorCargoInfo<CargoHoldTile> infoGoods;
+    private final CalculatorCargoInfo<BatteryComponentTile> infoBatteries;
 
     public VisitorCalculateCargoInfo() {
-        infoCrew = new CalculatorCargoInfo();
-        infoGoods = new CalculatorCargoInfo();
-        infoBatteries = new CalculatorCargoInfo();
+        infoCrew = new CalculatorCargoInfo<>();
+        infoGoods = new CalculatorCargoInfo<>();
+        infoBatteries = new CalculatorCargoInfo<>();
     }
 
     @Override
@@ -57,15 +57,15 @@ public class VisitorCalculateCargoInfo implements TileVisitor {
         }
     }
 
-    public CalculatorCargoInfo getGoodsInfo() {
-        return infoGoods;
-    }
-
-    public CalculatorCargoInfo getCrewInfo() {
+    public CalculatorCargoInfo<CabinTile> getCrewInfo() {
         return infoCrew;
     }
 
-    public CalculatorCargoInfo getBatteriesInfo() {
+    public CalculatorCargoInfo<CargoHoldTile> getGoodsInfo() {
+        return infoGoods;
+    }
+
+    public CalculatorCargoInfo<BatteryComponentTile> getBatteriesInfo() {
         return infoBatteries;
     }
 }
