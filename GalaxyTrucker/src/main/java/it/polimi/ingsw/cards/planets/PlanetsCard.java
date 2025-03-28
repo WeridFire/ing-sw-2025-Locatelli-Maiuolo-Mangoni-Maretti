@@ -3,6 +3,7 @@ package src.main.java.it.polimi.ingsw.cards.planets;
 import src.main.java.it.polimi.ingsw.GamesHandler;
 import src.main.java.it.polimi.ingsw.cards.Card;
 import src.main.java.it.polimi.ingsw.cards.exceptions.PlanetsCardException;
+import src.main.java.it.polimi.ingsw.game.GameData;
 import src.main.java.it.polimi.ingsw.player.Player;
 
 import java.util.Arrays;
@@ -18,12 +19,11 @@ public class PlanetsCard extends Card {
 	 *
 	 * @param textureName The name of the texture of the card.
 	 * @param level       The level of this card.
-	 * @param gameId      The ID of the game this card is part of.
 	 * @param planets Instances of the planets, each one populated with the goods available on it.
 	 * @param lostDays amount of days lost upon landing on a planet.
 	 */
-	public PlanetsCard(Planet[] planets, int lostDays, String textureName, int level, UUID gameId) {
-		super(textureName, level, gameId);
+	public PlanetsCard(Planet[] planets, int lostDays, String textureName, int level) {
+		super(textureName, level);
 	}
 
 	/**
@@ -42,11 +42,10 @@ public class PlanetsCard extends Card {
 	/**
 	 * Iteratively asks each player if they want to land. Then in reverse order allows players to pickup their items
 	 * and move back in days.
-	 * @param gameId The UUID of the game associated to this card, to access the game handler.
 	 */
 	@Override
-	public void playEffect(UUID gameId) {
-		for (Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers()){
+	public void playEffect(GameData game) {
+		for (Player p : game.getPlayers()){
 			//TODO: ask player if they wanna land. We should get here directly the reference to the planet to land on.
 			//TODO: the check that ID is valid AND the planet is free should be handled in the controller.
 			Planet planet = null;
@@ -57,7 +56,7 @@ public class PlanetsCard extends Card {
 				//TODO: get singleton of controller for the game, send message of error to player.
 			}
 		}
-		for(Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers().reversed()){
+		for(Player p : game.getPlayers().reversed()){
 			Planet landedPlanet = Arrays.stream(planets)
 					.filter(pl -> pl.getCurrentPlayer().equals(p))
 					.findFirst()
@@ -66,7 +65,7 @@ public class PlanetsCard extends Card {
 			if(landedPlanet != null){
 				landedPlanet.lootPlanet();
 				landedPlanet.leavePlanet();
-				movePlayer(p, lostDays);
+				game.movePlayerBackward(p, lostDays);
 			}
 		}
 	}

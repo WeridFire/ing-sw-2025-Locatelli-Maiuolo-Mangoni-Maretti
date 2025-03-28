@@ -3,6 +3,7 @@ package src.main.java.it.polimi.ingsw.cards.warzone;
 import src.main.java.it.polimi.ingsw.cards.Card;
 import src.main.java.it.polimi.ingsw.cards.projectile.Projectile;
 import src.main.java.it.polimi.ingsw.enums.PowerType;
+import src.main.java.it.polimi.ingsw.game.GameData;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 
@@ -26,17 +27,17 @@ public class WarFactory {
 				.getCrewInfo().countAll(LoadableType.CREW_SET))); // Placeholder
 	}
 
-	public static Consumer<Player> createLostDaysPunishment(int lostDays) {
-		return player -> Card.movePlayer(player, lostDays);
+	public static BiConsumer<Player, GameData> createLostDaysPunishment(int lostDays) {
+		return (player, game) -> game.movePlayerBackward(player, lostDays);
 	}
 
-	public static Consumer<Player> createCrewDeathPunishment(int crewAmount) {
+	public static BiConsumer<Player, GameData>createCrewDeathPunishment(int crewAmount) {
 		//TODO: implement method so that it asks the player where they wants their crew to be removed.
-		return (player) -> player.addCredits(1);
+		return (player, game) -> player.addCredits(1);
 	}
 
-	public static Consumer<Player> createProjectilePunishment(Projectile[] projectiles) {
-		return (player) -> {};
+	public static BiConsumer<Player, GameData> createProjectilePunishment(Projectile[] projectiles) {
+		return (player, game) -> {};
 		//TODO: implement hitting the player accordingly to the projectiles.
 	}
 

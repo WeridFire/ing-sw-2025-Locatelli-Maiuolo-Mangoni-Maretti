@@ -20,10 +20,9 @@ public class EpidemicCard extends Card{
 	 *
 	 * @param textureName The name of the texture of the card.
 	 * @param level       The level of this card.
-	 * @param gameId      The ID of the game this card is part of.
 	 */
-	public EpidemicCard(String textureName, int level, UUID gameId) {
-		super(textureName, level, gameId);
+	public EpidemicCard(String textureName, int level) {
+		super(textureName, level);
 	}
 
 	/**

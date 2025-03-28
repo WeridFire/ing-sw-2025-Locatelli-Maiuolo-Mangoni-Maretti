@@ -70,7 +70,7 @@ public class Game {
     public void gameLoop() throws IncorrectGamePhaseTypeException, InterruptedException {
 
         //nota sta nel playloop di una phase cambiare il suo stato in "ENDED"
-        AssembleGamePhase a = new AssembleGamePhase(id, GamePhaseType.ASSEMBLE, GameState.PLAYING, gameData);
+        AssembleGamePhase a = new AssembleGamePhase(id, GamePhaseType.ASSEMBLE, gameData);
         Thread thread = new Thread(a::playLoop);
         thread.start();
 
@@ -82,7 +82,7 @@ public class Game {
         while(gameData.getDeck().getTopCard() != null) {
 
             //create adventure
-            adventureGamePhase = new AdventureGamePhase(id, GamePhaseType.ADVENTURE, GameState.PLAYING, gameData, gameData.getDeck().getTopCard());
+            adventureGamePhase = new AdventureGamePhase(id, GamePhaseType.ADVENTURE, gameData, gameData.getDeck().getTopCard());
 
             thread = new Thread(adventureGamePhase::playLoop);
             thread.start();
