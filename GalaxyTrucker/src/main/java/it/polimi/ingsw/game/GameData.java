@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class GameData implements Serializable {
 
     /** The game level configuration. */
-    private final GameLevel level;
+    private GameLevel level;
 
     /** The current phase type of the game. */
     private GamePhaseType currentGamePhaseType;
@@ -42,25 +42,25 @@ public class GameData implements Serializable {
     private Player turn;
 
     /** Mapping of available cargo goods and their quantities. */
-    private HashMap<LoadableType, Integer> availableGoods;
+    private Map<LoadableType, Integer> availableGoods;
 
     /** List of game deck. */
     private Deck deck;
 
     /** List of covered tiles in the game. */
-    private ArrayList<TileSkeleton<SideType>> coveredTiles;
+    private List<TileSkeleton<SideType>> coveredTiles;
+
+    private int requiredPlayers = 4;
 
     /**
-     * Constructs a new GameData object with the specified game level.
-     *
-     * @param level The game level.
+     * Constructs a new GameData object with a default game level.
      */
-    public GameData(GameLevel level) {
-        this.level = level;
+    public GameData() {
         this.players = new HashSet<>();
         this.availableGoods = new HashMap<>();
-        this.coveredTiles = new ArrayList<TileSkeleton<SideType>>();
+        this.coveredTiles = new ArrayList<>();
         this.deck = null;
+        this.setCurrentGamePhaseType(GamePhaseType.LOBBY);
     }
 
     /**
@@ -70,6 +70,10 @@ public class GameData implements Serializable {
      */
     public GameLevel getLevel() {
         return level;
+    }
+
+    public void setLevel(GameLevel level){
+        this.level = level;
     }
 
     /**
@@ -124,7 +128,7 @@ public class GameData implements Serializable {
      *
      * @return The list of covered tiles.
      */
-    public ArrayList<TileSkeleton<SideType>> getCoveredTiles() {
+    public List<TileSkeleton<SideType>> getCoveredTiles() {
         return coveredTiles;
     }
 
@@ -162,7 +166,7 @@ public class GameData implements Serializable {
      *
      * @param coveredTiles The new list of covered tiles.
      */
-    public void setCoveredTiles(ArrayList<TileSkeleton<SideType>> coveredTiles) {
+    public void setCoveredTiles(List<TileSkeleton<SideType>> coveredTiles) {
         this.coveredTiles = coveredTiles;
     }
 
@@ -181,6 +185,9 @@ public class GameData implements Serializable {
             throw new PlayerAlreadyInGameException("Player with this username is already present.");
         }
         players.add(player);
+        if(players.size() >= getRequiredPlayers()){
+            startGame();
+        }
     }
 
 
@@ -194,80 +201,82 @@ public class GameData implements Serializable {
     }
 
     /**
-     * Initializes default game settings, including covered tiles and deck.
+     * Moves a player on the board, accounting for players they may pass.
+     * @param playerToMove player that is going to move
+     * @param steps number of steps the player is moving
+     * @param forward true if moving forward, false if moving backward
      */
-    public void initDefaults(){
-        this.coveredTiles = initDefaultTiles();
-        //this.deck = initDefaultCards();
+    private void movePlayer(Player playerToMove, int steps, boolean forward) {
+
+        // HashSet for fast position lookup
+        Set<Integer> occupiedPositions = new HashSet<>();
+        List<Player> currentOrder = getPlayers();
+        //TODO: SYNCHRONIZE! WE WANT TO MOVE ONLY 1 PLAYER AT A TIME SO SYNC ON THE OBJECT
+        for (Player player : currentOrder) {
+            if (!player.getUsername().equals(playerToMove.getUsername())) {
+                occupiedPositions.add(player.getPosition());
+            }
+        }
+
+        int newPosition = playerToMove.getPosition();
+        int stepsLeft = steps;
+
+        while (stepsLeft > 0) {
+            newPosition += (forward ? 1 : -1); // Move forward or backward
+            stepsLeft--; // Decrease steps left
+
+            // Add a step if a player is passed
+            if (occupiedPositions.contains(newPosition)) {
+                stepsLeft++;
+            }
+        }
+
+        playerToMove.setPosition(newPosition);
     }
 
     /**
-     * Initializes default covered tiles.
-     *
-     * @return A list of default covered tiles.
-     */
-    private ArrayList<TileSkeleton<SideType>> initDefaultTiles(){
-        return new ArrayList<>(TilesFactory.createPileTiles());
-    }
-
-    /**
-     * Moves a player forward on the board, accounting for players he may pass
+     * Moves a player forward on the board.
      * @param playerToMove player that is going to move
      * @param steps number of steps the player is moving
      */
     public void movePlayerForward(Player playerToMove, int steps) {
-
-        // HashSet for fast position lookup
-        Set<Integer> occupiedPositions = new HashSet<>();
-        for (Player player : players) {
-            if (!player.getUsername().equals(playerToMove.getUsername())) {
-                occupiedPositions.add(player.getPosition());
-            }
-        }
-
-        int newPosition = playerToMove.getPosition();
-        int stepsLeft = steps;
-
-        while (stepsLeft > 0) {
-            newPosition++; // Move one step back
-            stepsLeft--;   // Decrease steps left
-
-            // Add a step if a player is passed
-            if (occupiedPositions.contains(newPosition)) {
-                stepsLeft++;
-            }
-        }
-
-        playerToMove.setPosition(newPosition);
+        movePlayer(playerToMove, steps, true);
     }
 
     /**
-     * Moves a player backwards on the board, accounting for players he may pass
+     * Moves a player backward on the board.
      * @param playerToMove player that is going to move
      * @param steps number of steps the player is moving
      */
     public void movePlayerBackward(Player playerToMove, int steps) {
+        movePlayer(playerToMove, steps, false);
+    }
 
-        // HashSet for fast position lookup
-        Set<Integer> occupiedPositions = new HashSet<>();
-        for (Player player : players) {
-            if (!player.getUsername().equals(playerToMove.getUsername())) {
-                occupiedPositions.add(player.getPosition());
-            }
+    public void setCurrentGamePhaseType(GamePhaseType currentGamePhaseType) {
+        this.currentGamePhaseType = currentGamePhaseType;
+    }
+
+    public int getRequiredPlayers() {
+        return requiredPlayers;
+    }
+
+    public void setRequiredPlayers(int requiredPlayers) {
+        if(requiredPlayers > 4 || requiredPlayers < 2){
+            return;
         }
+        this.requiredPlayers = requiredPlayers;
+    }
 
-        int newPosition = playerToMove.getPosition();
-        int stepsLeft = steps;
-
-        while (stepsLeft > 0) {
-            newPosition--; // Move one step back
-            stepsLeft--;   // Decrease steps left
-
-            // Add a step if a player is passed
-            if (occupiedPositions.contains(newPosition)) {
-                stepsLeft++;
-            }
+    public void startGame(UUID gameId){
+        switch(getLevel()){
+            case TESTFLIGHT, ONE -> this.lapSize = 18;
+            case TWO -> this.lapSize = 24;
         }
-        playerToMove.setPosition(newPosition);
+        setCoveredTiles(TilesFactory.createPileTiles());
+        setDeck(new Deck(getLevel(), gameId));
+
+        if(this.currentGamePhaseType == GamePhaseType.LOBBY){
+            //set new game phase here, ideally assembly.
+        }
     }
 }
