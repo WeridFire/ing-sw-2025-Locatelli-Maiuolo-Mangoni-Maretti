@@ -123,6 +123,34 @@ public class CalculatorCargoInfo<ContainerType extends ContainerTile> {
     }
 
     /**
+     * Calculates a map taking in consideration just the containers with at least {@code minLoadedItems}
+     * loaded items (of the specified type) onto them.
+     *
+     * @param loadedItems the type of the loaded items to check
+     * @param minLoadedItems the target minimum loaded items (of the type {@code loadedItems})
+     * @return The calculated map of (coordinates -> visited container tile with enough loaded items) entries.
+     * @throws IllegalArgumentException If {@code minLoadedItems <= 0}.
+     */
+    public Map<Coordinates, ContainerType> getLocationsWithLoadedItems(LoadableType loadedItems, int minLoadedItems) {
+        if (minLoadedItems <= 0) {
+            throw new IllegalArgumentException("Minimum loaded items must be greater than zero (provided: "
+                    + ((minLoadedItems == 0)
+                    ? "zero. In this case simply call getLocations() instead)"
+                    : minLoadedItems + ")") );
+        }
+
+        Map<Coordinates, ContainerType> result = new HashMap<>();
+        for (Map.Entry<Coordinates, ContainerType> entry : containerLocations.entrySet()) {
+            if (entry.getValue().getLoadedItems().stream()
+                    .filter(i -> i.equals(loadedItems))
+                    .count() >= minLoadedItems) {
+                result.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return result;
+    }
+
+    /**
      * Calculates a map taking in consideration just the containers with at least ALL the {@code allowedItemTypes}
      * as allowed items.
      *
