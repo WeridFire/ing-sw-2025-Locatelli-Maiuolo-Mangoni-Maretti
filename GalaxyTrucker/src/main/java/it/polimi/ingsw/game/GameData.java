@@ -1,18 +1,14 @@
 package src.main.java.it.polimi.ingsw.game;
 
-import src.main.java.it.polimi.ingsw.TilesFactory;
 import src.main.java.it.polimi.ingsw.cards.Deck;
-import src.main.java.it.polimi.ingsw.cards.DeckFactory;
 import src.main.java.it.polimi.ingsw.enums.GameLevel;
 import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
 import src.main.java.it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
-import src.main.java.it.polimi.ingsw.game.exceptions.PlayerNotInGameException;
 import src.main.java.it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
-import src.main.java.it.polimi.ingsw.shipboard.ShipBoard;
 
 import java.io.Serializable;
 import java.util.*;
@@ -39,7 +35,7 @@ public class GameData implements Serializable {
     private int lapSize;
 
     /** The player whose turn it is. */
-    private Player turn;
+    private Player currentPlayerTurn;
 
     /** Mapping of available cargo goods and their quantities. */
     private Map<LoadableType, Integer> availableGoods;
@@ -110,8 +106,8 @@ public class GameData implements Serializable {
      *
      * @return The current turn player.
      */
-    public Player getTurn() {
-        return turn;
+    public Player getCurrentPlayerTurn() {
+        return currentPlayerTurn;
     }
 
     /**
@@ -191,10 +187,10 @@ public class GameData implements Serializable {
     /**
      * Sets the current turn player.
      *
-     * @param turn The player whose turn it is.
+     * @param currentPlayerTurn The player whose turn it is.
      */
-    private void setTurn(Player turn) {
-        this.turn = turn;
+    private void setCurrentPlayerTurn(Player currentPlayerTurn) {
+        this.currentPlayerTurn = currentPlayerTurn;
     }
 
     /**
