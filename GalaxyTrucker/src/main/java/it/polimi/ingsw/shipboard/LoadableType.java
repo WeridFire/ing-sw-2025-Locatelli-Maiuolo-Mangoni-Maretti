@@ -1,5 +1,7 @@
 package src.main.java.it.polimi.ingsw.shipboard;
 
+import java.util.Set;
+
 /**
  * Represents different types of loadable items that can be stored in a container (onto a tile).
  */
@@ -24,6 +26,9 @@ public enum LoadableType {
 
     /** A brown alien crew member, for thrust power bonus. */
     BROWN_ALIEN;
+
+    /** An unmodifiable set containing humans and aliens. */
+    public static final Set<LoadableType> CREW_SET = Set.of(HUMAN, PURPLE_ALIEN, BROWN_ALIEN);
 
     /**
      * Retrieves the required capacity for storing this item.

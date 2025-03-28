@@ -2,7 +2,9 @@ package src.main.java.it.polimi.ingsw.cards;
 
 import src.main.java.it.polimi.ingsw.GamesHandler;
 import src.main.java.it.polimi.ingsw.player.Player;
+import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 
+import java.util.Set;
 import java.util.UUID;
 
 public class AbandonedStationCard extends Card{
@@ -42,7 +44,7 @@ public class AbandonedStationCard extends Card{
 	@Override
 	public void playEffect(UUID gameId) {
 		for(Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers()){
-			if(p.getShipBoard().getStatistics().getCrewMembersCount() >= requiredCrew){
+			if (p.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().countAll(LoadableType.CREW_SET) >= requiredCrew){
 				//TODO: ask player if they want to actually take over the station.
 				if(true){ //meaning they accepted to do it
 					for(LoadableType c : availableCargo){

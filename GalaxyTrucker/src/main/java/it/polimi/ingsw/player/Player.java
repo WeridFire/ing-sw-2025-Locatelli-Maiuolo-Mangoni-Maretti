@@ -153,6 +153,6 @@ public class Player {
         if(getTileInHand() != null){
             //throw errror
         }
-        setTileInHand();
+        // TODO: actually draw component  // setTileInHand();
     }
 }

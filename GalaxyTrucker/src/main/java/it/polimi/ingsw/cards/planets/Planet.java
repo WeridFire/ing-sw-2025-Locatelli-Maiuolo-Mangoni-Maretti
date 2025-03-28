@@ -2,6 +2,7 @@ package src.main.java.it.polimi.ingsw.cards.planets;
 
 import src.main.java.it.polimi.ingsw.cards.exceptions.PlanetsCardException;
 import src.main.java.it.polimi.ingsw.player.Player;
+import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 
 import java.util.List;
 

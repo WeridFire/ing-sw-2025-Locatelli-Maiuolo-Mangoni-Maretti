@@ -30,7 +30,7 @@ public class CabinTile extends ContainerTile {
      * @param sides An array of sides defining the structure of the tile.
      */
     public CabinTile(SideType[] sides) {
-        this(sides, Set.of(LoadableType.HUMAN, LoadableType.PURPLE_ALIEN, LoadableType.BROWN_ALIEN));
+        this(sides, LoadableType.CREW_SET);
     }
 
     @Override

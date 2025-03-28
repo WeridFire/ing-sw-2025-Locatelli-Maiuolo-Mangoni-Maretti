@@ -2,6 +2,7 @@ package src.main.java.it.polimi.ingsw.cards;
 
 import src.main.java.it.polimi.ingsw.GamesHandler;
 import src.main.java.it.polimi.ingsw.player.Player;
+import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 
 import java.util.UUID;
 
@@ -44,7 +45,7 @@ public class AbandonedShipCard extends Card{
 	@Override
 	public void playEffect(UUID gameId) {
 		for(Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers()){
-			if(p.getShipBoard().getStatistics().getCrewMembersCount() >= requiredCrew){
+			if(p.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().countAll(LoadableType.CREW_SET) >= requiredCrew){
 				//TODO: ask player if they want to actually take the ship.
 				if(true){ //meaning they accepted to do it
 					for(int i=0; i<requiredCrew; i++){

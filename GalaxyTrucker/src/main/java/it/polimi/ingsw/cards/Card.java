@@ -35,7 +35,8 @@ public abstract class Card {
      * @param position The amount of positions (or days) to move.
      */
     public static void movePlayer(Player player, int position){
-        //TBD - Implement the logic of moving the players.
+        // TODO: Implement the logic of moving the players.
+        /*
         for(Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers())
         {//calcolo dei giocatori superati
             if(p != player){ //funziona se sono ordinati nell'array
@@ -50,7 +51,7 @@ public abstract class Card {
                     p.setDistFromFirst(-1*position); //"arretra" tutti gli altri giocatori di position posizioni
                 }
         }
-        elseif(player.getDistFromFirst() < position){ //il player supera il primo
+        else if(player.getDistFromFirst() < position){ //il player supera il primo
             tmp = player.getDistFromFirst();
             player.setDistFromFirst(tmp); //è meglio se lo salvo nel game, in modo da non dover chiamare ogni player ogni volta
             movePlayer(player, position-tmp);
@@ -58,6 +59,7 @@ public abstract class Card {
         else{ //tutto il resto
             player.setDistFromFirst(position);
         }
+        */
     }
 
     /**

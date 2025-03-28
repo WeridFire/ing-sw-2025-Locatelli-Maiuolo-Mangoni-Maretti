@@ -4,6 +4,7 @@ import src.main.java.it.polimi.ingsw.cards.Card;
 import src.main.java.it.polimi.ingsw.cards.projectile.Projectile;
 import src.main.java.it.polimi.ingsw.enums.PowerType;
 import src.main.java.it.polimi.ingsw.player.Player;
+import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 
 import java.util.Comparator;
 import java.util.function.BiConsumer;
@@ -12,16 +13,17 @@ import java.util.function.Consumer;
 public class WarFactory {
 	public static WarCriteria createThrustCriteria() {
 		//TODO: change the method used to also require player to specify his desired enabled thrusters.
-		return new WarCriteria(Comparator.comparingDouble(p -> p.getShipBoard().getStatistics().getFreePower(PowerType.THRUST)));
+		return new WarCriteria(Comparator.comparingDouble(p -> p.getShipBoard().getVisitorCalculateFirePower().getBaseFirePower()));
 	}
 
 	public static WarCriteria createFireCriteria() {
 		//TODO: change the method used to also require player to specify his desired enabled turrets.
-		return new WarCriteria(Comparator.comparingDouble(p -> p.getShipBoard().getStatistics().getFreePower(PowerType.FIRE))); // Placeholder
+		return new WarCriteria(Comparator.comparingDouble(p -> p.getShipBoard().getVisitorCalculateFirePower().getBaseFirePower())); // Placeholder
 	}
 
 	public static WarCriteria createCrewCriteria() {
-		return new WarCriteria(Comparator.comparingInt(p -> p.getShipBoard().getStatistics().getCrewMembersCount())); // Placeholder
+		return new WarCriteria(Comparator.comparingInt(p -> p.getShipBoard().getVisitorCalculateCargoInfo()
+				.getCrewInfo().countAll(LoadableType.CREW_SET))); // Placeholder
 	}
 
 	public static Consumer<Player> createLostDaysPunishment(int lostDays) {

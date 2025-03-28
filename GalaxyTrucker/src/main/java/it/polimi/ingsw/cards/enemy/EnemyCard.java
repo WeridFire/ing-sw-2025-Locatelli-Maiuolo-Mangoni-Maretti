@@ -14,7 +14,7 @@ public abstract class EnemyCard extends Card {
      */
     private int lostDays;
     /**
-     * The fire power necessary to beat this enemy.
+     * The firepower necessary to beat this enemy.
      */
     private int firePower;
 
@@ -62,11 +62,12 @@ public abstract class EnemyCard extends Card {
     @Override
     public void playEffect(UUID gameId) {
         for(Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers()){
-            //TODO: Implement logic of asking player what power they wanna use
-            if(p.getShipBoard().getVisitorCalculateFirePower().getFirePower() > getFirePower()){
+            //TODO: Implement logic of asking player what power they wanna use !!! MODIFY usedFirePower BELOW !!!
+            float usedFirePower = p.getShipBoard().getVisitorCalculateFirePower().getBaseFirePower();
+            if(usedFirePower > getFirePower()){
                 givePrize(p);
                 break;
-            }else if(p.getShipBoard().getVisitorCalculateFirePower().getFirePower()< getFirePower()){
+            }else if(usedFirePower< getFirePower()){
                 applyPunishment(p);
             }
         }
