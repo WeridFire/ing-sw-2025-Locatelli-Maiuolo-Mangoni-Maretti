@@ -24,16 +24,15 @@ public class AdventureGamePhase extends PlayableGamePhase{
     @Override
     public void playLoop() {
         //wait for player tacking the car
-        try {
-            Card card = gameData.getDeck().getTopCard();
+        gameData.getDeck().drawNextCard();
+        if(gameData.getDeck().getTopCard() != null){
+            gameData.getDeck().getTopCard().playEffect(gameId);
+        }else{
+            //TODO: endgame
+        }
 
             //TODO: come lo pensiamo? coi thread?
-            card.playEffect(gameId);
 
-
-        } catch (NoMoreCardsException e) {
-            // TODO: end game
-        }
     }
 
     @Override

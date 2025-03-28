@@ -13,13 +13,14 @@ import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import src.main.java.it.polimi.ingsw.shipboard.ShipBoard;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Represents the game data.
  */
-public class GameData {
+public class GameData implements Serializable {
 
     /** The game level configuration. */
     private final GameLevel level;
@@ -266,7 +267,6 @@ public class GameData {
                 stepsLeft++;
             }
         }
-
         playerToMove.setPosition(newPosition);
     }
 }

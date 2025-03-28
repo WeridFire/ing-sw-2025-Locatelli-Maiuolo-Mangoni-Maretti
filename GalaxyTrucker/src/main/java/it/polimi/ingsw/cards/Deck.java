@@ -1,18 +1,16 @@
 package src.main.java.it.polimi.ingsw.cards;
 
 import src.main.java.it.polimi.ingsw.gamePhases.exceptions.NoMoreCardsException;
+import src.main.java.it.polimi.ingsw.player.Player;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class Deck {
     /**
      * The list of cards present in the deck.
      */
     final List<Card> deck = new ArrayList<>();
-
+    private Card currentCard = null;
     /**
      * current index of the list
      */
@@ -22,6 +20,23 @@ public class Deck {
      * The list of cardsgroup, for the ship assembly phase.
      */
     private final List<CardsGroup> cardsGroups = new ArrayList<>();
+
+    /**
+     * Private constructor for creating an obfuscated cards group that will be sent to the player.
+     * The new Deck will only have the top card and the cards group that the player is currently holding (if any)
+     * @param deck The original deck
+     * @param player The target player
+     */
+    private Deck(Deck deck, Player player){
+        this.currentCard = deck.getTopCard();
+        for(CardsGroup c : deck.cardsGroups){
+            if(!Objects.equals(c.getHeldBy(), player.getUsername())){
+                this.cardsGroups.add(new CardsGroup(null, c.isSecret()));
+            }else{
+                this.cardsGroups.add(c);
+            }
+        }
+    }
 
     /**
      * Instance a deck with randomly selected cards, based on a level.
@@ -73,6 +88,14 @@ public class Deck {
         }
     }
 
+    public void convertGroupsToCards(){
+        for(CardsGroup c : cardsGroups){
+            while(!c.getGroupCards().isEmpty()){
+                deck.add(c.getGroupCards().removeFirst());
+            }
+        }
+    }
+
     /**
      * Access a specific card group, during ship-building phase.
      * @param index The card group index.
@@ -82,16 +105,26 @@ public class Deck {
         return cardsGroups.get(index);
     }
 
-    public Card getTopCard() throws NoMoreCardsException {
-        currentIndex++;
-        try{
-            return deck.get(currentIndex-1);
-        } catch (IndexOutOfBoundsException e){
-            throw new NoMoreCardsException("No more cards");
-        }
+    public Card getTopCard() {
+        return currentCard;
     }
 
-    public void shuffle(){
-        Collections.shuffle(deck);
+    public void drawNextCard(){
+        if(deck.isEmpty()){
+            currentCard = null;
+            return;
+        }
+        currentCard = deck.removeFirst();
+    }
+
+    /**
+     * Creates an obfuscated copy of the deck, to be sent to the player. The deck will only display the top card
+     * and the cards group if the player is holding it.
+     * @param original The original deck.
+     * @param target The player target to show the cards group to. It will be created ad hoc for them.
+     * @return A new deck obfuscated for target.
+     */
+    public static Deck obfuscateDeck(Deck original, Player target){
+        return new Deck(original, target);
     }
 }
