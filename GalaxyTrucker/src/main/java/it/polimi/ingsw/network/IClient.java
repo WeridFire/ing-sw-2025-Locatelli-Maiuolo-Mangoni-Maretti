@@ -6,4 +6,5 @@ public interface IClient extends Remote {
 
 	IServer getServer();
 	void updateClient(ClientUpdate clientUpdate);
+
 }

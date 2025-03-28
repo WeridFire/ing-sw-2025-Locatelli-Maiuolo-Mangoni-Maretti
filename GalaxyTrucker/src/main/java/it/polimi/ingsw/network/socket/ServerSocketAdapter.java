@@ -39,4 +39,14 @@ public class ServerSocketAdapter implements IServer {
 	public void joinGame(IClient client, UUID gameId, String username) {
 		output.println("joinGame|gameId|username"); //TODO: this has to be reviewed definetely
 	}
+
+	@Override
+	public void quitGame(IClient client) {
+		//TODO
+	}
+
+	@Override
+	public void drawComponent(IClient client) {
+
+	}
 }

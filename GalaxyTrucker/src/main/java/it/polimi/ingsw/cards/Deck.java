@@ -41,7 +41,6 @@ public class Deck {
                 break;
         }
         //TODO: implement extracting cards from pool and splitting them in subgroups
-
         shuffle();
     }
 
@@ -61,7 +60,6 @@ public class Deck {
         } catch (IndexOutOfBoundsException e){
             throw new NoMoreCardsException("No more cards");
         }
-
     }
 
     public void shuffle(){

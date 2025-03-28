@@ -17,12 +17,11 @@ public class ClientSocketToRMIAdapter implements IClient {
 	 * This adapter handles all socket connections on the server. It handles both INCOMING MESSAGES (parsing client-made
 	 * messages on the server, and then running them) and OUTCOMING MESSAGES (serializing outgoing messages and sending
 	 * them to the client).
-	 * @param gameServer a reference to the generic gameServer.
 	 * @param input The input buffer, for the incoming channel
 	 * @param output The output buffer, for the outgoing channel.
 	 */
-	public ClientSocketToRMIAdapter(GameServer gameServer, BufferedReader input, PrintWriter output) {
-		this.gameServer = gameServer;
+	public ClientSocketToRMIAdapter(BufferedReader input, PrintWriter output) {
+		this.gameServer = GameServer.getInstance();
 		this.input = input;
 		this.output = output;
 	}

@@ -36,7 +36,7 @@ public class SocketClient implements IClient {
 		//Basically we deserialized the function and now we send it to the RMI to process properly. HOWEVER,
 		// the RMICLIENT does not exist!! There can only be either the RMI or the SOCKET, not BOTH! So we have to move
 		// The implementation of this function in the generic GameClient, and both the SOCKET and RMI will call it!
-		gameClient.setConnectionUUID(clientUpdate.getClientUUID());
+		gameClient.updateClient(clientUpdate);
 	}
 
 }

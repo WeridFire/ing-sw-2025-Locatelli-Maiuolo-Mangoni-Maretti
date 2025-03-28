@@ -41,5 +41,4 @@ public class ClientUpdate {
 		return clientUUID;
 	}
 
-
 }

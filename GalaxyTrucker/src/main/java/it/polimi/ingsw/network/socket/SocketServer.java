@@ -11,18 +11,15 @@ import java.util.UUID;
 public class SocketServer {
 
 	final ServerSocket listenSocket;
-	final GameServer gameServer;
 
 	/**
 	 * Creates a socket server. The socket server will occupy a thread and constantly listen for incoming connections.
 	 * Whenever a connection is detected it instances a new thread that handles it.
 	 * @param listenSocket The socket object.
-	 * @param gameServer A reference to the generic game server.
 	 * @throws IOException
 	 */
-	public SocketServer(ServerSocket listenSocket, GameServer gameServer) throws IOException {
+	public SocketServer(ServerSocket listenSocket) throws IOException {
 		this.listenSocket = listenSocket;
-		this.gameServer = gameServer;
 		run();
 	}
 
@@ -37,10 +34,10 @@ public class SocketServer {
 			InputStreamReader socketRx = new InputStreamReader(clientSocket.getInputStream());
 			OutputStreamWriter socketTx = new OutputStreamWriter(clientSocket.getOutputStream());
 
-			ClientSocketToRMIAdapter handler = new ClientSocketToRMIAdapter(gameServer,
+			ClientSocketToRMIAdapter handler = new ClientSocketToRMIAdapter(
 																	new BufferedReader(socketRx),
 																	new PrintWriter(socketTx));
-			UUID connectionUUID = gameServer.registerClient(handler);
+			UUID connectionUUID = GameServer.getInstance().registerClient(handler);
 			//Confirm connection and send notify client with assigned UUID
 			handler.updateClient(new ClientUpdate(connectionUUID));
 			new Thread(() -> {

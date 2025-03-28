@@ -67,10 +67,6 @@ public class GameClient implements IClient{
 		this.connectionUUID = connectionUUID;
 	}
 
-	public static void main(String[] args) throws IOException, NotBoundException {
-		new GameClient(Boolean.parseBoolean(args[0]), args[1], Integer.parseInt(args[2]));
-	}
-
 	@Override
 	public IServer getServer() {
 		return getClient().getServer();
@@ -81,5 +77,9 @@ public class GameClient implements IClient{
 		//Process new update received from the server.
 		setConnectionUUID(clientUpdate.getClientUUID());
 		System.out.println(clientUpdate);
+	}
+
+	public static void main(String[] args) throws IOException, NotBoundException {
+		new GameClient(Boolean.parseBoolean(args[0]), args[1], Integer.parseInt(args[2]));
 	}
 }

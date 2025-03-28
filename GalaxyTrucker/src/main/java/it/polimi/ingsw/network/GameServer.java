@@ -21,12 +21,13 @@ import java.util.concurrent.Executors;
 
 public class GameServer{
 
-	private static int rmiPort;
-	private static int socketPort;
 	private SocketServer socketServer;
 	private RmiServer rmiServer;
 	private final Map<UUID, IClient> clients = new HashMap<>();
 	private final ExecutorService executor = Executors.newFixedThreadPool(2);
+
+	private static GameServer instance;
+
 	/**
 	 * Logic for the server. Starts both the Socket and the RMI servers, on different ports.
 	 * @param rmiPort The port for the RMI server.
@@ -36,7 +37,7 @@ public class GameServer{
 		//Start the RMI server on a separate thread.
 		executor.submit(() -> {
 			final String serverName = "GalaxyTruckerServer";
-			rmiServer = new RmiServer(this);
+			rmiServer = new RmiServer();
 			try {
 				RmiServer stub = (RmiServer) UnicastRemoteObject.exportObject(rmiServer, 0);
 				Registry registry = LocateRegistry.createRegistry(rmiPort);
@@ -47,13 +48,12 @@ public class GameServer{
 			}
 		});
 
-
 		//Start the ServerSocket on a separate thread,
 		executor.submit(() -> {
 			int port = socketPort;
 			try {
 				ServerSocket listenSocket = new ServerSocket(port);
-				socketServer = new SocketServer(listenSocket, this);
+				socketServer = new SocketServer(listenSocket);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -90,6 +90,17 @@ public class GameServer{
 				.filter(entry -> entry.getValue().equals(client))
 				.map(Map.Entry::getKey)
 				.findFirst().orElseThrow(() -> new RuntimeException("Could not find an UUID with the given connection."));
+	}
+
+	public static GameServer getInstance() {
+		if (instance == null) {
+			instance = new GameServer(1111, 1234);
+		}
+		return instance;
+	}
+
+	public static void main(String[] args) throws IOException, NotBoundException {
+		getInstance();
 	}
 
 

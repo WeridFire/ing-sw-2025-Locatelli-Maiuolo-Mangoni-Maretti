@@ -1,5 +1,6 @@
 package src.main.java.it.polimi.ingsw.player;
 
+import src.main.java.it.polimi.ingsw.game.Game;
 import src.main.java.it.polimi.ingsw.player.exceptions.TooManyReservedTilesException;
 import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.ShipBoard;
@@ -146,5 +147,12 @@ public class Player {
 
     public int getPosition() {
         return position;
+    }
+
+    public void drawComponent(Game game){
+        if(getTileInHand() != null){
+            //throw errror
+        }
+        setTileInHand();
     }
 }
