@@ -6,6 +6,10 @@ import java.util.List;
 
 public class CardsGroup {
 
+    public List<Card> getGroupCards() {
+        return groupCards;
+    }
+
     /**
      * The list of cards present by this group.
      */
@@ -52,11 +56,13 @@ public class CardsGroup {
             throw new CardsGroupException("The group is not being held by anyone.");
         }
         heldBy = null;
-        //No further logic is assumed here. We can assume the controller took action on the request to
-        //release the group and is processing it already, calling this method just to set heldBy to null.
     }
 
+    public String getHeldBy() {
+        return heldBy;
+    }
 
-
-
+    public boolean isSecret() {
+        return secret;
+    }
 }

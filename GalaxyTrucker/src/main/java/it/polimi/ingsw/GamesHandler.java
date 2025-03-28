@@ -73,25 +73,24 @@ public class GamesHandler {
         return null;
     }
 
-    public Game joinGame(String username, UUID gameId, UUID connectionUUID){
+    public Game addPlayerToGame(String username, UUID gameId, UUID connectionUUID){
         Game target = getGame(gameId);
         if(target == null){
             target = newGame();
-            return joinGame(username, target.getId(), connectionUUID);
+            return addPlayerToGame(username, target.getId(), connectionUUID);
         }
         Set<String> usernames = target.getGameData().getPlayers().stream()
                                                             .map(Player::getUsername)
                                                             .collect(Collectors.toSet());
         if(!usernames.contains(username)){
             try {
-                target.getGameData().addPlayer(new Player(username, connectionUUID));
+                target.addPlayer(new Player(username, connectionUUID));
                 return target;
             } catch (PlayerAlreadyInGameException e) {
                 throw new RuntimeException(e);  // should never happen (already checked username is not in usernames) -> runtime error
             }
         }
         return null;
-
     }
 
     public ArrayList<Game> getGames() {

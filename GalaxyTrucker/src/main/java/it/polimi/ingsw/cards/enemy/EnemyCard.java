@@ -3,6 +3,7 @@ package src.main.java.it.polimi.ingsw.cards.enemy;
 import src.main.java.it.polimi.ingsw.GamesHandler;
 import src.main.java.it.polimi.ingsw.cards.Card;
 import src.main.java.it.polimi.ingsw.enums.PowerType;
+import src.main.java.it.polimi.ingsw.game.GameData;
 import src.main.java.it.polimi.ingsw.player.Player;
 
 import java.util.UUID;
@@ -23,10 +24,9 @@ public abstract class EnemyCard extends Card {
      * @param lostDays days required to loot this enemy
      * @param textureName the texture of the card
      * @param level the level this card is part of
-     * @param gameId the ID of the game this card is part of.
      */
-    public EnemyCard(int firePower, int lostDays, String textureName, int level, UUID gameId) {
-        super(textureName, level, gameId);
+    public EnemyCard(int firePower, int lostDays, String textureName, int level) {
+        super(textureName, level);
         this.firePower = firePower;
         this.lostDays = lostDays;
     }
@@ -35,13 +35,13 @@ public abstract class EnemyCard extends Card {
      * Method to assign the loot of the defeated ship to a player
      * @param player player that is getting the loot
      */
-    public abstract void givePrize(Player player);
+    public abstract void givePrize(Player player, GameData game);
 
     /**
      * Method to punish the player that gets defeated by this enemy
      * @param player player on which the method is currently acting upon
      */
-    public abstract void applyPunishment(Player player);
+    public abstract void applyPunishment(Player player, GameData game);
 
     /**
      *
@@ -60,15 +60,15 @@ public abstract class EnemyCard extends Card {
     }
 
     @Override
-    public void playEffect(UUID gameId) {
-        for(Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers()){
+    public void playEffect(GameData game) {
+        for(Player p : game.getPlayers()){
             //TODO: Implement logic of asking player what power they wanna use !!! MODIFY usedFirePower BELOW !!!
             float usedFirePower = p.getShipBoard().getVisitorCalculateFirePower().getBaseFirePower();
             if(usedFirePower > getFirePower()){
-                givePrize(p);
+                givePrize(p, game);
                 break;
             }else if(usedFirePower< getFirePower()){
-                applyPunishment(p);
+                applyPunishment(p, game);
             }
         }
     }

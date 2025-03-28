@@ -1,6 +1,7 @@
 package src.main.java.it.polimi.ingsw.cards.enemy;
 
 import src.main.java.it.polimi.ingsw.cards.projectile.Projectile;
+import src.main.java.it.polimi.ingsw.game.GameData;
 import src.main.java.it.polimi.ingsw.player.Player;
 
 import java.util.UUID;
@@ -17,21 +18,21 @@ public class PiratesCard extends EnemyCard {
     private Projectile[] punishHits;
 
     public PiratesCard(int prizeBounty, Projectile[] punishHits, int firePower,
-                       int lostDays, String textureName, int level, UUID gameId){
-		super(firePower, lostDays, textureName, level, gameId);
+                       int lostDays, String textureName, int level){
+		super(firePower, lostDays, textureName, level);
         this.prizeBounty = prizeBounty;
         this.punishHits = punishHits;
 
 	}
 
     @Override
-    public void givePrize(Player player) {
+    public void givePrize(Player player, GameData game) {
         player.addCredits(prizeBounty);
-        movePlayer(player, getLostDays());
+        game.movePlayerBackward(player, getLostDays());
     }
 
     @Override
-    public void applyPunishment(Player player) {
+    public void applyPunishment(Player player, GameData game) {
         //TODO: hit player with projectile
     }
 

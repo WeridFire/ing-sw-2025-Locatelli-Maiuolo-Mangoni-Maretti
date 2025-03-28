@@ -9,31 +9,33 @@ import src.main.java.it.polimi.ingsw.gamePhases.exceptions.NoMoreCardsException;
 import java.util.UUID;
 
 public class AdventureGamePhase extends PlayableGamePhase{
+
+    /**Card that determins the andventure*/
+    private Card card;
+
     /**
      * Constructs a new PlayableGamePhase.
      *
      * @param gameId        The unique identifier of the game.
      * @param gamePhaseType The type of the game phase.
-     * @param gameState     The current state of the game.
      * @param gameData      The game data.
      */
-    public AdventureGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameState gameState, GameData gameData) {
-        super(gameId, gamePhaseType, gameState, gameData);
+    public AdventureGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameData gameData, Card card) {
+        super(gameId, gamePhaseType, gameData);
     }
 
     @Override
     public void playLoop() {
         //wait for player tacking the car
-        try {
-            Card card = gameData.getDeck().getTopCard();
-
-            //TODO: come lo pensiamo? coi thread?
-            card.playEffect(gameId);
-
-
-        } catch (NoMoreCardsException e) {
-            // TODO: end game
+        gameData.getDeck().drawNextCard();
+        if(gameData.getDeck().getTopCard() != null){
+            gameData.getDeck().getTopCard().playEffect(gameData);
+        }else{
+            //TODO: endgame
         }
+
+            //TODO: come lo pensiamo? coi thread? yep, uno per phase
+
     }
 
     @Override

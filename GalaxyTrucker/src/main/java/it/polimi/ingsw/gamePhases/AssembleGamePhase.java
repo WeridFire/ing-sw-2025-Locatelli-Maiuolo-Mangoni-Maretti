@@ -22,11 +22,10 @@ public class AssembleGamePhase extends PlayableGamePhase{
      *
      * @param gameId        The unique identifier of the game.
      * @param gamePhaseType The type of the game phase.
-     * @param gameState     The current state of the game.
      * @param gameData      The game data.
      */
-    public AssembleGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameState gameState, GameData gameData) throws IncorrectGamePhaseTypeException {
-        super(gameId, gamePhaseType, gameState, gameData);
+    public AssembleGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameData gameData) throws IncorrectGamePhaseTypeException {
+        super(gameId, gamePhaseType, gameData);
 
         if (!gamePhaseType.equals(GamePhaseType.ASSEMBLE)){
             throw new IncorrectGamePhaseTypeException("Assemble gamePhase type is not coherent");
@@ -67,7 +66,7 @@ public class AssembleGamePhase extends PlayableGamePhase{
     public void onTimerEnd() {
         if (howManyTimerRotationsLeft == 0){
             //close server logic
-            gameState = GameState.ENDED;
+
         }
     }
 

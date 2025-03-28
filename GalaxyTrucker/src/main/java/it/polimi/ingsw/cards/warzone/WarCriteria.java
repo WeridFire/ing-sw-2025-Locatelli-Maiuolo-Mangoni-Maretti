@@ -8,7 +8,7 @@ public class WarCriteria {
 	/**
 	 * Comparator used to classify players.
 	 */
-	private Comparator<Player> comparator;
+	private final Comparator<Player> comparator;
 
 	/**
 	 * Instances the object and accepts the comparator.

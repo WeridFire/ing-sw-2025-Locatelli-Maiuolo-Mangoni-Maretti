@@ -1,6 +1,7 @@
 package src.main.java.it.polimi.ingsw.cards;
 
 import src.main.java.it.polimi.ingsw.GamesHandler;
+import src.main.java.it.polimi.ingsw.game.GameData;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 
@@ -28,10 +29,9 @@ public class AbandonedStationCard extends Card{
 	 * @param requiredCrew the amount of crew required to loot the station.
 	 * @param textureName The name of the texture of the card.
 	 * @param level       The level of this card.
-	 * @param gameId      The ID of the game this card is part of.
 	 */
-	public AbandonedStationCard(LoadableType[] availableCargo, int lostDays, int requiredCrew, String textureName, int level, UUID gameId) {
-		super(textureName, level, gameId);
+	public AbandonedStationCard(LoadableType[] availableCargo, int lostDays, int requiredCrew, String textureName, int level) {
+		super(textureName, level);
 		this.availableCargo = availableCargo;
 		this.lostDays = lostDays;
 		this.requiredCrew = requiredCrew;
@@ -42,15 +42,15 @@ public class AbandonedStationCard extends Card{
 	 * @param gameId The UUID of the game associated to this card, to access the game handler.
 	 */
 	@Override
-	public void playEffect(UUID gameId) {
-		for(Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers()){
+	public void playEffect(GameData game) {
+		for(Player p : game.getPlayers()){
 			if (p.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().countAll(LoadableType.CREW_SET) >= requiredCrew){
 				//TODO: ask player if they want to actually take over the station.
 				if(true){ //meaning they accepted to do it
 					for(LoadableType c : availableCargo){
 						//TODO: asks player where they want to put each single cargo.
 					}
-					movePlayer(p, lostDays);
+					game.movePlayerBackward(p, lostDays);
 					break;
 				}
 			}

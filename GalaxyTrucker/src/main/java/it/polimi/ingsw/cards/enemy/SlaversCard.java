@@ -1,5 +1,6 @@
 package src.main.java.it.polimi.ingsw.cards.enemy;
 
+import src.main.java.it.polimi.ingsw.game.GameData;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 import src.main.java.it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
@@ -33,20 +34,19 @@ public class SlaversCard extends EnemyCard {
 	 * @param lostDays    days required to loot this enemy
 	 * @param textureName the texture of the card
 	 * @param level       the level this card is part of
-	 * @param gameId      the ID of the game this card is part of.
 	 * @param punishCrewAmount The amount of crew members to remove upon being beat by this card.
 	 * @param prizeBounty The amount of money to award to the player that beats this card.
 	 */
-	public SlaversCard(int punishCrewAmount, int prizeBounty, int firePower, int lostDays, String textureName, int level, UUID gameId) {
-		super(firePower, lostDays, textureName, level, gameId);
+	public SlaversCard(int punishCrewAmount, int prizeBounty, int firePower, int lostDays, String textureName, int level) {
+		super(firePower, lostDays, textureName, level);
 		this.punishCrewAmount = punishCrewAmount;
 		this.prizeBounty = prizeBounty;
 	}
 
 	@Override
-	public void givePrize(Player player) {
+	public void givePrize(Player player, GameData game) {
 		player.addCredits(prizeBounty);
-		movePlayer(player, getLostDays());
+		game.movePlayerBackward(player, getLostDays());
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class SlaversCard extends EnemyCard {
 	 * @param player player on which the method is currently acting upon
 	 */
 	@Override
-	public void applyPunishment(Player player) {
+	public void applyPunishment(Player player, GameData game) {
 		Map<Coordinates, CabinTile> itemsPosition = player.getShipBoard().getVisitorCalculateCargoInfo()
 				.getCrewInfo().getLocationsWithLoadedItems(1);
 		//TODO: send the map of positions and content to the player, wait for them to return

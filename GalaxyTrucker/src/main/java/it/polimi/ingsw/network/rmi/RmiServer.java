@@ -1,7 +1,6 @@
 package src.main.java.it.polimi.ingsw.network.rmi;
 
 import src.main.java.it.polimi.ingsw.GamesHandler;
-import src.main.java.it.polimi.ingsw.game.Game;
 import src.main.java.it.polimi.ingsw.network.ClientUpdate;
 import src.main.java.it.polimi.ingsw.network.GameServer;
 import src.main.java.it.polimi.ingsw.network.IClient;
@@ -39,7 +38,7 @@ public class RmiServer implements IServer {
 	@Override
 	public void joinGame(IClient client, UUID gameId, String username) {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
-		gamesHandler.joinGame(username, gameId, connectionUUID);
+		gamesHandler.addPlayerToGame(username, gameId, connectionUUID);
 		//after the user has been added into the game, we can notify the client with the new information.
 		client.updateClient(new ClientUpdate(connectionUUID));
 	}

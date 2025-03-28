@@ -16,8 +16,6 @@ public abstract class PlayableGamePhase implements TimerBehavior {
     /** The type of the game phase. */
     GamePhaseType gamePhaseType;
 
-    /** The current state of the game. */
-    GameState gameState;
 
     /** The unique identifier of the game. */
     UUID gameId;
@@ -30,13 +28,11 @@ public abstract class PlayableGamePhase implements TimerBehavior {
      *
      * @param gameId The unique identifier of the game.
      * @param gamePhaseType The type of the game phase.
-     * @param gameState The current state of the game.
      * @param gameData The game data.
      */
-    public PlayableGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameState gameState, GameData gameData) {
+    public PlayableGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameData gameData) {
         this.gameId = gameId;
         this.gamePhaseType = gamePhaseType;
-        this.gameState = gameState;
         this.gameData = gameData;
     }
 

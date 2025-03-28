@@ -1,5 +1,14 @@
 package src.main.java.it.polimi.ingsw.game;
 
+import src.main.java.it.polimi.ingsw.TilesFactory;
+import src.main.java.it.polimi.ingsw.cards.Deck;
+import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
+import src.main.java.it.polimi.ingsw.enums.GameState;
+import src.main.java.it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
+import src.main.java.it.polimi.ingsw.gamePhases.AdventureGamePhase;
+import src.main.java.it.polimi.ingsw.gamePhases.AssembleGamePhase;
+import src.main.java.it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTypeException;
+import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.timer.Timer;
 
 import java.util.UUID;
@@ -62,8 +71,34 @@ public class Game {
      * This method is currently a placeholder and needs to be implemented.
      * </p>
      */
-    public void gameLoop() {
-        // TBD (To Be Determined)
+    public void gameLoop() throws IncorrectGamePhaseTypeException, InterruptedException {
+
+        //nota sta nel playloop di una phase cambiare il suo stato in "ENDED"
+        AssembleGamePhase a = new AssembleGamePhase(id, GamePhaseType.ASSEMBLE, gameData);
+        Thread thread = new Thread(a::playLoop);
+        thread.start();
+
+        // ASSEMBLE phase
+        thread.join();
+
+        gameData.getDeck().drawNextCard();
+        AdventureGamePhase adventureGamePhase = null;
+        while(gameData.getDeck().getTopCard() != null) {
+
+            //create adventure
+            adventureGamePhase = new AdventureGamePhase(id, GamePhaseType.ADVENTURE, gameData, gameData.getDeck().getTopCard());
+
+            thread = new Thread(adventureGamePhase::playLoop);
+            thread.start();
+
+            //adventure phase
+            thread.join();
+
+            gameData.getDeck().drawNextCard();
+        }
+
+        //TODO: vogliamo fare una fase di ending?
+
     }
 
     /**
@@ -78,5 +113,35 @@ public class Game {
         this.gameData = gameData;
         return true;
     }
+
+
+    public void addPlayer(Player player) throws PlayerAlreadyInGameException {
+        if(gameData.getCurrentGamePhaseType() == GamePhaseType.LOBBY){
+            gameData.addPlayer(player);
+            if(gameData.getPlayers().size() >= gameData.getRequiredPlayers()){
+                startGame();
+            }
+        }
+        //IN here we should handle when a player reconnects. That's why it is handled on the Game level, and not
+        //GameData.
+    }
+
+    private void startGame(){
+        switch(gameData.getLevel()){
+            case TESTFLIGHT, ONE -> gameData.setLapSize(18);
+            case TWO -> gameData.setLapSize(24);
+        }
+        gameData.setCoveredTiles(TilesFactory.createPileTiles());
+        gameData.setDeck(new Deck(gameData.getLevel()));
+
+        if(gameData.getCurrentGamePhaseType() == GamePhaseType.LOBBY){
+			try {
+				gameLoop();
+			} catch (IncorrectGamePhaseTypeException | InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		}
+    }
+
 
 }
