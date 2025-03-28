@@ -1,5 +1,6 @@
 package src.main.java.it.polimi.ingsw.cards;
 
+import src.main.java.it.polimi.ingsw.enums.GameLevel;
 import src.main.java.it.polimi.ingsw.gamePhases.exceptions.NoMoreCardsException;
 import src.main.java.it.polimi.ingsw.player.Player;
 
@@ -43,12 +44,12 @@ public class Deck {
      * @param level The deck level.
      * @param gameId The id of the associated game.
      */
-    public Deck(int level, UUID gameId){
+    public Deck(GameLevel level, UUID gameId){
         List<Card> tutorialPool = null;
         List<Card> l1Pool = null;
         List<Card> l2Pool = null;
         switch(level){
-            case 0:
+            case TESTFLIGHT:
                 //for the tutorial is simply puts 8 cards randomly into the deck. No cardsgroup here.
                 tutorialPool = DeckFactory.createTutorialDeck(gameId);
                 Collections.shuffle(tutorialPool);
@@ -56,7 +57,7 @@ public class Deck {
                     this.deck.add(tutorialPool.removeFirst());
                 }
                 break;
-            case 1:
+            case ONE:
                 l1Pool = DeckFactory.createLevelOneDeck(gameId);
                 Collections.shuffle(l1Pool);
                 //Creates 4 cardsgroup of 2 level1 cards each. The first group is the "secret" one, other 3 are the
@@ -70,7 +71,7 @@ public class Deck {
                     this.cardsGroups.add(new CardsGroup(groupCard, cardsGroups.isEmpty()));
                 }
                 break;
-            case 2:
+            case TWO:
                 l2Pool = DeckFactory.createLevelTwoDeck(gameId);
                 l1Pool = DeckFactory.createLevelOneDeck(gameId);
                 Collections.shuffle(l2Pool);

@@ -41,13 +41,13 @@ public class GameData implements Serializable {
     private Player turn;
 
     /** Mapping of available cargo goods and their quantities. */
-    private HashMap<LoadableType, Integer> availableGoods;
+    private Map<LoadableType, Integer> availableGoods;
 
     /** List of game deck. */
     private Deck deck;
 
     /** List of covered tiles in the game. */
-    private ArrayList<TileSkeleton<SideType>> coveredTiles;
+    private List<TileSkeleton<SideType>> coveredTiles;
 
     private int requiredPlayers = 4;
 
@@ -127,7 +127,7 @@ public class GameData implements Serializable {
      *
      * @return The list of covered tiles.
      */
-    public ArrayList<TileSkeleton<SideType>> getCoveredTiles() {
+    public List<TileSkeleton<SideType>> getCoveredTiles() {
         return coveredTiles;
     }
 
@@ -165,7 +165,7 @@ public class GameData implements Serializable {
      *
      * @param coveredTiles The new list of covered tiles.
      */
-    public void setCoveredTiles(ArrayList<TileSkeleton<SideType>> coveredTiles) {
+    public void setCoveredTiles(List<TileSkeleton<SideType>> coveredTiles) {
         this.coveredTiles = coveredTiles;
     }
 
@@ -197,23 +197,6 @@ public class GameData implements Serializable {
      */
     private void setTurn(Player turn) {
         this.turn = turn;
-    }
-
-    /**
-     * Initializes default game settings, including covered tiles and deck.
-     */
-    public void initDefaults(){
-        this.coveredTiles = initDefaultTiles();
-        //this.deck = initDefaultCards();
-    }
-
-    /**
-     * Initializes default covered tiles.
-     *
-     * @return A list of default covered tiles.
-     */
-    private ArrayList<TileSkeleton<SideType>> initDefaultTiles(){
-        return new ArrayList<>(TilesFactory.createPileTiles());
     }
 
     /**
@@ -283,11 +266,14 @@ public class GameData implements Serializable {
         this.requiredPlayers = requiredPlayers;
     }
 
-    public void startGame(){
+    public void startGame(UUID gameId){
         switch(getLevel()){
             case TESTFLIGHT, ONE -> this.lapSize = 18;
             case TWO -> this.lapSize = 24;
         }
+        setCoveredTiles(TilesFactory.createPileTiles());
+        setDeck(new Deck(getLevel(), gameId));
+
         if(this.currentGamePhaseType == GamePhaseType.LOBBY){
             //set new game phase here, ideally assembly.
         }
