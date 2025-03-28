@@ -1,5 +1,6 @@
 package src.main.java.it.polimi.ingsw.game;
 
+import src.main.java.it.polimi.ingsw.enums.GameLevel;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.timer.Timer;
 
@@ -87,5 +88,9 @@ public class Game {
     }
 
 
+    public void updateGameSettings(GameLevel level, int requiredPlayers){
+        this.gameData.setLevel(level);
+        this.gameData.setRequiredPlayers(requiredPlayers);
+    }
 
 }

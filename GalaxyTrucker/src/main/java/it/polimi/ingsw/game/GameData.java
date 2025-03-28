@@ -6,6 +6,7 @@ import src.main.java.it.polimi.ingsw.enums.GameLevel;
 import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
 import src.main.java.it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import src.main.java.it.polimi.ingsw.game.exceptions.PlayerNotInGameException;
+import src.main.java.it.polimi.ingsw.gamePhases.LobbyGamePhase;
 import src.main.java.it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 public class GameData implements Serializable {
 
     /** The game level configuration. */
-    private final GameLevel level;
+    private GameLevel level;
 
     /** The current phase type of the game. */
     private GamePhaseType currentGamePhaseType;
@@ -49,17 +50,17 @@ public class GameData implements Serializable {
     /** List of covered tiles in the game. */
     private ArrayList<TileSkeleton<SideType>> coveredTiles;
 
+    private int requiredPlayers = 4;
+
     /**
-     * Constructs a new GameData object with the specified game level.
-     *
-     * @param level The game level.
+     * Constructs a new GameData object with a default game level.
      */
-    public GameData(GameLevel level) {
-        this.level = level;
+    public GameData() {
         this.players = new HashSet<>();
         this.availableGoods = new HashMap<>();
-        this.coveredTiles = new ArrayList<TileSkeleton<SideType>>();
+        this.coveredTiles = new ArrayList<>();
         this.deck = null;
+        this.setCurrentGamePhaseType(GamePhaseType.LOBBY);
     }
 
     /**
@@ -69,6 +70,10 @@ public class GameData implements Serializable {
      */
     public GameLevel getLevel() {
         return level;
+    }
+
+    public void setLevel(GameLevel level){
+        this.level = level;
     }
 
     /**
@@ -180,6 +185,9 @@ public class GameData implements Serializable {
             throw new PlayerAlreadyInGameException("Player with this username is already present.");
         }
         players.add(player);
+        if(players.size() >= getRequiredPlayers()){
+            startGame();
+        }
     }
 
 
@@ -210,15 +218,18 @@ public class GameData implements Serializable {
     }
 
     /**
-     * Moves a player forward on the board, accounting for players he may pass
+     * Moves a player on the board, accounting for players they may pass.
      * @param playerToMove player that is going to move
      * @param steps number of steps the player is moving
+     * @param forward true if moving forward, false if moving backward
      */
-    public void movePlayerForward(Player playerToMove, int steps) {
+    private void movePlayer(Player playerToMove, int steps, boolean forward) {
 
         // HashSet for fast position lookup
         Set<Integer> occupiedPositions = new HashSet<>();
-        for (Player player : players) {
+        List<Player> currentOrder = getPlayers();
+        //TODO: SYNCHRONIZE! WE WANT TO MOVE ONLY 1 PLAYER AT A TIME SO SYNC ON THE OBJECT
+        for (Player player : currentOrder) {
             if (!player.getUsername().equals(playerToMove.getUsername())) {
                 occupiedPositions.add(player.getPosition());
             }
@@ -228,8 +239,8 @@ public class GameData implements Serializable {
         int stepsLeft = steps;
 
         while (stepsLeft > 0) {
-            newPosition++; // Move one step back
-            stepsLeft--;   // Decrease steps left
+            newPosition += (forward ? 1 : -1); // Move forward or backward
+            stepsLeft--; // Decrease steps left
 
             // Add a step if a player is passed
             if (occupiedPositions.contains(newPosition)) {
@@ -241,32 +252,45 @@ public class GameData implements Serializable {
     }
 
     /**
-     * Moves a player backwards on the board, accounting for players he may pass
+     * Moves a player forward on the board.
+     * @param playerToMove player that is going to move
+     * @param steps number of steps the player is moving
+     */
+    public void movePlayerForward(Player playerToMove, int steps) {
+        movePlayer(playerToMove, steps, true);
+    }
+
+    /**
+     * Moves a player backward on the board.
      * @param playerToMove player that is going to move
      * @param steps number of steps the player is moving
      */
     public void movePlayerBackward(Player playerToMove, int steps) {
+        movePlayer(playerToMove, steps, false);
+    }
 
-        // HashSet for fast position lookup
-        Set<Integer> occupiedPositions = new HashSet<>();
-        for (Player player : players) {
-            if (!player.getUsername().equals(playerToMove.getUsername())) {
-                occupiedPositions.add(player.getPosition());
-            }
+    public void setCurrentGamePhaseType(GamePhaseType currentGamePhaseType) {
+        this.currentGamePhaseType = currentGamePhaseType;
+    }
+
+    public int getRequiredPlayers() {
+        return requiredPlayers;
+    }
+
+    public void setRequiredPlayers(int requiredPlayers) {
+        if(requiredPlayers > 4 || requiredPlayers < 2){
+            return;
         }
+        this.requiredPlayers = requiredPlayers;
+    }
 
-        int newPosition = playerToMove.getPosition();
-        int stepsLeft = steps;
-
-        while (stepsLeft > 0) {
-            newPosition--; // Move one step back
-            stepsLeft--;   // Decrease steps left
-
-            // Add a step if a player is passed
-            if (occupiedPositions.contains(newPosition)) {
-                stepsLeft++;
-            }
+    public void startGame(){
+        switch(getLevel()){
+            case TESTFLIGHT, ONE -> this.lapSize = 18;
+            case TWO -> this.lapSize = 24;
         }
-        playerToMove.setPosition(newPosition);
+        if(this.currentGamePhaseType == GamePhaseType.LOBBY){
+            //set new game phase here, ideally assembly.
+        }
     }
 }
