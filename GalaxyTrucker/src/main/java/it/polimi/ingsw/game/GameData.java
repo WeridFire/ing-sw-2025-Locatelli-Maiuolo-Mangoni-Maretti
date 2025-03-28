@@ -6,7 +6,6 @@ import src.main.java.it.polimi.ingsw.enums.GameLevel;
 import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
 import src.main.java.it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import src.main.java.it.polimi.ingsw.game.exceptions.PlayerNotInGameException;
-import src.main.java.it.polimi.ingsw.gamePhases.LobbyGamePhase;
 import src.main.java.it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
