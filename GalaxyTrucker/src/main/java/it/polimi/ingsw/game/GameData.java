@@ -44,8 +44,6 @@ public class GameData {
     /** The player whose turn it is. */
     private Player turn;
 
-    /** Mapping of players to their respective ship boards. */
-    private HashMap<Player, ShipBoard> shipFromPlayer;
 
     /** Mapping of available cargo goods and their quantities. */
     private HashMap<LoadableType, Integer> availableGoods;
@@ -64,7 +62,6 @@ public class GameData {
     public GameData(GameLevel level) {
         this.level = level;
         this.players = new ArrayList<>();
-        this.shipFromPlayer = new HashMap<>();
         this.availableGoods = new HashMap<>();
         this.coveredTiles = new ArrayList<TileSkeleton<SideType>>();
     }
@@ -130,16 +127,6 @@ public class GameData {
      */
     public ArrayList<TileSkeleton<SideType>> getCoveredTiles() {
         return coveredTiles;
-    }
-
-    /**
-     * Gets the ship board of a specific player.
-     *
-     * @param player The player whose ship board is requested.
-     * @return The ship board of the specified player.
-     */
-    public ShipBoard getPlayerShipBoard(Player player) {
-        return shipFromPlayer.get(player);
     }
 
     /**
