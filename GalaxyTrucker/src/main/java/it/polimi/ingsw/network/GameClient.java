@@ -62,7 +62,6 @@ public class GameClient implements IClient{
 		}
 	}
 
-
 	@Override
 	public IServer getServer() {
 		return getClient().getServer();
@@ -70,7 +69,13 @@ public class GameClient implements IClient{
 
 	@Override
 	public void updateClient(ClientUpdate clientUpdate) {
-		System.out.println(clientUpdate);
+		System.out.println("Received new client update!");
+		if(clientUpdate.getCurrentGame() == null){
+			System.out.println("You are currently not in any game.");
+		}
+		System.out.println("Available games: ");
+		clientUpdate.getAvailableGames().forEach((game) -> System.out.println(game.getId()));
+		//We probably will need to define some nice printers inside of each model element to display prettily to the CLI
 	}
 
 	public static void main(String[] args) throws IOException, NotBoundException {

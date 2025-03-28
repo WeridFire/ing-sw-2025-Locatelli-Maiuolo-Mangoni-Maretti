@@ -5,6 +5,7 @@ import src.main.java.it.polimi.ingsw.network.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class ClientSocketToRMIAdapter implements IClient {
@@ -58,7 +59,9 @@ public class ClientSocketToRMIAdapter implements IClient {
 	@Override
 	public void updateClient(ClientUpdate clientUpdate) {
 		//TODO: IMPLEMENT PROPER SERIALIZATION
-		output.println(clientUpdate.toString());
+
+		output.println(new String(clientUpdate.serialize(), StandardCharsets.UTF_8));
+
 	}
 
 }

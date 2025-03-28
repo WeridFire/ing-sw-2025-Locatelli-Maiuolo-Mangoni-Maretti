@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class ClientUpdate {
+public class ClientUpdate implements Serializable {
 
 	private final UUID clientUUID;
 	private final GameData currentGame;
@@ -79,5 +79,25 @@ public class ClientUpdate {
 
 	public List<Game> getAvailableGames() {
 		return availableGames;
+	}
+
+	public byte[] serialize() {
+		try{
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			ObjectOutputStream out = new ObjectOutputStream(bos);
+			out.writeObject(this);
+			out.flush();
+			return bos.toByteArray();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
+	public static ClientUpdate deserialize(byte[] serialized) throws IOException, ClassNotFoundException {
+		ByteArrayInputStream bis = new ByteArrayInputStream(serialized);
+		ObjectInputStream in = new ObjectInputStream(bis);
+		return (ClientUpdate) in.readObject();
 	}
 }

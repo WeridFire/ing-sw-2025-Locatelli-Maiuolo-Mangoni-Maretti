@@ -8,6 +8,7 @@ import src.main.java.it.polimi.ingsw.network.IServer;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class SocketClient implements IClient {
 	final BufferedReader input;
@@ -20,14 +21,14 @@ public class SocketClient implements IClient {
 		this.input = input;
 		this.server = new ServerSocketAdapter(output);
 		this.gameClient = gameClient;
+
 	}
 
-	private void runVirtualServer() throws IOException {
+	private void runVirtualServer() throws IOException, ClassNotFoundException {
 		String line;
-
 		while ((line = input.readLine()) != null) {
-			System.out.println(line);
-			//Here we should parse line into a ClientUpdate, and call updateClient.
+			ClientUpdate clientUpdate = ClientUpdate.deserialize(line.getBytes(StandardCharsets.UTF_8));
+			updateClient(clientUpdate);
 		}
 	}
 
