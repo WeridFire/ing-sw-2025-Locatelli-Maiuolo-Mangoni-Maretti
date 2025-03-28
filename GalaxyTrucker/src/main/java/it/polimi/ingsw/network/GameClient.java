@@ -70,7 +70,6 @@ public class GameClient implements IClient{
 
 	@Override
 	public void updateClient(ClientUpdate clientUpdate) {
-
 		System.out.println(clientUpdate);
 	}
 

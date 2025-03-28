@@ -1,5 +1,6 @@
 package src.main.java.it.polimi.ingsw.game;
 
+import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.timer.Timer;
 
 import java.util.UUID;
@@ -77,6 +78,12 @@ public class Game {
 
         this.gameData = gameData;
         return true;
+    }
+
+    public Player getPlayerByConnection(UUID connection){
+        return gameData.getPlayers().stream()
+                                    .filter((player) -> player.getConnectionUUID() == connection)
+                                    .findFirst().orElse(null);
     }
 
 
