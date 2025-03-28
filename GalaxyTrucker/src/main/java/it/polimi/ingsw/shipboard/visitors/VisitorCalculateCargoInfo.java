@@ -7,11 +7,13 @@ public class VisitorCalculateCargoInfo implements TileVisitor {
     private final CalculatorCargoInfo<CabinTile> infoCrew;
     private final CalculatorCargoInfo<CargoHoldTile> infoGoods;
     private final CalculatorCargoInfo<BatteryComponentTile> infoBatteries;
+    private final CalculatorCargoInfo<ContainerTile> infoAllContainers;
 
     public VisitorCalculateCargoInfo() {
         infoCrew = new CalculatorCargoInfo<>();
         infoGoods = new CalculatorCargoInfo<>();
         infoBatteries = new CalculatorCargoInfo<>();
+        infoAllContainers = new CalculatorCargoInfo<>();
     }
 
     @Override
@@ -29,6 +31,7 @@ public class VisitorCalculateCargoInfo implements TileVisitor {
     public void visitCargoHold(CargoHoldTile tile) {
         try {
             infoGoods.visit(tile);
+            infoAllContainers.visit(tile);
         } catch (NotFixedTileException e) {
             throw new RuntimeException(e);  // should never happen -> runtime error
         }
@@ -38,6 +41,7 @@ public class VisitorCalculateCargoInfo implements TileVisitor {
     public void visitCabin(CabinTile tile) {
         try {
             infoCrew.visit(tile);
+            infoAllContainers.visit(tile);
         } catch (NotFixedTileException e) {
             throw new RuntimeException(e);  // should never happen -> runtime error
         }
@@ -52,6 +56,7 @@ public class VisitorCalculateCargoInfo implements TileVisitor {
     public void visitBatteryComponent(BatteryComponentTile tile) {
         try {
             infoBatteries.visit(tile);
+            infoAllContainers.visit(tile);
         } catch (NotFixedTileException e) {
             throw new RuntimeException(e);  // should never happen -> runtime error
         }
@@ -67,5 +72,9 @@ public class VisitorCalculateCargoInfo implements TileVisitor {
 
     public CalculatorCargoInfo<BatteryComponentTile> getBatteriesInfo() {
         return infoBatteries;
+    }
+
+    public CalculatorCargoInfo<ContainerTile> getInfoAllContainers() {
+        return infoAllContainers;
     }
 }
