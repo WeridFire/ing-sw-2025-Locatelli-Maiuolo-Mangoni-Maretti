@@ -13,15 +13,14 @@ import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import src.main.java.it.polimi.ingsw.shipboard.ShipBoard;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents the game data.
  */
-public class GameData {
+public class GameData implements Serializable {
 
     /** The game level configuration. */
     private final GameLevel level;
@@ -33,17 +32,13 @@ public class GameData {
     private PlayableGamePhase currentGamePhase;
 
     /** List of players in the game. */
-    private ArrayList<Player> players;
-
-    /** Player's positions (absolute values)    */
-    Set<Integer> playerPositions = new HashSet<>();
+    private final Set<Player> players;
 
     /** Number of positions in 1 lap */
     private int lapSize;
 
     /** The player whose turn it is. */
     private Player turn;
-
 
     /** Mapping of available cargo goods and their quantities. */
     private HashMap<LoadableType, Integer> availableGoods;
@@ -61,9 +56,10 @@ public class GameData {
      */
     public GameData(GameLevel level) {
         this.level = level;
-        this.players = new ArrayList<>();
+        this.players = new HashSet<>();
         this.availableGoods = new HashMap<>();
         this.coveredTiles = new ArrayList<TileSkeleton<SideType>>();
+        this.deck = null;
     }
 
     /**
@@ -98,8 +94,10 @@ public class GameData {
      *
      * @return The list of players.
      */
-    public ArrayList<Player> getPlayers() {
-        return players;
+    public List<Player> getPlayers() {
+        return players.stream()
+                        .sorted(Comparator.comparingInt(Player::getPosition))
+                        .toList();
     }
 
     /**
@@ -167,14 +165,6 @@ public class GameData {
         this.coveredTiles = coveredTiles;
     }
 
-    /**
-     * Sets the list of players in the game.
-     *
-     * @param players The new list of players.
-     */
-    public void setPlayers(ArrayList<Player> players) {
-        this.players = players;
-    }
 
     /**
      * Adds a player to the game.
@@ -183,24 +173,15 @@ public class GameData {
      * @throws PlayerAlreadyInGameException If the player is already in the game.
      */
     public void addPlayer(Player player) throws PlayerAlreadyInGameException {
-        if(players.contains(player)) {
-            throw new PlayerAlreadyInGameException("Player already added to the game");
+        if(players.stream()
+                    .map(Player::getUsername)
+                    .collect(Collectors.toSet())
+                    .contains(player.getUsername())) {
+            throw new PlayerAlreadyInGameException("Player with this username is already present.");
         }
         players.add(player);
     }
 
-    /**
-     * Removes a player from the game.
-     *
-     * @param player The player to remove.
-     * @throws PlayerNotInGameException If the player is not in the game.
-     */
-    public void removePlayer(Player player) {
-        if (!players.contains(player)) {
-            throw new PlayerNotInGameException("Player not in the game");
-        }
-        players.remove(player);
-    }
 
     /**
      * Sets the current turn player.
@@ -218,17 +199,6 @@ public class GameData {
         this.coveredTiles = initDefaultTiles();
         //this.deck = initDefaultCards();
     }
-
-    /**
-     * Initializes default game deck.
-     *
-     * @return A list of default game deck.
-     */
-    /**
-     * // TODO: davide appena sistemi, sistema
-     * private Deck initDefaultCards(){
-        return new Deck(GameLevel);
-    }**/
 
     /**
      * Initializes default covered tiles.
@@ -297,7 +267,6 @@ public class GameData {
                 stepsLeft++;
             }
         }
-
         playerToMove.setPosition(newPosition);
     }
 }

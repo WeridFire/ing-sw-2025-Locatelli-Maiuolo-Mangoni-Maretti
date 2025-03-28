@@ -1,6 +1,6 @@
 package src.main.java.it.polimi.ingsw.gamePhases.exceptions;
 
-public class NoMoreCardsException extends RuntimeException {
+public class NoMoreCardsException extends Exception {
     public NoMoreCardsException(String message) {
         super(message);
     }

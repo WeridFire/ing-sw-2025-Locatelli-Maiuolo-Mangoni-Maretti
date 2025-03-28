@@ -34,15 +34,16 @@ public class GameServer{
 	 * @param socketPort The port for the SOCKET server.
 	 */
 	public GameServer(int rmiPort, int socketPort) {
+		final String serverName = "GalaxyTruckerServer";
 		//Start the RMI server on a separate thread.
 		executor.submit(() -> {
-			final String serverName = "GalaxyTruckerServer";
+			System.out.println("RMI server bound on port " + rmiPort + " with name " + serverName + ".");
 			rmiServer = new RmiServer();
 			try {
 				RmiServer stub = (RmiServer) UnicastRemoteObject.exportObject(rmiServer, 0);
 				Registry registry = LocateRegistry.createRegistry(rmiPort);
 				registry.rebind(serverName, stub);
-				System.out.println("RMI server bound.");
+
 			} catch (RemoteException e) {
 				throw new RuntimeException(e);
 			}
@@ -52,12 +53,14 @@ public class GameServer{
 		executor.submit(() -> {
 			int port = socketPort;
 			try {
+				System.out.println("Socket server bound on port " + socketPort + ".");
 				ServerSocket listenSocket = new ServerSocket(port);
 				socketServer = new SocketServer(listenSocket);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		});
+
 	}
 
 	/**

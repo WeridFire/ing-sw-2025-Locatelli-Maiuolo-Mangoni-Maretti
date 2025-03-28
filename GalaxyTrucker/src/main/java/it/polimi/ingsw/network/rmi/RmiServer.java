@@ -62,5 +62,10 @@ public class RmiServer implements IServer {
 		*/
 	}
 
+	@Override
+	public void ping(IClient client) {
+		client.updateClient(new ClientUpdate(gameServer.getUUIDbyConnection(client)));
+	}
+
 
 }

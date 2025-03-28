@@ -1,6 +1,5 @@
 package src.main.java.it.polimi.ingsw.shipboard.visitors.integrity;
 
-import javafx.util.Pair;
 import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.TileCluster;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
@@ -60,7 +59,7 @@ public class IntegrityProblem {
     public IntegrityProblem(Map<Coordinates, TileSkeleton<SideType>> visitedTiles,
                             List<TileCluster> clusters,
                             Set<TileSkeleton<SideType>> intrinsicallyWrongTiles,
-                            List<Pair<TileSkeleton<SideType>, TileSkeleton<SideType>>> illegallyWeldedTiles) {
+                            List<Map.Entry<TileSkeleton<SideType>, TileSkeleton<SideType>>> illegallyWeldedTiles) {
 
         this.clustersToRemove = new ArrayList<>();
         this.clustersToKeep = new ArrayList<>();
@@ -78,7 +77,7 @@ public class IntegrityProblem {
             note: with implementation that keeps intersection of clusters to keep, is ok to mask with
             previously set clusters.
          */
-        for (Pair<TileSkeleton<SideType>, TileSkeleton<SideType>> illegallyWeldedTile : illegallyWeldedTiles) {
+        for (Map.Entry<TileSkeleton<SideType>, TileSkeleton<SideType>> illegallyWeldedTile : illegallyWeldedTiles) {
             clustersToKeep.add(exploreCluster(visitedTiles,
                     illegallyWeldedTile.getKey(), illegallyWeldedTile.getValue()));
             clustersToKeep.add(exploreCluster(visitedTiles,

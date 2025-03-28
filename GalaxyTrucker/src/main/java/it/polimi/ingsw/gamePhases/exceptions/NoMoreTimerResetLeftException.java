@@ -1,5 +1,5 @@
 package src.main.java.it.polimi.ingsw.gamePhases.exceptions;
 
-public class NoMoreTimerResetLeftException extends RuntimeException{
+public class NoMoreTimerResetLeftException extends Exception{
     public NoMoreTimerResetLeftException(String message) {super(message);}
 }

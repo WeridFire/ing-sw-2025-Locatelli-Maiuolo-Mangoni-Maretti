@@ -10,4 +10,5 @@ public interface IServer extends Remote {
 	void joinGame(IClient client, UUID gameId, String username);
 	void quitGame(IClient client);
 	void drawComponent(IClient client);
+	void ping(IClient client);
 }

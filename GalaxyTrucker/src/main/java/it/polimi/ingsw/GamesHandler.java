@@ -1,6 +1,7 @@
 package src.main.java.it.polimi.ingsw;
 
 import src.main.java.it.polimi.ingsw.game.Game;
+import src.main.java.it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import src.main.java.it.polimi.ingsw.player.Player;
 
 import java.util.ArrayList;
@@ -82,8 +83,12 @@ public class GamesHandler {
                                                             .map(Player::getUsername)
                                                             .collect(Collectors.toSet());
         if(!usernames.contains(username)){
-            target.getGameData().addPlayer(new Player(username, connectionUUID));
-            return target;
+            try {
+                target.getGameData().addPlayer(new Player(username, connectionUUID));
+                return target;
+            } catch (PlayerAlreadyInGameException e) {
+                throw new RuntimeException(e);  // should never happen (already checked username is not in usernames) -> runtime error
+            }
         }
         return null;
 

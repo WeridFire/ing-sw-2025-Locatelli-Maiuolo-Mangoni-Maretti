@@ -1,6 +1,6 @@
 package src.main.java.it.polimi.ingsw.shipboard.visitors.integrity;
 
-import javafx.util.Pair;
+
 import src.main.java.it.polimi.ingsw.enums.Direction;
 import src.main.java.it.polimi.ingsw.enums.Rotation;
 import src.main.java.it.polimi.ingsw.shipboard.SideType;
@@ -12,6 +12,7 @@ import src.main.java.it.polimi.ingsw.util.Coordinates;
 
 import java.util.*;
 
+
 /**
  * Visitor to check for integrity problems. The first encountered must be resolved.
  */
@@ -19,7 +20,7 @@ public class VisitorCheckIntegrity implements TileVisitor {
     private final Map<Coordinates, TileSkeleton<SideType>> visitedTiles;
     private final List<TileCluster> clusters;
     private final Set<TileSkeleton<SideType>> intrinsicallyWrongTiles;
-    private final List<Pair<TileSkeleton<SideType>, TileSkeleton<SideType>>> illegallyWeldedTiles;
+    private final List<Map.Entry<TileSkeleton<SideType>, TileSkeleton<SideType>>> illegallyWeldedTiles;
 
     public VisitorCheckIntegrity() {
         visitedTiles = new HashMap<>();
