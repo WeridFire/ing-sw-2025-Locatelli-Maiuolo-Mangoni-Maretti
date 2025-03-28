@@ -24,16 +24,16 @@ public class ClientUpdate implements Serializable {
 
 	public ClientUpdate(UUID clientUUID){
 		this.clientUUID = clientUUID;
-		Game game = findGameByClientUUID(clientUUID).orElse(null);
+		Game game = findGameByClientUUID(clientUUID);
 		if(game != null){
-			this.currentGame = obfuscateGame(game.getGameData(), game.getPlayerByConnection(clientUUID));
+			this.currentGame = obfuscateGame(game.getGameData(), getPlayerByConnection(game, clientUUID));
 		}else{
 			currentGame = null;
 		}
 		this.availableGames = GamesHandler.getInstance().getGames();
 	}
 
-	private Optional<Game> findGameByClientUUID(UUID clientUUID) {
+	private Game findGameByClientUUID(UUID clientUUID) {
 		return GamesHandler.getInstance().getGames()
 				.stream()
 				.filter(game -> {
@@ -43,7 +43,14 @@ public class ClientUpdate implements Serializable {
 							.collect(Collectors.toSet());
 					return playerUUIDs.contains(clientUUID);
 				})
-				.findFirst();
+				.findFirst().orElse(null);
+	}
+
+	private Player getPlayerByConnection(Game game, UUID clientUUID){
+		return game.getGameData().getPlayers().stream()
+											.filter((player) -> player.getConnectionUUID() == clientUUID)
+											.findFirst()
+											.orElse(null);
 	}
 
 	public UUID getClientUUID() {
