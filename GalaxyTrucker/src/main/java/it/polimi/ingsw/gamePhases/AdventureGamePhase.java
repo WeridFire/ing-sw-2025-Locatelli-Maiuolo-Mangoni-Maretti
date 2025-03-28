@@ -4,6 +4,7 @@ import src.main.java.it.polimi.ingsw.cards.Card;
 import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
 import src.main.java.it.polimi.ingsw.enums.GameState;
 import src.main.java.it.polimi.ingsw.game.GameData;
+import src.main.java.it.polimi.ingsw.gamePhases.exceptions.NoMoreCardsException;
 
 import java.util.UUID;
 
@@ -23,10 +24,16 @@ public class AdventureGamePhase extends PlayableGamePhase{
     @Override
     public void playLoop() {
         //wait for player tacking the car
-        Card card = gameData.getDeck().getTopCard();
+        try {
+            Card card = gameData.getDeck().getTopCard();
 
-        //TODO: come lo pensiamo? coi thread?
-        card.playEffect(gameId);
+            //TODO: come lo pensiamo? coi thread?
+            card.playEffect(gameId);
+
+
+        } catch (NoMoreCardsException e) {
+            // TODO: end game
+        }
     }
 
     @Override

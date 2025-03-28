@@ -13,10 +13,7 @@ import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import src.main.java.it.polimi.ingsw.shipboard.ShipBoard;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -35,9 +32,6 @@ public class GameData {
 
     /** List of players in the game. */
     private final Set<Player> players;
-
-    /** Player's positions (absolute values)    */
-    Set<Integer> playerPositions = new HashSet<>();
 
     /** Number of positions in 1 lap */
     private int lapSize;
@@ -99,8 +93,10 @@ public class GameData {
      *
      * @return The list of players.
      */
-    public Set<Player> getPlayers() {
-        return players;
+    public List<Player> getPlayers() {
+        return players.stream()
+                        .sorted(Comparator.comparingInt(Player::getPosition))
+                        .toList();
     }
 
     /**

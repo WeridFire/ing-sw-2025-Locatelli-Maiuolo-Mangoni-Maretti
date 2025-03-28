@@ -25,7 +25,7 @@ public class AssembleGamePhase extends PlayableGamePhase{
      * @param gameState     The current state of the game.
      * @param gameData      The game data.
      */
-    public AssembleGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameState gameState, GameData gameData) {
+    public AssembleGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameState gameState, GameData gameData) throws IncorrectGamePhaseTypeException {
         super(gameId, gamePhaseType, gameState, gameData);
 
         if (!gamePhaseType.equals(GamePhaseType.ASSEMBLE)){
@@ -71,7 +71,7 @@ public class AssembleGamePhase extends PlayableGamePhase{
         }
     }
 
-    private void resetTimer() {
+    private void resetTimer() throws NoMoreTimerResetLeftException {
         if (howManyTimerRotationsLeft == 0){
             throw new NoMoreTimerResetLeftException("No more timer reset");
         }

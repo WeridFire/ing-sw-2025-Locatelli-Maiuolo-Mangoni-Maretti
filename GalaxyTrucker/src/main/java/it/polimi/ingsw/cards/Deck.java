@@ -82,7 +82,7 @@ public class Deck {
         return cardsGroups.get(index);
     }
 
-    public Card getTopCard() {
+    public Card getTopCard() throws NoMoreCardsException {
         currentIndex++;
         try{
             return deck.get(currentIndex-1);
