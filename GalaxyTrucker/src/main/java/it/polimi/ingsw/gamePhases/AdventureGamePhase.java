@@ -9,6 +9,10 @@ import src.main.java.it.polimi.ingsw.gamePhases.exceptions.NoMoreCardsException;
 import java.util.UUID;
 
 public class AdventureGamePhase extends PlayableGamePhase{
+
+    /**Card that determins the andventure*/
+    private Card card;
+
     /**
      * Constructs a new PlayableGamePhase.
      *
@@ -17,7 +21,7 @@ public class AdventureGamePhase extends PlayableGamePhase{
      * @param gameState     The current state of the game.
      * @param gameData      The game data.
      */
-    public AdventureGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameState gameState, GameData gameData) {
+    public AdventureGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameState gameState, GameData gameData, Card card) {
         super(gameId, gamePhaseType, gameState, gameData);
     }
 
@@ -31,7 +35,7 @@ public class AdventureGamePhase extends PlayableGamePhase{
             //TODO: endgame
         }
 
-            //TODO: come lo pensiamo? coi thread?
+            //TODO: come lo pensiamo? coi thread? yep, uno per phase
 
     }
 

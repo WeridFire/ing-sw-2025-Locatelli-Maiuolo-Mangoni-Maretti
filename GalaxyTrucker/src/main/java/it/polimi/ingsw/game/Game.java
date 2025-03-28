@@ -1,5 +1,10 @@
 package src.main.java.it.polimi.ingsw.game;
 
+import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
+import src.main.java.it.polimi.ingsw.enums.GameState;
+import src.main.java.it.polimi.ingsw.gamePhases.AdventureGamePhase;
+import src.main.java.it.polimi.ingsw.gamePhases.AssembleGamePhase;
+import src.main.java.it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTypeException;
 import src.main.java.it.polimi.ingsw.timer.Timer;
 
 import java.util.UUID;
@@ -62,8 +67,34 @@ public class Game {
      * This method is currently a placeholder and needs to be implemented.
      * </p>
      */
-    public void gameLoop() {
-        // TBD (To Be Determined)
+    public void gameLoop() throws IncorrectGamePhaseTypeException, InterruptedException {
+
+        //nota sta nel playloop di una phase cambiare il suo stato in "ENDED"
+        AssembleGamePhase a = new AssembleGamePhase(id, GamePhaseType.ASSEMBLE, GameState.PLAYING, gameData);
+        Thread thread = new Thread(a::playLoop);
+        thread.start();
+
+        // ASSEMBLE phase
+        thread.join();
+
+        gameData.getDeck().drawNextCard();
+        AdventureGamePhase adventureGamePhase = null;
+        while(gameData.getDeck().getTopCard() != null) {
+
+            //create adventure
+            adventureGamePhase = new AdventureGamePhase(id, GamePhaseType.ADVENTURE, GameState.PLAYING, gameData, gameData.getDeck().getTopCard());
+
+            thread = new Thread(adventureGamePhase::playLoop);
+            thread.start();
+
+            //adventure phase
+            thread.join();
+
+            gameData.getDeck().drawNextCard();
+        }
+
+        //TODO: vogliamo fare una fase di ending?
+
     }
 
     /**
