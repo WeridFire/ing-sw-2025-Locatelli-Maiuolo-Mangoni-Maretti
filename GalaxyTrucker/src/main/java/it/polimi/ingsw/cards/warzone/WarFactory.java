@@ -41,8 +41,8 @@ public class WarFactory {
 		//TODO: implement hitting the player accordingly to the projectiles.
 	}
 
-	public static Consumer<Player> createLostGoodsPunishment(int lostGoods) {
-		return (player) -> {};
+	public static BiConsumer<Player, GameData> createLostGoodsPunishment(int lostGoods) {
+		return (player, game) -> {};
 		//TBD : implement losing cargo from the ship.
 	}
 }

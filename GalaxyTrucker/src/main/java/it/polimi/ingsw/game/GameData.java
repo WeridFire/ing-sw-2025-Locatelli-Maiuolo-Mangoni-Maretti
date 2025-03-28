@@ -267,13 +267,13 @@ public class GameData implements Serializable {
         this.requiredPlayers = requiredPlayers;
     }
 
-    public void startGame(UUID gameId){
+    public void startGame(){
         switch(getLevel()){
             case TESTFLIGHT, ONE -> this.lapSize = 18;
             case TWO -> this.lapSize = 24;
         }
         setCoveredTiles(TilesFactory.createPileTiles());
-        setDeck(new Deck(getLevel(), gameId));
+        setDeck(new Deck(getLevel()));
 
         if(this.currentGamePhaseType == GamePhaseType.LOBBY){
             //set new game phase here, ideally assembly.

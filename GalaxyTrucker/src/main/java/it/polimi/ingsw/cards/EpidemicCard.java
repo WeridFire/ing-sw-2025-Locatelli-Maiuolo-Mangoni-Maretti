@@ -1,6 +1,7 @@
 package src.main.java.it.polimi.ingsw.cards;
 
 import src.main.java.it.polimi.ingsw.GamesHandler;
+import src.main.java.it.polimi.ingsw.game.GameData;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.Tile;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
@@ -28,11 +29,10 @@ public class EpidemicCard extends Card{
 	/**
 	 * For each player, iterates on all the tiles present in the shipboard. Then for each one it applies the check of
 	 * looking for adiacent tiles, to kill the passengers.
-	 * @param gameId The UUID of the game associated to this card, to access the game handler.
 	 */
 	@Override
-	public void playEffect(UUID gameId) {
-		for (Player p : GamesHandler.getInstance().getGame(gameId).getGameData().getPlayers()) {
+	public void playEffect(GameData game) {
+		for (Player p : game.getPlayers()) {
 			VisitorEpidemic visitorEpidemic = new VisitorEpidemic();
 			for(Tile t : p.getShipBoard().getTiles()){
 				t.accept(visitorEpidemic);
