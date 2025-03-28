@@ -4,4 +4,7 @@ public class AlreadyInitializedCabinException extends Exception {
     public AlreadyInitializedCabinException(String message) {
         super(message);
     }
+    public AlreadyInitializedCabinException() {
+        this("Attempt to fill a cabin already initialized");
+    }
 }
