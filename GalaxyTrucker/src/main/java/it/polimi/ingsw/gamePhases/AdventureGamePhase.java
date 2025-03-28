@@ -29,7 +29,7 @@ public class AdventureGamePhase extends PlayableGamePhase{
         //wait for player tacking the car
         gameData.getDeck().drawNextCard();
         if(gameData.getDeck().getTopCard() != null){
-            gameData.getDeck().getTopCard().playEffect(gameId);
+            gameData.getDeck().getTopCard().playEffect(gameData);
         }else{
             //TODO: endgame
         }

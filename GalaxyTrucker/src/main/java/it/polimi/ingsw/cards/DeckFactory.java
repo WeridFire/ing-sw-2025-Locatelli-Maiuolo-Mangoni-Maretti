@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class DeckFactory {
-	public static ArrayList<Card> createTutorialDeck(UUID gameId) {
+	public static ArrayList<Card> createTutorialDeck() {
 		ArrayList<Card> deckPool = new ArrayList<>();
 		deckPool.add(new WarZoneCard(new WarLevel[] {
 				new WarLevel(WarFactory.createCrewCriteria(), WarFactory.createLostDaysPunishment(3)),
@@ -63,8 +63,8 @@ public class DeckFactory {
 	}
 
 
-	public static ArrayList<Card> createLevelOneDeck(UUID gameId){
-		ArrayList<Card> deckPool = createTutorialDeck(gameId);
+	public static ArrayList<Card> createLevelOneDeck(){
+		ArrayList<Card> deckPool = createTutorialDeck();
 		deckPool.stream().forEach((c) -> {c.setLevel(1);});
 		deckPool.add(new OpenSpaceCard("GT-cards_I_IT_016.jpg", 1));
 		deckPool.add(new OpenSpaceCard("GT-cards_I_IT_016.jpg", 1));
@@ -155,7 +155,7 @@ public class DeckFactory {
 		return deckPool;
 	}
 
-	public static ArrayList<Card> createLevelTwoDeck(UUID gameId){
+	public static ArrayList<Card> createLevelTwoDeck(){
 		ArrayList<Card> deckPool = new ArrayList<>();
 		deckPool.stream();
 		deckPool.add(new WarZoneCard(new WarLevel[]{

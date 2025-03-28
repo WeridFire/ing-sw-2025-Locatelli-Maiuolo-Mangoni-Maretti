@@ -177,7 +177,7 @@ public class GameData implements Serializable {
      * @param player The player to add.
      * @throws PlayerAlreadyInGameException If the player is already in the game.
      */
-    public void addPlayer(Player player) throws PlayerAlreadyInGameException {
+    protected void addPlayer(Player player) throws PlayerAlreadyInGameException {
         if(players.stream()
                     .map(Player::getUsername)
                     .collect(Collectors.toSet())
@@ -185,9 +185,6 @@ public class GameData implements Serializable {
             throw new PlayerAlreadyInGameException("Player with this username is already present.");
         }
         players.add(player);
-        if(players.size() >= getRequiredPlayers()){
-            startGame();
-        }
     }
 
 
@@ -267,16 +264,7 @@ public class GameData implements Serializable {
         this.requiredPlayers = requiredPlayers;
     }
 
-    public void startGame(){
-        switch(getLevel()){
-            case TESTFLIGHT, ONE -> this.lapSize = 18;
-            case TWO -> this.lapSize = 24;
-        }
-        setCoveredTiles(TilesFactory.createPileTiles());
-        setDeck(new Deck(getLevel()));
-
-        if(this.currentGamePhaseType == GamePhaseType.LOBBY){
-            //set new game phase here, ideally assembly.
-        }
+    public void setLapSize(int lapSize) {
+        this.lapSize = lapSize;
     }
 }

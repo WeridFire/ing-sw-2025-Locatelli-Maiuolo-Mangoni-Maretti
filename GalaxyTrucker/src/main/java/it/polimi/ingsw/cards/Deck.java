@@ -42,23 +42,22 @@ public class Deck {
     /**
      * Instance a deck with randomly selected cards, based on a level.
      * @param level The deck level.
-     * @param gameId The id of the associated game.
      */
-    public Deck(GameLevel level, UUID gameId){
+    public Deck(GameLevel level){
         List<Card> tutorialPool = null;
         List<Card> l1Pool = null;
         List<Card> l2Pool = null;
         switch(level){
             case TESTFLIGHT:
                 //for the tutorial is simply puts 8 cards randomly into the deck. No cardsgroup here.
-                tutorialPool = DeckFactory.createTutorialDeck(gameId);
+                tutorialPool = DeckFactory.createTutorialDeck();
                 Collections.shuffle(tutorialPool);
                 while (this.deck.size() < 8){
                     this.deck.add(tutorialPool.removeFirst());
                 }
                 break;
             case ONE:
-                l1Pool = DeckFactory.createLevelOneDeck(gameId);
+                l1Pool = DeckFactory.createLevelOneDeck();
                 Collections.shuffle(l1Pool);
                 //Creates 4 cardsgroup of 2 level1 cards each. The first group is the "secret" one, other 3 are the
                 //flight predictions, so not secret.
@@ -72,8 +71,8 @@ public class Deck {
                 }
                 break;
             case TWO:
-                l2Pool = DeckFactory.createLevelTwoDeck(gameId);
-                l1Pool = DeckFactory.createLevelOneDeck(gameId);
+                l2Pool = DeckFactory.createLevelTwoDeck();
+                l1Pool = DeckFactory.createLevelOneDeck();
                 Collections.shuffle(l2Pool);
                 Collections.shuffle(l1Pool);
                 //Create 4 cardgroups each with 2 cards from level 2 and 1 from level 1. Also makes only the first
