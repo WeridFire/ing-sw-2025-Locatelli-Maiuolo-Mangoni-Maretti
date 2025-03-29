@@ -1,9 +1,12 @@
 package src.main.java.it.polimi.ingsw.cards.enemy;
 
 import src.main.java.it.polimi.ingsw.cards.projectile.Projectile;
+import src.main.java.it.polimi.ingsw.enums.PowerType;
 import src.main.java.it.polimi.ingsw.game.GameData;
 import src.main.java.it.polimi.ingsw.player.Player;
+import src.main.java.it.polimi.ingsw.playerInput.PlayerTurnUtils;
 
+import java.util.List;
 import java.util.UUID;
 
 public class PiratesCard extends EnemyCard {
@@ -33,7 +36,10 @@ public class PiratesCard extends EnemyCard {
 
     @Override
     public void applyPunishment(Player player, GameData game) {
-        //TODO: hit player with projectile
+        for(Projectile p : punishHits){
+            List<Boolean> protectedSides = PlayerTurnUtils.runPlayerShieldsActivationInteraction(player, game);
+            //TODO: send projectile against shipboard based on activations.
+        }
     }
 
 

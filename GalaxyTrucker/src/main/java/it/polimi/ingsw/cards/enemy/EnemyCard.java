@@ -68,7 +68,7 @@ public abstract class EnemyCard extends Card {
     @Override
     public void playEffect(GameData game) {
         for(Player p : game.getPlayers()){
-            float totalFirePower = PlayerTurnUtils.runPlayerPowerTilesActivationInteraction(p ,game, PowerType.FIRE);
+            float totalFirePower = PlayerTurnUtils.runPlayerPowerTilesActivationInteraction(p, game, PowerType.FIRE);
             if(totalFirePower > getFirePower()){
                 givePrize(p, game);
                 break;

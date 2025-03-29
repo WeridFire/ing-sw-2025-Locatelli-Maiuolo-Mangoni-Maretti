@@ -4,9 +4,13 @@ import src.main.java.it.polimi.ingsw.enums.PowerType;
 import src.main.java.it.polimi.ingsw.game.GameData;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
+import src.main.java.it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
+import src.main.java.it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import src.main.java.it.polimi.ingsw.shipboard.visitors.VisitorCalculatePowers;
+import src.main.java.it.polimi.ingsw.shipboard.visitors.VisitorCalculateShieldedSides;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,8 +60,6 @@ public class PlayerTurnUtils {
 				// TODO: manage InterruptedException
 			}
 		}
-		// reset activated tile
-		player.getShipBoard().resetActivatedTiles();
 
 		// phase 3: calculate total power and return it
 		float activatedPower = (float) powerInfo.getLocationsToActivate().entrySet().stream()
@@ -66,7 +68,59 @@ public class PlayerTurnUtils {
 				.sum();
 		float totalFirePower = powerInfo.getBasePower() + activatedPower;
 		totalFirePower += powerInfo.getBonus(totalFirePower);
+		// reset activated tile
+		player.getShipBoard().resetActivatedTiles();
 		return totalFirePower;
+	}
+
+	/**
+	 * Executes the interaction for activating shield-related tiles for a player.
+	 * <p>
+	 * The activation process consists of three phases:
+	 * <ol>
+	 *     <li>Requesting tile activation from the player.</li>
+	 *     <li>Requesting battery removal for the activated tiles.</li>
+	 *     <li>Calculating the total protected sides generated after activation.</li>
+	 * </ol>
+	 *
+	 * @param player The player whose shield tiles should be activated.
+	 * @param game The game data context in which the interaction takes place.
+	 * @return The total sides protected after activation.
+	 */
+	public static List<Boolean> runPlayerShieldsActivationInteraction(Player player, GameData game) {
+		// phase 1: ask activation
+		game.setCurrentPlayerTurn(new PlayerActivateTilesRequest(player, 30, PowerType.SHIELD));
+		try {
+			game.getCurrentPlayerTurn().run();
+		} catch (InterruptedException e) {
+			// TODO: manage InterruptedException
+		}
+
+		// phase 2: ask batteries removal for desired activation
+		Set<Coordinates> activatedTiles = player.getShipBoard().getActivatedTiles();
+		int batteriesToRemove = activatedTiles.size();
+		if(batteriesToRemove > 0){
+			game.setCurrentPlayerTurn(
+					new PlayerRemoveLoadableRequest(player, 30, Set.of(LoadableType.BATTERY), batteriesToRemove)
+			);
+			try {
+				game.getCurrentPlayerTurn().run();
+			} catch (InterruptedException e) {
+				// TODO: manage InterruptedException
+			}
+		}
+
+		VisitorCalculateShieldedSides visitor = new VisitorCalculateShieldedSides();
+		for(Coordinates c : activatedTiles){
+			try {
+				player.getShipBoard().getTile(c).accept(visitor);
+			} catch (OutOfBuildingAreaException | NoTileFoundException e) {
+				e.printStackTrace();
+			}
+		}
+
+		player.getShipBoard().resetActivatedTiles();
+		return List.of(visitor.getProtectedSides());
 	}
 
 

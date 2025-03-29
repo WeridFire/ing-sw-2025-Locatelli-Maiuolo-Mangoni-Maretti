@@ -2,6 +2,9 @@ package src.main.java.it.polimi.ingsw.shipboard.visitors;
 
 import src.main.java.it.polimi.ingsw.enums.Direction;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.*;
+import src.main.java.it.polimi.ingsw.util.Coordinates;
+
+import java.util.List;
 
 public class VisitorCalculateShieldedSides implements TileVisitor {
     private final Boolean[] protectedSides;
@@ -45,5 +48,9 @@ public class VisitorCalculateShieldedSides implements TileVisitor {
      */
     public boolean hasShieldFacing(Direction direction) {
         return protectedSides[direction.getValue()];
+    }
+
+    public Boolean[] getProtectedSides() {
+        return protectedSides;
     }
 }
