@@ -3,6 +3,7 @@ package src.main.java.it.polimi.ingsw.shipboard;
 import src.main.java.it.polimi.ingsw.enums.GameLevel;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.*;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import src.main.java.it.polimi.ingsw.shipboard.visitors.*;
 import src.main.java.it.polimi.ingsw.shipboard.visitors.integrity.*;
 import src.main.java.it.polimi.ingsw.shipboard.exceptions.*;
@@ -193,26 +194,58 @@ public class ShipBoard {
 		resetVisitors();
 	}
 
+	/**
+	 * Processes the removal of contraband items.
+	 *
+	 * @param quantityToRemove the number of contraband items to remove
+	 */
+	public void acceptSmugglers(int quantityToRemove) {
+		VisitorSmugglers smugglers = new VisitorSmugglers(quantityToRemove);
+		for (TileSkeleton<SideType> tile : board.values()) {
+			tile.accept(smugglers);
+		}
+		smugglers.removeMostValuableItems(quantityToRemove);
+	}
+
+	/**
+	 * Retrieves the set of currently activated tiles.
+	 *
+	 * @return a set of {@link Coordinates} representing activated tiles
+	 */
 	public Set<Coordinates> getActivatedTiles() {
 		return activatedTiles;
 	}
 
-	public void resetActivatedTiles(){
+	/**
+	 * Clears the set of activated tiles, resetting their state.
+	 */
+	public void resetActivatedTiles() {
 		activatedTiles.clear();
 	}
 
-
-	private int getAvailableBatteriesAmount(){
+	/**
+	 * Calculates the number of available battery units that are not currently used for tile activation.
+	 *
+	 * @return the number of available batteries
+	 */
+	private int getAvailableBatteriesAmount() {
 		return (getVisitorCalculateCargoInfo()
 				.getInfoAllContainers()
 				.count(LoadableType.BATTERY) - getActivatedTiles().size());
 	}
 
-	public void activateTiles(Set<Coordinates> coordinates) throws Exception {
-			if(getAvailableBatteriesAmount() - coordinates.size() >= 0){
-				activatedTiles.addAll(coordinates);
-			}else{
-				throw new Exception("Not enough batteries!");
-			}
+	/**
+	 * Activates a set of tiles if there are enough available batteries to power them.
+	 *
+	 * @param coordinates a set of tile coordinates to activate
+	 * @throws NotEnoughItemsException if there are not enough available batteries to activate the tiles
+	 */
+	public void activateTiles(Set<Coordinates> coordinates) throws NotEnoughItemsException {
+		if (getAvailableBatteriesAmount() >= coordinates.size()) {
+			activatedTiles.addAll(coordinates);
+		} else {
+			throw new NotEnoughItemsException("Attempt to activate more tiles than batteries available");
+		}
 	}
+
 }
