@@ -2,17 +2,18 @@ package src.main.java.it.polimi.ingsw.cards.enemy;
 
 import src.main.java.it.polimi.ingsw.game.GameData;
 import src.main.java.it.polimi.ingsw.player.Player;
+import src.main.java.it.polimi.ingsw.playerInput.PlayerAddLoadableRequest;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 public class SmugglersCard extends EnemyCard {
 
 
-	private LoadableType[] prizeGoods;
+	private final LoadableType[] prizeGoods;
 	private int punishCargo;
-
 
 	/**
 	 * @param firePower   firepower of this enemy
@@ -30,14 +31,8 @@ public class SmugglersCard extends EnemyCard {
 
 	@Override
 	public void givePrize(Player player, GameData game) {
-		for(LoadableType c : prizeGoods){
-			//TODO: ask player what they want to do for each cargo. Here we get coordinates, but we can assume we will
-			//just get a Tile object, and we'll be able to add the cargo on it.
-			Coordinates coordinates = new Coordinates(0, 0);
-			//player.getShipBoard().getTile(coordinates).getContent().addCargo(c);
-		}
+		game.setCurrentPlayerTurn(new PlayerAddLoadableRequest(player, 30, Arrays.stream(prizeGoods).toList()));
 		game.movePlayerBackward(player, getLostDays());
-
 	}
 
 	@Override
