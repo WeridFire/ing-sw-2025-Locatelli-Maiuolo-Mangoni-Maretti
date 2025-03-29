@@ -131,6 +131,43 @@ public abstract class ContainerTile extends TileSkeleton<SideType> {
     }
 
     /**
+     * Removes up to the specified quantity of items from the container.
+     * <p>
+     * This method searches for items in the container that match the given set of {@link LoadableType} and removes
+     * them, up to the specified {@code quantity}. If fewer matching items are available, it removes all that it can.
+     * </p>
+     *
+     * @param items the set of {@link LoadableType} items valid for removal
+     * @param quantity the maximum number of items to remove
+     * @return the actual number of items removed. If fewer than {@code quantity} items are available,
+     *         it returns the total number removed, else it returns {@code quantity}.
+     * @throws IllegalArgumentException if {@code quantity <= 0}.
+     */
+    public int removeAny(Set<LoadableType> items, int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than zero, " + quantity + " provided");
+        }
+
+        // creates a list of items to remove
+        List<LoadableType> toRemove = new ArrayList<>(quantity);
+        int removed = 0;
+        for (LoadableType loadedItem : loadedItems) {
+            if (items.contains(loadedItem)) {
+                toRemove.add(loadedItem);
+                removed++;
+                if (removed >= quantity) {
+                    break;
+                }
+            }
+        }
+
+        // actually removes them
+        loadedItems.removeAll(toRemove);
+        return removed;
+    }
+
+
+    /**
      * Checks whether a specific item is allowed to be stored in this container.
      *
      * @param item The item to check.
