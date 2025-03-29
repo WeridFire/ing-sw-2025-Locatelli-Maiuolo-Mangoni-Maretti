@@ -93,6 +93,30 @@ public class GamesHandler {
         return null;
     }
 
+    public Player getPlayerByConnection(UUID clientUUID){
+        Game playerGame = findGameByClientUUID(clientUUID);
+        if(playerGame == null){
+            return null;
+        }
+        return playerGame.getGameData().getPlayers().stream()
+                .filter((player) -> player.getConnectionUUID() == clientUUID)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Game findGameByClientUUID(UUID clientUUID) {
+        return GamesHandler.getInstance().getGames()
+                .stream()
+                .filter(game -> {
+                    Set<UUID> playerUUIDs = game.getGameData().getPlayers()
+                            .stream()
+                            .map(Player::getConnectionUUID)
+                            .collect(Collectors.toSet());
+                    return playerUUIDs.contains(clientUUID);
+                })
+                .findFirst().orElse(null);
+    }
+
     public ArrayList<Game> getGames() {
         return games;
     }

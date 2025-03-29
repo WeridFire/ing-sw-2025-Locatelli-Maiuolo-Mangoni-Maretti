@@ -200,4 +200,19 @@ public class ShipBoard {
 	public void resetActivatedTiles(){
 		activatedTiles.clear();
 	}
+
+
+	private int getAvailableBatteriesAmount(){
+		return (getVisitorCalculateCargoInfo()
+				.getInfoAllContainers()
+				.count(LoadableType.BATTERY) - getActivatedTiles().size());
+	}
+
+	public void activateTiles(Set<Coordinates> coordinates) throws Exception {
+			if(getAvailableBatteriesAmount() - coordinates.size() >= 0){
+				activatedTiles.addAll(coordinates);
+			}else{
+				throw new Exception("Not enough batteries!");
+			}
+	}
 }

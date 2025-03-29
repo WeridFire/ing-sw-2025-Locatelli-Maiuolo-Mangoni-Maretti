@@ -27,13 +27,6 @@ public class PlayerAddLoadableRequest extends PlayerInputRequest {
 				.keySet();
 	}
 
-	private int getCargoAmount(){
-		return currentPlayer.getShipBoard()
-				.getVisitorCalculateCargoInfo()
-				.getInfoAllContainers()
-				.countAll(allowedCargo);
-	}
-
 	@Override
 	public void run() throws InterruptedException {
 		synchronized (lock){

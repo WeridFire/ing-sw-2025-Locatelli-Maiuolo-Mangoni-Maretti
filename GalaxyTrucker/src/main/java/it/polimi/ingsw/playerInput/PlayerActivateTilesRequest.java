@@ -38,12 +38,4 @@ public class PlayerActivateTilesRequest extends PlayerInputRequest {
 		//This function gets called by the player when they're done activating stuff.
 		lock.notifyAll();
 	}
-
-	private int getAvailableBatteriesAmount(){
-		return (currentPlayer
-				.getShipBoard()
-				.getVisitorCalculateCargoInfo()
-				.getInfoAllContainers()
-				.count(LoadableType.BATTERY) - currentPlayer.getShipBoard().getActivatedTiles().size());
-	}
 }

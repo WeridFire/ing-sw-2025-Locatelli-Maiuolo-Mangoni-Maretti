@@ -7,8 +7,10 @@ import src.main.java.it.polimi.ingsw.game.GameData;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.playerInput.PlayerActivateTilesRequest;
 import src.main.java.it.polimi.ingsw.playerInput.PlayerRemoveLoadableRequest;
+import src.main.java.it.polimi.ingsw.playerInput.PlayerTurnUtils;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -66,26 +68,13 @@ public abstract class EnemyCard extends Card {
     @Override
     public void playEffect(GameData game) {
         for(Player p : game.getPlayers()){
-            game.setCurrentPlayerTurn(new PlayerActivateTilesRequest(p, 30, PowerType.FIRE));
-            int activatedTiles = p.getShipBoard().getActivatedTiles().size();
-            if(activatedTiles > 0){
-                game.setCurrentPlayerTurn(
-                        new PlayerRemoveLoadableRequest(p, 30, Set.of(LoadableType.BATTERY), activatedTiles)
-                );
-            }
-            float usedFirePower = p.getShipBoard().getVisitorCalculateFirePower().getBaseFirePower();
-            //TODO: add on top of this firepower the amount of firepower
-            // provided by the coordinates in shipBoard.getActivatedTiles()
-
-            if(usedFirePower > getFirePower()){
+            float totalFirePower = PlayerTurnUtils.runPlayerFireTilesActivationInteraction(p ,game);
+            if(totalFirePower > getFirePower()){
                 givePrize(p, game);
-                p.getShipBoard().resetActivatedTiles();
                 break;
-            }else if(usedFirePower< getFirePower()){
+            }else if(totalFirePower < getFirePower()) {
                 applyPunishment(p, game);
-                p.getShipBoard().resetActivatedTiles();
             }
-
         }
     }
 }

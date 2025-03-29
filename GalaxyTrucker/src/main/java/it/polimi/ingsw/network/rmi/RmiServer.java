@@ -1,11 +1,16 @@
 package src.main.java.it.polimi.ingsw.network.rmi;
 
 import src.main.java.it.polimi.ingsw.GamesHandler;
+import src.main.java.it.polimi.ingsw.game.Game;
 import src.main.java.it.polimi.ingsw.network.ClientUpdate;
 import src.main.java.it.polimi.ingsw.network.GameServer;
 import src.main.java.it.polimi.ingsw.network.IClient;
 import src.main.java.it.polimi.ingsw.network.IServer;
+import src.main.java.it.polimi.ingsw.player.Player;
+import src.main.java.it.polimi.ingsw.playerInput.PlayerTurnType;
+import src.main.java.it.polimi.ingsw.util.Coordinates;
 
+import java.util.Set;
 import java.util.UUID;
 
 public class RmiServer implements IServer {
@@ -64,6 +69,36 @@ public class RmiServer implements IServer {
 	@Override
 	public void ping(IClient client) {
 		client.updateClient(new ClientUpdate(gameServer.getUUIDbyConnection(client)));
+	}
+
+	@Override
+	public void activateTiles(IClient client, Set<Coordinates> tilesToActivate) {
+		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
+		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
+		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
+		if(player != null && game != null){
+			if(!game.getGameData().getCurrentPlayerTurn().getCurrentPlayer().equals(player)){
+				//TODO: error hihihii
+				return;
+			}
+			if(game.getGameData().getCurrentPlayerTurn().getPlayerTurnType() != PlayerTurnType.ACTIVATE_TILE){
+				//TODO: error hihihii
+				return;
+			}
+			if(!game.getGameData().getCurrentPlayerTurn().getHighlightMask().containsAll(tilesToActivate)){
+				//TODO: error hihihii
+				return;
+			}
+
+			try {
+				player.getShipBoard().activateTiles(tilesToActivate);
+				game.getGameData().getCurrentPlayerTurn().checkForResult();
+			} catch (Exception e) {
+				//TODO error hihihi not enough batteries
+				return;
+			}
+
+		}
 	}
 
 
