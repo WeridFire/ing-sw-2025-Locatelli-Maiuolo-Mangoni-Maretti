@@ -14,12 +14,12 @@ import java.util.function.Consumer;
 public class WarFactory {
 	public static WarCriteria createThrustCriteria() {
 		//TODO: change the method used to also require player to specify his desired enabled thrusters.
-		return new WarCriteria(Comparator.comparingDouble(p -> p.getShipBoard().getVisitorCalculateFirePower().getBaseFirePower()));
+		return new WarCriteria(Comparator.comparingDouble(p -> p.getShipBoard().getVisitorCalculatePowers().getInfoThrustPower().getBasePower()));
 	}
 
 	public static WarCriteria createFireCriteria() {
 		//TODO: change the method used to also require player to specify his desired enabled turrets.
-		return new WarCriteria(Comparator.comparingDouble(p -> p.getShipBoard().getVisitorCalculateFirePower().getBaseFirePower())); // Placeholder
+		return new WarCriteria(Comparator.comparingDouble(p -> p.getShipBoard().getVisitorCalculatePowers().getInfoFirePower().getBasePower())); // Placeholder
 	}
 
 	public static WarCriteria createCrewCriteria() {

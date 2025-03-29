@@ -4,6 +4,7 @@ import src.main.java.it.polimi.ingsw.enums.PowerType;
 import src.main.java.it.polimi.ingsw.game.GameData;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
+import src.main.java.it.polimi.ingsw.shipboard.visitors.VisitorCalculatePowers;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
 import java.util.Map;
@@ -11,36 +12,61 @@ import java.util.Set;
 
 public class PlayerTurnUtils {
 
+	/**
+	 * Executes the interaction for activating power-related tiles for a player.
+	 * <p>
+	 * The activation process consists of three phases:
+	 * <ol>
+	 *     <li>Requesting tile activation from the player.</li>
+	 *     <li>Requesting battery removal for the activated tiles.</li>
+	 *     <li>Calculating the total power generated after activation.</li>
+	 * </ol>
+	 *
+	 * @param player The player whose power tiles should be activated.
+	 * @param game The game data context in which the interaction takes place.
+	 * @param powerType The type of power being activated. Can be {@link PowerType#FIRE} or {@link PowerType#THRUST}.
+	 * @return The total power output after activation.
+	 */
+	public static float runPlayerPowerTilesActivationInteraction(Player player, GameData game, PowerType powerType) {
 
-	public static float runPlayerFireTilesActivationInteraction(Player player, GameData game){
+		VisitorCalculatePowers.CalculatorPowerInfo powerInfo = player.getShipBoard().getVisitorCalculatePowers().getInfoPower(powerType);
+		if (powerInfo == null) {
+			// TODO: throw error invalid power type -> shield or none (remove none?)
+			return 0f;
+		}
 
-		game.setCurrentPlayerTurn(new PlayerActivateTilesRequest(player, 30, PowerType.FIRE));
-		game.getCurrentPlayerTurn().run();
+		// phase 1: ask activation
+		game.setCurrentPlayerTurn(new PlayerActivateTilesRequest(player, 30, powerType));
+        try {
+            game.getCurrentPlayerTurn().run();
+        } catch (InterruptedException e) {
+			// TODO: manage InterruptedException
+        }
 
+        // phase 2: ask batteries removal for desired activation
 		Set<Coordinates> activatedTiles = player.getShipBoard().getActivatedTiles();
 		int batteriesToRemove = activatedTiles.size();
 		if(batteriesToRemove > 0){
-
 			game.setCurrentPlayerTurn(
 					new PlayerRemoveLoadableRequest(player, 30, Set.of(LoadableType.BATTERY), batteriesToRemove)
 			);
-			game.getCurrentPlayerTurn().run();
-
+			try {
+				game.getCurrentPlayerTurn().run();
+			} catch (InterruptedException e) {
+				// TODO: manage InterruptedException
+			}
 		}
-		double doubleFirePower = player.getShipBoard().getVisitorCalculateFirePower()
-				.getDoubleCannons()
-				.entrySet()
-				.stream()
+		// reset activated tile
+		player.getShipBoard().resetActivatedTiles();
+
+		// phase 3: calculate total power and return it
+		float activatedPower = (float) powerInfo.getLocationsToActivate().entrySet().stream()
 				.filter(entry -> activatedTiles.contains(entry.getKey()))
 				.mapToDouble(Map.Entry::getValue)
 				.sum();
-		double baseFirePower = player.getShipBoard().getVisitorCalculateFirePower().getBaseFirePower();
-		double totalFirePower = baseFirePower + doubleFirePower;
-		if(totalFirePower > 0 && player.getShipBoard().getVisitorCalculateFirePower().hasBonus()){
-			totalFirePower += 2;
-		}
-		player.getShipBoard().resetActivatedTiles();
-		return (float) totalFirePower;
+		float totalFirePower = powerInfo.getBasePower() + activatedPower;
+		totalFirePower += powerInfo.getBonus(totalFirePower);
+		return totalFirePower;
 	}
 
 

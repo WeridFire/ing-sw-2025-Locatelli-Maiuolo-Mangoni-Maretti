@@ -22,8 +22,7 @@ public class ShipBoard {
 	private final Set<Coordinates> activatedTiles = new HashSet<>();
 
 	private VisitorCalculateCargoInfo visitorCalculateCargoInfo;
-	private VisitorCalculateFirePower visitorCalculateFirePower;
-	private VisitorCalculateThrustPower visitorCalculateThrustPower;
+	private VisitorCalculatePowers visitorCalculatePowers;
 	private VisitorCalculateShieldedSides visitorCalculateShieldedSides;
 	private VisitorCheckIntegrity visitorCheckIntegrity;
 
@@ -34,15 +33,13 @@ public class ShipBoard {
 
 	private void resetVisitors() {
 		visitorCalculateCargoInfo = new VisitorCalculateCargoInfo();
-		visitorCalculateFirePower = new VisitorCalculateFirePower();
-		visitorCalculateThrustPower = new VisitorCalculateThrustPower();
+		visitorCalculatePowers = new VisitorCalculatePowers();
 		visitorCalculateShieldedSides = new VisitorCalculateShieldedSides();
 		visitorCheckIntegrity = new VisitorCheckIntegrity();
 
 		for (TileSkeleton<SideType> tile : board.values()) {
 			tile.accept(visitorCalculateCargoInfo);
-			tile.accept(visitorCalculateFirePower);
-			tile.accept(visitorCalculateThrustPower);
+			tile.accept(visitorCalculatePowers);
 			tile.accept(visitorCalculateShieldedSides);
 			tile.accept(visitorCheckIntegrity);
 		}
@@ -52,12 +49,8 @@ public class ShipBoard {
 		return visitorCalculateCargoInfo;
 	}
 
-	public VisitorCalculateFirePower getVisitorCalculateFirePower() {
-		return visitorCalculateFirePower;
-	}
-
-	public VisitorCalculateThrustPower getVisitorCalculateThrustPower() {
-		return visitorCalculateThrustPower;
+	public VisitorCalculatePowers getVisitorCalculatePowers() {
+		return visitorCalculatePowers;
 	}
 
 	public VisitorCalculateShieldedSides getVisitorCalculateShieldedSides() {
