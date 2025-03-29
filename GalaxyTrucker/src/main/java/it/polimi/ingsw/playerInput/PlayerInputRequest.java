@@ -9,6 +9,7 @@ public abstract class PlayerInputRequest {
 
 	protected Player currentPlayer;
 	private int cooldown;
+	protected Object lock = new Object();
 
 	/**
 	 * Abstract object for a PlayerInput request. The server will instance a new thread and wait for the player to
@@ -40,4 +41,24 @@ public abstract class PlayerInputRequest {
 
 	public abstract void run() throws InterruptedException;
 
+	/**
+	 *
+	 * @return the cooldown of the turn (the max time it can take for the player to fulfill the request)
+	 */
+	public int getCooldown() {
+		return cooldown;
+	}
+
+	/**
+	 * @return the current player of the turn.
+	 */
+	public Player getCurrentPlayer() {
+		return currentPlayer;
+	}
+
+	/**
+	 * Calling this function will check for the result of the input request. If the request is fulfilled, the
+	 * turn will end and move to the next. If not fulfilled, it will keep waiting.
+	 */
+	public abstract void checkForResult();
 }

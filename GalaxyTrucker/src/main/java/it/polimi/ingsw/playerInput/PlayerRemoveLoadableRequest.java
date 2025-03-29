@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class PlayerRemoveLoadableRequest extends PlayerInputRequest {
 
-	private LoadableType targetCargo;
+	private final LoadableType targetCargo;
 	private int targetAmount;
 
 	public PlayerRemoveLoadableRequest(Player currentPlayer, int cooldown, LoadableType targetCargo, int amount) {
@@ -44,9 +44,20 @@ public class PlayerRemoveLoadableRequest extends PlayerInputRequest {
 
 	@Override
 	public void run() throws InterruptedException {
-		while(getLoadableAmount() > targetAmount){
-			//TODO: implement thread logic to wait
+		synchronized (lock){
+			lock.wait(getCooldown());
+			if(getLoadableAmount() > targetAmount){
+				//TODO: remove remaining cargo automatically, as player has not fulfilled the request.
+			}
 		}
-		//TODO: time expired, hard-remove remaining cargo items
+	}
+
+	@Override
+	public void checkForResult() {
+		synchronized (lock){
+			if(getLoadableAmount() <= targetAmount){
+				lock.notifyAll();;
+			}
+		}
 	}
 }
