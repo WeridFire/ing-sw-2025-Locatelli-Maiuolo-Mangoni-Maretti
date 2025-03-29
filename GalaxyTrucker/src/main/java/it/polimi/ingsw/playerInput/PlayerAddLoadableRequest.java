@@ -11,11 +11,9 @@ import java.util.stream.Collectors;
 
 public class PlayerAddLoadableRequest extends PlayerInputRequest {
 
-	private final List<LoadableType> allocatedCargo;
-
 	public PlayerAddLoadableRequest(Player currentPlayer, int cooldown, List<LoadableType> allocatedCargo) {
 		super(currentPlayer, cooldown, PlayerTurnType.ADD_CARGO);
-		this.allocatedCargo = allocatedCargo;
+		currentPlayer.getShipBoard().getFloatingLoadables().addAll(allocatedCargo);
 	}
 
 	@Override
@@ -23,7 +21,9 @@ public class PlayerAddLoadableRequest extends PlayerInputRequest {
 		return currentPlayer.getShipBoard()
 				.getVisitorCalculateCargoInfo()
 				.getInfoAllContainers()
-				.getLocationsWithAllowedContent(new HashSet<>(allocatedCargo))
+				.getLocationsWithAllowedContent(
+						new HashSet<>(currentPlayer.getShipBoard().getFloatingLoadables())
+				)
 				.keySet();
 	}
 
@@ -33,15 +33,14 @@ public class PlayerAddLoadableRequest extends PlayerInputRequest {
 			lock.wait(getCooldown()* 1000L);
 			//at the end if the cargo is not completely allocated, it gets ignored
 			//TODO: handle the case where ignored cargo is passed onto next player?
+			currentPlayer.getShipBoard().getFloatingLoadables().clear();
 		}
 	}
 
 	@Override
 	public void checkForResult() {
 		synchronized (lock){
-			if(allocatedCargo.){
-				lock.notifyAll();;
-			}
+			lock.notifyAll();
 		}
 	}
 }

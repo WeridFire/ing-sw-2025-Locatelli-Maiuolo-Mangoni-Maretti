@@ -10,16 +10,14 @@ import src.main.java.it.polimi.ingsw.shipboard.exceptions.*;
 import src.main.java.it.polimi.ingsw.util.BoardCoordinates;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ShipBoard {
 
 	private final GameLevel level;
 	private final Map<Coordinates, TileSkeleton<SideType>> board;
 	private final Set<Coordinates> activatedTiles = new HashSet<>();
+	private final List<LoadableType> floatingLoadables = new ArrayList<>();
 
 	private VisitorCalculateCargoInfo visitorCalculateCargoInfo;
 	private VisitorCalculatePowers visitorCalculatePowers;
@@ -241,4 +239,7 @@ public class ShipBoard {
 		}
 	}
 
+	public List<LoadableType> getFloatingLoadables() {
+		return floatingLoadables;
+	}
 }

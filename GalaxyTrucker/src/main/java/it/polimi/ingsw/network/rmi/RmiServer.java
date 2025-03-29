@@ -8,6 +8,11 @@ import src.main.java.it.polimi.ingsw.network.IClient;
 import src.main.java.it.polimi.ingsw.network.IServer;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.playerInput.PlayerTurnType;
+import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.ContainerTile;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
 import java.util.Set;
@@ -76,29 +81,94 @@ public class RmiServer implements IServer {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
 		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
-		if(player != null && game != null){
-			if(!game.getGameData().getCurrentPlayerTurn().getCurrentPlayer().equals(player)){
-				//TODO: error hihihii
-				return;
-			}
-			if(game.getGameData().getCurrentPlayerTurn().getPlayerTurnType() != PlayerTurnType.ACTIVATE_TILE){
-				//TODO: error hihihii
-				return;
-			}
-			if(!game.getGameData().getCurrentPlayerTurn().getHighlightMask().containsAll(tilesToActivate)){
-				//TODO: error hihihii
-				return;
-			}
-
-			try {
-				player.getShipBoard().activateTiles(tilesToActivate);
-				game.getGameData().getCurrentPlayerTurn().checkForResult();
-			} catch (Exception e) {
-				//TODO error hihihi not enough batteries
-				return;
-			}
-
+		if(player == null || game == null) {
+			//TODO: player or game not found.
+			return;
 		}
+
+		if(!game.getGameData().getCurrentPlayerTurn().getCurrentPlayer().equals(player)){
+			//TODO: notify player that it's not their current turn.
+			return;
+		}
+		if(game.getGameData().getCurrentPlayerTurn().getPlayerTurnType() != PlayerTurnType.ACTIVATE_TILE){
+			//TODO: notify player that this action is not supported in the turn type.
+			return;
+		}
+		if(!game.getGameData().getCurrentPlayerTurn().getHighlightMask().containsAll(tilesToActivate)){
+			//TODO: notify player that this location is not activable in this turn.
+			return;
+		}
+		try {
+			player.getShipBoard().activateTiles(tilesToActivate);
+			game.getGameData().getCurrentPlayerTurn().checkForResult();
+			client.updateClient(new ClientUpdate(connectionUUID));
+		} catch (NotEnoughItemsException e) {
+			//TODO: notify the player that they don't have enough batteries for this.
+		}
+
+	}
+
+	@Override
+	public void allocateLoadable(IClient client, LoadableType loadable, Coordinates location) {
+		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
+		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
+		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
+		if(player == null || game == null){
+			//TODO: player or game not found.
+			return;
+		}
+		if(!game.getGameData().getCurrentPlayerTurn().getCurrentPlayer().equals(player)){
+			//TODO: it is not the player's turn.
+			return;
+		}
+		if(game.getGameData().getCurrentPlayerTurn().getPlayerTurnType() != PlayerTurnType.ADD_CARGO){
+			//TODO: The turn does not expect this type of action.
+			return;
+		}
+		if(!game.getGameData().getCurrentPlayerTurn().getHighlightMask().contains(location)){
+			//TODO: The target coordinate can not hold this type of cargo.
+			return;
+		}
+
+		if(!player.getShipBoard().getFloatingLoadables().contains(loadable)){
+			//TODO: This cargo is not available for allocation.
+			return;
+		}
+		player.getShipBoard().getFloatingLoadables().remove(loadable);
+		ContainerTile targetContainer = player.getShipBoard()
+												.getVisitorCalculateCargoInfo()
+												.getInfoAllContainers()
+												.getLocations()
+												.get(location);
+		try {
+			targetContainer.loadItems(loadable, 1);
+			if(player.getShipBoard().getFloatingLoadables().isEmpty()){
+				//We auto end the turn in case all the items were allocated.
+				game.getGameData().getCurrentPlayerTurn().checkForResult();;
+			}
+			client.updateClient(new ClientUpdate(connectionUUID));
+		} catch (TooMuchLoadException e) {
+			//TODO: notify that the container is full and therefore can't handle it.
+		} catch (UnsupportedLoadableItemException e) {
+			//TODO: notify that the type is not supported.
+		}
+	}
+
+	@Override
+	public void forceEndTurn(IClient client) {
+		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
+		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
+		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
+		if(player == null || game == null){
+			//TODO: player or game not found.
+			return;
+		}
+		if(!game.getGameData().getCurrentPlayerTurn().getCurrentPlayer().equals(player)){
+			//TODO: it is not the player's turn.
+			return;
+		}
+		game.getGameData().getCurrentPlayerTurn().checkForResult();
+		client.updateClient(new ClientUpdate(connectionUUID));
 	}
 
 
