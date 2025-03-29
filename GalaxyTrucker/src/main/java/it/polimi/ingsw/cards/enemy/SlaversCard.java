@@ -2,6 +2,7 @@ package src.main.java.it.polimi.ingsw.cards.enemy;
 
 import src.main.java.it.polimi.ingsw.game.GameData;
 import src.main.java.it.polimi.ingsw.player.Player;
+import src.main.java.it.polimi.ingsw.playerInput.PlayerRemoveLoadableRequest;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 import src.main.java.it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
 import src.main.java.it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
@@ -55,25 +56,14 @@ public class SlaversCard extends EnemyCard {
 	 */
 	@Override
 	public void applyPunishment(Player player, GameData game) {
-		Map<Coordinates, CabinTile> itemsPosition = player.getShipBoard().getVisitorCalculateCargoInfo()
-				.getCrewInfo().getLocationsWithLoadedItems(1);
-		//TODO: send the map of positions and content to the player, wait for them to return
-		// a similar map that will contain the items that the user desires to remove from each coordinate.
-		Map<Coordinates, List<LoadableType>> itemsToRemove = new HashMap<>();
-		itemsToRemove.forEach((coords, items) -> {
-			ContainerTile tile = null;
-			try {
-				tile = (ContainerTile) player.getShipBoard().getTile(coords);
-			} catch (OutOfBuildingAreaException | NoTileFoundException e) {
-				throw new RuntimeException(e);
-			}
-			for(LoadableType l : items){
-				try {
-					tile.loadItems(l, 1);
-				} catch (TooMuchLoadException | UnsupportedLoadableItemException e) {
-					//TODO: Contact player to notify failure, and retry
-				}
-			}
-		});
+		game.setCurrentPlayerTurn(
+				new PlayerRemoveLoadableRequest(player, 30, LoadableType.CREW_SET, punishCrewAmount)
+		);
+		try {
+			game.getCurrentPlayerTurn().run();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
 	}
 }

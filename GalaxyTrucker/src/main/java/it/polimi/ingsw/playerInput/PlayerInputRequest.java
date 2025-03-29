@@ -8,8 +8,9 @@ import java.util.Set;
 public abstract class PlayerInputRequest {
 
 	protected Player currentPlayer;
-	private int cooldown;
-	protected Object lock = new Object();
+	private final int cooldown;
+	protected final Object lock = new Object();
+	private final PlayerTurnType playerTurnType;
 
 	/**
 	 * Abstract object for a PlayerInput request. The server will instance a new thread and wait for the player to
@@ -18,9 +19,10 @@ public abstract class PlayerInputRequest {
 	 * @param currentPlayer The player the game waits for
 	 * @param cooldown The cooldown duration.
 	 */
-	public PlayerInputRequest(Player currentPlayer, int cooldown){
+	public PlayerInputRequest(Player currentPlayer, int cooldown, PlayerTurnType playerTurnType){
 		this.currentPlayer = currentPlayer;
 		this.cooldown = cooldown;
+		this.playerTurnType = playerTurnType;
 	}
 
 	/**
@@ -34,10 +36,6 @@ public abstract class PlayerInputRequest {
 	//* any astronauts, the mask will need to be changed. This is why we calculate it live.
 	public abstract Set<Coordinates> getHighlightMask();
 
-
-	protected void sleep() throws InterruptedException {
-		Thread.sleep(cooldown);
-	}
 
 	public abstract void run() throws InterruptedException;
 
@@ -61,4 +59,14 @@ public abstract class PlayerInputRequest {
 	 * turn will end and move to the next. If not fulfilled, it will keep waiting.
 	 */
 	public abstract void checkForResult();
+
+	/**
+	 * This is used both for the client and the controller to understand what type of action to allow to the player.
+	 * When the player takes an action, the controller will check that the action will match the turn type, and
+	 * that the targeted coordinate for the action is contained in the coordinate mask.
+	 * @return
+	 */
+	public PlayerTurnType getPlayerTurnType() {
+		return playerTurnType;
+	}
 }

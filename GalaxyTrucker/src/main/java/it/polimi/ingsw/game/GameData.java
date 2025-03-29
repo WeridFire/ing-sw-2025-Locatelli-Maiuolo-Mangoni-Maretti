@@ -6,6 +6,7 @@ import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
 import src.main.java.it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import src.main.java.it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import src.main.java.it.polimi.ingsw.player.Player;
+import src.main.java.it.polimi.ingsw.playerInput.PlayerInputRequest;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
@@ -34,8 +35,11 @@ public class GameData implements Serializable {
     /** Number of positions in 1 lap */
     private int lapSize;
 
-    /** The player whose turn it is. */
+    /** The player whose turn it is.
     private Player currentPlayerTurn;
+     */
+
+    private PlayerInputRequest currentPlayerTurn;
 
     /** Mapping of available cargo goods and their quantities. */
     private Map<LoadableType, Integer> availableGoods;
@@ -106,7 +110,7 @@ public class GameData implements Serializable {
      *
      * @return The current turn player.
      */
-    public Player getCurrentPlayerTurn() {
+    public PlayerInputRequest getCurrentPlayerTurn() {
         return currentPlayerTurn;
     }
 
@@ -184,12 +188,7 @@ public class GameData implements Serializable {
     }
 
 
-    /**
-     * Sets the current turn player.
-     *
-     * @param currentPlayerTurn The player whose turn it is.
-     */
-    private void setCurrentPlayerTurn(Player currentPlayerTurn) {
+    public void setCurrentPlayerTurn(PlayerInputRequest currentPlayerTurn) {
         this.currentPlayerTurn = currentPlayerTurn;
     }
 

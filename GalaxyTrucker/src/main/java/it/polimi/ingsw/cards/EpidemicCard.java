@@ -33,11 +33,7 @@ public class EpidemicCard extends Card{
 	@Override
 	public void playEffect(GameData game) {
 		for (Player p : game.getPlayers()) {
-			VisitorEpidemic visitorEpidemic = new VisitorEpidemic();
-			for(Tile t : p.getShipBoard().getTiles()){
-				t.accept(visitorEpidemic);
-			}
-			visitorEpidemic.applyEpidemicEffect(p.getShipBoard().getTilesOnBoard());
+
 		}
 	}
 

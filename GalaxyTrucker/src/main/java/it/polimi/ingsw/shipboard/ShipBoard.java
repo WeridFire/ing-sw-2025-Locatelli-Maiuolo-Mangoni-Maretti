@@ -18,6 +18,7 @@ public class ShipBoard {
 
 	private final GameLevel level;
 	private final Map<Coordinates, TileSkeleton<SideType>> board;
+	private final Set<Coordinates> activatedTiles = new HashSet<>();
 
 	private VisitorCalculateCargoInfo visitorCalculateCargoInfo;
 	private VisitorCalculateFirePower visitorCalculateFirePower;
@@ -190,5 +191,13 @@ public class ShipBoard {
 		// Remove the tile and reset visitors
 		board.remove(coordinates);
 		resetVisitors();
+	}
+
+	public Set<Coordinates> getActivatedTiles() {
+		return activatedTiles;
+	}
+
+	public void resetActivatedTiles(){
+		activatedTiles.clear();
 	}
 }

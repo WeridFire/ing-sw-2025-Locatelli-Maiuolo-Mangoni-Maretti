@@ -4,24 +4,18 @@ import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-public class PlayerRemoveLoadableRequest extends PlayerInputRequest {
+public class PlayerAddLoadableRequest extends PlayerInputRequest {
 
-	private int targetAmount;
-	private final Set<LoadableType> allowedCargo;
+	private final List<LoadableType> allocatedCargo;
 
-	public PlayerRemoveLoadableRequest(Player currentPlayer, int cooldown, Set<LoadableType> allowedCargo, int amount) {
-		super(currentPlayer, cooldown, PlayerTurnType.REMOVE_CARGO);
-		this.allowedCargo = allowedCargo;
-
-		this.targetAmount = currentPlayer
-						.getShipBoard()
-						.getVisitorCalculateCargoInfo()
-						.getInfoAllContainers().countAll(allowedCargo) - amount;
-		if(this.targetAmount < 0){
-			this.targetAmount = 0;
-		}
+	public PlayerAddLoadableRequest(Player currentPlayer, int cooldown, List<LoadableType> allocatedCargo) {
+		super(currentPlayer, cooldown, PlayerTurnType.ADD_CARGO);
+		this.allocatedCargo = allocatedCargo;
 	}
 
 	@Override
@@ -29,7 +23,7 @@ public class PlayerRemoveLoadableRequest extends PlayerInputRequest {
 		return currentPlayer.getShipBoard()
 				.getVisitorCalculateCargoInfo()
 				.getInfoAllContainers()
-				.getLocationsWithLoadedItems(allowedCargo, 1)
+				.getLocationsWithAllowedContent(new HashSet<>(allocatedCargo))
 				.keySet();
 	}
 
@@ -44,17 +38,15 @@ public class PlayerRemoveLoadableRequest extends PlayerInputRequest {
 	public void run() throws InterruptedException {
 		synchronized (lock){
 			lock.wait(getCooldown()* 1000L);
-			if(getCargoAmount() > targetAmount){
-
-				//TODO: remove remaining cargo automatically, as player has not fulfilled the request.
-			}
+			//at the end if the cargo is not completely allocated, it gets ignored
+			//TODO: handle the case where ignored cargo is passed onto next player?
 		}
 	}
 
 	@Override
 	public void checkForResult() {
 		synchronized (lock){
-			if(getCargoAmount() <= targetAmount){
+			if(allocatedCargo.){
 				lock.notifyAll();;
 			}
 		}
