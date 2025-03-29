@@ -24,34 +24,18 @@ public class ClientUpdate implements Serializable {
 
 	public ClientUpdate(UUID clientUUID){
 		this.clientUUID = clientUUID;
-		Game game = findGameByClientUUID(clientUUID);
+		GamesHandler gamesHandler = GamesHandler.getInstance();
+		Game game = gamesHandler.findGameByClientUUID(clientUUID);
 		if(game != null){
-			this.currentGame = obfuscateGame(game.getGameData(), getPlayerByConnection(game, clientUUID));
+			Player player = gamesHandler.getPlayerByConnection(clientUUID);
+			this.currentGame = obfuscateGame(game.getGameData(), player);
 		}else{
 			currentGame = null;
 		}
 		this.availableGames = GamesHandler.getInstance().getGames();
 	}
 
-	private Game findGameByClientUUID(UUID clientUUID) {
-		return GamesHandler.getInstance().getGames()
-				.stream()
-				.filter(game -> {
-					Set<UUID> playerUUIDs = game.getGameData().getPlayers()
-							.stream()
-							.map(Player::getConnectionUUID)
-							.collect(Collectors.toSet());
-					return playerUUIDs.contains(clientUUID);
-				})
-				.findFirst().orElse(null);
-	}
 
-	private Player getPlayerByConnection(Game game, UUID clientUUID){
-		return game.getGameData().getPlayers().stream()
-											.filter((player) -> player.getConnectionUUID() == clientUUID)
-											.findFirst()
-											.orElse(null);
-	}
 
 	public UUID getClientUUID() {
 		return clientUUID;
