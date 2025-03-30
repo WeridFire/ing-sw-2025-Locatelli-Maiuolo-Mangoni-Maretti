@@ -12,15 +12,15 @@ public class AbandonedShipCard extends Card{
 	/**
 	 * The crew that is required and will be taken away when taking the ship.
 	 */
-	private int requiredCrew;
+	private final int requiredCrew;
 	/**
 	 * The days removed when taking the ship.
 	 */
-	private int lostDays;
+	private final int lostDays;
 	/**
 	 * The credits earned upon fixing and selling the ship.
 	 */
-	private int sellPrice;
+	private final int sellPrice;
 
 	/**
 	 * Instances a card.

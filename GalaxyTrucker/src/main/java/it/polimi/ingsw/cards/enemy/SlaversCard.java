@@ -22,12 +22,12 @@ public class SlaversCard extends EnemyCard {
 	/**
 	 * How many crew members to remove.
 	 */
-	private int punishCrewAmount;
+	private final int punishCrewAmount;
 
 	/**
 	 * The amount of money to award to the player that beats this card.
 	 */
-	private int prizeBounty;
+	private final int prizeBounty;
 
 
 	/**

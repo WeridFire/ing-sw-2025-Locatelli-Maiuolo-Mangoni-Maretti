@@ -19,11 +19,11 @@ public abstract class EnemyCard extends Card {
     /**
      * How many days are removed upon taking the prize of this enemy.
      */
-    private int lostDays;
+    private final int lostDays;
     /**
      * The firepower necessary to beat this enemy.
      */
-    private int firePower;
+    private final int firePower;
 
     /**
      * @param firePower firepower of this enemy

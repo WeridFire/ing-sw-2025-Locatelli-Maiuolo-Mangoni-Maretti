@@ -13,7 +13,7 @@ public class MeteorStormCard extends Card {
 	/**
 	 * The list of meteors that will hit the players.
 	 */
-	private Projectile[] meteors;
+	private final Projectile[] meteors;
 
 	/**
 	 * Instances a card.

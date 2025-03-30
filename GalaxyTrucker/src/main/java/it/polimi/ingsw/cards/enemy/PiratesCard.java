@@ -14,11 +14,11 @@ public class PiratesCard extends EnemyCard {
     /**
      * The amount of cash bounty given to the player that defeats this pirate.
      */
-    private int prizeBounty;
+    private final int prizeBounty;
     /**
      * The projectiles that punish the player when they are beaten by this pirate.
      */
-    private Projectile[] punishHits;
+    private final Projectile[] punishHits;
 
     public PiratesCard(int prizeBounty, Projectile[] punishHits, int firePower,
                        int lostDays, String textureName, int level){

@@ -16,11 +16,11 @@ public class AbandonedStationCard extends Card{
 	/**
 	 * The days removed when looting the station.
 	 */
-	private int lostDays;
+	private final int lostDays;
 	/**
 	 * The crew required to access the station.
 	 */
-	private int requiredCrew;
+	private final int requiredCrew;
 
 	/**
 	 * Instances a card.

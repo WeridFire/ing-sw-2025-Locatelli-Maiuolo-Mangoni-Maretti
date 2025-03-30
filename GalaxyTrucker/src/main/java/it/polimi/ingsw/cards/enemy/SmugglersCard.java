@@ -13,7 +13,7 @@ public class SmugglersCard extends EnemyCard {
 
 
 	private final LoadableType[] prizeGoods;
-	private int punishCargo;
+	private final int punishCargo;
 
 	/**
 	 * @param firePower   firepower of this enemy
