@@ -45,7 +45,6 @@ public class PlayerRemoveLoadableRequest extends PlayerInputRequest {
 		synchronized (lock){
 			lock.wait(getCooldown()* 1000L);
 			if(getCargoAmount() > targetAmount){
-
 				//TODO: remove remaining cargo automatically, as player has not fulfilled the request.
 			}
 		}
@@ -55,7 +54,7 @@ public class PlayerRemoveLoadableRequest extends PlayerInputRequest {
 	public void checkForResult() {
 		synchronized (lock){
 			if(getCargoAmount() <= targetAmount){
-				lock.notifyAll();;
+				lock.notifyAll();
 			}
 		}
 	}
