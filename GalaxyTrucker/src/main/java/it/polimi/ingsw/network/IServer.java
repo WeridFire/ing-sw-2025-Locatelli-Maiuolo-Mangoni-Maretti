@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface IServer extends Remote {
 
 	void connect(IClient client) throws RemoteException;
-	void requestUpdate(IClient client) throws RemoteException;
+	void createGame(IClient client, String username) throws RemoteException;
 	void joinGame(IClient client, UUID gameId, String username) throws RemoteException;
 	void quitGame(IClient client) throws RemoteException;
 	void drawComponent(IClient client) throws RemoteException;

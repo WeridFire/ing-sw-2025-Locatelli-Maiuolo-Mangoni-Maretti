@@ -6,11 +6,12 @@ import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.ShipBoard;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Player {
+public class Player implements Serializable {
 
     private final String username;
     private UUID connectionUUID;

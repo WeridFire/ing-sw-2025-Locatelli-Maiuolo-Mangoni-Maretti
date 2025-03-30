@@ -34,11 +34,22 @@ public class Game {
     private final Timer timer;
 
     /**
-     * Creates a new game instance with a randomly generated UUID and a Timer.
+     * Creates a new game, based on a GameData. Creates an ID and a timer for it.
+     * @param resumeGame The game data to resume.
      */
-    public Game() {
+    public Game(GameData resumeGame) {
+        this.id = resumeGame.getGameId();
+        this.timer = new Timer();
+        loadGameData(resumeGame);
+    }
+
+    /**
+     * Creates a new game, with a new game.
+     */
+    public Game(){
         this.id = UUID.randomUUID();
         this.timer = new Timer();
+        loadGameData(new GameData(id));
     }
 
     /**
@@ -107,7 +118,7 @@ public class Game {
      * @param gameData the game data to load
      * @return {@code true} if the game data was successfully loaded, {@code false} if the provided data is {@code null}
      */
-    public boolean loadGameData(GameData gameData) {
+    private boolean loadGameData(GameData gameData) {
         if (gameData == null) return false;
 
         this.gameData = gameData;

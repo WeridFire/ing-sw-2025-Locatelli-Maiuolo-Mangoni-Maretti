@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.UUID;
 
 public class ClientSocketToRMIAdapter implements IClient {
@@ -35,15 +36,30 @@ public class ClientSocketToRMIAdapter implements IClient {
 	 */
 	public void runVirtualView() throws IOException {
 		String line;
-		System.out.println("Waiting for messages...");
 		while ((line = input.readLine()) != null) {
-			System.out.println("Received new message: " + line);
-			// TODO: add serialization and deserialization!
-			switch (line) {
-				case "ping":
-					getServer().ping(this);
-					break;
+			SocketMessage message = null;
+			try{
+				byte[] decodedMessage = Base64.getDecoder().decode(line);
+				message = SocketMessage.deserialize(decodedMessage);
+			}catch(ClassNotFoundException | IOException e){
+				System.err.println("Could not deserialize message: " + line);
+				e.printStackTrace();
 			}
+			if(message != null){
+				System.out.println("Received new command: " + message.getType());
+				switch (message.getType()) {
+					case PING -> getServer().ping(this);
+					case JOIN_GAME -> getServer()
+									.joinGame(
+											this,
+											(UUID) message.getArgs().getFirst(),
+											(String) message.getArgs().get(1));
+					case CREATE_GAME -> getServer().createGame(
+											this,
+											(String) message.getArgs().getFirst());
+				}
+			}
+
 		}
 	}
 
@@ -60,11 +76,8 @@ public class ClientSocketToRMIAdapter implements IClient {
 	 */
 	@Override
 	public void updateClient(ClientUpdate clientUpdate) {
-		//TODO: IMPLEMENT PROPER SERIALIZATION
-		//output.println(new String(clientUpdate.serialize(), StandardCharsets.UTF_8));
-		output.println("pong!");
+		String encodedMessage = Base64.getEncoder().encodeToString(clientUpdate.serialize());
+		output.println(encodedMessage);
 		output.flush();
-		System.out.println("Responding...");
 	}
-
 }

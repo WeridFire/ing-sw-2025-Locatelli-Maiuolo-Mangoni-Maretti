@@ -1,6 +1,7 @@
 package src.main.java.it.polimi.ingsw;
 
 import src.main.java.it.polimi.ingsw.game.Game;
+import src.main.java.it.polimi.ingsw.game.exceptions.GameNotFoundException;
 import src.main.java.it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import src.main.java.it.polimi.ingsw.player.Player;
 
@@ -55,6 +56,7 @@ public class GamesHandler {
     public Game newGame() {
         Game game = new Game();
         games.add(game);
+        System.out.println(games);
         return game;
     }
 
@@ -73,11 +75,41 @@ public class GamesHandler {
         return null;
     }
 
-    public Game addPlayerToGame(String username, UUID gameId, UUID connectionUUID){
+
+    /**
+     * Creates a game and adds the player into the game. Makes sure that the player is not already in another game.
+     * @param username The username the player wants to join with.
+     * @param connectionUUID The connection id of the player
+     * @return The created game.
+     * @throws PlayerAlreadyInGameException The player is in another game.
+     */
+    public Game createGame(String username, UUID connectionUUID) throws PlayerAlreadyInGameException {
+        if(findGameByClientUUID(connectionUUID) != null){
+            throw new PlayerAlreadyInGameException("You already are in a game.");
+        }
+        Game createdGame = newGame();
+		try {
+			addPlayerToGame(username, createdGame.getId(), connectionUUID);
+		} catch (GameNotFoundException e) {
+			//Ignore, we are sure the game exists
+		}
+        return createdGame;
+	}
+
+
+    /**
+     * Adds a player into an existing game.
+     * @param username The username the player wants to join with.
+     * @param gameId The game UUID, must exist.
+     * @param connectionUUID The connection UUID.
+     * @return The joined game
+     * @throws PlayerAlreadyInGameException The username is already present in the game.
+     * @throws GameNotFoundException The game does not exist.
+     */
+    public Game addPlayerToGame(String username, UUID gameId, UUID connectionUUID) throws PlayerAlreadyInGameException, GameNotFoundException {
         Game target = getGame(gameId);
         if(target == null){
-            target = newGame();
-            return addPlayerToGame(username, target.getId(), connectionUUID);
+            throw new GameNotFoundException(gameId);
         }
         Set<String> usernames = target.getGameData().getPlayers().stream()
                                                             .map(Player::getUsername)
@@ -89,8 +121,9 @@ public class GamesHandler {
             } catch (PlayerAlreadyInGameException e) {
                 throw new RuntimeException(e);  // should never happen (already checked username is not in usernames) -> runtime error
             }
+        }else{
+            throw new PlayerAlreadyInGameException("This username is already in the game.");
         }
-        return null;
     }
 
     public Player getPlayerByConnection(UUID clientUUID){

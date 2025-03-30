@@ -35,6 +35,8 @@ public class GameData implements Serializable {
     /** Number of positions in 1 lap */
     private int lapSize;
 
+    private UUID gameId;
+
     /** The player whose turn it is.
     private Player currentPlayerTurn;
      */
@@ -50,17 +52,19 @@ public class GameData implements Serializable {
     /** List of covered tiles in the game. */
     private List<TileSkeleton<SideType>> coveredTiles;
 
-    private int requiredPlayers = 4;
+    private int requiredPlayers;
 
     /**
      * Constructs a new GameData object with a default game level.
      */
-    public GameData() {
+    public GameData(UUID gameId) {
         this.players = new HashSet<>();
         this.availableGoods = new HashMap<>();
         this.coveredTiles = new ArrayList<>();
         this.deck = null;
+        this.gameId = gameId;
         this.setCurrentGamePhaseType(GamePhaseType.LOBBY);
+        this.setRequiredPlayers(4);
     }
 
     /**
@@ -261,5 +265,9 @@ public class GameData implements Serializable {
 
     public void setLapSize(int lapSize) {
         this.lapSize = lapSize;
+    }
+
+    public UUID getGameId() {
+        return gameId;
     }
 }

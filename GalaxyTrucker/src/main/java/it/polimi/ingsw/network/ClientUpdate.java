@@ -3,6 +3,7 @@ package src.main.java.it.polimi.ingsw.network;
 
 import src.main.java.it.polimi.ingsw.GamesHandler;
 import src.main.java.it.polimi.ingsw.cards.Deck;
+import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
 import src.main.java.it.polimi.ingsw.game.Game;
 import src.main.java.it.polimi.ingsw.game.GameData;
 import src.main.java.it.polimi.ingsw.player.Player;
@@ -10,6 +11,7 @@ import src.main.java.it.polimi.ingsw.shipboard.SideType;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -20,7 +22,8 @@ public class ClientUpdate implements Serializable {
 
 	private final UUID clientUUID;
 	private final GameData currentGame;
-	private final List<Game> availableGames;
+	private final List<GameData> availableGames;
+	private String error;
 
 	public ClientUpdate(UUID clientUUID){
 		this.clientUUID = clientUUID;
@@ -32,7 +35,14 @@ public class ClientUpdate implements Serializable {
 		}else{
 			currentGame = null;
 		}
-		this.availableGames = GamesHandler.getInstance().getGames();
+
+		this.availableGames = GamesHandler.getInstance().getGames().stream().map(Game::getGameData
+		).collect(Collectors.toList());
+	}
+
+	public ClientUpdate(UUID clientUUID, String error){
+		this(clientUUID);
+		this.error = error;
 	}
 
 
@@ -53,7 +63,9 @@ public class ClientUpdate implements Serializable {
 			ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
 			ObjectInputStream in = new ObjectInputStream(bis);
 			GameData clone = (GameData) in.readObject();
-
+			if(clone.getCurrentGamePhaseType() == GamePhaseType.LOBBY){
+				return clone;
+			}
 			//Check for performance issues, since this will be executed ALOT! In case this is heavy performance wise
 			clone.setCoveredTiles(null);
 			clone.setDeck(Deck.obfuscateDeck(clone.getDeck(), target));
@@ -68,10 +80,15 @@ public class ClientUpdate implements Serializable {
 		return currentGame;
 	}
 
-	public List<Game> getAvailableGames() {
+	public List<GameData> getAvailableGames() {
 		return availableGames;
 	}
 
+
+	/**
+	 * Serializes the object instance into an UTF-8 encoded string.
+	 * @return
+	 */
 	public byte[] serialize() {
 		try{
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -86,9 +103,20 @@ public class ClientUpdate implements Serializable {
 
 	}
 
+	/**
+	 * Creates an instance based on a serialized string, encoded in UTF-8.
+	 * @param serialized The serialized string
+	 * @return The deserialized instance.
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	public static ClientUpdate deserialize(byte[] serialized) throws IOException, ClassNotFoundException {
 		ByteArrayInputStream bis = new ByteArrayInputStream(serialized);
 		ObjectInputStream in = new ObjectInputStream(bis);
 		return (ClientUpdate) in.readObject();
+	}
+
+	public String getError() {
+		return error;
 	}
 }

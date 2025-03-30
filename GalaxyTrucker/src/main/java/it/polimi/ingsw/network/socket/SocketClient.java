@@ -9,33 +9,33 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class SocketClient implements IClient {
 	final BufferedReader input;
 	final IServer server;
 	final GameClient gameClient;
 
-	//TODO: implement the loop for reading client incoming messages and parsing them into updates,
-	// to then send to the RMI client.
 	public SocketClient(BufferedReader input, BufferedWriter output, GameClient gameClient) {
 		this.input = input;
 		this.server = new ServerSocketAdapter(output);
 		this.gameClient = gameClient;
 	}
 
-	public void runVirtualServer() throws IOException, ClassNotFoundException {
+	public void runVirtualServer() throws IOException {
 		String line;
 		while ((line = input.readLine()) != null) {
-			/*
-			ClientUpdate clientUpdate = ClientUpdate.deserialize(line.getBytes(StandardCharsets.UTF_8));
-			updateClient(clientUpdate);
-			 */
-			System.out.println("Received server message: ");
-			System.out.println(line);
+			ClientUpdate clientUpdate = null;
+			try {
+				byte[] serialized = Base64.getDecoder().decode(line);
+				clientUpdate = ClientUpdate.deserialize(serialized);
+				updateClient(clientUpdate);
+			} catch (IOException  | ClassNotFoundException e) {
+				System.err.println("Error deserializing message: " + line);
+				e.printStackTrace();
+			}
 		}
 	}
-
-
 
 
 	@Override

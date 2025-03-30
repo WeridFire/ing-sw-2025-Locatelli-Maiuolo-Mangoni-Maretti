@@ -35,8 +35,6 @@ public class RmiClient extends UnicastRemoteObject implements IClient {
 	 */
 	@Override
 	public void updateClient(ClientUpdate clientUpdate) throws RemoteException {
-		//We delegate the generic gameClient to handle the update.
-		System.out.println(gameClient);
 		gameClient.updateClient(clientUpdate);
 	}
 
