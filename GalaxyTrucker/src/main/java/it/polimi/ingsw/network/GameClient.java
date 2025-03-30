@@ -87,6 +87,6 @@ public class GameClient implements IClient{
 	}
 
 	public static void main(String[] args) throws IOException, NotBoundException {
-		new GameClient(false, "0.0.0.0", 1234);
+		new GameClient(true, "0.0.0.0", 1111	);
 	}
 }

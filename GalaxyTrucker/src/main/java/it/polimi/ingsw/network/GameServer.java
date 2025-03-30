@@ -40,7 +40,7 @@ public class GameServer{
 			rmiServer = new RmiServer();
 			try {
 				rmiServer = new RmiServer();
-				IServer stub = (IServer) UnicastRemoteObject.exportObject(rmiServer, rmiPort);
+				IServer stub = (IServer) UnicastRemoteObject.exportObject(rmiServer, 0);
 				Registry registry = LocateRegistry.createRegistry(rmiPort);
 				registry.rebind(serverName, stub);
 				System.out.println("RMI server bound on port " + rmiPort + " with name " + serverName + ".");
