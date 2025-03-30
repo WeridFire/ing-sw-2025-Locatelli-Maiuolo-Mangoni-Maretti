@@ -21,14 +21,17 @@ public class SocketClient implements IClient {
 		this.input = input;
 		this.server = new ServerSocketAdapter(output);
 		this.gameClient = gameClient;
-
 	}
 
-	private void runVirtualServer() throws IOException, ClassNotFoundException {
+	public void runVirtualServer() throws IOException, ClassNotFoundException {
 		String line;
 		while ((line = input.readLine()) != null) {
+			/*
 			ClientUpdate clientUpdate = ClientUpdate.deserialize(line.getBytes(StandardCharsets.UTF_8));
 			updateClient(clientUpdate);
+			 */
+			System.out.println("Received server message: ");
+			System.out.println(line);
 		}
 	}
 

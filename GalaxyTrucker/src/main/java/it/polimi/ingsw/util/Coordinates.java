@@ -2,13 +2,14 @@ package src.main.java.it.polimi.ingsw.util;
 
 import src.main.java.it.polimi.ingsw.enums.Direction;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * Represents a coordinate in a grid-based system.
  * Each coordinate is defined by a row and a column and is uniquely identified by an ID.
  */
-public class Coordinates {
+public class Coordinates implements Serializable {
     /** The maximum number of columns in the grid.
      * Based on the maximum grid possible.
      */

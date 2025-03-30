@@ -15,6 +15,7 @@ import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadExcep
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
+import java.rmi.RemoteException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,20 +34,20 @@ public class RmiServer implements IServer {
 	}
 
 	@Override
-	public void connect(IClient client) {
+	public void connect(IClient client) throws RemoteException {
 		UUID clientUUID = gameServer.registerClient(client);
 		//Confirm connection and notify the assigned UUID.
 		client.updateClient(new ClientUpdate(clientUUID));
 	}
 
 	@Override
-	public void requestUpdate(IClient client) {
+	public void requestUpdate(IClient client) throws RemoteException {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		client.updateClient(new ClientUpdate(connectionUUID));
 	}
 
 	@Override
-	public void joinGame(IClient client, UUID gameId, String username) {
+	public void joinGame(IClient client, UUID gameId, String username) throws RemoteException {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		gamesHandler.addPlayerToGame(username, gameId, connectionUUID);
 		//after the user has been added into the game, we can notify the client with the new information.
@@ -54,7 +55,7 @@ public class RmiServer implements IServer {
 	}
 
 	@Override
-	public void quitGame(IClient client) {
+	public void quitGame(IClient client) throws RemoteException {
 		//assume we left the game
 		client.updateClient(new ClientUpdate(gameServer.getUUIDbyConnection(client)));
 	}
@@ -72,7 +73,7 @@ public class RmiServer implements IServer {
 	}
 
 	@Override
-	public void ping(IClient client) {
+	public void ping(IClient client) throws RemoteException {
 		client.updateClient(new ClientUpdate(gameServer.getUUIDbyConnection(client)));
 	}
 
@@ -102,14 +103,14 @@ public class RmiServer implements IServer {
 			player.getShipBoard().activateTiles(tilesToActivate);
 			game.getGameData().getCurrentPlayerTurn().checkForResult();
 			client.updateClient(new ClientUpdate(connectionUUID));
-		} catch (NotEnoughItemsException e) {
+		} catch (NotEnoughItemsException | RemoteException e) {
 			//TODO: notify the player that they don't have enough batteries for this.
 		}
 
 	}
 
 	@Override
-	public void allocateLoadable(IClient client, LoadableType loadable, Coordinates location) {
+	public void allocateLoadable(IClient client, LoadableType loadable, Coordinates location) throws RemoteException {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
 		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
@@ -155,7 +156,7 @@ public class RmiServer implements IServer {
 	}
 
 	@Override
-	public void forceEndTurn(IClient client) {
+	public void forceEndTurn(IClient client) throws RemoteException {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
 		Game game = gamesHandler.findGameByClientUUID(connectionUUID);

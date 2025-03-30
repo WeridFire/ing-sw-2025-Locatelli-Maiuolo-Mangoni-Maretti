@@ -35,7 +35,9 @@ public class ClientSocketToRMIAdapter implements IClient {
 	 */
 	public void runVirtualView() throws IOException {
 		String line;
+		System.out.println("Waiting for messages...");
 		while ((line = input.readLine()) != null) {
+			System.out.println("Received new message: " + line);
 			// TODO: add serialization and deserialization!
 			switch (line) {
 				case "ping":
@@ -59,9 +61,10 @@ public class ClientSocketToRMIAdapter implements IClient {
 	@Override
 	public void updateClient(ClientUpdate clientUpdate) {
 		//TODO: IMPLEMENT PROPER SERIALIZATION
-
-		output.println(new String(clientUpdate.serialize(), StandardCharsets.UTF_8));
-
+		//output.println(new String(clientUpdate.serialize(), StandardCharsets.UTF_8));
+		output.println("pong!");
+		output.flush();
+		System.out.println("Responding...");
 	}
 
 }

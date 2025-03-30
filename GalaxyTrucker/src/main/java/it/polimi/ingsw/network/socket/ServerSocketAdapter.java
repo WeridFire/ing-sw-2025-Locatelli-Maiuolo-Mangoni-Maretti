@@ -3,6 +3,8 @@ package src.main.java.it.polimi.ingsw.network.socket;
 import src.main.java.it.polimi.ingsw.game.Game;
 import src.main.java.it.polimi.ingsw.network.IClient;
 import src.main.java.it.polimi.ingsw.network.IServer;
+import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
+import src.main.java.it.polimi.ingsw.util.Coordinates;
 
 import java.io.BufferedWriter;
 import java.io.PrintWriter;
@@ -52,6 +54,23 @@ public class ServerSocketAdapter implements IServer {
 
 	@Override
 	public void ping(IClient client) {
+		System.out.println("Pinging the server...");
 		output.println("ping");
+		output.flush();
+	}
+
+	@Override
+	public void activateTiles(IClient client, Set<Coordinates> tilesToActivate) {
+
+	}
+
+	@Override
+	public void allocateLoadable(IClient client, LoadableType loadable, Coordinates location) {
+
+	}
+
+	@Override
+	public void forceEndTurn(IClient client) {
+
 	}
 }

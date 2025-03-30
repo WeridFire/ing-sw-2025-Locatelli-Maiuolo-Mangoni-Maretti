@@ -37,15 +37,15 @@ public class GameServer{
 		final String serverName = "GalaxyTruckerServer";
 		//Start the RMI server on a separate thread.
 		executor.submit(() -> {
-			System.out.println("RMI server bound on port " + rmiPort + " with name " + serverName + ".");
 			rmiServer = new RmiServer();
 			try {
-				RmiServer stub = (RmiServer) UnicastRemoteObject.exportObject(rmiServer, 0);
+				rmiServer = new RmiServer();
+				IServer stub = (IServer) UnicastRemoteObject.exportObject(rmiServer, rmiPort);
 				Registry registry = LocateRegistry.createRegistry(rmiPort);
 				registry.rebind(serverName, stub);
-
-			} catch (RemoteException e) {
-				throw new RuntimeException(e);
+				System.out.println("RMI server bound on port " + rmiPort + " with name " + serverName + ".");
+			} catch (Exception e) { // Catching all exceptions to see what's going wrong
+				e.printStackTrace();
 			}
 		});
 
@@ -57,7 +57,7 @@ public class GameServer{
 				ServerSocket listenSocket = new ServerSocket(port);
 				socketServer = new SocketServer(listenSocket);
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				e.printStackTrace();
 			}
 		});
 

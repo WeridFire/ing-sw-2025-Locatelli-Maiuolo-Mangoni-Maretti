@@ -6,8 +6,9 @@ import src.main.java.it.polimi.ingsw.network.IClient;
 import src.main.java.it.polimi.ingsw.network.IServer;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
-public class RmiClient implements IClient {
+public class RmiClient extends UnicastRemoteObject implements IClient {
 
 	final IServer server;
 	final GameClient gameClient;
@@ -18,9 +19,8 @@ public class RmiClient implements IClient {
 	 * @param gameClient A reference to the generic game client.
 	 * @throws RemoteException
 	 */
-	public RmiClient(RmiServer server, GameClient gameClient) throws RemoteException {
+	public RmiClient(IServer server, GameClient gameClient) throws RemoteException {
 		this.server = server;
-		server.connect(this);
 		this.gameClient = gameClient;
 	}
 
@@ -34,8 +34,9 @@ public class RmiClient implements IClient {
 	 * @param clientUpdate
 	 */
 	@Override
-	public void updateClient(ClientUpdate clientUpdate) {
+	public void updateClient(ClientUpdate clientUpdate) throws RemoteException {
 		//We delegate the generic gameClient to handle the update.
+		System.out.println(gameClient);
 		gameClient.updateClient(clientUpdate);
 	}
 
