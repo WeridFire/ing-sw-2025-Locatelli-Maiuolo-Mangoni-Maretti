@@ -21,7 +21,7 @@ public class ClientCLIView {
 		if(lastUpdate.getCurrentGame() == null){
 			displayGamesList();
 		}
-		displayError();;
+		displayError();
 	}
 
 	private void displayGamesList(){

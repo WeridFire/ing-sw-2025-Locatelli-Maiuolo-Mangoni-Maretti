@@ -9,7 +9,7 @@ public class SocketMessage implements Serializable{
 	public enum MessageType {
 		PING,
 		JOIN_GAME,
-		CREATE_GAME
+		CREATE_GAME,
 		// Add other message types as necessary
 	}
 
@@ -66,4 +66,12 @@ public class SocketMessage implements Serializable{
 		ObjectInputStream in = new ObjectInputStream(bis);
 		return (SocketMessage) in.readObject();
 	}
+
+
+	/*
+	public static SocketMessage createGameMessage(String username){
+		return new SocketMessage(MessageType.CREATE_GAME, List.of(username));
+	}
+
+	 */
 }
