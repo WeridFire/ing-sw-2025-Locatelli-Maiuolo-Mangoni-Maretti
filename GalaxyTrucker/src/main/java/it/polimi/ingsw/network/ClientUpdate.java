@@ -35,7 +35,6 @@ public class ClientUpdate implements Serializable {
 		}else{
 			currentGame = null;
 		}
-
 		this.availableGames = GamesHandler.getInstance().getGames().stream().map(Game::getGameData
 		).collect(Collectors.toList());
 	}
