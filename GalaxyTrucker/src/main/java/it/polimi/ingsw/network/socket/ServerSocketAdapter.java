@@ -48,6 +48,7 @@ public class ServerSocketAdapter implements IServer {
 
 	@Override
 	public void createGame(IClient client, String username) throws RemoteException {
+		//SocketMessage m1 = SocketMessage.createGameMessage(username);
 		SocketMessage mess = new SocketMessage(SocketMessage.MessageType.CREATE_GAME, List.of(username));
 		sendSocketMessage(mess);
 	}
