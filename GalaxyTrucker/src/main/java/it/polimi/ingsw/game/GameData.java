@@ -226,7 +226,6 @@ public class GameData implements Serializable {
                 stepsLeft++;
             }
         }
-
         playerToMove.setPosition(newPosition);
     }
 
