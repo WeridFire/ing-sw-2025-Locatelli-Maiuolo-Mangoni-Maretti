@@ -95,7 +95,6 @@ public class Game {
         gameData.getDeck().drawNextCard();
         AdventureGamePhase adventureGamePhase = null;
         while(gameData.getDeck().getTopCard() != null) {
-
             //create adventure
             adventureGamePhase = new AdventureGamePhase(id, GamePhaseType.ADVENTURE, gameData, gameData.getDeck().getTopCard());
 
