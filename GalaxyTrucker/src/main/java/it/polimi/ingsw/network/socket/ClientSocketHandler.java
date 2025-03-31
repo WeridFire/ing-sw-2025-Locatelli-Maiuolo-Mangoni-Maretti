@@ -5,11 +5,10 @@ import src.main.java.it.polimi.ingsw.network.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.UUID;
 
-public class ClientSocketToRMIAdapter implements IClient {
+public class ClientSocketHandler implements IClient {
 
 	final GameServer gameServer;
 	final BufferedReader input;
@@ -18,18 +17,19 @@ public class ClientSocketToRMIAdapter implements IClient {
 	/**
 	 * This adapter handles all socket connections on the server. It handles both INCOMING MESSAGES (parsing client-made
 	 * messages on the server, and then running them) and OUTCOMING MESSAGES (serializing outgoing messages and sending
-	 * them to the client).
+	 * them to the client). Messages arriving here are simply parsed and forwarded to the RMI on the corresponding
+	 * method call.
 	 * @param input The input buffer, for the incoming channel
 	 * @param output The output buffer, for the outgoing channel.
 	 */
-	public ClientSocketToRMIAdapter(BufferedReader input, PrintWriter output) {
+	public ClientSocketHandler(BufferedReader input, PrintWriter output) {
 		this.gameServer = GameServer.getInstance();
 		this.input = input;
 		this.output = output;
 	}
 
 	/**
-	 * Occupies a thread to constantly receive and parse messages. Based on the message content, it will call the RMI
+	 * Blocking function to receive and parse messages. Based on the message content, it will call the RMI
 	 * server to execute as necessary the method. It will also pass a reference to itself to the RMI, so that it will
 	 * be able to send messages using sockets by accessing it.
 	 * @throws IOException
