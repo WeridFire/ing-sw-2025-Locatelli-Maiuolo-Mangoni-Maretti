@@ -53,10 +53,7 @@ public abstract class ContainerTile extends TileSkeleton<SideType> {
      */
     public List<LoadableType> setAllowedItems(Set<LoadableType> allowedItems) throws UnsupportedLoadableItemException {
         if (!maxAllowedItems.containsAll(allowedItems)) {
-            throw new UnsupportedLoadableItemException("Attempt to modify the allowed items"
-                    + " with a non-subset of the allowed items for this kind of container: "
-                    + allowedItems + " is not a subset of " + maxAllowedItems
-                    + ". This would result in undesired and unsignaled exceptions.");
+            throw new UnsupportedLoadableItemException(allowedItems, maxAllowedItems);
         }
 
         this.allowedItems = allowedItems;
@@ -85,8 +82,7 @@ public abstract class ContainerTile extends TileSkeleton<SideType> {
     public void loadItems(LoadableType item, int quantity) throws TooMuchLoadException,
             UnsupportedLoadableItemException {
         if (!allowedItems.contains(item)) {
-            throw new UnsupportedLoadableItemException("Attempt to add " + item +
-                    " in a container which allows only the following items: " + allowedItems);
+            throw new UnsupportedLoadableItemException(item, allowedItems);
         }
 
         int requiredCapacity = quantity * item.getRequiredCapacity();
@@ -117,8 +113,7 @@ public abstract class ContainerTile extends TileSkeleton<SideType> {
         }
 
         if (!allowedItems.contains(item)) {
-            throw new UnsupportedLoadableItemException("Attempt to remove " + item +
-                    " in a container which allows only the following items: " + allowedItems);
+            throw new UnsupportedLoadableItemException(item, allowedItems);
         }
 
         long loadedCount = loadedItems.stream().filter(it -> it == item).count();
