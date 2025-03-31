@@ -6,12 +6,10 @@ import src.main.java.it.polimi.ingsw.playerInput.exceptions.TileNotAvailableExce
 import src.main.java.it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public abstract class PlayerInputRequest {
 
@@ -99,5 +97,11 @@ public abstract class PlayerInputRequest {
 	public void activateTiles(Player player, Set<Coordinates> coordinates) throws WrongPlayerTurnException, InputNotSupportedException, NotEnoughItemsException, TileNotAvailableException {
 		throw new InputNotSupportedException(playerTurnType);
 	}
+
+	public void removeLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToRemove) throws InputNotSupportedException, WrongPlayerTurnException, TileNotAvailableException, NotEnoughItemsException, UnsupportedLoadableItemException {
+		throw new InputNotSupportedException(playerTurnType);
+	}
+
+
 
 }
