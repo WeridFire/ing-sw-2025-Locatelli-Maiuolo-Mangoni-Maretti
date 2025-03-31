@@ -2,7 +2,7 @@ package src.main.java.it.polimi.ingsw.network.socket;
 
 import src.main.java.it.polimi.ingsw.network.IClient;
 import src.main.java.it.polimi.ingsw.network.IServer;
-import src.main.java.it.polimi.ingsw.network.SocketMessage;
+import src.main.java.it.polimi.ingsw.network.messages.SocketMessage;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
@@ -10,7 +10,6 @@ import java.io.BufferedWriter;
 import java.io.PrintWriter;
 import java.rmi.RemoteException;
 import java.util.Base64;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 

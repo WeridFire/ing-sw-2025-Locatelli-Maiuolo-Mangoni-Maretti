@@ -1,4 +1,4 @@
-package src.main.java.it.polimi.ingsw.network;
+package src.main.java.it.polimi.ingsw.network.messages;
 
 
 import src.main.java.it.polimi.ingsw.GamesHandler;
@@ -7,14 +7,9 @@ import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
 import src.main.java.it.polimi.ingsw.game.Game;
 import src.main.java.it.polimi.ingsw.game.GameData;
 import src.main.java.it.polimi.ingsw.player.Player;
-import src.main.java.it.polimi.ingsw.shipboard.SideType;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 

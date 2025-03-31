@@ -1,5 +1,7 @@
 package src.main.java.it.polimi.ingsw.network;
 
+import src.main.java.it.polimi.ingsw.network.messages.ClientUpdate;
+
 public class ClientCLIView {
 
 	private ClientUpdate lastUpdate;

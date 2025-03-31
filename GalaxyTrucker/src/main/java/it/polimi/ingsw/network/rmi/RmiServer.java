@@ -4,7 +4,7 @@ import src.main.java.it.polimi.ingsw.GamesHandler;
 import src.main.java.it.polimi.ingsw.game.Game;
 import src.main.java.it.polimi.ingsw.game.exceptions.GameNotFoundException;
 import src.main.java.it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
-import src.main.java.it.polimi.ingsw.network.ClientUpdate;
+import src.main.java.it.polimi.ingsw.network.messages.ClientUpdate;
 import src.main.java.it.polimi.ingsw.network.GameServer;
 import src.main.java.it.polimi.ingsw.network.IClient;
 import src.main.java.it.polimi.ingsw.network.IServer;

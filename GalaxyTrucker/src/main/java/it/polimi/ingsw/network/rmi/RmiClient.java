@@ -1,6 +1,6 @@
 package src.main.java.it.polimi.ingsw.network.rmi;
 
-import src.main.java.it.polimi.ingsw.network.ClientUpdate;
+import src.main.java.it.polimi.ingsw.network.messages.ClientUpdate;
 import src.main.java.it.polimi.ingsw.network.GameClient;
 import src.main.java.it.polimi.ingsw.network.IClient;
 import src.main.java.it.polimi.ingsw.network.IServer;

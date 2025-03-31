@@ -2,6 +2,7 @@ package src.main.java.it.polimi.ingsw.network;
 
 
 
+import src.main.java.it.polimi.ingsw.network.messages.ClientUpdate;
 import src.main.java.it.polimi.ingsw.network.rmi.RmiClient;
 import src.main.java.it.polimi.ingsw.network.socket.SocketClient;
 

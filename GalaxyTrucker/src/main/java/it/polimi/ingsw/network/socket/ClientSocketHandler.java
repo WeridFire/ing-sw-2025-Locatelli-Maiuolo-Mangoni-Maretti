@@ -1,6 +1,8 @@
 package src.main.java.it.polimi.ingsw.network.socket;
 
 import src.main.java.it.polimi.ingsw.network.*;
+import src.main.java.it.polimi.ingsw.network.messages.ClientUpdate;
+import src.main.java.it.polimi.ingsw.network.messages.SocketMessage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
