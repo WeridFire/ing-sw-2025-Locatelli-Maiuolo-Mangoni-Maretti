@@ -25,6 +25,13 @@ public class ClientUpdate implements Serializable {
 	private final List<GameData> availableGames;
 	private String error;
 
+	/**
+	 * A ClientUpdate is the type of message the server sends to the client. It sends the client all the information about
+	 * the client is currently in (which may be null), and also the information about available games, in lobby phase.
+	 * Based on the client the server needs to update, this class will automatically build the correct message for the
+	 * client.
+	 * @param clientUUID The UUID of the client the message is directed to.
+	 */
 	public ClientUpdate(UUID clientUUID){
 		this.clientUUID = clientUUID;
 		GamesHandler gamesHandler = GamesHandler.getInstance();
@@ -39,12 +46,18 @@ public class ClientUpdate implements Serializable {
 		).collect(Collectors.toList());
 	}
 
+	/**
+	 * A ClientUpdate is the type of message the server sends to the client. It sends the client all the information about
+	 * the client is currently in (which may be null), and also the information about available games, in lobby phase.
+	 * Based on the client the server needs to update, this class will automatically build the correct message for the
+	 * client.
+	 * @param clientUUID The client the message is directed to.
+	 * @param error The error to display on the client.
+	 */
 	public ClientUpdate(UUID clientUUID, String error){
 		this(clientUUID);
 		this.error = error;
 	}
-
-
 
 	public UUID getClientUUID() {
 		return clientUUID;
