@@ -8,7 +8,6 @@ import src.main.java.it.polimi.ingsw.network.IServer;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class SocketClient implements IClient {
@@ -16,12 +15,25 @@ public class SocketClient implements IClient {
 	final IServer server;
 	final GameClient gameClient;
 
+	/**
+	 * Creates a Socket Client, which will accept messages from the server and parse them. Will then forward these
+	 * parsed messages to the GameClient.
+	 * @param input The input stream, from where the server will communicate.
+	 * @param output The output stream, used to create the ServerSocketHandler.
+	 * @param gameClient The game client.
+	 */
 	public SocketClient(BufferedReader input, BufferedWriter output, GameClient gameClient) {
 		this.input = input;
-		this.server = new ServerSocketAdapter(output);
+		this.server = new ServerSocketHandler(output);
 		this.gameClient = gameClient;
 	}
 
+
+	/**
+	 * Blocking function that constantly reads input from the server, if present, and then parses it and forwards
+	 * it to the GameClient.
+	 * @throws IOException error deserializing messages.
+	 */
 	public void runVirtualServer() throws IOException {
 		String line;
 		while ((line = input.readLine()) != null) {
