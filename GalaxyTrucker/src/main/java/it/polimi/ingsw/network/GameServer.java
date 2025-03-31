@@ -1,15 +1,11 @@
 package src.main.java.it.polimi.ingsw.network;
 
-import src.main.java.it.polimi.ingsw.GamesHandler;
-import src.main.java.it.polimi.ingsw.network.rmi.RmiClient;
 import src.main.java.it.polimi.ingsw.network.rmi.RmiServer;
-import src.main.java.it.polimi.ingsw.network.socket.ClientSocketToRMIAdapter;
 import src.main.java.it.polimi.ingsw.network.socket.SocketServer;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
