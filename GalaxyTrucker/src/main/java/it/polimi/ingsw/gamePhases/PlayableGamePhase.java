@@ -3,8 +3,10 @@ package src.main.java.it.polimi.ingsw.gamePhases;
 import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
 import src.main.java.it.polimi.ingsw.enums.GameState;
 import src.main.java.it.polimi.ingsw.game.GameData;
+import src.main.java.it.polimi.ingsw.network.exceptions.CantFindClientException;
 import src.main.java.it.polimi.ingsw.timer.TimerBehavior;
 
+import java.rmi.RemoteException;
 import java.util.UUID;
 
 /**
@@ -49,5 +51,5 @@ public abstract class PlayableGamePhase implements TimerBehavior {
      * Defines the main gameplay loop for this phase.
      * To be implemented by subclasses.
      */
-    public abstract void playLoop();
+    public abstract void playLoop() throws RemoteException, CantFindClientException;
 }
