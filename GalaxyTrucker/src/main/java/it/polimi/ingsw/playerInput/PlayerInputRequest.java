@@ -64,7 +64,7 @@ public abstract class PlayerInputRequest {
 	 * Calling this function will check for the result of the input request. If the request is fulfilled, the
 	 * turn will end and move to the next. If not fulfilled, it will keep waiting.
 	 */
-	public abstract void checkForResult();
+	public abstract void endTurn();
 
 	/**
 	 * This is used both for the client and the controller to understand what type of action to allow to the player.

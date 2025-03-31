@@ -38,7 +38,7 @@ public class PlayerAddLoadableRequest extends PlayerInputRequest {
 	}
 
 	@Override
-	public void checkForResult() {
+	public void endTurn() {
 		synchronized (lock){
 			lock.notifyAll();
 		}

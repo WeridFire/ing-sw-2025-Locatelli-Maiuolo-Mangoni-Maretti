@@ -41,7 +41,7 @@ public class PlayerActivateTilesRequest extends PlayerInputRequest {
 	}
 
 	@Override
-	public void checkForResult() {
+	public void endTurn() {
 		//This function gets called by the player when they're done activating stuff.
 		lock.notifyAll();
 	}
@@ -68,6 +68,7 @@ public class PlayerActivateTilesRequest extends PlayerInputRequest {
 		} else {
 			throw new NotEnoughItemsException("Attempt to activate more tiles than batteries available");
 		}
+		endTurn();
 	}
 
 	public Set<Coordinates> getActivatedTiles() {

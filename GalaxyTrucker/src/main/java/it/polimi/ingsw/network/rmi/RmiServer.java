@@ -150,7 +150,7 @@ public class RmiServer implements IServer {
 			targetContainer.loadItems(loadable, 1);
 			if(player.getShipBoard().getFloatingLoadables().isEmpty()){
 				//We auto end the turn in case all the items were allocated.
-				game.getGameData().getCurrentPlayerTurn().checkForResult();;
+				game.getGameData().getCurrentPlayerTurn().endTurn();;
 			}
 			client.updateClient(new ClientUpdate(connectionUUID));
 		} catch (TooMuchLoadException e) {
@@ -173,7 +173,7 @@ public class RmiServer implements IServer {
 			//TODO: it is not the player's turn.
 			return;
 		}
-		game.getGameData().getCurrentPlayerTurn().checkForResult();
+		game.getGameData().getCurrentPlayerTurn().endTurn();
 		client.updateClient(new ClientUpdate(connectionUUID));
 	}
 
