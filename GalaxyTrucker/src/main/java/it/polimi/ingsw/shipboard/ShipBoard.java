@@ -214,30 +214,7 @@ public class ShipBoard {
 		activatedTiles.clear();
 	}
 
-	/**
-	 * Calculates the number of available battery units that are not currently used for tile activation.
-	 *
-	 * @return the number of available batteries
-	 */
-	private int getAvailableBatteriesAmount() {
-		return (getVisitorCalculateCargoInfo()
-				.getInfoAllContainers()
-				.count(LoadableType.BATTERY) - getActivatedTiles().size());
-	}
 
-	/**
-	 * Activates a set of tiles if there are enough available batteries to power them.
-	 *
-	 * @param coordinates a set of tile coordinates to activate
-	 * @throws NotEnoughItemsException if there are not enough available batteries to activate the tiles
-	 */
-	public void activateTiles(Set<Coordinates> coordinates) throws NotEnoughItemsException {
-		if (getAvailableBatteriesAmount() >= coordinates.size()) {
-			activatedTiles.addAll(coordinates);
-		} else {
-			throw new NotEnoughItemsException("Attempt to activate more tiles than batteries available");
-		}
-	}
 
 	public List<LoadableType> getFloatingLoadables() {
 		return floatingLoadables;

@@ -10,6 +10,9 @@ import src.main.java.it.polimi.ingsw.network.IClient;
 import src.main.java.it.polimi.ingsw.network.IServer;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.playerInput.PlayerTurnType;
+import src.main.java.it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
+import src.main.java.it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
+import src.main.java.it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.ContainerTile;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
@@ -94,30 +97,20 @@ public class RmiServer implements IServer {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
 		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
+		//Check that we have a reference to the game & player
 		if(player == null || game == null) {
 			client.updateClient(new ClientUpdate(connectionUUID, "You are not in a game."));
 			return;
 		}
-
-		if(!game.getGameData().getCurrentPlayerTurn().getCurrentPlayer().equals(player)){
-			client.updateClient(new ClientUpdate(connectionUUID, "It's not your turn."));
-			return;
-		}
-		if(game.getGameData().getCurrentPlayerTurn().getPlayerTurnType() != PlayerTurnType.ACTIVATE_TILE){
-			client.updateClient(new ClientUpdate(connectionUUID, "This action is not supported in this turn."));
-			return;
-		}
-		if(!game.getGameData().getCurrentPlayerTurn().getHighlightMask().containsAll(tilesToActivate)){
-			client.updateClient(new ClientUpdate(connectionUUID, "This tile is not activable in this turn."));
-			return;
-		}
+		//Actually try to perform the action
 		try {
-			player.getShipBoard().activateTiles(tilesToActivate);
-			game.getGameData().getCurrentPlayerTurn().checkForResult();
+			game.getGameData().getCurrentPlayerTurn().activateTiles(player, tilesToActivate);
 			client.updateClient(new ClientUpdate(connectionUUID));
-		} catch (NotEnoughItemsException e) {
+		} catch (WrongPlayerTurnException | InputNotSupportedException | NotEnoughItemsException |
+				 TileNotAvailableException e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
+
 
 	}
 
