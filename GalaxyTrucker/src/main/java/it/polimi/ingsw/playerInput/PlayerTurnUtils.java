@@ -38,10 +38,10 @@ public class PlayerTurnUtils {
 			// TODO: throw error invalid power type -> shield or none (remove none?)
 			return 0f;
 		}
-
+		PlayerActivateTilesRequest inputRequest = new PlayerActivateTilesRequest(player, 30, powerType);
 		// phase 1: ask activation
-		game.setCurrentPlayerTurn(new PlayerActivateTilesRequest(player, 30, powerType));
-		PlayerActivateTilesRequest inputRequest = (PlayerActivateTilesRequest) game.getCurrentPlayerTurn();
+		game.setCurrentPlayerTurn(inputRequest);
+
         try {
             game.getCurrentPlayerTurn().run();
         } catch (InterruptedException e) {
@@ -89,8 +89,8 @@ public class PlayerTurnUtils {
 	 */
 	public static List<Boolean> runPlayerShieldsActivationInteraction(Player player, GameData game) {
 		// phase 1: ask activation
-		game.setCurrentPlayerTurn(new PlayerActivateTilesRequest(player, 30, PowerType.SHIELD));
-		PlayerActivateTilesRequest inputRequest = (PlayerActivateTilesRequest) game.getCurrentPlayerTurn();
+		PlayerActivateTilesRequest inputRequest  = new PlayerActivateTilesRequest(player, 30, PowerType.SHIELD);
+		game.setCurrentPlayerTurn(inputRequest);
 		try {
 			game.getCurrentPlayerTurn().run();
 		} catch (InterruptedException e) {
