@@ -34,7 +34,7 @@ public class SocketServer {
 			InputStreamReader socketRx = new InputStreamReader(clientSocket.getInputStream());
 			OutputStreamWriter socketTx = new OutputStreamWriter(clientSocket.getOutputStream());
 
-			ClientSocketToRMIAdapter handler = new ClientSocketToRMIAdapter(
+			ClientSocketHandler handler = new ClientSocketHandler(
 																	new BufferedReader(socketRx),
 																	new PrintWriter(socketTx));
 			UUID connectionUUID = GameServer.getInstance().registerClient(handler);
