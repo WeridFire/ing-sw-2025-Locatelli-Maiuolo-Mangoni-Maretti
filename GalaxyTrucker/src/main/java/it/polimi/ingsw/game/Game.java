@@ -11,6 +11,7 @@ import src.main.java.it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTyp
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.timer.Timer;
 
+import java.rmi.RemoteException;
 import java.util.UUID;
 
 /**
@@ -86,7 +87,13 @@ public class Game {
 
         //nota sta nel playloop di una phase cambiare il suo stato in "ENDED"
         AssembleGamePhase a = new AssembleGamePhase(id, GamePhaseType.ASSEMBLE, gameData);
-        Thread thread = new Thread(a::playLoop);
+        Thread thread = new Thread(() -> {
+            try {
+                a.playLoop();
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        });
         thread.start();
 
         // ASSEMBLE phase
