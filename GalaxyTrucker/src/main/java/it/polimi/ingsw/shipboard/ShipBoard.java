@@ -16,8 +16,6 @@ public class ShipBoard {
 
 	private final GameLevel level;
 	private final Map<Coordinates, TileSkeleton<SideType>> board;
-	private final Set<Coordinates> activatedTiles = new HashSet<>();
-	private final List<LoadableType> floatingLoadables = new ArrayList<>();
 
 	private VisitorCalculateCargoInfo visitorCalculateCargoInfo;
 	private VisitorCalculatePowers visitorCalculatePowers;
@@ -198,25 +196,4 @@ public class ShipBoard {
 		smugglers.removeMostValuableItems(quantityToRemove);
 	}
 
-	/**
-	 * Retrieves the set of currently activated tiles.
-	 *
-	 * @return a set of {@link Coordinates} representing activated tiles
-	 */
-	public Set<Coordinates> getActivatedTiles() {
-		return activatedTiles;
-	}
-
-	/**
-	 * Clears the set of activated tiles, resetting their state.
-	 */
-	public void resetActivatedTiles() {
-		activatedTiles.clear();
-	}
-
-
-
-	public List<LoadableType> getFloatingLoadables() {
-		return floatingLoadables;
-	}
 }
