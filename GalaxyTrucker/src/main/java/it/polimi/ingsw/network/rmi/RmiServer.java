@@ -21,6 +21,8 @@ import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoada
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
 import java.rmi.RemoteException;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -115,48 +117,21 @@ public class RmiServer implements IServer {
 	}
 
 	@Override
-	public void allocateLoadable(IClient client, LoadableType loadable, Coordinates location) throws RemoteException {
+	public void allocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
 		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
 		if(player == null || game == null){
-			//TODO: player or game not found.
-			return;
-		}
-		if(!game.getGameData().getCurrentPlayerTurn().getCurrentPlayer().equals(player)){
-			//TODO: it is not the player's turn.
-			return;
-		}
-		if(game.getGameData().getCurrentPlayerTurn().getPlayerTurnType() != PlayerTurnType.ADD_CARGO){
-			//TODO: The turn does not expect this type of action.
-			return;
-		}
-		if(!game.getGameData().getCurrentPlayerTurn().getHighlightMask().contains(location)){
-			//TODO: The target coordinate can not hold this type of cargo.
+			client.updateClient(new ClientUpdate(connectionUUID, "You are not in a game."));
 			return;
 		}
 
-		if(!player.getShipBoard().getFloatingLoadables().contains(loadable)){
-			//TODO: This cargo is not available for allocation.
-			return;
-		}
-		player.getShipBoard().getFloatingLoadables().remove(loadable);
-		ContainerTile targetContainer = player.getShipBoard()
-												.getVisitorCalculateCargoInfo()
-												.getInfoAllContainers()
-												.getLocations()
-												.get(location);
 		try {
-			targetContainer.loadItems(loadable, 1);
-			if(player.getShipBoard().getFloatingLoadables().isEmpty()){
-				//We auto end the turn in case all the items were allocated.
-				game.getGameData().getCurrentPlayerTurn().endTurn();;
-			}
+			game.getGameData().getCurrentPlayerTurn().addLoadables(player, cargoToAdd);
 			client.updateClient(new ClientUpdate(connectionUUID));
-		} catch (TooMuchLoadException e) {
-			//TODO: notify that the container is full and therefore can't handle it.
-		} catch (UnsupportedLoadableItemException e) {
-			//TODO: notify that the type is not supported.
+		} catch (InputNotSupportedException | WrongPlayerTurnException | TileNotAvailableException |
+				 NotEnoughItemsException | UnsupportedLoadableItemException | TooMuchLoadException e) {
+			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
 	}
 

@@ -19,6 +19,6 @@ public interface IServer extends Remote {
 	void drawComponent(IClient client) throws RemoteException;
 	void ping(IClient client) throws RemoteException;
 	void activateTiles(IClient client, Set<Coordinates> tilesToActivate) throws RemoteException;
-	void allocateLoadable(IClient client, LoadableType loadable, Coordinates location) throws RemoteException;
+	void allocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException;
 	void forceEndTurn(IClient client) throws RemoteException;
 }

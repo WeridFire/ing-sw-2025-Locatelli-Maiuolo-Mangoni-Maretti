@@ -9,9 +9,7 @@ import src.main.java.it.polimi.ingsw.util.Coordinates;
 import java.io.BufferedWriter;
 import java.io.PrintWriter;
 import java.rmi.RemoteException;
-import java.util.Base64;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class ServerSocketHandler implements IServer {
 	final PrintWriter output;
@@ -78,9 +76,10 @@ public class ServerSocketHandler implements IServer {
 	}
 
 	@Override
-	public void allocateLoadable(IClient client, LoadableType loadable, Coordinates location) {
+	public void allocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException {
 
 	}
+
 
 	@Override
 	public void forceEndTurn(IClient client) {
