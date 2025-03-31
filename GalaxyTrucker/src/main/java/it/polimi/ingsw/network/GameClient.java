@@ -21,6 +21,16 @@ public class GameClient implements IClient{
 	private SocketClient socketClient = null;
 	private final ClientCLIView cliView;
 
+	/**
+	 * The main game client. Based on the selected options, this client will instance a connection using either RMI or
+	 * soket protocol, onto the desired host & port. This gameClient will also handle all the method calls from the
+	 * server on the client (basically just the updates).
+	 * @param useRMI If to use RMI (false will use socket)
+	 * @param host The host IP address
+	 * @param port The port on the host
+	 * @throws IOException
+	 * @throws NotBoundException The RMI server is not present
+	 */
 	public GameClient(boolean useRMI, String host, Integer port) throws IOException, NotBoundException {
 		this.useRMI = useRMI;
 		if(useRMI){
@@ -44,6 +54,9 @@ public class GameClient implements IClient{
 		this.cliView = new ClientCLIView(null);
 	}
 
+	/**
+	 * @return The low-level client the Game is currently using, either RMI or Socket.
+	 */
 	public IClient getClient(){
 		if(useRMI){
 			return rmiClient;
@@ -52,6 +65,11 @@ public class GameClient implements IClient{
 		}
 	}
 
+	/**
+	 * Runs the CLI on the client, allowing player to input commands to send to the server. These commands will be
+	 * executed automatically on the desired client.
+	 * @throws RemoteException
+	 */
 	private void runCli() throws RemoteException {
 		Scanner scan = new Scanner(System.in);
 		while (true) {
