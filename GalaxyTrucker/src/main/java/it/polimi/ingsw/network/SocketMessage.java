@@ -3,6 +3,7 @@ package src.main.java.it.polimi.ingsw.network;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.UUID;
 
 public class SocketMessage implements Serializable{
 	// Enum to define message types
@@ -16,13 +17,25 @@ public class SocketMessage implements Serializable{
 	private MessageType type;
 	private List<Object> args;
 
-	// Constructor
-	public SocketMessage(MessageType type, List<Object> args) {
+	/**
+	 * SocketMessage is the type of message sent by client to server via SOCKET. It represents a command the player
+	 * is trying to execute on the remote server. It holds information about the command to call, and the parameters
+	 * to pass into the command.
+	 * @param type The type of command to execute
+	 * @param args The arguments, in a list.
+	 */
+	private SocketMessage(MessageType type, List<Object> args) {
 		this.type = type;
 		this.args = args;
 	}
 
-	public SocketMessage(MessageType type) {
+	/**
+	 * SocketMessage is the type of message sent by client to server via SOCKET. It represents a command the player
+	 * is trying to execute on the remote server. It holds information about the command to call, and the parameters
+	 * to pass into the command.
+	 * @param type The type of command to execute
+	 */
+	private SocketMessage(MessageType type) {
 		this.type = type;
 		this.args = null;
 	}
@@ -68,10 +81,32 @@ public class SocketMessage implements Serializable{
 	}
 
 
-	/*
+	/**
+	 * Creates a socket message to tell the server to create a game and join it, using the specified username.
+	 * @param username The username to use
+	 * @return The socket message containing the desired information.
+	 */
 	public static SocketMessage createGameMessage(String username){
 		return new SocketMessage(MessageType.CREATE_GAME, List.of(username));
 	}
 
+	/**
+	 * Creates a socket message to tell the server to join a game identified by ID using a specified username
+	 * @param username The username to use
+	 * @param gameId The game ID to join
+	 * @return The socket message containing the desired information.
 	 */
+	public static SocketMessage joinGameMessage(UUID gameId, String username){
+		return new SocketMessage(MessageType.JOIN_GAME, List.of(username, gameId));
+	}
+
+	/**
+	 * Creates a socket message to ping the server.
+	 * @return The socket message containing the desired information.
+	 */
+	public static SocketMessage pingMessage(){
+		return new SocketMessage(MessageType.PING);
+	}
+
+
 }

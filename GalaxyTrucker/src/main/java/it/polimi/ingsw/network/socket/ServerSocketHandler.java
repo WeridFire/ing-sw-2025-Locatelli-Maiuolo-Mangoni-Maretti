@@ -1,6 +1,5 @@
 package src.main.java.it.polimi.ingsw.network.socket;
 
-import src.main.java.it.polimi.ingsw.game.Game;
 import src.main.java.it.polimi.ingsw.network.IClient;
 import src.main.java.it.polimi.ingsw.network.IServer;
 import src.main.java.it.polimi.ingsw.network.SocketMessage;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class ServerSocketAdapter implements IServer {
+public class ServerSocketHandler implements IServer {
 	final PrintWriter output;
 
 	/**
@@ -24,7 +23,7 @@ public class ServerSocketAdapter implements IServer {
 	 * cause a status update for the whole client.
 	 * @param output the output buffer to write messages to.
 	 */
-	public ServerSocketAdapter(BufferedWriter output) {
+	public ServerSocketHandler(BufferedWriter output) {
 		this.output = new PrintWriter(output);
 	}
 
@@ -48,14 +47,13 @@ public class ServerSocketAdapter implements IServer {
 
 	@Override
 	public void createGame(IClient client, String username) throws RemoteException {
-		//SocketMessage m1 = SocketMessage.createGameMessage(username);
-		SocketMessage mess = new SocketMessage(SocketMessage.MessageType.CREATE_GAME, List.of(username));
+		SocketMessage mess = SocketMessage.createGameMessage(username);
 		sendSocketMessage(mess);
 	}
 
 	@Override
 	public void joinGame(IClient client, UUID gameId, String username) {
-		SocketMessage mess = new SocketMessage(SocketMessage.MessageType.JOIN_GAME, List.of(gameId, username));
+		SocketMessage mess = SocketMessage.joinGameMessage(gameId, username);
 		sendSocketMessage(mess);
 	}
 
@@ -71,7 +69,7 @@ public class ServerSocketAdapter implements IServer {
 
 	@Override
 	public void ping(IClient client) {
-		SocketMessage mess = new SocketMessage(SocketMessage.MessageType.PING);
+		SocketMessage mess = SocketMessage.pingMessage();
 		sendSocketMessage(mess);
 	}
 
