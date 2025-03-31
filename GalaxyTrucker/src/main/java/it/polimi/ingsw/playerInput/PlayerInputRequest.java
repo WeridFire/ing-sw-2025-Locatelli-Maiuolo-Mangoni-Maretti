@@ -6,6 +6,7 @@ import src.main.java.it.polimi.ingsw.playerInput.exceptions.TileNotAvailableExce
 import src.main.java.it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
@@ -88,17 +89,15 @@ public abstract class PlayerInputRequest {
 		}
 	}
 
-	/**
-	 * Activates a set of tiles if there are enough available batteries to power them.
-	 *
-	 * @param coordinates a set of tile coordinates to activate
-	 * @throws NotEnoughItemsException if there are not enough available batteries to activate the tiles
-	 */
 	public void activateTiles(Player player, Set<Coordinates> coordinates) throws WrongPlayerTurnException, InputNotSupportedException, NotEnoughItemsException, TileNotAvailableException {
 		throw new InputNotSupportedException(playerTurnType);
 	}
 
 	public void removeLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToRemove) throws InputNotSupportedException, WrongPlayerTurnException, TileNotAvailableException, NotEnoughItemsException, UnsupportedLoadableItemException {
+		throw new InputNotSupportedException(playerTurnType);
+	}
+
+	public void addLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToAdd) throws InputNotSupportedException, WrongPlayerTurnException, TileNotAvailableException, NotEnoughItemsException, UnsupportedLoadableItemException, TooMuchLoadException {
 		throw new InputNotSupportedException(playerTurnType);
 	}
 
