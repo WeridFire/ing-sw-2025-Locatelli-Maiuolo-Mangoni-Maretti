@@ -1,8 +1,16 @@
 package src.main.java.it.polimi.ingsw.playerInput;
 
 import src.main.java.it.polimi.ingsw.player.Player;
+import src.main.java.it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
+import src.main.java.it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
+import src.main.java.it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
+import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
+import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public abstract class PlayerInputRequest {
@@ -69,4 +77,27 @@ public abstract class PlayerInputRequest {
 	public PlayerTurnType getPlayerTurnType() {
 		return playerTurnType;
 	}
+
+	protected void checkForTileMask(Coordinates coordinate) throws TileNotAvailableException {
+		if(!getHighlightMask().contains(coordinate)){
+			throw new TileNotAvailableException(coordinate, playerTurnType);
+		}
+	}
+
+	protected void checkForTurn(Player player) throws WrongPlayerTurnException {
+		if(player != currentPlayer){
+			throw new WrongPlayerTurnException(currentPlayer, player, playerTurnType);
+		}
+	}
+
+	/**
+	 * Activates a set of tiles if there are enough available batteries to power them.
+	 *
+	 * @param coordinates a set of tile coordinates to activate
+	 * @throws NotEnoughItemsException if there are not enough available batteries to activate the tiles
+	 */
+	public void activateTiles(Player player, Set<Coordinates> coordinates) throws WrongPlayerTurnException, InputNotSupportedException, NotEnoughItemsException, TileNotAvailableException {
+		throw new InputNotSupportedException(playerTurnType);
+	}
+
 }
