@@ -1,5 +1,6 @@
 package src.main.java.it.polimi.ingsw.network;
 
+import src.main.java.it.polimi.ingsw.GamesHandler;
 import src.main.java.it.polimi.ingsw.game.Game;
 import src.main.java.it.polimi.ingsw.network.exceptions.CantFindClientException;
 import src.main.java.it.polimi.ingsw.network.messages.ClientUpdate;
@@ -115,6 +116,10 @@ public class GameServer{
 			}
 			client.updateClient(new ClientUpdate(player.getConnectionUUID()));
 		}
+	}
+
+	public void broadcastUpdate(UUID gameId) throws RemoteException, CantFindClientException {
+		broadcastUpdate(GamesHandler.getInstance().getGame(gameId));
 	}
 
 
