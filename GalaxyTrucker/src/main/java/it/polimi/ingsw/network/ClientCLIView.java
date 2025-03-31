@@ -4,6 +4,12 @@ public class ClientCLIView {
 
 	private ClientUpdate lastUpdate;
 
+	/**
+	 * Class used to print the current game based on the last update present on the client. Each time the client
+	 * recevies a new game update, this class will print it accordingly to how the game is. For example if the
+	 * game phase is in lobby phase, it will just print information about the lobby.
+	 * @param newUpdate
+	 */
 	public ClientCLIView(ClientUpdate newUpdate){
 		if(newUpdate == null){
 			return;
@@ -11,6 +17,10 @@ public class ClientCLIView {
 		this.lastUpdate = newUpdate;
 	}
 
+	/**
+	 * Updates the last information present on a client, and immediately prints it to screen.
+	 * @param newUpdate The new update
+	 */
 	public void setLastUpdate(ClientUpdate newUpdate){
 		System.out.println("Received new client update.");
 		if(newUpdate == null){
@@ -23,6 +33,7 @@ public class ClientCLIView {
 		}
 		displayError();
 	}
+
 
 	private void displayGamesList(){
 		System.out.println("- AVAILABLE GAMES -");
