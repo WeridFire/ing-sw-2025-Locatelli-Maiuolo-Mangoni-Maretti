@@ -1,7 +1,6 @@
 package src.main.java.it.polimi.ingsw.playerInput;
 
 import src.main.java.it.polimi.ingsw.player.Player;
-import src.main.java.it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import src.main.java.it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import src.main.java.it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
@@ -10,6 +9,7 @@ import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsEx
 import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import src.main.java.it.polimi.ingsw.util.Coordinates;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,7 +62,7 @@ public class PlayerRemoveLoadableRequest extends PlayerInputRequest {
 	}
 
 	@Override
-	public void checkForResult() {
+	public void endTurn() {
 		synchronized (lock){
 			if(getCargoAmount() <= targetAmount){
 				lock.notifyAll();
@@ -87,6 +87,9 @@ public class PlayerRemoveLoadableRequest extends PlayerInputRequest {
 			checkForTileMask(c);
 		}
 		for(Map.Entry<Coordinates, List<LoadableType>> entry : cargoToRemove.entrySet()){
+			if(!allowedCargo.containsAll(entry.getValue())){
+				throw new UnsupportedLoadableItemException(new HashSet<>(entry.getValue()), allowedCargo);
+			}
 			ContainerTile containerTile = currentPlayer.getShipBoard()
 											.getVisitorCalculateCargoInfo()
 											.getInfoAllContainers()
@@ -100,9 +103,13 @@ public class PlayerRemoveLoadableRequest extends PlayerInputRequest {
 				containerTile.removeItems(loadable, 1);
 			}
 		}
+		endTurn();
 	}
 
-
+	/**
+	 * Returns the amount of loadable items to remove from the shipboard.
+	 * @return The amount of loadable items to remove from the shipboard.
+	 */
 	public int getAmountToRemove() {
 		return amountToRemove;
 	}
