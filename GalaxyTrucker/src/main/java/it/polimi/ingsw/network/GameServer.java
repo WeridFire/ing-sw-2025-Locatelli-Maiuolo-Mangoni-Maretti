@@ -1,11 +1,16 @@
 package src.main.java.it.polimi.ingsw.network;
 
+import src.main.java.it.polimi.ingsw.game.Game;
+import src.main.java.it.polimi.ingsw.network.exceptions.CantFindClientException;
+import src.main.java.it.polimi.ingsw.network.messages.ClientUpdate;
 import src.main.java.it.polimi.ingsw.network.rmi.RmiServer;
 import src.main.java.it.polimi.ingsw.network.socket.SocketServer;
+import src.main.java.it.polimi.ingsw.player.Player;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -102,7 +107,15 @@ public class GameServer{
 		getInstance();
 	}
 
-
+	public void broadcastUpdate(Game game) throws RemoteException, CantFindClientException {
+		for (Player player: game.getGameData().getPlayers()){
+			IClient client = clients.get(player.getConnectionUUID());
+			if (client == null){
+				throw new CantFindClientException();
+			}
+			client.updateClient(new ClientUpdate(player.getConnectionUUID()));
+		}
+	}
 
 
 }
