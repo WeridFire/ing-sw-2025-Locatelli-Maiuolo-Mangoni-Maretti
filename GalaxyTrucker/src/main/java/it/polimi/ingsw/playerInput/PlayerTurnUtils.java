@@ -41,6 +41,7 @@ public class PlayerTurnUtils {
 
 		// phase 1: ask activation
 		game.setCurrentPlayerTurn(new PlayerActivateTilesRequest(player, 30, powerType));
+		PlayerActivateTilesRequest inputRequest = (PlayerActivateTilesRequest) game.getCurrentPlayerTurn();
         try {
             game.getCurrentPlayerTurn().run();
         } catch (InterruptedException e) {
@@ -48,7 +49,7 @@ public class PlayerTurnUtils {
         }
 
         // phase 2: ask batteries removal for desired activation
-		Set<Coordinates> activatedTiles = player.getShipBoard().getActivatedTiles();
+		Set<Coordinates> activatedTiles = inputRequest.getActivatedTiles();
 		int batteriesToRemove = activatedTiles.size();
 		if(batteriesToRemove > 0){
 			game.setCurrentPlayerTurn(
@@ -69,7 +70,6 @@ public class PlayerTurnUtils {
 		float totalFirePower = powerInfo.getBasePower() + activatedPower;
 		totalFirePower += powerInfo.getBonus(totalFirePower);
 		// reset activated tile
-		player.getShipBoard().resetActivatedTiles();
 		return totalFirePower;
 	}
 
@@ -90,15 +90,15 @@ public class PlayerTurnUtils {
 	public static List<Boolean> runPlayerShieldsActivationInteraction(Player player, GameData game) {
 		// phase 1: ask activation
 		game.setCurrentPlayerTurn(new PlayerActivateTilesRequest(player, 30, PowerType.SHIELD));
+		PlayerActivateTilesRequest inputRequest = (PlayerActivateTilesRequest) game.getCurrentPlayerTurn();
 		try {
 			game.getCurrentPlayerTurn().run();
 		} catch (InterruptedException e) {
 			// TODO: manage InterruptedException
 		}
 
-		// phase 2: ask batteries removal for desired activation
-		Set<Coordinates> activatedTiles = player.getShipBoard().getActivatedTiles();
-		int batteriesToRemove = activatedTiles.size();
+
+		int batteriesToRemove = inputRequest.getActivatedTiles().size();
 		if(batteriesToRemove > 0){
 			game.setCurrentPlayerTurn(
 					new PlayerRemoveLoadableRequest(player, 30, Set.of(LoadableType.BATTERY), batteriesToRemove)
@@ -111,15 +111,13 @@ public class PlayerTurnUtils {
 		}
 
 		VisitorCalculateShieldedSides visitor = new VisitorCalculateShieldedSides();
-		for(Coordinates c : activatedTiles){
+		for(Coordinates c : inputRequest.getActivatedTiles()){
 			try {
 				player.getShipBoard().getTile(c).accept(visitor);
 			} catch (OutOfBuildingAreaException | NoTileFoundException e) {
 				e.printStackTrace();
 			}
 		}
-
-		player.getShipBoard().resetActivatedTiles();
 		return List.of(visitor.getProtectedSides());
 	}
 
