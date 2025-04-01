@@ -101,6 +101,10 @@ public abstract class PlayerInputRequest {
 		throw new InputNotSupportedException(playerTurnType);
 	}
 
+	public void makeChoice(Player player, boolean choice) throws InputNotSupportedException, WrongPlayerTurnException {
+		throw new InputNotSupportedException(playerTurnType);
+	}
+
 
 
 }
