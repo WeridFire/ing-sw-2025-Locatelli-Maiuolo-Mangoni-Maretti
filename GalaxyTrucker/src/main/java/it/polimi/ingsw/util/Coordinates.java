@@ -58,6 +58,20 @@ public class Coordinates implements Serializable {
     }
 
     /**
+     * @return the coordinate row
+     */
+    public int getRow() {
+        return row;
+    }
+
+    /**
+     * @return the coordinate column
+     */
+    public int getColumn() {
+        return column;
+    }
+
+    /**
      * Computes and returns the adjacent coordinate in the specified direction.
      * <p>
      * If the direction is:
