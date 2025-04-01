@@ -19,9 +19,6 @@ public class PlayerActivateTilesRequest extends PlayerInputRequest {
 
 	public PlayerActivateTilesRequest(Player currentPlayer, int cooldown, PowerType powerType) {
 		super(currentPlayer, cooldown, PlayerTurnType.ACTIVATE_TILE);
-		if(powerType == PowerType.NONE){
-			throw new RuntimeException("Can not create an activate request with power type NONE.");
-		}
 		this.powerType = powerType;
 	}
 
