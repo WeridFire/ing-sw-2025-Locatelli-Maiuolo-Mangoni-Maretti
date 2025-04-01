@@ -65,6 +65,12 @@ public class PIRHandler {
 		return removeLoadables;
 	}
 
+	/**
+	 * This function sets and run the turn itself. After a turn is set, it will automatically run. Once the turn has
+	 * finished running (either happening due to timeout or player taking action) it will reset the handler and remove
+	 * the previous turn, whatever it is. Also it will delete the generic reference pointer
+	 * @param genericPIR The PIR to run and wait for it to finish.
+	 */
 	private void setGenericReference(PIR genericPIR){
 		this.genericReference = genericPIR;
 		try {
@@ -111,6 +117,10 @@ public class PIRHandler {
 		setGenericReference(removeLoadables);
 	}
 
+	/**
+	 *
+	 * @return the player the current turn is dedicated to.
+	 */
 	public Player getCurrentPlayer() {
 		if(!isAnyTurnActive()){
 			return null;
@@ -118,6 +128,10 @@ public class PIRHandler {
 		return genericReference.getCurrentPlayer();
 	}
 
+	/**
+	 *
+	 * @return The type of the current turn.
+	 */
 	public PIRType getType() {
 		//basically nullcheck generic reference
 		if(!isAnyTurnActive()){
@@ -127,6 +141,12 @@ public class PIRHandler {
 	}
 
 
+	/**
+	 * This function will force end a turn. It can be called by any player, but it will check ofcourse that the
+	 * caller is the one the turn is dedicated to. If that is the case the function will force the turn to end.
+	 * @param player The player sending the command to end the turn.
+	 * @throws WrongPlayerTurnException If the player is not who the turn is for.
+	 */
 	public void endTurn(Player player) throws WrongPlayerTurnException {
 		if(!isAnyTurnActive()) {
 			return;
@@ -140,6 +160,5 @@ public class PIRHandler {
 		and the caller of genericReference.run() resumes. This happens in this class PIRHandler#setGenericReference.
 		As you can see in there the nullification of the reference is already handled.
 		 */
-
 	}
 }
