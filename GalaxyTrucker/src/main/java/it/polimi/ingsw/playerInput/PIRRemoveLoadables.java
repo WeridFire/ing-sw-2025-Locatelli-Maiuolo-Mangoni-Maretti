@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class PlayerRemoveLoadableRequest extends PlayerInputRequest {
+public class PIRRemoveLoadables extends PIR {
 
 	private int targetAmount;
 	private int amountToRemove;
 	private final Set<LoadableType> allowedCargo;
 
-	public PlayerRemoveLoadableRequest(Player currentPlayer, int cooldown, Set<LoadableType> allowedCargo, int amount) {
-		super(currentPlayer, cooldown, PlayerTurnType.REMOVE_CARGO);
+	public PIRRemoveLoadables(Player currentPlayer, int cooldown, Set<LoadableType> allowedCargo, int amount) {
+		super(currentPlayer, cooldown, PIRType.REMOVE_CARGO);
 		this.allowedCargo = allowedCargo;
 
 		this.targetAmount = currentPlayer
@@ -62,7 +62,7 @@ public class PlayerRemoveLoadableRequest extends PlayerInputRequest {
 	}
 
 	@Override
-	public void endTurn() {
+	void endTurn() {
 		synchronized (lock){
 			if(getCargoAmount() <= targetAmount){
 				lock.notifyAll();
@@ -80,7 +80,6 @@ public class PlayerRemoveLoadableRequest extends PlayerInputRequest {
 	 * @throws NotEnoughItemsException The tile requested does not have enough items.
 	 * @throws UnsupportedLoadableItemException The tile requested does not support the requested loadable.
 	 */
-	@Override
 	public void removeLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToRemove) throws WrongPlayerTurnException, TileNotAvailableException, NotEnoughItemsException, UnsupportedLoadableItemException {
 		checkForTurn(player);
 		for(Coordinates c : cargoToRemove.keySet()){

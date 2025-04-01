@@ -2,7 +2,6 @@ package it.polimi.ingsw.playerInput;
 
 import it.polimi.ingsw.enums.PowerType;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.shipboard.LoadableType;
@@ -12,13 +11,13 @@ import it.polimi.ingsw.util.Coordinates;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PlayerActivateTilesRequest extends PlayerInputRequest {
+public class PIRActivateTiles extends PIR {
 
 	private PowerType powerType;
 	private final Set<Coordinates> activatedTiles = new HashSet<>();
 
-	public PlayerActivateTilesRequest(Player currentPlayer, int cooldown, PowerType powerType) {
-		super(currentPlayer, cooldown, PlayerTurnType.ACTIVATE_TILE);
+	public PIRActivateTiles(Player currentPlayer, int cooldown, PowerType powerType) {
+		super(currentPlayer, cooldown, PIRType.ACTIVATE_TILE);
 		this.powerType = powerType;
 	}
 
@@ -38,7 +37,7 @@ public class PlayerActivateTilesRequest extends PlayerInputRequest {
 	}
 
 	@Override
-	public void endTurn() {
+	void endTurn() {
 		//This function gets called by the player when they're done activating stuff.
 		lock.notifyAll();
 	}
@@ -65,7 +64,6 @@ public class PlayerActivateTilesRequest extends PlayerInputRequest {
 	 * @throws NotEnoughItemsException If the player does not have enough batteries to activate the tiles.
 	 * @throws TileNotAvailableException If the tile is not supported for this action in this turn.
 	 */
-	@Override
 	public void activateTiles(Player player, Set<Coordinates> coordinates) throws WrongPlayerTurnException, NotEnoughItemsException, TileNotAvailableException {
 		checkForTurn(player);
 		for(Coordinates c : coordinates){

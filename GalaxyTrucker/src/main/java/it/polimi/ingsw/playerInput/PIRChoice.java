@@ -1,13 +1,12 @@
 package it.polimi.ingsw.playerInput;
 
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.util.Set;
 
-public class PlayerChoiceRequest extends PlayerInputRequest {
+public class PIRChoice extends PIR {
 
 	private boolean choice;
 	private final String choiceMessage;
@@ -21,8 +20,8 @@ public class PlayerChoiceRequest extends PlayerInputRequest {
 	 * @param choiceMessage The message to pass with the choice.
 	 * @param defaultChoice The default choice if the player does not respond on the action
 	 */
-	public PlayerChoiceRequest(Player currentPlayer, int cooldown, String choiceMessage, boolean defaultChoice) {
-		super(currentPlayer, cooldown, PlayerTurnType.CHOICE);
+	public PIRChoice(Player currentPlayer, int cooldown, String choiceMessage, boolean defaultChoice) {
+		super(currentPlayer, cooldown, PIRType.CHOICE);
 		this.choice = defaultChoice;
 		this.choiceMessage = choiceMessage;
 	}
@@ -40,13 +39,12 @@ public class PlayerChoiceRequest extends PlayerInputRequest {
 	}
 
 	@Override
-	public void endTurn() {
+	void endTurn() {
 		synchronized (lock){
 			lock.notifyAll();
 		}
 	}
 
-	@Override
 	public void makeChoice(Player player, boolean choice) throws WrongPlayerTurnException {
 		checkForTurn(player);
 		this.choice = choice;

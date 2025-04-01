@@ -1,22 +1,18 @@
 package it.polimi.ingsw.playerInput;
 
 import it.polimi.ingsw.cards.projectile.Projectile;
-import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.PowerType;
+import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.LoadableType;
-import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
-import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import it.polimi.ingsw.shipboard.visitors.VisitorCalculatePowers;
-import it.polimi.ingsw.shipboard.visitors.VisitorCalculateShieldedSides;
 import it.polimi.ingsw.util.Coordinates;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class PlayerTurnUtils {
+public class PIRUtils {
 
 	/**
 	 * Executes the interaction for activating power-related tiles for a player.
@@ -40,12 +36,12 @@ public class PlayerTurnUtils {
 			// TODO: throw error invalid power type -> shield or none (remove none?)
 			return 0f;
 		}
-		PlayerActivateTilesRequest inputRequest = new PlayerActivateTilesRequest(player, 30, powerType);
+		PIRActivateTiles inputRequest = new PIRActivateTiles(player, 30, powerType);
 		// phase 1: ask activation
-		game.setCurrentPlayerTurn(inputRequest);
+		game.getPIRHandler().setTurn(inputRequest);
 
         try {
-            game.getCurrentPlayerTurn().run();
+            inputRequest.run();
         } catch (InterruptedException e) {
 			// TODO: manage InterruptedException
         }
@@ -54,11 +50,12 @@ public class PlayerTurnUtils {
 		Set<Coordinates> activatedTiles = inputRequest.getActivatedTiles();
 		int batteriesToRemove = activatedTiles.size();
 		if(batteriesToRemove > 0){
-			game.setCurrentPlayerTurn(
-					new PlayerRemoveLoadableRequest(player, 30, Set.of(LoadableType.BATTERY), batteriesToRemove)
+			PIRRemoveLoadables pirRemoveLoadables = new PIRRemoveLoadables(player, 30, Set.of(LoadableType.BATTERY), batteriesToRemove);
+			game.getPIRHandler().setTurn(
+					pirRemoveLoadables
 			);
 			try {
-				game.getCurrentPlayerTurn().run();
+				pirRemoveLoadables.run();
 			} catch (InterruptedException e) {
 				// TODO: manage InterruptedException
 			}
@@ -90,44 +87,83 @@ public class PlayerTurnUtils {
 	 */
 	public static boolean runPlayerProjectileDefendRequest(Player player, Projectile projectile, GameData game) {
 
-		return false;
-		/* TODO adjust
-		if(!projectile.isShieldDefendable() && !projectile.isFireDefendable()){
-			//Player can't defend that side.
+		if(projectile.isShieldDefendable()){
+			if(player.getShipBoard()
+					.getVisitorCalculateCargoInfo()
+					.getBatteriesInfo()
+					.count(LoadableType.BATTERY) == 0){
+				//player doesn't have enough batteries.
+				return false;
+			}
+
+			if(!player.getShipBoard()
+					.getVisitorCalculateShieldedSides()
+					.hasShieldFacing(projectile.getDirection()
+					.getRotated(Rotation.OPPOSITE))){
+				//player doesn't have a shield on that side
+				return false;
+			}
+
+			String message = "You are being hit from direction " + projectile.getDirection().toString() + ". You can defend yourself " +
+					"with a shield. Do you want to activate it?";
+			PIRChoice choiceReq = new PIRChoice(player, 30, message, false);
+			game.getPIRHandler().setTurn(choiceReq);
+			try {
+				choiceReq.run();
+			} catch (InterruptedException e) {
+				//TODO: Manage interruptedException
+				e.printStackTrace();
+			}
+
+			boolean choice = choiceReq.getChoice();
+			if(!choice){
+				return false;
+			}
+			PIRRemoveLoadables pirRemoveLoadables = new PIRRemoveLoadables(player, 30, Set.of(LoadableType.BATTERY), 1);
+			game.getPIRHandler().setTurn(pirRemoveLoadables);
+
+			try {
+				pirRemoveLoadables.run();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				// TODO: manage InterruptedException
+			}
+			return true;
+
+		}else if(projectile.isFireDefendable()){
+			//TODO: check that projectile is defendable by a single cannon, so no request necessary and return true
+			//TODO: check that projectile is defendable by a double cannon, if so proceed with request
+			String message = "You are being hit from direction " + projectile.getDirection().toString() + ". You can defend yourself " +
+					"with a double cannon. Do you want to activate it?";
+			PIRChoice choiceReq = new PIRChoice(player, 30, message, false);
+			game.getPIRHandler().setTurn(choiceReq);
+			try {
+				choiceReq.run();
+			} catch (InterruptedException e) {
+				//TODO: Manage interruptedException
+				e.printStackTrace();
+			}
+
+			boolean choice = choiceReq.getChoice();
+			if(!choice){
+				return false;
+			}
+			PIRRemoveLoadables pirRemoveLoadables = new PIRRemoveLoadables(player, 30, Set.of(LoadableType.BATTERY), 1);
+			game.getPIRHandler().setTurn(
+					pirRemoveLoadables
+			);
+
+			try {
+				pirRemoveLoadables.run();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				// TODO: manage InterruptedException
+			}
+			return true;
+
+		}else{
 			return false;
 		}
-
-
-		if(player.getShipBoard().getVisitorCalculateCargoInfo().getBatteriesInfo().count(LoadableType.BATTERY) == 0){
-			//player doesn't have enough batteries.
-			return false;
-		}
-		String message = "You are being hit from direction " + shieldDirection.toString() + ". You can defend yourself " +
-				"with a shield. Do you want to activate it?";
-		PlayerChoiceRequest choiceReq = new PlayerChoiceRequest(player, 30, message, false);
-		game.setCurrentPlayerTurn(choiceReq);
-		try {
-			choiceReq.run();
-		} catch (InterruptedException e) {
-			//TODO: Manage interruptedException
-			e.printStackTrace();
-		}
-		boolean choice = choiceReq.getChoice();
-		if(!choice){
-			return false;
-		}
-
-		game.setCurrentPlayerTurn(
-				new PlayerRemoveLoadableRequest(player, 30, Set.of(LoadableType.BATTERY), 1)
-		);
-		try {
-			game.getCurrentPlayerTurn().run();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			// TODO: manage InterruptedException
-		}
-		return true;
-		*/
 	}
 
 

@@ -3,13 +3,11 @@ package it.polimi.ingsw.game;
 import it.polimi.ingsw.TilesFactory;
 import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.GamePhaseType;
-import it.polimi.ingsw.enums.GameState;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.AdventureGamePhase;
 import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTypeException;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.timer.Timer;
 
 import java.rmi.RemoteException;
 import java.util.UUID;
@@ -30,17 +28,11 @@ public class Game {
     private GameData gameData;
 
     /**
-     * Timer for managing game-related events.
-     */
-    private final Timer timer;
-
-    /**
      * Creates a new game, based on a GameData. Creates an ID and a timer for it.
      * @param resumeGame The game data to resume.
      */
     public Game(GameData resumeGame) {
         this.id = resumeGame.getGameId();
-        this.timer = new Timer();
         loadGameData(resumeGame);
     }
 
@@ -49,7 +41,6 @@ public class Game {
      */
     public Game(){
         this.id = UUID.randomUUID();
-        this.timer = new Timer();
         loadGameData(new GameData(id));
     }
 
@@ -60,15 +51,6 @@ public class Game {
      */
     public UUID getId() {
         return id;
-    }
-
-    /**
-     * Returns the timer of this game.
-     *
-     * @return the {@code Timer} of the game
-     */
-    public Timer getTimer() {
-        return timer;
     }
 
     /**
@@ -83,15 +65,11 @@ public class Game {
      * This method is currently a placeholder and needs to be implemented.
      * </p>
      */
-    public void gameLoop() throws IncorrectGamePhaseTypeException, InterruptedException {
+    public void gameLoop() throws IncorrectGamePhaseTypeException, InterruptedException, RemoteException {
 
         //nota sta nel playloop di una phase cambiare il suo stato in "ENDED"
         AssembleGamePhase a = new AssembleGamePhase(id, GamePhaseType.ASSEMBLE, gameData);
-        Thread thread = new Thread(a::playLoop);
-        thread.start();
-
-        // ASSEMBLE phase
-        thread.join();
+        a.playLoop();
 
         gameData.getDeck().drawNextCard();
         AdventureGamePhase adventureGamePhase = null;
@@ -99,11 +77,7 @@ public class Game {
             //create adventure
             adventureGamePhase = new AdventureGamePhase(id, GamePhaseType.ADVENTURE, gameData, gameData.getDeck().getTopCard());
 
-            thread = new Thread(adventureGamePhase::playLoop);
-            thread.start();
-
-            //adventure phase
-            thread.join();
+            adventureGamePhase.playLoop();
 
             gameData.getDeck().drawNextCard();
         }
@@ -148,7 +122,7 @@ public class Game {
         if(gameData.getCurrentGamePhaseType() == GamePhaseType.LOBBY){
 			try {
 				gameLoop();
-			} catch (IncorrectGamePhaseTypeException | InterruptedException e) {
+			} catch (IncorrectGamePhaseTypeException | InterruptedException | RemoteException e) {
 				throw new RuntimeException(e);
 			}
 		}

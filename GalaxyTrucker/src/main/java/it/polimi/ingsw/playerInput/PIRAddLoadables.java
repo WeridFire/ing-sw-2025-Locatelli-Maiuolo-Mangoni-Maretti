@@ -1,20 +1,17 @@
 package it.polimi.ingsw.playerInput;
 
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.tiles.ContainerTile;
-import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-public class PlayerAddLoadableRequest extends PlayerInputRequest {
+public class PIRAddLoadables extends PIR {
 
 	private final List<LoadableType> floatingLoadables = new ArrayList<>();
 
@@ -27,8 +24,8 @@ public class PlayerAddLoadableRequest extends PlayerInputRequest {
 	 * @param cooldown The maximimum time the round will last
 	 * @param allocatedCargo The list of loadable items to load. May contain duplicates for multiple items
 	 */
-	public PlayerAddLoadableRequest(Player currentPlayer, int cooldown, List<LoadableType> allocatedCargo) {
-		super(currentPlayer, cooldown, PlayerTurnType.ADD_CARGO);
+	public PIRAddLoadables(Player currentPlayer, int cooldown, List<LoadableType> allocatedCargo) {
+		super(currentPlayer, cooldown, PIRType.ADD_CARGO);
 		floatingLoadables.addAll(allocatedCargo);
 	}
 
@@ -78,7 +75,7 @@ public class PlayerAddLoadableRequest extends PlayerInputRequest {
 	}
 
 	@Override
-	public void endTurn() {
+	void endTurn() {
 		synchronized (lock){
 			lock.notifyAll();
 		}
@@ -98,7 +95,6 @@ public class PlayerAddLoadableRequest extends PlayerInputRequest {
 	 * @throws UnsupportedLoadableItemException An item being loaded is not supported either by a container, or by the list of cargo that has to be loaded.
 	 * @throws TooMuchLoadException A tile is being loaded with too much loadables.
 	 */
-	@Override
 	public void addLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToAdd) throws WrongPlayerTurnException, TileNotAvailableException, UnsupportedLoadableItemException, TooMuchLoadException {
 		checkForTurn(player);
 		for(Coordinates c : cargoToAdd.keySet()){
