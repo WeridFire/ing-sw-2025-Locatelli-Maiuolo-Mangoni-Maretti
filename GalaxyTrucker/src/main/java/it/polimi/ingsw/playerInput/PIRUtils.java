@@ -5,6 +5,9 @@ import it.polimi.ingsw.enums.PowerType;
 import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PIRs.PIRActivateTiles;
+import it.polimi.ingsw.playerInput.PIRs.PIRChoice;
+import it.polimi.ingsw.playerInput.PIRs.PIRRemoveLoadables;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.visitors.VisitorCalculatePowers;
 import it.polimi.ingsw.util.Coordinates;
@@ -38,27 +41,15 @@ public class PIRUtils {
 		}
 		PIRActivateTiles inputRequest = new PIRActivateTiles(player, 30, powerType);
 		// phase 1: ask activation
-		game.getPIRHandler().setTurn(inputRequest);
-
-        try {
-            inputRequest.run();
-        } catch (InterruptedException e) {
-			// TODO: manage InterruptedException
-        }
+		Set<Coordinates> activatedTiles = game.getPIRHandler().setAndRunTurn(inputRequest);
 
         // phase 2: ask batteries removal for desired activation
-		Set<Coordinates> activatedTiles = inputRequest.getActivatedTiles();
 		int batteriesToRemove = activatedTiles.size();
 		if(batteriesToRemove > 0){
 			PIRRemoveLoadables pirRemoveLoadables = new PIRRemoveLoadables(player, 30, Set.of(LoadableType.BATTERY), batteriesToRemove);
-			game.getPIRHandler().setTurn(
+			game.getPIRHandler().setAndRunTurn(
 					pirRemoveLoadables
 			);
-			try {
-				pirRemoveLoadables.run();
-			} catch (InterruptedException e) {
-				// TODO: manage InterruptedException
-			}
 		}
 
 		// phase 3: calculate total power and return it
@@ -107,27 +98,14 @@ public class PIRUtils {
 			String message = "You are being hit from direction " + projectile.getDirection().toString() + ". You can defend yourself " +
 					"with a shield. Do you want to activate it?";
 			PIRChoice choiceReq = new PIRChoice(player, 30, message, false);
-			game.getPIRHandler().setTurn(choiceReq);
-			try {
-				choiceReq.run();
-			} catch (InterruptedException e) {
-				//TODO: Manage interruptedException
-				e.printStackTrace();
-			}
 
-			boolean choice = choiceReq.getChoice();
+			boolean choice = game.getPIRHandler().setAndRunTurn(choiceReq);
 			if(!choice){
 				return false;
 			}
 			PIRRemoveLoadables pirRemoveLoadables = new PIRRemoveLoadables(player, 30, Set.of(LoadableType.BATTERY), 1);
-			game.getPIRHandler().setTurn(pirRemoveLoadables);
+			game.getPIRHandler().setAndRunTurn(pirRemoveLoadables);
 
-			try {
-				pirRemoveLoadables.run();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				// TODO: manage InterruptedException
-			}
 			return true;
 
 		}else if(projectile.isFireDefendable()){
@@ -136,29 +114,15 @@ public class PIRUtils {
 			String message = "You are being hit from direction " + projectile.getDirection().toString() + ". You can defend yourself " +
 					"with a double cannon. Do you want to activate it?";
 			PIRChoice choiceReq = new PIRChoice(player, 30, message, false);
-			game.getPIRHandler().setTurn(choiceReq);
-			try {
-				choiceReq.run();
-			} catch (InterruptedException e) {
-				//TODO: Manage interruptedException
-				e.printStackTrace();
-			}
-
-			boolean choice = choiceReq.getChoice();
+			boolean choice = game.getPIRHandler().setAndRunTurn(choiceReq);;
 			if(!choice){
 				return false;
 			}
 			PIRRemoveLoadables pirRemoveLoadables = new PIRRemoveLoadables(player, 30, Set.of(LoadableType.BATTERY), 1);
-			game.getPIRHandler().setTurn(
+			game.getPIRHandler().setAndRunTurn(
 					pirRemoveLoadables
 			);
 
-			try {
-				pirRemoveLoadables.run();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				// TODO: manage InterruptedException
-			}
 			return true;
 
 		}else{

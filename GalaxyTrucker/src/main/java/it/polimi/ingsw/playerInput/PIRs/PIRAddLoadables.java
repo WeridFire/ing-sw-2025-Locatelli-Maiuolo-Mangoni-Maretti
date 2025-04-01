@@ -1,4 +1,4 @@
-package it.polimi.ingsw.playerInput;
+package it.polimi.ingsw.playerInput.PIRs;
 
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
@@ -25,7 +25,7 @@ public class PIRAddLoadables extends PIR {
 	 * @param allocatedCargo The list of loadable items to load. May contain duplicates for multiple items
 	 */
 	public PIRAddLoadables(Player currentPlayer, int cooldown, List<LoadableType> allocatedCargo) {
-		super(currentPlayer, cooldown, PIRType.ADD_CARGO);
+		super(currentPlayer, cooldown, it.polimi.ingsw.playerInput.PIRType.ADD_CARGO);
 		floatingLoadables.addAll(allocatedCargo);
 	}
 
