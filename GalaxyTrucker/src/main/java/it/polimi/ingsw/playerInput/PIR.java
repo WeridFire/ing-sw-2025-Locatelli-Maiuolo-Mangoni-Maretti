@@ -1,13 +1,8 @@
 package it.polimi.ingsw.playerInput;
 
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
-import it.polimi.ingsw.shipboard.LoadableType;
-import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
-import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
-import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.util.*;
@@ -65,7 +60,7 @@ public abstract class PIR {
 	 * Calling this function will check for the result of the input request. If the request is fulfilled, the
 	 * turn will end and move to the next. If not fulfilled, it will keep waiting.
 	 */
-	public abstract void endTurn();
+	abstract void endTurn();
 
 	/**
 	 * This is used both for the client and the controller to understand what type of action to allow to the player.
@@ -88,23 +83,4 @@ public abstract class PIR {
 			throw new WrongPlayerTurnException(currentPlayer, player, PIRType);
 		}
 	}
-
-	public void activateTiles(Player player, Set<Coordinates> coordinates) throws WrongPlayerTurnException, InputNotSupportedException, NotEnoughItemsException, TileNotAvailableException {
-		throw new InputNotSupportedException(PIRType);
-	}
-
-	public void removeLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToRemove) throws InputNotSupportedException, WrongPlayerTurnException, TileNotAvailableException, NotEnoughItemsException, UnsupportedLoadableItemException {
-		throw new InputNotSupportedException(PIRType);
-	}
-
-	public void addLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToAdd) throws InputNotSupportedException, WrongPlayerTurnException, TileNotAvailableException, NotEnoughItemsException, UnsupportedLoadableItemException, TooMuchLoadException {
-		throw new InputNotSupportedException(PIRType);
-	}
-
-	public void makeChoice(Player player, boolean choice) throws InputNotSupportedException, WrongPlayerTurnException {
-		throw new InputNotSupportedException(PIRType);
-	}
-
-
-
 }
