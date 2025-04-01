@@ -5,6 +5,7 @@ import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.cards.projectile.Projectile;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PIRUtils;
 
 import java.util.UUID;
 
@@ -31,9 +32,13 @@ public class MeteorStormCard extends Card {
 	 */
 	@Override
 	public void playEffect(GameData game) {
-		for(Projectile m : meteors){
-			for(Player victim : game.getPlayers()){
-				//TODO: hit victim with the current projectile.
+		for(Projectile proj : meteors){
+			//TODO: make first player roll coordinates
+			for(Player player : game.getPlayers()){
+				boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, game);
+				if(!defended){
+					//TODO: HIT PLAYER
+				}
 			}
 		}
 	}
