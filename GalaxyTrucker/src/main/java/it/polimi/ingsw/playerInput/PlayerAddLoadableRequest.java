@@ -19,6 +19,14 @@ public class PlayerAddLoadableRequest extends PlayerInputRequest {
 	private final List<LoadableType> floatingLoadables = new ArrayList<>();
 
 
+	/**
+	 * This turn will make the game wait for player to specify where they want to allocate cargo on the shipboard.
+	 * The game will stop and wait cooldown for the player to fulfill the action, and at the end, if the action
+	 * is not completed, it will "ignore" the remaining items.
+	 * @param currentPlayer The player it'll except the action from
+	 * @param cooldown The maximimum time the round will last
+	 * @param allocatedCargo The list of loadable items to load. May contain duplicates for multiple items
+	 */
 	public PlayerAddLoadableRequest(Player currentPlayer, int cooldown, List<LoadableType> allocatedCargo) {
 		super(currentPlayer, cooldown, PlayerTurnType.ADD_CARGO);
 		floatingLoadables.addAll(allocatedCargo);
