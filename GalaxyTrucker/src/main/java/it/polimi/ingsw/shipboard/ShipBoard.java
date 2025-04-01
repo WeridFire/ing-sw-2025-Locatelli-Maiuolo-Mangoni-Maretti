@@ -1,9 +1,11 @@
 package it.polimi.ingsw.shipboard;
 
+import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.enums.ProtectionType;
+import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.shipboard.tiles.*;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
-import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.shipboard.visitors.*;
 import it.polimi.ingsw.shipboard.visitors.integrity.*;
 import it.polimi.ingsw.shipboard.exceptions.*;
@@ -167,7 +169,7 @@ public class ShipBoard {
 	 * @throws OutOfBuildingAreaException If the specified coordinates are outside the valid building area.
 	 * @throws NoTileFoundException If there is no tile at the given coordinates.
 	 */
-	public void removeTile(Coordinates coordinates) throws OutOfBuildingAreaException, NoTileFoundException {
+	private void removeTile(Coordinates coordinates) throws OutOfBuildingAreaException, NoTileFoundException {
 		// Check if the coordinates are within the valid board area
 		if (!BoardCoordinates.isOnBoard(level, coordinates)) {
 			throw new OutOfBuildingAreaException(level, coordinates);
@@ -182,6 +184,146 @@ public class ShipBoard {
 		board.remove(coordinates);
 		resetVisitors();
 	}
+
+    /**
+     * Finds the first tile in a given direction from a specified coordinate.
+     * <p>
+     * This method searches for the first tile along the given direction, starting from the
+     * specified coordinate value interpreting it as row or column depending on the specified direction.
+     *
+     * @param direction The direction to search in (EAST, WEST, NORTH, SOUTH).
+     * @param coordinate The coordinate along the perpendicular axis to the direction.
+     * @return The {@link Coordinates} of the first found tile, or {@code null} if no tile is found.
+     */
+    private Coordinates getFirstTileLocation(Direction direction, int coordinate) {
+        int firstCoordValue = BoardCoordinates.getFirstCoordinateFromDirection(direction);
+        Coordinates coord = switch (direction) {
+            case EAST, WEST -> new Coordinates(coordinate, firstCoordValue);
+            case NORTH, SOUTH -> new Coordinates(firstCoordValue, coordinate);
+        };
+
+        Direction checkDirection = direction.getRotated(Rotation.OPPOSITE);
+        int maxIterations = BoardCoordinates.getFirstCoordinateFromDirection(checkDirection) - firstCoordValue;
+        if (maxIterations < 0) {
+            maxIterations = -maxIterations;
+        }
+
+        for (int i = 0; i < maxIterations; i++) {
+            if (board.containsKey(coord)) {
+                return coord;
+            }
+            coord = coord.getNext(checkDirection);
+        }
+
+        return null;
+    }
+
+    /**
+     * Hits a tile at the first found position in the given direction.
+     * <p>
+     * This method find and remove a tile by searching in the given direction from the specified coordinate.
+     *
+     * @param direction The direction from which the hit is coming.
+     * @param coordinate The coordinate along the perpendicular axis to the direction.
+     * @throws NoTileFoundException If no tile is found in the given direction and coordinate.
+     * @throws OutOfBuildingAreaException If the given coordinate value does not represent
+     * a valid row or column for the board.
+     */
+    public void hit(Direction direction, int coordinate) throws NoTileFoundException, OutOfBuildingAreaException {
+        Coordinates coordinates = getFirstTileLocation(direction, coordinate);
+        if (coordinates == null) {
+            throw new NoTileFoundException("Attempt to hit the shipboard from non-valid direction (" +
+                    direction + ") & coordinate (" + coordinate + ")");
+        } else {
+            removeTile(coordinates);
+        }
+    }
+
+    /**
+     * Checks whether there is a cannon pointing in the given direction.
+     * <p>
+     * This method iterates over a defined rectangular area and determines if there is
+     * a cannon that is properly oriented towards the specified direction.
+     *
+     * @param checkForDoubleCannon Whether to check for double cannons ({@code true})
+     *                             or a single cannon ({@code false}).
+     * @param pointingDirection The direction in which the cannon should be pointing.
+     * @param coordTopLeft The top-left coordinate of the search area.
+     * @param coordBottomRight The bottom-right coordinate of the search area.
+     * @return {@code true} if a cannon pointing in the given direction is found, otherwise {@code false}.
+     */
+    private boolean hasCannonPointing(boolean checkForDoubleCannon, Direction pointingDirection,
+                                      Coordinates coordTopLeft, Coordinates coordBottomRight) {
+        for (int row = coordTopLeft.getRow(); row <= coordBottomRight.getRow(); row++) {
+            for (int col = coordTopLeft.getColumn(); col <= coordBottomRight.getColumn(); col++) {
+                Coordinates coord = new Coordinates(row, col);
+                if (visitorCalculatePowers.getInfoFirePower().isPresent(coord)) {  // there is a cannon
+                    if ((checkForDoubleCannon == visitorCalculatePowers.getInfoFirePower()
+                            .getLocationsToActivate().containsKey(coord))
+                            // cannon type is the target cannon type
+                            && (board.get(coord).getSide(pointingDirection) == SideType.CANNON)) {
+                            // cannon is pointing in the target direction
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Determines the level of protection from cannons in a given direction, coordinate and range.
+     * <p>
+     * This method checks for the presence of single or double cannons within a certain range
+     * in the specified direction and returns the corresponding {@link ProtectionType}.
+     * <p>
+     * Single cannons have priority over double cannons: if both a single and a double cannon are found,
+     * the protection is given by the single cannon (no need for battery: low entropy -> Stevino wins).
+     *
+     * @param direction The direction in which to check for cannon protection.
+     * @param coordinate The coordinate along the perpendicular axis to the direction.
+     * @param range The range within which to search for cannons.
+     *              This equivalently represents the number of rows (or columns) to check, centered in the
+     *              {@code coordinate} row/column with the given direction.
+     *              It should be an odd integer for symmetry.
+     * @return The level of protection, which can be: {@link ProtectionType#SINGLE_CANNON},
+     *         {@link ProtectionType#DOUBLE_CANNON} or {@link ProtectionType#NONE}.
+	 *
+	 * @throws IllegalArgumentException If {@code range <= 0}.
+     */
+    public ProtectionType getCannonProtection(Direction direction, int coordinate, int range) {
+		if (range <= 0) {
+			throw new IllegalArgumentException("range must be greater than zero. " + range + " provided.");
+		}
+
+		// create coordinates box range
+        int firstCoordValue = BoardCoordinates.getFirstCoordinateFromDirection(direction);
+        Coordinates coordTopLeft = null, coordBottomRight = null;
+		int halfRangeDown = (range - 1) / 2;
+		int halfRangeUp = (range - 1) - halfRangeDown;
+        switch (direction) {
+            case EAST, WEST:
+                coordTopLeft = new Coordinates(coordinate - halfRangeDown, firstCoordValue);
+                coordBottomRight = new Coordinates(coordinate + halfRangeUp, firstCoordValue);
+                break;
+            case NORTH, SOUTH:
+                coordTopLeft = new Coordinates(firstCoordValue, coordinate - halfRangeDown);
+                coordBottomRight = new Coordinates(firstCoordValue, coordinate + halfRangeUp);
+                break;
+        }
+
+		// first search for single cannons: higher priority
+        if (hasCannonPointing(false, direction, coordTopLeft, coordBottomRight)) {
+            return ProtectionType.SINGLE_CANNON;
+        }
+		// if no single cannon is found: search for double cannons
+        if (hasCannonPointing(true, direction, coordTopLeft, coordBottomRight)) {
+            return ProtectionType.DOUBLE_CANNON;
+        }
+		// if here: no cannon found
+        return ProtectionType.NONE;
+    }
+
 
 	/**
 	 * Processes the removal of contraband items.

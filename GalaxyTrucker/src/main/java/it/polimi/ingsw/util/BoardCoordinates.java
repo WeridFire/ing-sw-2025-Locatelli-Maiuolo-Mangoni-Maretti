@@ -1,5 +1,6 @@
 package it.polimi.ingsw.util;
 
+import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GameLevel;
 
 import java.util.HashMap;
@@ -108,6 +109,24 @@ public class BoardCoordinates {
         }
 
         return allowedPlaces.contains(coordinates.getID());
+    }
+
+    /**
+     * Returns the first coordinate value valid on the board associated with a given direction.
+     * <p>
+     * These values are used as a starting point depending on the direction provided.
+     * This method works for {@link GameLevel#TESTFLIGHT}, {@link GameLevel#ONE} and {@link GameLevel#TWO}.
+     *
+     * @param direction The direction for which to get the associated first coordinate value.
+     * @return The first coordinate value corresponding to the provided direction.
+     */
+    public static int getFirstCoordinateFromDirection(Direction direction) {
+        return switch (direction) {
+            case EAST -> 10;
+            case NORTH -> 5;
+            case WEST -> 4;
+            case SOUTH -> 9;
+        };
     }
 
 }

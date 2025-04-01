@@ -6,7 +6,9 @@ import it.polimi.ingsw.shipboard.tiles.*;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
 import it.polimi.ingsw.util.Coordinates;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class VisitorCalculatePowers implements TileVisitor {
@@ -18,16 +20,16 @@ public class VisitorCalculatePowers implements TileVisitor {
         private boolean bonus;  // Indicates whether an alien bonus applies (e.g. purple/brown alien)
         private float basePower;  // The base power before any modifications: simple tiles (e.g. single cannons/engines)
         private final Map<Coordinates, Float> locationsToActivate;  // Map of tiles that can be activated mapped to their power values
+        private final List<Coordinates> locations;  // List of visited tiles coordinates
 
         /**
          * Constructs a CalculatorPowerInfo object with a given map of activable tiles.
-         *
-         * @param locationsToActivate A map of coordinates where activable power tiles are located mapped to their power values.
          */
-        public CalculatorPowerInfo(Map<Coordinates, Float> locationsToActivate) {
+        public CalculatorPowerInfo() {
             bonus = false;
             basePower = 0;
-            this.locationsToActivate = locationsToActivate;
+            locationsToActivate = new HashMap<>();
+            locations = new ArrayList<>();
         }
 
         /**
@@ -57,14 +59,23 @@ public class VisitorCalculatePowers implements TileVisitor {
         public Map<Coordinates, Float> getLocationsToActivate() {
             return new HashMap<>(locationsToActivate);
         }
+
+        /**
+         * Retrieve info about the presence of this power in specific coordinates.
+         * @param coordinates the coordinates to check for presence.
+         * @return {@code true} if the specified coordinates contains this power info, {@code false} otherwise.
+         */
+        public boolean isPresent(Coordinates coordinates) {
+            return locations.contains(coordinates);
+        }
     }
 
     private final CalculatorPowerInfo infoFirePower;
     private final CalculatorPowerInfo infoThrustPower;
 
     public VisitorCalculatePowers() {
-        infoFirePower = new CalculatorPowerInfo(new HashMap<>());
-        infoThrustPower = new CalculatorPowerInfo(new HashMap<>());
+        infoFirePower = new CalculatorPowerInfo();
+        infoThrustPower = new CalculatorPowerInfo();
     }
 
 
@@ -100,32 +111,38 @@ public class VisitorCalculatePowers implements TileVisitor {
 
     @Override
     public void visitCannon(CannonTile tile) {
+        Coordinates location;
+        try {
+            location = tile.getCoordinates();
+        } catch (NotFixedTileException e) {
+            throw new RuntimeException(e);  // should never happen -> runtime exception
+        }
+
         if (tile.isDoubleCannon()) {
-            try {
-                Coordinates location = tile.getCoordinates();
-                infoFirePower.locationsToActivate.put(location, tile.calculateFirePower());
-            } catch (NotFixedTileException e) {
-                throw new RuntimeException(e);  // should never happen -> runtime exception
-            }
+            infoFirePower.locationsToActivate.put(location, tile.calculateFirePower());
         }
         else {
             infoFirePower.basePower += tile.calculateFirePower();
         }
+        infoFirePower.locations.add(location);
     }
 
     @Override
     public void visitEngine(EngineTile tile) {
+        Coordinates location;
+        try {
+            location = tile.getCoordinates();
+        } catch (NotFixedTileException e) {
+            throw new RuntimeException(e);  // should never happen -> runtime exception
+        }
+
         if (tile.isDoubleEngine()) {
-            try {
-                Coordinates location = tile.getCoordinates();
-                infoThrustPower.locationsToActivate.put(location, tile.calculateThrustPower());
-            } catch (NotFixedTileException e) {
-                throw new RuntimeException(e);  // should never happen -> runtime exception
-            }
+            infoThrustPower.locationsToActivate.put(location, tile.calculateThrustPower());
         }
         else {
             infoThrustPower.basePower += tile.calculateThrustPower();
         }
+        infoThrustPower.locations.add(location);
     }
 
     public CalculatorPowerInfo getInfoFirePower() {
@@ -139,15 +156,13 @@ public class VisitorCalculatePowers implements TileVisitor {
     /**
      * Retrieves the stored power information based on the given power type.
      *
-     * @param powerType The type of power requested. Can be {@link PowerType#FIRE} or {@link PowerType#THRUST}.
-     * @return The corresponding {@code CalculatorPowerInfo} for the given power type,
-     * or {@code null} if the type is invalid.
+     * @param powerType The type of power requested.
+     * @return The corresponding {@code CalculatorPowerInfo} for the given power type.
      */
     public CalculatorPowerInfo getInfoPower(PowerType powerType) {
         return switch (powerType) {
             case FIRE -> infoFirePower;
             case THRUST -> infoThrustPower;
-            default -> null;
         };
     }
 
