@@ -7,6 +7,7 @@ import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIR;
+import it.polimi.ingsw.playerInput.PIRHandler;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
@@ -41,7 +42,7 @@ public class GameData implements Serializable {
     private Player currentPlayerTurn;
      */
 
-    private PIR currentPlayerTurn;
+    private PIRHandler pirHandler;
 
     /** Mapping of available cargo goods and their quantities. */
     private Map<LoadableType, Integer> availableGoods;
@@ -63,6 +64,7 @@ public class GameData implements Serializable {
         this.coveredTiles = new ArrayList<>();
         this.deck = null;
         this.gameId = gameId;
+        this.pirHandler = new PIRHandler();
         this.setCurrentGamePhaseType(GamePhaseType.LOBBY);
         this.setRequiredPlayers(4);
     }
@@ -114,8 +116,8 @@ public class GameData implements Serializable {
      *
      * @return The current turn player.
      */
-    public PIR getCurrentPlayerTurn() {
-        return currentPlayerTurn;
+    public PIRHandler getPIRHandler(){
+        return pirHandler;
     }
 
     /**
@@ -189,11 +191,6 @@ public class GameData implements Serializable {
             throw new PlayerAlreadyInGameException("Player with this username is already present.");
         }
         players.add(player);
-    }
-
-
-    public void setCurrentPlayerTurn(PIR currentPlayerTurn) {
-        this.currentPlayerTurn = currentPlayerTurn;
     }
 
     /**
