@@ -1,9 +1,9 @@
-package src.main.java.it.polimi.ingsw;
+package it.polimi.ingsw;
 
-import src.main.java.it.polimi.ingsw.enums.Direction;
-import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
-import src.main.java.it.polimi.ingsw.shipboard.SideType;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.*;
+import it.polimi.ingsw.enums.Direction;
+import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.SideType;
+import it.polimi.ingsw.shipboard.tiles.*;
 
 import java.util.*;
 import java.util.function.Function;

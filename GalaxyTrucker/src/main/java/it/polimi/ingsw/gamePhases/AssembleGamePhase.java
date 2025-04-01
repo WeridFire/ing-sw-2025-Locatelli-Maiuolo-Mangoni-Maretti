@@ -1,13 +1,13 @@
-package src.main.java.it.polimi.ingsw.gamePhases;
+package it.polimi.ingsw.gamePhases;
 
-import src.main.java.it.polimi.ingsw.GamesHandler;
-import src.main.java.it.polimi.ingsw.enums.GameLevel;
-import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
-import src.main.java.it.polimi.ingsw.enums.GameState;
-import src.main.java.it.polimi.ingsw.game.GameData;
-import src.main.java.it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTypeException;
-import src.main.java.it.polimi.ingsw.gamePhases.exceptions.NoMoreTimerResetLeftException;
-import src.main.java.it.polimi.ingsw.timer.Timer;
+import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.enums.GameState;
+import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTypeException;
+import it.polimi.ingsw.gamePhases.exceptions.NoMoreTimerResetLeftException;
+import it.polimi.ingsw.timer.Timer;
 
 import java.util.UUID;
 

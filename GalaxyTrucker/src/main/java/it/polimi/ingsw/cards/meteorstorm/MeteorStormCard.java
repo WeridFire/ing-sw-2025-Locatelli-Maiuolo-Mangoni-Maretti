@@ -1,10 +1,10 @@
-package src.main.java.it.polimi.ingsw.cards.meteorstorm;
+package it.polimi.ingsw.cards.meteorstorm;
 
-import src.main.java.it.polimi.ingsw.GamesHandler;
-import src.main.java.it.polimi.ingsw.cards.Card;
-import src.main.java.it.polimi.ingsw.cards.projectile.Projectile;
-import src.main.java.it.polimi.ingsw.game.GameData;
-import src.main.java.it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.cards.Card;
+import it.polimi.ingsw.cards.projectile.Projectile;
+import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.player.Player;
 
 import java.util.UUID;
 

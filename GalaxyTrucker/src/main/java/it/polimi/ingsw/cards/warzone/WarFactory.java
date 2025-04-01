@@ -1,11 +1,11 @@
-package src.main.java.it.polimi.ingsw.cards.warzone;
+package it.polimi.ingsw.cards.warzone;
 
-import src.main.java.it.polimi.ingsw.cards.Card;
-import src.main.java.it.polimi.ingsw.cards.projectile.Projectile;
-import src.main.java.it.polimi.ingsw.enums.PowerType;
-import src.main.java.it.polimi.ingsw.game.GameData;
-import src.main.java.it.polimi.ingsw.player.Player;
-import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.cards.Card;
+import it.polimi.ingsw.cards.projectile.Projectile;
+import it.polimi.ingsw.enums.PowerType;
+import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.shipboard.LoadableType;
 
 import java.util.Comparator;
 import java.util.function.BiConsumer;

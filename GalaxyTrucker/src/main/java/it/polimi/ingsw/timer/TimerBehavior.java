@@ -1,4 +1,4 @@
-package src.main.java.it.polimi.ingsw.timer;
+package it.polimi.ingsw.timer;
 
 /**
  * An interface that defines the behavior the timer.

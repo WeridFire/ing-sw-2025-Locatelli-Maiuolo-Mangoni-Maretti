@@ -1,9 +1,9 @@
-package src.main.java.it.polimi.ingsw.shipboard.tiles;
+package it.polimi.ingsw.shipboard.tiles;
 
-import src.main.java.it.polimi.ingsw.enums.Direction;
-import src.main.java.it.polimi.ingsw.enums.Rotation;
-import src.main.java.it.polimi.ingsw.shipboard.SideType;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
+import it.polimi.ingsw.enums.Direction;
+import it.polimi.ingsw.enums.Rotation;
+import it.polimi.ingsw.shipboard.SideType;
+import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 
 public abstract class PowerableTile extends TileSkeleton<SideType> {
     private final Boolean[] sidesWithPower;

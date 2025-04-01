@@ -1,14 +1,14 @@
-package src.main.java.it.polimi.ingsw.cards.enemy;
+package it.polimi.ingsw.cards.enemy;
 
-import src.main.java.it.polimi.ingsw.GamesHandler;
-import src.main.java.it.polimi.ingsw.cards.Card;
-import src.main.java.it.polimi.ingsw.enums.PowerType;
-import src.main.java.it.polimi.ingsw.game.GameData;
-import src.main.java.it.polimi.ingsw.player.Player;
-import src.main.java.it.polimi.ingsw.playerInput.PlayerActivateTilesRequest;
-import src.main.java.it.polimi.ingsw.playerInput.PlayerRemoveLoadableRequest;
-import src.main.java.it.polimi.ingsw.playerInput.PlayerTurnUtils;
-import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.cards.Card;
+import it.polimi.ingsw.enums.PowerType;
+import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PlayerActivateTilesRequest;
+import it.polimi.ingsw.playerInput.PlayerRemoveLoadableRequest;
+import it.polimi.ingsw.playerInput.PlayerTurnUtils;
+import it.polimi.ingsw.shipboard.LoadableType;
 
 import java.util.Map;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package src.main.java.it.polimi.ingsw.playerInput;
+package it.polimi.ingsw.playerInput;
 
 public enum PlayerTurnType {
 

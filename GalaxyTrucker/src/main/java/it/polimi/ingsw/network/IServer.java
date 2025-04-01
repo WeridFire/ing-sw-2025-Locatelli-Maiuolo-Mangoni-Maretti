@@ -1,7 +1,7 @@
-package src.main.java.it.polimi.ingsw.network;
+package it.polimi.ingsw.network;
 
-import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
-import src.main.java.it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.util.Coordinates;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

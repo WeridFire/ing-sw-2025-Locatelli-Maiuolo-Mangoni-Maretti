@@ -1,10 +1,10 @@
-package src.main.java.it.polimi.ingsw.gamePhases;
+package it.polimi.ingsw.gamePhases;
 
-import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
-import src.main.java.it.polimi.ingsw.enums.GameState;
-import src.main.java.it.polimi.ingsw.game.GameData;
-import src.main.java.it.polimi.ingsw.network.exceptions.CantFindClientException;
-import src.main.java.it.polimi.ingsw.timer.TimerBehavior;
+import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.enums.GameState;
+import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.network.exceptions.CantFindClientException;
+import it.polimi.ingsw.timer.TimerBehavior;
 
 import java.rmi.RemoteException;
 import java.util.UUID;

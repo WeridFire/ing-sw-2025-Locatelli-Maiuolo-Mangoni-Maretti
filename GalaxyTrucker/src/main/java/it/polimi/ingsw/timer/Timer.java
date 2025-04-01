@@ -1,4 +1,4 @@
-package src.main.java.it.polimi.ingsw.timer;
+package it.polimi.ingsw.timer;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

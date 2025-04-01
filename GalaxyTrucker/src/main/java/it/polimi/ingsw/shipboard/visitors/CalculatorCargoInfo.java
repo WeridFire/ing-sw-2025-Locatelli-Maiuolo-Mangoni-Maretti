@@ -1,9 +1,9 @@
-package src.main.java.it.polimi.ingsw.shipboard.visitors;
+package it.polimi.ingsw.shipboard.visitors;
 
-import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.*;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
-import src.main.java.it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.tiles.*;
+import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
+import it.polimi.ingsw.util.Coordinates;
 
 import java.util.*;
 

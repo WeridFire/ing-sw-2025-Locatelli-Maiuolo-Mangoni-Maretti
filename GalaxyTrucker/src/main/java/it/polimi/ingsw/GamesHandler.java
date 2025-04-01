@@ -1,9 +1,9 @@
-package src.main.java.it.polimi.ingsw;
+package it.polimi.ingsw;
 
-import src.main.java.it.polimi.ingsw.game.Game;
-import src.main.java.it.polimi.ingsw.game.exceptions.GameNotFoundException;
-import src.main.java.it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
-import src.main.java.it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.game.exceptions.GameNotFoundException;
+import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
+import it.polimi.ingsw.player.Player;
 
 import java.util.ArrayList;
 import java.util.Set;

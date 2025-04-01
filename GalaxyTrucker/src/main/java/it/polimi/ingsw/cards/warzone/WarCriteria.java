@@ -1,7 +1,7 @@
-package src.main.java.it.polimi.ingsw.cards.warzone;
+package it.polimi.ingsw.cards.warzone;
 
 import java.util.Comparator;
-import src.main.java.it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.player.Player;
 
 public class WarCriteria {
 

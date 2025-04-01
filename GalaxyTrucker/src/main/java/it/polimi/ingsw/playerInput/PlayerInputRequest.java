@@ -1,14 +1,14 @@
-package src.main.java.it.polimi.ingsw.playerInput;
+package it.polimi.ingsw.playerInput;
 
-import src.main.java.it.polimi.ingsw.player.Player;
-import src.main.java.it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
-import src.main.java.it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
-import src.main.java.it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
-import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
-import src.main.java.it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
+import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
+import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
+import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
+import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
+import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
+import it.polimi.ingsw.util.Coordinates;
 
 import java.util.*;
 

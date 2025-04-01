@@ -1,7 +1,7 @@
-package src.main.java.it.polimi.ingsw.shipboard.tiles;
+package it.polimi.ingsw.shipboard.tiles;
 
-import src.main.java.it.polimi.ingsw.shipboard.SideType;
-import src.main.java.it.polimi.ingsw.shipboard.visitors.TileVisitor;
+import it.polimi.ingsw.shipboard.SideType;
+import it.polimi.ingsw.shipboard.visitors.TileVisitor;
 
 /**
  * Represents a structural tile, which defines the shape and connectivity

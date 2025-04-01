@@ -1,4 +1,4 @@
-package src.main.java.it.polimi.ingsw.enums;
+package it.polimi.ingsw.enums;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,7 @@
-package src.main.java.it.polimi.ingsw.shipboard.tiles;
+package it.polimi.ingsw.shipboard.tiles;
 
-import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
-import src.main.java.it.polimi.ingsw.shipboard.SideType;
+import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.SideType;
 
 import java.util.Set;
 

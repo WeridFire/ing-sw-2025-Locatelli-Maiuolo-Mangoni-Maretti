@@ -1,8 +1,8 @@
-package src.main.java.it.polimi.ingsw.shipboard.exceptions;
+package it.polimi.ingsw.shipboard.exceptions;
 
-import src.main.java.it.polimi.ingsw.shipboard.SideType;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
-import src.main.java.it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.shipboard.SideType;
+import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.util.Coordinates;
 
 public class TileAlreadyPresentException extends Exception {
     public TileAlreadyPresentException(String message) {

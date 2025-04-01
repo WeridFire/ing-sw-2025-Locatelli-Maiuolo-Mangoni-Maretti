@@ -1,6 +1,6 @@
-package src.main.java.it.polimi.ingsw.playerInput.exceptions;
+package it.polimi.ingsw.playerInput.exceptions;
 
-import src.main.java.it.polimi.ingsw.playerInput.PlayerTurnType;
+import it.polimi.ingsw.playerInput.PlayerTurnType;
 
 public class InputNotSupportedException extends Exception {
 	public InputNotSupportedException(PlayerTurnType supportedType) {

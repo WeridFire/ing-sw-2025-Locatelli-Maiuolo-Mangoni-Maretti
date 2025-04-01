@@ -1,7 +1,7 @@
-package src.main.java.it.polimi.ingsw.shipboard.visitors;
+package it.polimi.ingsw.shipboard.visitors;
 
-import src.main.java.it.polimi.ingsw.shipboard.tiles.*;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
+import it.polimi.ingsw.shipboard.tiles.*;
+import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
 
 public class VisitorCalculateCargoInfo implements TileVisitor {
     private final CalculatorCargoInfo<CabinTile> infoCrew;

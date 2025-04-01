@@ -1,8 +1,8 @@
-package src.main.java.it.polimi.ingsw.cards.warzone;
+package it.polimi.ingsw.cards.warzone;
 
-import src.main.java.it.polimi.ingsw.cards.Card;
-import src.main.java.it.polimi.ingsw.game.GameData;
-import src.main.java.it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.cards.Card;
+import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.player.Player;
 
 import java.util.UUID;
 

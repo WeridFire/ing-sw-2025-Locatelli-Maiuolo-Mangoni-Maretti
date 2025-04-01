@@ -1,10 +1,10 @@
-package src.main.java.it.polimi.ingsw.cards.enemy;
+package it.polimi.ingsw.cards.enemy;
 
-import src.main.java.it.polimi.ingsw.game.GameData;
-import src.main.java.it.polimi.ingsw.player.Player;
-import src.main.java.it.polimi.ingsw.playerInput.PlayerAddLoadableRequest;
-import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
-import src.main.java.it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PlayerAddLoadableRequest;
+import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.util.Coordinates;
 
 import java.util.Arrays;
 import java.util.UUID;

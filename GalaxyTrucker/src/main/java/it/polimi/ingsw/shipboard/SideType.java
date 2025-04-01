@@ -1,4 +1,4 @@
-package src.main.java.it.polimi.ingsw.shipboard;
+package it.polimi.ingsw.shipboard;
 
 /**
  * Represents different types of sides that a tile can have.

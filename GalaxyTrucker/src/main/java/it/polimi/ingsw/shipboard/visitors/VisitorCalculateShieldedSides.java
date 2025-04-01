@@ -1,8 +1,8 @@
-package src.main.java.it.polimi.ingsw.shipboard.visitors;
+package it.polimi.ingsw.shipboard.visitors;
 
-import src.main.java.it.polimi.ingsw.enums.Direction;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.*;
-import src.main.java.it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.enums.Direction;
+import it.polimi.ingsw.shipboard.tiles.*;
+import it.polimi.ingsw.util.Coordinates;
 
 import java.util.List;
 

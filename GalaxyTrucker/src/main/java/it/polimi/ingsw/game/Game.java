@@ -1,15 +1,15 @@
-package src.main.java.it.polimi.ingsw.game;
+package it.polimi.ingsw.game;
 
-import src.main.java.it.polimi.ingsw.TilesFactory;
-import src.main.java.it.polimi.ingsw.cards.Deck;
-import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
-import src.main.java.it.polimi.ingsw.enums.GameState;
-import src.main.java.it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
-import src.main.java.it.polimi.ingsw.gamePhases.AdventureGamePhase;
-import src.main.java.it.polimi.ingsw.gamePhases.AssembleGamePhase;
-import src.main.java.it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTypeException;
-import src.main.java.it.polimi.ingsw.player.Player;
-import src.main.java.it.polimi.ingsw.timer.Timer;
+import it.polimi.ingsw.TilesFactory;
+import it.polimi.ingsw.cards.Deck;
+import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.enums.GameState;
+import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
+import it.polimi.ingsw.gamePhases.AdventureGamePhase;
+import it.polimi.ingsw.gamePhases.AssembleGamePhase;
+import it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTypeException;
+import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.timer.Timer;
 
 import java.rmi.RemoteException;
 import java.util.UUID;

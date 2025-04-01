@@ -1,14 +1,14 @@
-package src.main.java.it.polimi.ingsw.shipboard;
+package it.polimi.ingsw.shipboard;
 
-import src.main.java.it.polimi.ingsw.enums.GameLevel;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.*;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
-import src.main.java.it.polimi.ingsw.shipboard.visitors.*;
-import src.main.java.it.polimi.ingsw.shipboard.visitors.integrity.*;
-import src.main.java.it.polimi.ingsw.shipboard.exceptions.*;
-import src.main.java.it.polimi.ingsw.util.BoardCoordinates;
-import src.main.java.it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.shipboard.tiles.*;
+import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
+import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
+import it.polimi.ingsw.shipboard.visitors.*;
+import it.polimi.ingsw.shipboard.visitors.integrity.*;
+import it.polimi.ingsw.shipboard.exceptions.*;
+import it.polimi.ingsw.util.BoardCoordinates;
+import it.polimi.ingsw.util.Coordinates;
 
 import java.util.*;
 

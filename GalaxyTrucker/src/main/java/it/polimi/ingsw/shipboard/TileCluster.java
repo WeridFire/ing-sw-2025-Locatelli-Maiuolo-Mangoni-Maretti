@@ -1,8 +1,8 @@
-package src.main.java.it.polimi.ingsw.shipboard;
+package it.polimi.ingsw.shipboard;
 
-import src.main.java.it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.Tile;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
+import it.polimi.ingsw.shipboard.tiles.Tile;
+import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.util.HashSet;
 import java.util.Set;

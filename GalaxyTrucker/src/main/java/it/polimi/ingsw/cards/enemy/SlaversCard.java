@@ -1,16 +1,16 @@
-package src.main.java.it.polimi.ingsw.cards.enemy;
+package it.polimi.ingsw.cards.enemy;
 
-import src.main.java.it.polimi.ingsw.game.GameData;
-import src.main.java.it.polimi.ingsw.player.Player;
-import src.main.java.it.polimi.ingsw.playerInput.PlayerRemoveLoadableRequest;
-import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
-import src.main.java.it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
-import src.main.java.it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.CabinTile;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.ContainerTile;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
-import src.main.java.it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PlayerRemoveLoadableRequest;
+import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
+import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
+import it.polimi.ingsw.shipboard.tiles.CabinTile;
+import it.polimi.ingsw.shipboard.tiles.ContainerTile;
+import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
+import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
+import it.polimi.ingsw.util.Coordinates;
 
 import java.util.HashMap;
 import java.util.List;

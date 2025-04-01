@@ -1,6 +1,6 @@
-package src.main.java.it.polimi.ingsw.network;
+package it.polimi.ingsw.network;
 
-import src.main.java.it.polimi.ingsw.network.messages.ClientUpdate;
+import it.polimi.ingsw.network.messages.ClientUpdate;
 
 public class ClientCLIView {
 

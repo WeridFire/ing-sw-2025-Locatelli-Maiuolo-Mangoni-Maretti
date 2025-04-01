@@ -1,10 +1,10 @@
-package src.main.java.it.polimi.ingsw.shipboard.visitors;
+package it.polimi.ingsw.shipboard.visitors;
 
-import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.*;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
-import src.main.java.it.polimi.ingsw.util.ContrabandCalculator;
+import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.tiles.*;
+import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
+import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
+import it.polimi.ingsw.util.ContrabandCalculator;
 
 import java.util.Map;
 import java.util.PriorityQueue;

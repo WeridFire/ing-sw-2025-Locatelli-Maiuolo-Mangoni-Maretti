@@ -1,10 +1,10 @@
-package src.main.java.it.polimi.ingsw.player;
+package it.polimi.ingsw.player;
 
-import src.main.java.it.polimi.ingsw.game.Game;
-import src.main.java.it.polimi.ingsw.player.exceptions.TooManyReservedTilesException;
-import src.main.java.it.polimi.ingsw.shipboard.SideType;
-import src.main.java.it.polimi.ingsw.shipboard.ShipBoard;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.player.exceptions.TooManyReservedTilesException;
+import it.polimi.ingsw.shipboard.SideType;
+import it.polimi.ingsw.shipboard.ShipBoard;
+import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.io.Serializable;
 import java.util.ArrayList;

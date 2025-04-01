@@ -1,12 +1,12 @@
-package src.main.java.it.polimi.ingsw.network;
+package it.polimi.ingsw.network;
 
-import src.main.java.it.polimi.ingsw.GamesHandler;
-import src.main.java.it.polimi.ingsw.game.Game;
-import src.main.java.it.polimi.ingsw.network.exceptions.CantFindClientException;
-import src.main.java.it.polimi.ingsw.network.messages.ClientUpdate;
-import src.main.java.it.polimi.ingsw.network.rmi.RmiServer;
-import src.main.java.it.polimi.ingsw.network.socket.SocketServer;
-import src.main.java.it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.network.exceptions.CantFindClientException;
+import it.polimi.ingsw.network.messages.ClientUpdate;
+import it.polimi.ingsw.network.rmi.RmiServer;
+import it.polimi.ingsw.network.socket.SocketServer;
+import it.polimi.ingsw.player.Player;
 
 import java.io.IOException;
 import java.net.ServerSocket;

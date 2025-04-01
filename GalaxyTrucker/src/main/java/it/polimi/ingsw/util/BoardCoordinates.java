@@ -1,6 +1,6 @@
-package src.main.java.it.polimi.ingsw.util;
+package it.polimi.ingsw.util;
 
-import src.main.java.it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.enums.GameLevel;
 
 import java.util.HashMap;
 import java.util.Set;

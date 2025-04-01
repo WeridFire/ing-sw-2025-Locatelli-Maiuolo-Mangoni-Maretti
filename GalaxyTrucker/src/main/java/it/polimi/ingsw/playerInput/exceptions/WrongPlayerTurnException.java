@@ -1,7 +1,7 @@
-package src.main.java.it.polimi.ingsw.playerInput.exceptions;
+package it.polimi.ingsw.playerInput.exceptions;
 
-import src.main.java.it.polimi.ingsw.player.Player;
-import src.main.java.it.polimi.ingsw.playerInput.PlayerTurnType;
+import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PlayerTurnType;
 
 public class WrongPlayerTurnException extends Exception {
 	public WrongPlayerTurnException(Player realPlayer, Player wrongPlayer, PlayerTurnType turnType) {

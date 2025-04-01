@@ -1,14 +1,14 @@
-package src.main.java.it.polimi.ingsw.shipboard.visitors.integrity;
+package it.polimi.ingsw.shipboard.visitors.integrity;
 
 
-import src.main.java.it.polimi.ingsw.enums.Direction;
-import src.main.java.it.polimi.ingsw.enums.Rotation;
-import src.main.java.it.polimi.ingsw.shipboard.SideType;
-import src.main.java.it.polimi.ingsw.shipboard.TileCluster;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.*;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
-import src.main.java.it.polimi.ingsw.shipboard.visitors.TileVisitor;
-import src.main.java.it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.enums.Direction;
+import it.polimi.ingsw.enums.Rotation;
+import it.polimi.ingsw.shipboard.SideType;
+import it.polimi.ingsw.shipboard.TileCluster;
+import it.polimi.ingsw.shipboard.tiles.*;
+import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
+import it.polimi.ingsw.shipboard.visitors.TileVisitor;
+import it.polimi.ingsw.util.Coordinates;
 
 import java.util.*;
 

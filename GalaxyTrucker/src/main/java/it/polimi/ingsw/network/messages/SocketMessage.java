@@ -1,4 +1,4 @@
-package src.main.java.it.polimi.ingsw.network.messages;
+package it.polimi.ingsw.network.messages;
 
 import java.io.*;
 import java.util.List;

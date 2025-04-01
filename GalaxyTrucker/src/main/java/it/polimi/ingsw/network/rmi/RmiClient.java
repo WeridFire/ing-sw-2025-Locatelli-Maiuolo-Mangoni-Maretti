@@ -1,9 +1,9 @@
-package src.main.java.it.polimi.ingsw.network.rmi;
+package it.polimi.ingsw.network.rmi;
 
-import src.main.java.it.polimi.ingsw.network.messages.ClientUpdate;
-import src.main.java.it.polimi.ingsw.network.GameClient;
-import src.main.java.it.polimi.ingsw.network.IClient;
-import src.main.java.it.polimi.ingsw.network.IServer;
+import it.polimi.ingsw.network.messages.ClientUpdate;
+import it.polimi.ingsw.network.GameClient;
+import it.polimi.ingsw.network.IClient;
+import it.polimi.ingsw.network.IServer;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;

@@ -1,6 +1,6 @@
-package src.main.java.it.polimi.ingsw.cards.projectile;
+package it.polimi.ingsw.cards.projectile;
 
-import src.main.java.it.polimi.ingsw.enums.Direction;
+import it.polimi.ingsw.enums.Direction;
 
 public class Projectile {
 

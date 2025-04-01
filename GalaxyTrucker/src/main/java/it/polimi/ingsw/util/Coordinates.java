@@ -1,6 +1,6 @@
-package src.main.java.it.polimi.ingsw.util;
+package it.polimi.ingsw.util;
 
-import src.main.java.it.polimi.ingsw.enums.Direction;
+import it.polimi.ingsw.enums.Direction;
 
 import java.io.Serializable;
 import java.util.*;

@@ -1,8 +1,8 @@
-package src.main.java.it.polimi.ingsw.cards;
+package it.polimi.ingsw.cards;
 
-import src.main.java.it.polimi.ingsw.enums.GameLevel;
-import src.main.java.it.polimi.ingsw.gamePhases.exceptions.NoMoreCardsException;
-import src.main.java.it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.gamePhases.exceptions.NoMoreCardsException;
+import it.polimi.ingsw.player.Player;
 
 import java.util.*;
 

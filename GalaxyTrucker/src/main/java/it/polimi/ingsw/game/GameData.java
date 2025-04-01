@@ -1,15 +1,15 @@
-package src.main.java.it.polimi.ingsw.game;
+package it.polimi.ingsw.game;
 
-import src.main.java.it.polimi.ingsw.cards.Deck;
-import src.main.java.it.polimi.ingsw.enums.GameLevel;
-import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
-import src.main.java.it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
-import src.main.java.it.polimi.ingsw.gamePhases.PlayableGamePhase;
-import src.main.java.it.polimi.ingsw.player.Player;
-import src.main.java.it.polimi.ingsw.playerInput.PlayerInputRequest;
-import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
-import src.main.java.it.polimi.ingsw.shipboard.SideType;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.cards.Deck;
+import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
+import it.polimi.ingsw.gamePhases.PlayableGamePhase;
+import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PlayerInputRequest;
+import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.SideType;
+import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.io.Serializable;
 import java.util.*;

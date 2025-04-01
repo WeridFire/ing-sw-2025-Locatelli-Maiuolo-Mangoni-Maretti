@@ -1,10 +1,10 @@
-package src.main.java.it.polimi.ingsw.network;
+package it.polimi.ingsw.network;
 
 
 
-import src.main.java.it.polimi.ingsw.network.messages.ClientUpdate;
-import src.main.java.it.polimi.ingsw.network.rmi.RmiClient;
-import src.main.java.it.polimi.ingsw.network.socket.SocketClient;
+import it.polimi.ingsw.network.messages.ClientUpdate;
+import it.polimi.ingsw.network.rmi.RmiClient;
+import it.polimi.ingsw.network.socket.SocketClient;
 
 import java.io.*;
 import java.net.Socket;

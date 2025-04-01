@@ -1,17 +1,17 @@
-package src.main.java.it.polimi.ingsw.cards;
+package it.polimi.ingsw.cards;
 
-import src.main.java.it.polimi.ingsw.cards.enemy.PiratesCard;
-import src.main.java.it.polimi.ingsw.cards.enemy.SlaversCard;
-import src.main.java.it.polimi.ingsw.cards.enemy.SmugglersCard;
-import src.main.java.it.polimi.ingsw.cards.meteorstorm.MeteorStormCard;
-import src.main.java.it.polimi.ingsw.cards.planets.Planet;
-import src.main.java.it.polimi.ingsw.cards.planets.PlanetsCard;
-import src.main.java.it.polimi.ingsw.cards.projectile.Projectile;
-import src.main.java.it.polimi.ingsw.cards.warzone.WarFactory;
-import src.main.java.it.polimi.ingsw.cards.warzone.WarLevel;
-import src.main.java.it.polimi.ingsw.cards.warzone.WarZoneCard;
-import src.main.java.it.polimi.ingsw.enums.Direction;
-import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.cards.enemy.PiratesCard;
+import it.polimi.ingsw.cards.enemy.SlaversCard;
+import it.polimi.ingsw.cards.enemy.SmugglersCard;
+import it.polimi.ingsw.cards.meteorstorm.MeteorStormCard;
+import it.polimi.ingsw.cards.planets.Planet;
+import it.polimi.ingsw.cards.planets.PlanetsCard;
+import it.polimi.ingsw.cards.projectile.Projectile;
+import it.polimi.ingsw.cards.warzone.WarFactory;
+import it.polimi.ingsw.cards.warzone.WarLevel;
+import it.polimi.ingsw.cards.warzone.WarZoneCard;
+import it.polimi.ingsw.enums.Direction;
+import it.polimi.ingsw.shipboard.LoadableType;
 
 import java.util.ArrayList;
 import java.util.List;

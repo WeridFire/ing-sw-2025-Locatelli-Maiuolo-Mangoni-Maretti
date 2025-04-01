@@ -1,10 +1,10 @@
-package src.main.java.it.polimi.ingsw.shipboard.tiles;
+package it.polimi.ingsw.shipboard.tiles;
 
-import src.main.java.it.polimi.ingsw.enums.Direction;
-import src.main.java.it.polimi.ingsw.enums.Rotation;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
-import src.main.java.it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.enums.Direction;
+import it.polimi.ingsw.enums.Rotation;
+import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
+import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
+import it.polimi.ingsw.util.Coordinates;
 
 /**
  * Generic structure of a Tile.

@@ -1,11 +1,11 @@
-package src.main.java.it.polimi.ingsw.cards.enemy;
+package it.polimi.ingsw.cards.enemy;
 
-import src.main.java.it.polimi.ingsw.cards.projectile.Projectile;
-import src.main.java.it.polimi.ingsw.enums.PowerType;
-import src.main.java.it.polimi.ingsw.enums.Rotation;
-import src.main.java.it.polimi.ingsw.game.GameData;
-import src.main.java.it.polimi.ingsw.player.Player;
-import src.main.java.it.polimi.ingsw.playerInput.PlayerTurnUtils;
+import it.polimi.ingsw.cards.projectile.Projectile;
+import it.polimi.ingsw.enums.PowerType;
+import it.polimi.ingsw.enums.Rotation;
+import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PlayerTurnUtils;
 
 import java.util.List;
 import java.util.UUID;

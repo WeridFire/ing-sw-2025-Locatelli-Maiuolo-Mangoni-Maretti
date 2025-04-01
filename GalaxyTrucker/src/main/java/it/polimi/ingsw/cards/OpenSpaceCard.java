@@ -1,8 +1,8 @@
-package src.main.java.it.polimi.ingsw.cards;
+package it.polimi.ingsw.cards;
 
-import src.main.java.it.polimi.ingsw.GamesHandler;
-import src.main.java.it.polimi.ingsw.game.GameData;
-import src.main.java.it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.player.Player;
 
 import java.util.UUID;
 

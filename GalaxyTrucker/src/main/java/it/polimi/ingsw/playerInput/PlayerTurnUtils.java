@@ -1,16 +1,16 @@
-package src.main.java.it.polimi.ingsw.playerInput;
+package it.polimi.ingsw.playerInput;
 
-import src.main.java.it.polimi.ingsw.cards.projectile.Projectile;
-import src.main.java.it.polimi.ingsw.enums.Direction;
-import src.main.java.it.polimi.ingsw.enums.PowerType;
-import src.main.java.it.polimi.ingsw.game.GameData;
-import src.main.java.it.polimi.ingsw.player.Player;
-import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
-import src.main.java.it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
-import src.main.java.it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
-import src.main.java.it.polimi.ingsw.shipboard.visitors.VisitorCalculatePowers;
-import src.main.java.it.polimi.ingsw.shipboard.visitors.VisitorCalculateShieldedSides;
-import src.main.java.it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.cards.projectile.Projectile;
+import it.polimi.ingsw.enums.Direction;
+import it.polimi.ingsw.enums.PowerType;
+import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
+import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
+import it.polimi.ingsw.shipboard.visitors.VisitorCalculatePowers;
+import it.polimi.ingsw.shipboard.visitors.VisitorCalculateShieldedSides;
+import it.polimi.ingsw.util.Coordinates;
 
 import java.util.List;
 import java.util.Map;
@@ -90,6 +90,8 @@ public class PlayerTurnUtils {
 	 */
 	public static boolean runPlayerProjectileDefendRequest(Player player, Projectile projectile, GameData game) {
 
+		return false;
+		/* TODO adjust
 		if(!projectile.isShieldDefendable() && !projectile.isFireDefendable()){
 			//Player can't defend that side.
 			return false;
@@ -125,6 +127,7 @@ public class PlayerTurnUtils {
 			// TODO: manage InterruptedException
 		}
 		return true;
+		*/
 	}
 
 

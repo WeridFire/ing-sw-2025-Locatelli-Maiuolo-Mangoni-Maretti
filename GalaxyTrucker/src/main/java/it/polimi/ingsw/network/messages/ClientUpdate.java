@@ -1,12 +1,12 @@
-package src.main.java.it.polimi.ingsw.network.messages;
+package it.polimi.ingsw.network.messages;
 
 
-import src.main.java.it.polimi.ingsw.GamesHandler;
-import src.main.java.it.polimi.ingsw.cards.Deck;
-import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
-import src.main.java.it.polimi.ingsw.game.Game;
-import src.main.java.it.polimi.ingsw.game.GameData;
-import src.main.java.it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.cards.Deck;
+import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.player.Player;
 
 import java.io.*;
 import java.util.List;

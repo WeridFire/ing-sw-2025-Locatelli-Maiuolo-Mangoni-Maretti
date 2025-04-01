@@ -1,7 +1,7 @@
-package src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions;
+package it.polimi.ingsw.shipboard.tiles.exceptions;
 
-import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.ContainerTile;
+import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.tiles.ContainerTile;
 
 import java.util.List;
 import java.util.Set;

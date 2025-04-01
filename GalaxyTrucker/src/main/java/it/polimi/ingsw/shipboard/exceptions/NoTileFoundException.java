@@ -1,6 +1,6 @@
-package src.main.java.it.polimi.ingsw.shipboard.exceptions;
+package it.polimi.ingsw.shipboard.exceptions;
 
-import src.main.java.it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.util.Coordinates;
 
 public class NoTileFoundException extends Exception {
     public NoTileFoundException(String message) {

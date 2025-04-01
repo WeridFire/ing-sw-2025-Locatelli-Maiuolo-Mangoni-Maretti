@@ -1,10 +1,10 @@
-package src.main.java.it.polimi.ingsw.network.socket;
+package it.polimi.ingsw.network.socket;
 
-import src.main.java.it.polimi.ingsw.network.IClient;
-import src.main.java.it.polimi.ingsw.network.IServer;
-import src.main.java.it.polimi.ingsw.network.messages.SocketMessage;
-import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
-import src.main.java.it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.network.IClient;
+import it.polimi.ingsw.network.IServer;
+import it.polimi.ingsw.network.messages.SocketMessage;
+import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.util.Coordinates;
 
 import java.io.BufferedWriter;
 import java.io.PrintWriter;

@@ -1,10 +1,10 @@
-package src.main.java.it.polimi.ingsw.cards.planets;
+package it.polimi.ingsw.cards.planets;
 
-import src.main.java.it.polimi.ingsw.GamesHandler;
-import src.main.java.it.polimi.ingsw.cards.Card;
-import src.main.java.it.polimi.ingsw.cards.exceptions.PlanetsCardException;
-import src.main.java.it.polimi.ingsw.game.GameData;
-import src.main.java.it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.cards.Card;
+import it.polimi.ingsw.cards.exceptions.PlanetsCardException;
+import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.player.Player;
 
 import java.util.Arrays;
 import java.util.UUID;

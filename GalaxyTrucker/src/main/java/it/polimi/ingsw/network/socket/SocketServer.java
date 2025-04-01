@@ -1,7 +1,7 @@
-package src.main.java.it.polimi.ingsw.network.socket;
+package it.polimi.ingsw.network.socket;
 
-import src.main.java.it.polimi.ingsw.network.messages.ClientUpdate;
-import src.main.java.it.polimi.ingsw.network.GameServer;
+import it.polimi.ingsw.network.messages.ClientUpdate;
+import it.polimi.ingsw.network.GameServer;
 
 import java.io.*;
 import java.net.ServerSocket;

@@ -1,10 +1,10 @@
-package src.main.java.it.polimi.ingsw.gamePhases;
+package it.polimi.ingsw.gamePhases;
 
-import src.main.java.it.polimi.ingsw.cards.Card;
-import src.main.java.it.polimi.ingsw.enums.GamePhaseType;
-import src.main.java.it.polimi.ingsw.enums.GameState;
-import src.main.java.it.polimi.ingsw.game.GameData;
-import src.main.java.it.polimi.ingsw.gamePhases.exceptions.NoMoreCardsException;
+import it.polimi.ingsw.cards.Card;
+import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.enums.GameState;
+import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.gamePhases.exceptions.NoMoreCardsException;
 
 import java.util.UUID;
 

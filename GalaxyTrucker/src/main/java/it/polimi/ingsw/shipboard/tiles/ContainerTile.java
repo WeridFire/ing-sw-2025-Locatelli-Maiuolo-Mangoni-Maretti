@@ -1,11 +1,11 @@
-package src.main.java.it.polimi.ingsw.shipboard.tiles;
+package it.polimi.ingsw.shipboard.tiles;
 
-import src.main.java.it.polimi.ingsw.shipboard.LoadableType;
-import src.main.java.it.polimi.ingsw.shipboard.SideType;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
-import src.main.java.it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
-import src.main.java.it.polimi.ingsw.util.ContrabandCalculator;
+import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.SideType;
+import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
+import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
+import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
+import it.polimi.ingsw.util.ContrabandCalculator;
 
 import java.util.*;
 

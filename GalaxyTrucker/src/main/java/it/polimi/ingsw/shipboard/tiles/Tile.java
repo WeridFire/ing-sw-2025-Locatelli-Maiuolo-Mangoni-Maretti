@@ -1,6 +1,6 @@
-package src.main.java.it.polimi.ingsw.shipboard.tiles;
+package it.polimi.ingsw.shipboard.tiles;
 
-import src.main.java.it.polimi.ingsw.shipboard.visitors.TileVisitor;
+import it.polimi.ingsw.shipboard.visitors.TileVisitor;
 
 public interface Tile {
     /**

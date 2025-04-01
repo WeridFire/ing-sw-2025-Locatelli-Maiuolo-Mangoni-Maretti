@@ -1,6 +1,6 @@
-package src.main.java.it.polimi.ingsw.cards;
+package it.polimi.ingsw.cards;
 
-import src.main.java.it.polimi.ingsw.cards.exceptions.CardsGroupException;
+import it.polimi.ingsw.cards.exceptions.CardsGroupException;
 
 import java.util.List;
 

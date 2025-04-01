@@ -1,4 +1,4 @@
-package src.main.java.it.polimi.ingsw.game.exceptions;
+package it.polimi.ingsw.game.exceptions;
 
 import java.util.UUID;
 
