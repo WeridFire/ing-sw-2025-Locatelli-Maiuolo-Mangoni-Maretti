@@ -2,6 +2,7 @@ package src.main.java.it.polimi.ingsw.cards.enemy;
 
 import src.main.java.it.polimi.ingsw.cards.projectile.Projectile;
 import src.main.java.it.polimi.ingsw.enums.PowerType;
+import src.main.java.it.polimi.ingsw.enums.Rotation;
 import src.main.java.it.polimi.ingsw.game.GameData;
 import src.main.java.it.polimi.ingsw.player.Player;
 import src.main.java.it.polimi.ingsw.playerInput.PlayerTurnUtils;
@@ -36,8 +37,12 @@ public class PiratesCard extends EnemyCard {
 
     @Override
     public void applyPunishment(Player player, GameData game) {
-        for(Projectile p : punishHits){
-            List<Boolean> protectedSides = PlayerTurnUtils.runPlayerShieldsActivationInteraction(player, game);
+        for(Projectile proj : punishHits){
+            boolean defended = PlayerTurnUtils.runPlayerProjectileDefendRequest(player, proj, game);
+            if(!defended){
+                //hittt
+            }
+
             //TODO: send projectile against shipboard based on activations.
         }
     }
