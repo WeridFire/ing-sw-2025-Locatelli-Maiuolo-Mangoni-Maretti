@@ -3,6 +3,7 @@ package it.polimi.ingsw.cards.enemy;
 import it.polimi.ingsw.cards.projectile.Projectile;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PIRs.PIRChoice;
 import it.polimi.ingsw.playerInput.PIRUtils;
 
 public class PiratesCard extends EnemyCard {
@@ -26,18 +27,26 @@ public class PiratesCard extends EnemyCard {
 
     @Override
     public void givePrize(Player player, GameData game) {
-        player.addCredits(prizeBounty);
-        game.movePlayerBackward(player, getLostDays());
+        PIRChoice pirChoice = new PIRChoice(player,
+                                    30,
+                                "You will receive " + prizeBounty +" credits, but you will lose "
+                                             + getLostDays() + " days.",
+                                true);
+        boolean wantToAccept = game.getPIRHandler().setAndRunTurn(pirChoice);
+        if(wantToAccept){
+            player.addCredits(prizeBounty);
+            game.movePlayerBackward(player, getLostDays());
+        }
     }
 
     @Override
     public void applyPunishment(Player player, GameData game) {
         for(Projectile proj : punishHits){
+            //TODO: make player roll coordinates
             boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, game);
             if(!defended){
-                //hittt
+                //TODO: HIT PLAYER
             }
-
         }
     }
 
