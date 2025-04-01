@@ -1,4 +1,4 @@
-package it.polimi.ingsw.playerInput;
+package it.polimi.ingsw.playerInput.PIRs;
 
 import it.polimi.ingsw.enums.PowerType;
 import it.polimi.ingsw.player.Player;
@@ -17,7 +17,7 @@ public class PIRActivateTiles extends PIR {
 	private final Set<Coordinates> activatedTiles = new HashSet<>();
 
 	public PIRActivateTiles(Player currentPlayer, int cooldown, PowerType powerType) {
-		super(currentPlayer, cooldown, PIRType.ACTIVATE_TILE);
+		super(currentPlayer, cooldown, it.polimi.ingsw.playerInput.PIRType.ACTIVATE_TILE);
 		this.powerType = powerType;
 	}
 
@@ -77,7 +77,7 @@ public class PIRActivateTiles extends PIR {
 		}
 	}
 
-	public Set<Coordinates> getActivatedTiles() {
+	 Set<Coordinates> getActivatedTiles() {
 		return activatedTiles;
 	}
 }

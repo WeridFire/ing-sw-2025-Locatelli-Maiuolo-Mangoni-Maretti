@@ -1,4 +1,4 @@
-package it.polimi.ingsw.playerInput;
+package it.polimi.ingsw.playerInput.PIRs;
 
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
@@ -21,7 +21,7 @@ public class PIRRemoveLoadables extends PIR {
 	private final Set<LoadableType> allowedCargo;
 
 	public PIRRemoveLoadables(Player currentPlayer, int cooldown, Set<LoadableType> allowedCargo, int amount) {
-		super(currentPlayer, cooldown, PIRType.REMOVE_CARGO);
+		super(currentPlayer, cooldown, it.polimi.ingsw.playerInput.PIRType.REMOVE_CARGO);
 		this.allowedCargo = allowedCargo;
 
 		this.targetAmount = currentPlayer
@@ -96,7 +96,7 @@ public class PIRRemoveLoadables extends PIR {
 											.get(entry.getKey());
 			if(containerTile == null){
 				//shouldn't really happen tbh
-				throw new TileNotAvailableException(entry.getKey(), getPlayerTurnType());
+				throw new TileNotAvailableException(entry.getKey(), getPIRType());
 			}
 			for(LoadableType loadable : entry.getValue()){
 				containerTile.removeItems(loadable, 1);

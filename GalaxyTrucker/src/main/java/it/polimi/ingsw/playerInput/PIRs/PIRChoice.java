@@ -1,4 +1,4 @@
-package it.polimi.ingsw.playerInput;
+package it.polimi.ingsw.playerInput.PIRs;
 
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
@@ -21,7 +21,7 @@ public class PIRChoice extends PIR {
 	 * @param defaultChoice The default choice if the player does not respond on the action
 	 */
 	public PIRChoice(Player currentPlayer, int cooldown, String choiceMessage, boolean defaultChoice) {
-		super(currentPlayer, cooldown, PIRType.CHOICE);
+		super(currentPlayer, cooldown, it.polimi.ingsw.playerInput.PIRType.CHOICE);
 		this.choice = defaultChoice;
 		this.choiceMessage = choiceMessage;
 	}
@@ -51,7 +51,7 @@ public class PIRChoice extends PIR {
 		endTurn();
 	}
 
-	public boolean getChoice() {
+	 boolean getChoice() {
 		return choice;
 	}
 

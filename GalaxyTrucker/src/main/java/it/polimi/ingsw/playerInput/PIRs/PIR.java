@@ -1,6 +1,7 @@
-package it.polimi.ingsw.playerInput;
+package it.polimi.ingsw.playerInput.PIRs;
 
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PIRType;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.util.Coordinates;
@@ -12,7 +13,7 @@ public abstract class PIR {
 	protected Player currentPlayer;
 	private final int cooldown;
 	protected final Object lock = new Object();
-	private final PIRType PIRType;
+	private final it.polimi.ingsw.playerInput.PIRType PIRType;
 
 	/**
 	 * Abstract object for a PlayerInput request. The server will instance a new thread and wait for the player to
@@ -68,7 +69,7 @@ public abstract class PIR {
 	 * that the targeted coordinate for the action is contained in the coordinate mask.
 	 * @return
 	 */
-	public PIRType getPlayerTurnType() {
+	public PIRType getPIRType() {
 		return PIRType;
 	}
 

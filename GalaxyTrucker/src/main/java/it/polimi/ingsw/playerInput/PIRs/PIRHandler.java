@@ -1,8 +1,12 @@
-package it.polimi.ingsw.playerInput;
+package it.polimi.ingsw.playerInput.PIRs;
 
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PIRType;
 import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
+import it.polimi.ingsw.util.Coordinates;
+
+import java.util.Set;
 
 public class PIRHandler {
 
@@ -18,7 +22,7 @@ public class PIRHandler {
 	 */
 	private boolean isAnyTurnActive(){
 		//if first is not null, second is usually never null but check anyways
-		return genericReference == null || genericReference.getPlayerTurnType() == null;
+		return genericReference == null || genericReference.getPIRType() == null;
 	}
 
 	/**
@@ -67,30 +71,28 @@ public class PIRHandler {
 
 	/**
 	 * This function sets and run the turn itself. After a turn is set, it will automatically run. Once the turn has
-	 * finished running (either happening due to timeout or player taking action) it will reset the handler and remove
-	 * the previous turn, whatever it is. Also it will delete the generic reference pointer
+	 * finished running (either happening due to timeout or player taking action) it will delete the generic reference pointer
 	 * @param genericPIR The PIR to run and wait for it to finish.
 	 */
 	private void setGenericReference(PIR genericPIR){
 		this.genericReference = genericPIR;
 		try {
 			genericPIR.run();
-			this.removeLoadables = null;
-			this.activateTiles = null;
-			this.choice = null;
-			this.addLoadables = null;
 			this.genericReference = null;
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void setAndRunTurn(PIRActivateTiles activateTiles) {
+	public Set<Coordinates> setAndRunTurn(PIRActivateTiles activateTiles) {
 		if(isAnyTurnActive()){
 			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
 		}
 		this.activateTiles = activateTiles;
 		setGenericReference(activateTiles);
+		Set<Coordinates> result = activateTiles.getActivatedTiles();
+		this.activateTiles = null;
+		return result;
 	}
 
 	public void setAndRunTurn(PIRAddLoadables addLoadables) {
@@ -99,14 +101,18 @@ public class PIRHandler {
 		}
 		this.addLoadables = addLoadables;
 		setGenericReference(addLoadables);
+		this.addLoadables = null;
 	}
 
-	public void setAndRunTurn(PIRChoice choice) {
+	public boolean setAndRunTurn(PIRChoice choice) {
 		if(isAnyTurnActive()){
 			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
 		}
 		this.choice = choice;
 		setGenericReference(choice);
+		boolean result = choice.getChoice();
+		this.choice = null;
+		return result;
 	}
 
 	public void setAndRunTurn(PIRRemoveLoadables removeLoadables) {
@@ -115,6 +121,7 @@ public class PIRHandler {
 		}
 		this.removeLoadables = removeLoadables;
 		setGenericReference(removeLoadables);
+		this.removeLoadables = null;
 	}
 
 	/**
@@ -137,7 +144,7 @@ public class PIRHandler {
 		if(!isAnyTurnActive()){
 			return null;
 		}
-		return genericReference.getPlayerTurnType();
+		return genericReference.getPIRType();
 	}
 
 
