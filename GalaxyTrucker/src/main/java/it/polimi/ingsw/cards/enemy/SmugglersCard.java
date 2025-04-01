@@ -29,7 +29,13 @@ public class SmugglersCard extends EnemyCard {
 
 	@Override
 	public void givePrize(Player player, GameData game) {
-		game.setCurrentPlayerTurn(new PIRAddLoadables(player, 30, Arrays.stream(prizeGoods).toList()));
+		PIRAddLoadables pirAddLoadables = new PIRAddLoadables(player, 30, Arrays.stream(prizeGoods).toList());
+		game.getPIRHandler().setTurn(pirAddLoadables);
+		try {
+			pirAddLoadables.run();
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
 		game.movePlayerBackward(player, getLostDays());
 	}
 

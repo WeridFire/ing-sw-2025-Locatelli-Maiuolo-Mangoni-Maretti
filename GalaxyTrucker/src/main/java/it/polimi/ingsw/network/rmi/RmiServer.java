@@ -104,7 +104,7 @@ public class RmiServer implements IServer {
 		}
 		//Actually try to perform the action
 		try {
-			game.getGameData().getCurrentPlayerTurn().activateTiles(player, tilesToActivate);
+			game.getGameData().getPIRHandler().getActivateTiles().activateTiles(player, tilesToActivate);
 			client.updateClient(new ClientUpdate(connectionUUID));
 		} catch (WrongPlayerTurnException | InputNotSupportedException | NotEnoughItemsException |
 				 TileNotAvailableException e) {
@@ -125,10 +125,10 @@ public class RmiServer implements IServer {
 		}
 
 		try {
-			game.getGameData().getCurrentPlayerTurn().addLoadables(player, cargoToAdd);
+			game.getGameData().getPIRHandler().getAddLoadables().addLoadables(player, cargoToAdd);
 			client.updateClient(new ClientUpdate(connectionUUID));
 		} catch (InputNotSupportedException | WrongPlayerTurnException | TileNotAvailableException |
-				 NotEnoughItemsException | UnsupportedLoadableItemException | TooMuchLoadException e) {
+				 UnsupportedLoadableItemException | TooMuchLoadException e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
 	}
@@ -142,11 +142,11 @@ public class RmiServer implements IServer {
 			//TODO: player or game not found.
 			return;
 		}
-		if(!game.getGameData().getCurrentPlayerTurn().getCurrentPlayer().equals(player)){
-			//TODO: it is not the player's turn.
-			return;
+		try {
+			game.getGameData().getPIRHandler().endTurn(player);
+		} catch (WrongPlayerTurnException e) {
+			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
-		game.getGameData().getCurrentPlayerTurn().endTurn();
 		client.updateClient(new ClientUpdate(connectionUUID));
 	}
 

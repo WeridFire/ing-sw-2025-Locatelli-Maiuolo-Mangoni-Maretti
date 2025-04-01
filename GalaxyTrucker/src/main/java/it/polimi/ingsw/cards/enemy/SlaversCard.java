@@ -44,11 +44,11 @@ public class SlaversCard extends EnemyCard {
 	 */
 	@Override
 	public void applyPunishment(Player player, GameData game) {
-		game.setCurrentPlayerTurn(
-				new PIRRemoveLoadables(player, 30, LoadableType.CREW_SET, punishCrewAmount)
-		);
+
+		PIRRemoveLoadables pirRemoveLoadables = new PIRRemoveLoadables(player, 30, LoadableType.CREW_SET, punishCrewAmount);
+		game.getPIRHandler().setTurn(pirRemoveLoadables);
 		try {
-			game.getCurrentPlayerTurn().run();
+			pirRemoveLoadables.run();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
