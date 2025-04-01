@@ -1,8 +1,11 @@
 package it.polimi.ingsw.cards;
 
 import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.enums.PowerType;
+import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PIRUtils;
 
 import java.util.UUID;
 
@@ -23,8 +26,9 @@ public class OpenSpaceCard extends Card{
 	@Override
 	public void playEffect(GameData game) {
 		for(Player p : game.getPlayers()){
-			//TODO: request to controller the movement power.
-			game.movePlayerForward(p, 4);
+			float steps = PIRUtils.runPlayerPowerTilesActivationInteraction(p, game, PowerType.THRUST);
+			//Here we just round, but know for sure that the thrusters tiles won't return numbers with decimals.
+			game.movePlayerForward(p, Math.round(steps));
 		}
 	}
 }

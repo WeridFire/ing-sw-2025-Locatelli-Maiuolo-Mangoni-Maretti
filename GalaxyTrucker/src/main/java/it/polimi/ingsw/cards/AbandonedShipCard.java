@@ -3,6 +3,8 @@ package it.polimi.ingsw.cards;
 import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PIRs.PIRChoice;
+import it.polimi.ingsw.playerInput.PIRs.PIRRemoveLoadables;
 import it.polimi.ingsw.shipboard.LoadableType;
 
 import java.util.UUID;
@@ -45,11 +47,16 @@ public class AbandonedShipCard extends Card{
 	public void playEffect(GameData game) {
 		for(Player p : game.getPlayers()){
 			if(p.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().countAll(LoadableType.CREW_SET) >= requiredCrew){
-				//TODO: ask player if they want to actually take the ship.
-				if(true){ //meaning they accepted to do it
-					for(int i=0; i<requiredCrew; i++){
-						//TODO: asks player where they want to remove crew from
-					}
+				boolean result = game.getPIRHandler().setAndRunTurn(
+						new PIRChoice(p, 30, "Do you want to take the ship? " +
+								"You will lose " + requiredCrew + " crew " +
+								"and " + lostDays + " travel days, but you will receive " +
+								sellPrice + " credits.", false)
+				);
+				if(result){ //meaning they accepted to do it
+					game.getPIRHandler().setAndRunTurn(
+							new PIRRemoveLoadables(p, 30, LoadableType.CREW_SET, requiredCrew)
+					);
 					game.movePlayerBackward(p, lostDays);
 					break;
 				}
