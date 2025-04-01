@@ -6,7 +6,7 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PlayerInputRequest;
+import it.polimi.ingsw.playerInput.PIR;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
@@ -41,7 +41,7 @@ public class GameData implements Serializable {
     private Player currentPlayerTurn;
      */
 
-    private PlayerInputRequest currentPlayerTurn;
+    private PIR currentPlayerTurn;
 
     /** Mapping of available cargo goods and their quantities. */
     private Map<LoadableType, Integer> availableGoods;
@@ -114,7 +114,7 @@ public class GameData implements Serializable {
      *
      * @return The current turn player.
      */
-    public PlayerInputRequest getCurrentPlayerTurn() {
+    public PIR getCurrentPlayerTurn() {
         return currentPlayerTurn;
     }
 
@@ -192,7 +192,7 @@ public class GameData implements Serializable {
     }
 
 
-    public void setCurrentPlayerTurn(PlayerInputRequest currentPlayerTurn) {
+    public void setCurrentPlayerTurn(PIR currentPlayerTurn) {
         this.currentPlayerTurn = currentPlayerTurn;
     }
 

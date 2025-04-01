@@ -1,9 +1,9 @@
 package it.polimi.ingsw.playerInput.exceptions;
 
-import it.polimi.ingsw.playerInput.PlayerTurnType;
+import it.polimi.ingsw.playerInput.PIRType;
 
 public class InputNotSupportedException extends Exception {
-	public InputNotSupportedException(PlayerTurnType supportedType) {
+	public InputNotSupportedException(PIRType supportedType) {
 		super("Incompatible action with input of type " + supportedType);
 	}
 }

@@ -2,12 +2,10 @@ package it.polimi.ingsw.cards.enemy;
 
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PlayerAddLoadableRequest;
+import it.polimi.ingsw.playerInput.PIRAddLoadables;
 import it.polimi.ingsw.shipboard.LoadableType;
-import it.polimi.ingsw.util.Coordinates;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 public class SmugglersCard extends EnemyCard {
 
@@ -31,7 +29,7 @@ public class SmugglersCard extends EnemyCard {
 
 	@Override
 	public void givePrize(Player player, GameData game) {
-		game.setCurrentPlayerTurn(new PlayerAddLoadableRequest(player, 30, Arrays.stream(prizeGoods).toList()));
+		game.setCurrentPlayerTurn(new PIRAddLoadables(player, 30, Arrays.stream(prizeGoods).toList()));
 		game.movePlayerBackward(player, getLostDays());
 	}
 

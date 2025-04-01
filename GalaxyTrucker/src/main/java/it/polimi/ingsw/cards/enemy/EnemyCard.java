@@ -1,18 +1,10 @@
 package it.polimi.ingsw.cards.enemy;
 
-import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.enums.PowerType;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PlayerActivateTilesRequest;
-import it.polimi.ingsw.playerInput.PlayerRemoveLoadableRequest;
-import it.polimi.ingsw.playerInput.PlayerTurnUtils;
-import it.polimi.ingsw.shipboard.LoadableType;
-
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import it.polimi.ingsw.playerInput.PIRUtils;
 
 public abstract class EnemyCard extends Card {
 
@@ -68,7 +60,7 @@ public abstract class EnemyCard extends Card {
     @Override
     public void playEffect(GameData game) {
         for(Player p : game.getPlayers()){
-            float totalFirePower = PlayerTurnUtils.runPlayerPowerTilesActivationInteraction(p, game, PowerType.FIRE);
+            float totalFirePower = PIRUtils.runPlayerPowerTilesActivationInteraction(p, game, PowerType.FIRE);
             if(totalFirePower > getFirePower()){
                 givePrize(p, game);
                 break;

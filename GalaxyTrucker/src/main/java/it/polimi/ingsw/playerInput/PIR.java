@@ -12,12 +12,12 @@ import it.polimi.ingsw.util.Coordinates;
 
 import java.util.*;
 
-public abstract class PlayerInputRequest {
+public abstract class PIR {
 
 	protected Player currentPlayer;
 	private final int cooldown;
 	protected final Object lock = new Object();
-	private final PlayerTurnType playerTurnType;
+	private final PIRType PIRType;
 
 	/**
 	 * Abstract object for a PlayerInput request. The server will instance a new thread and wait for the player to
@@ -26,10 +26,10 @@ public abstract class PlayerInputRequest {
 	 * @param currentPlayer The player the game waits for
 	 * @param cooldown The cooldown duration.
 	 */
-	public PlayerInputRequest(Player currentPlayer, int cooldown, PlayerTurnType playerTurnType){
+	public PIR(Player currentPlayer, int cooldown, PIRType PIRType){
 		this.currentPlayer = currentPlayer;
 		this.cooldown = cooldown;
-		this.playerTurnType = playerTurnType;
+		this.PIRType = PIRType;
 	}
 
 	/**
@@ -73,36 +73,36 @@ public abstract class PlayerInputRequest {
 	 * that the targeted coordinate for the action is contained in the coordinate mask.
 	 * @return
 	 */
-	public PlayerTurnType getPlayerTurnType() {
-		return playerTurnType;
+	public PIRType getPlayerTurnType() {
+		return PIRType;
 	}
 
 	protected void checkForTileMask(Coordinates coordinate) throws TileNotAvailableException {
 		if(!getHighlightMask().contains(coordinate)){
-			throw new TileNotAvailableException(coordinate, playerTurnType);
+			throw new TileNotAvailableException(coordinate, PIRType);
 		}
 	}
 
 	protected void checkForTurn(Player player) throws WrongPlayerTurnException {
 		if(player != currentPlayer){
-			throw new WrongPlayerTurnException(currentPlayer, player, playerTurnType);
+			throw new WrongPlayerTurnException(currentPlayer, player, PIRType);
 		}
 	}
 
 	public void activateTiles(Player player, Set<Coordinates> coordinates) throws WrongPlayerTurnException, InputNotSupportedException, NotEnoughItemsException, TileNotAvailableException {
-		throw new InputNotSupportedException(playerTurnType);
+		throw new InputNotSupportedException(PIRType);
 	}
 
 	public void removeLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToRemove) throws InputNotSupportedException, WrongPlayerTurnException, TileNotAvailableException, NotEnoughItemsException, UnsupportedLoadableItemException {
-		throw new InputNotSupportedException(playerTurnType);
+		throw new InputNotSupportedException(PIRType);
 	}
 
 	public void addLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToAdd) throws InputNotSupportedException, WrongPlayerTurnException, TileNotAvailableException, NotEnoughItemsException, UnsupportedLoadableItemException, TooMuchLoadException {
-		throw new InputNotSupportedException(playerTurnType);
+		throw new InputNotSupportedException(PIRType);
 	}
 
 	public void makeChoice(Player player, boolean choice) throws InputNotSupportedException, WrongPlayerTurnException {
-		throw new InputNotSupportedException(playerTurnType);
+		throw new InputNotSupportedException(PIRType);
 	}
 
 

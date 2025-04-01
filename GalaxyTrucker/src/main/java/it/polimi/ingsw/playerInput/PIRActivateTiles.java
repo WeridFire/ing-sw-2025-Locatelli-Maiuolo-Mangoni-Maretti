@@ -2,7 +2,6 @@ package it.polimi.ingsw.playerInput;
 
 import it.polimi.ingsw.enums.PowerType;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.shipboard.LoadableType;
@@ -12,13 +11,13 @@ import it.polimi.ingsw.util.Coordinates;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PlayerActivateTilesRequest extends PlayerInputRequest {
+public class PIRActivateTiles extends PIR {
 
 	private PowerType powerType;
 	private final Set<Coordinates> activatedTiles = new HashSet<>();
 
-	public PlayerActivateTilesRequest(Player currentPlayer, int cooldown, PowerType powerType) {
-		super(currentPlayer, cooldown, PlayerTurnType.ACTIVATE_TILE);
+	public PIRActivateTiles(Player currentPlayer, int cooldown, PowerType powerType) {
+		super(currentPlayer, cooldown, PIRType.ACTIVATE_TILE);
 		this.powerType = powerType;
 	}
 

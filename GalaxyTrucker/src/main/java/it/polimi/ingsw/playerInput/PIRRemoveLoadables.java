@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class PlayerRemoveLoadableRequest extends PlayerInputRequest {
+public class PIRRemoveLoadables extends PIR {
 
 	private int targetAmount;
 	private int amountToRemove;
 	private final Set<LoadableType> allowedCargo;
 
-	public PlayerRemoveLoadableRequest(Player currentPlayer, int cooldown, Set<LoadableType> allowedCargo, int amount) {
-		super(currentPlayer, cooldown, PlayerTurnType.REMOVE_CARGO);
+	public PIRRemoveLoadables(Player currentPlayer, int cooldown, Set<LoadableType> allowedCargo, int amount) {
+		super(currentPlayer, cooldown, PIRType.REMOVE_CARGO);
 		this.allowedCargo = allowedCargo;
 
 		this.targetAmount = currentPlayer
