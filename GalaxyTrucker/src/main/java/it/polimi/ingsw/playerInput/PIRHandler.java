@@ -11,6 +11,7 @@ public class PIRHandler {
 	private PIRChoice choice = null;
 	private PIRRemoveLoadables removeLoadables = null;
 	private PIR genericReference;
+
 	/**
 	 *
 	 * @return true if any turn in the player input request is set, or null if none is not set.
@@ -66,38 +67,48 @@ public class PIRHandler {
 
 	private void setGenericReference(PIR genericPIR){
 		this.genericReference = genericPIR;
+		try {
+			genericPIR.run();
+			this.removeLoadables = null;
+			this.activateTiles = null;
+			this.choice = null;
+			this.addLoadables = null;
+			this.genericReference = null;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public void setTurn(PIRActivateTiles activateTiles) {
+	public void setAndRunTurn(PIRActivateTiles activateTiles) {
 		if(isAnyTurnActive()){
 			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
 		}
-		setGenericReference(activateTiles);
 		this.activateTiles = activateTiles;
+		setGenericReference(activateTiles);
 	}
 
-	public void setTurn(PIRAddLoadables addLoadables) {
+	public void setAndRunTurn(PIRAddLoadables addLoadables) {
 		if(isAnyTurnActive()){
 			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
 		}
-		setGenericReference(addLoadables);
 		this.addLoadables = addLoadables;
+		setGenericReference(addLoadables);
 	}
 
-	public void setTurn(PIRChoice choice) {
+	public void setAndRunTurn(PIRChoice choice) {
 		if(isAnyTurnActive()){
 			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
 		}
-		setGenericReference(choice);
 		this.choice = choice;
+		setGenericReference(choice);
 	}
 
-	public void setTurn(PIRRemoveLoadables removeLoadables) {
+	public void setAndRunTurn(PIRRemoveLoadables removeLoadables) {
 		if(isAnyTurnActive()){
 			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
 		}
-		setGenericReference(removeLoadables);
 		this.removeLoadables = removeLoadables;
+		setGenericReference(removeLoadables);
 	}
 
 	public Player getCurrentPlayer() {
@@ -119,7 +130,6 @@ public class PIRHandler {
 		if(!isAnyTurnActive()) {
 			return;
 		}
-
 		if(!getCurrentPlayer().equals(player)){
 			throw new WrongPlayerTurnException(getCurrentPlayer(), player, getType());
 		}
