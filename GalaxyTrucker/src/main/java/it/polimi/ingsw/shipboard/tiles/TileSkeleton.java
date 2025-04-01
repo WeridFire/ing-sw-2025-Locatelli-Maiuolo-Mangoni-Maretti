@@ -11,9 +11,9 @@ import it.polimi.ingsw.util.Coordinates;
  * @param <SideType> Tile's single side type
  */
 public abstract class TileSkeleton<SideType> implements Tile {
-    protected SideType[] sides;
-    protected Rotation appliedRotation;
-    protected Coordinates fixedAt;
+    private final SideType[] sides;
+    private Rotation appliedRotation;
+    private Coordinates fixedAt;
 
     /**
      * Construct the tile with specified parameters.
@@ -55,8 +55,13 @@ public abstract class TileSkeleton<SideType> implements Tile {
      * Set {@code this} tile fixed at specified coordinates
      * @param coordinates Where the tile is placed.
      * @throws FixedTileException If the tile is already fixed.
+     * @throws NullPointerException If {@code coordinates} is {@code null}.
      */
     public void place(Coordinates coordinates) throws FixedTileException {
+        if (coordinates == null) {
+            throw new NullPointerException("coordinates cannot be null");
+        }
+
         if (fixedAt != null) {
             throw new FixedTileException("Attempt to place an already fixed tile.");
         }

@@ -57,6 +57,12 @@ public abstract class ContainerTile extends TileSkeleton<SideType> {
         }
 
         this.allowedItems = allowedItems;
+
+        // if no items loaded -> no items to remove
+        if ((loadedItems == null) || (loadedItems.isEmpty())) {
+            return Collections.emptyList();
+        }
+        // else: calculate all the items to remove and remove and return them
         List<LoadableType> removedItems = new ArrayList<>(loadedItems.size());
 
         Iterator<LoadableType> iterator = loadedItems.iterator();
@@ -92,8 +98,18 @@ public abstract class ContainerTile extends TileSkeleton<SideType> {
                     + " of them.");
         }
 
-        occupiedCapacity -= requiredCapacity;
+        occupiedCapacity += requiredCapacity;
         loadedItems.addAll(Collections.nCopies(quantity, item));
+    }
+
+    /**
+     * Calculate and set {@link #occupiedCapacity} from loaded items
+     */
+    private void recalculateOccupiedCapacity() {
+        occupiedCapacity = 0;
+        for (LoadableType item : loadedItems) {
+            occupiedCapacity += item.getRequiredCapacity();
+        }
     }
 
     /**
@@ -123,6 +139,7 @@ public abstract class ContainerTile extends TileSkeleton<SideType> {
         }
 
         loadedItems.removeAll(Collections.nCopies(quantity, item));
+        recalculateOccupiedCapacity();
     }
 
     /**
@@ -158,6 +175,7 @@ public abstract class ContainerTile extends TileSkeleton<SideType> {
 
         // actually removes them
         loadedItems.removeAll(toRemove);
+        recalculateOccupiedCapacity();
         return removed;
     }
 
@@ -232,9 +250,18 @@ public abstract class ContainerTile extends TileSkeleton<SideType> {
     /**
      * Returns the set of allowed items onto the tile.
      * @return the set of allowed items on the tile.
+     * @implNote a copy is returned to allow modifications: in the implementation is an unmodifiable set.
      */
     public Set<LoadableType> getAllowedItems(){
-        return allowedItems;
+        return new HashSet<>(allowedItems);
+    }
+
+    /**
+     * Equivalent to {@code getLoadedItems().isEmpty()}
+     * @return {@code true} if this container has no loaded items, {@code false} otherwise.
+     */
+    public boolean isEmpty() {
+        return loadedItems.isEmpty();
     }
 }
 

@@ -47,21 +47,25 @@ public class CabinTile extends ContainerTile {
      *             or {@link LoadableType#BROWN_ALIEN}.
      * @throws AlreadyInitializedCabinException If the cabin has already been initialized with a loadable type.
      * @throws UnsupportedLoadableItemException If the specified loadable type is not supported for this cabin.
+     * @throws NullPointerException If {@code crew} is {@code null}.
      */
     public void fillWith(LoadableType crew) throws AlreadyInitializedCabinException, UnsupportedLoadableItemException {
+        if (crew == null) {
+            throw new NullPointerException("crew to add cannot be null");
+        }
         if (loadedCrew != null) {
             throw new AlreadyInitializedCabinException();
         }
-        // set loaded crew type
-        loadedCrew = crew;
         // calculate how many components of the crew are needed to fill the cabin
-        int quantity = getCapacityLeft() / loadedCrew.getRequiredCapacity();
+        int quantity = getCapacityLeft() / crew.getRequiredCapacity();
         // load the crew
         try {
-            loadItems(loadedCrew, quantity);
+            loadItems(crew, quantity);
         } catch (TooMuchLoadException e) {
             throw new RuntimeException(e);  // should never happen -> runtime error
         }
+        // set loaded crew type
+        loadedCrew = crew;
     }
 
 }

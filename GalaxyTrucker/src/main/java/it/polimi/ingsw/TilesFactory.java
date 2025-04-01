@@ -25,7 +25,7 @@ public class TilesFactory {
      *
      * @return A {@code Tile} instance representing the main cabin.
      */
-    public static TileSkeleton<SideType> createMainCabinTile() {
+    public static MainCabinTile createMainCabinTile() {
         /*
         Blue -> "GT-new_tiles_16_for web33.jpg"
         Green -> "GT-new_tiles_16_for web34.jpg"
