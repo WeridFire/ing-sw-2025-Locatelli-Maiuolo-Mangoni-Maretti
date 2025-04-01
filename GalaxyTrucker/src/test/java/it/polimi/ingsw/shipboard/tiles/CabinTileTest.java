@@ -10,7 +10,6 @@ import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.SideType;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
