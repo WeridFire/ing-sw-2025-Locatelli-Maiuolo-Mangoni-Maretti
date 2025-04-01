@@ -3,6 +3,7 @@ package it.polimi.ingsw.playerInput;
 import it.polimi.ingsw.cards.projectile.Projectile;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.PowerType;
+import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.LoadableType;
@@ -90,44 +91,85 @@ public class PlayerTurnUtils {
 	 */
 	public static boolean runPlayerProjectileDefendRequest(Player player, Projectile projectile, GameData game) {
 
-		return false;
-		/* TODO adjust
-		if(!projectile.isShieldDefendable() && !projectile.isFireDefendable()){
-			//Player can't defend that side.
+		if(projectile.isShieldDefendable()){
+			if(player.getShipBoard()
+					.getVisitorCalculateCargoInfo()
+					.getBatteriesInfo()
+					.count(LoadableType.BATTERY) == 0){
+				//player doesn't have enough batteries.
+				return false;
+			}
+
+			if(!player.getShipBoard()
+					.getVisitorCalculateShieldedSides()
+					.hasShieldFacing(projectile.getDirection()
+					.getRotated(Rotation.OPPOSITE))){
+				//player doesn't have a shield on that side
+				return false;
+			}
+
+			String message = "You are being hit from direction " + projectile.getDirection().toString() + ". You can defend yourself " +
+					"with a shield. Do you want to activate it?";
+			PlayerChoiceRequest choiceReq = new PlayerChoiceRequest(player, 30, message, false);
+			game.setCurrentPlayerTurn(choiceReq);
+			try {
+				choiceReq.run();
+			} catch (InterruptedException e) {
+				//TODO: Manage interruptedException
+				e.printStackTrace();
+			}
+
+			boolean choice = choiceReq.getChoice();
+			if(!choice){
+				return false;
+			}
+
+			game.setCurrentPlayerTurn(
+					new PlayerRemoveLoadableRequest(player, 30, Set.of(LoadableType.BATTERY), 1)
+			);
+
+			try {
+				game.getCurrentPlayerTurn().run();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				// TODO: manage InterruptedException
+			}
+			return true;
+
+		}else if(projectile.isFireDefendable()){
+			//TODO: check that projectile is defendable by a single cannon, so no request necessary and return true
+			//TODO: check that projectile is defendable by a double cannon, if so proceed with request
+			String message = "You are being hit from direction " + projectile.getDirection().toString() + ". You can defend yourself " +
+					"with a double cannon. Do you want to activate it?";
+			PlayerChoiceRequest choiceReq = new PlayerChoiceRequest(player, 30, message, false);
+			game.setCurrentPlayerTurn(choiceReq);
+			try {
+				choiceReq.run();
+			} catch (InterruptedException e) {
+				//TODO: Manage interruptedException
+				e.printStackTrace();
+			}
+
+			boolean choice = choiceReq.getChoice();
+			if(!choice){
+				return false;
+			}
+
+			game.setCurrentPlayerTurn(
+					new PlayerRemoveLoadableRequest(player, 30, Set.of(LoadableType.BATTERY), 1)
+			);
+
+			try {
+				game.getCurrentPlayerTurn().run();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				// TODO: manage InterruptedException
+			}
+			return true;
+
+		}else{
 			return false;
 		}
-
-
-		if(player.getShipBoard().getVisitorCalculateCargoInfo().getBatteriesInfo().count(LoadableType.BATTERY) == 0){
-			//player doesn't have enough batteries.
-			return false;
-		}
-		String message = "You are being hit from direction " + shieldDirection.toString() + ". You can defend yourself " +
-				"with a shield. Do you want to activate it?";
-		PlayerChoiceRequest choiceReq = new PlayerChoiceRequest(player, 30, message, false);
-		game.setCurrentPlayerTurn(choiceReq);
-		try {
-			choiceReq.run();
-		} catch (InterruptedException e) {
-			//TODO: Manage interruptedException
-			e.printStackTrace();
-		}
-		boolean choice = choiceReq.getChoice();
-		if(!choice){
-			return false;
-		}
-
-		game.setCurrentPlayerTurn(
-				new PlayerRemoveLoadableRequest(player, 30, Set.of(LoadableType.BATTERY), 1)
-		);
-		try {
-			game.getCurrentPlayerTurn().run();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			// TODO: manage InterruptedException
-		}
-		return true;
-		*/
 	}
 
 
