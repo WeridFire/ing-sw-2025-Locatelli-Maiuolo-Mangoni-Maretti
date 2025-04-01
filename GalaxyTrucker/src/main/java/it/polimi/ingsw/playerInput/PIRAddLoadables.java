@@ -75,7 +75,7 @@ public class PIRAddLoadables extends PIR {
 	}
 
 	@Override
-	public void endTurn() {
+	void endTurn() {
 		synchronized (lock){
 			lock.notifyAll();
 		}
@@ -95,7 +95,6 @@ public class PIRAddLoadables extends PIR {
 	 * @throws UnsupportedLoadableItemException An item being loaded is not supported either by a container, or by the list of cargo that has to be loaded.
 	 * @throws TooMuchLoadException A tile is being loaded with too much loadables.
 	 */
-	@Override
 	public void addLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToAdd) throws WrongPlayerTurnException, TileNotAvailableException, UnsupportedLoadableItemException, TooMuchLoadException {
 		checkForTurn(player);
 		for(Coordinates c : cargoToAdd.keySet()){

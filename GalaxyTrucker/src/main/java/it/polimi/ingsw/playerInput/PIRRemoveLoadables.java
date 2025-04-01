@@ -62,7 +62,7 @@ public class PIRRemoveLoadables extends PIR {
 	}
 
 	@Override
-	public void endTurn() {
+	void endTurn() {
 		synchronized (lock){
 			if(getCargoAmount() <= targetAmount){
 				lock.notifyAll();
@@ -80,7 +80,6 @@ public class PIRRemoveLoadables extends PIR {
 	 * @throws NotEnoughItemsException The tile requested does not have enough items.
 	 * @throws UnsupportedLoadableItemException The tile requested does not support the requested loadable.
 	 */
-	@Override
 	public void removeLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToRemove) throws WrongPlayerTurnException, TileNotAvailableException, NotEnoughItemsException, UnsupportedLoadableItemException {
 		checkForTurn(player);
 		for(Coordinates c : cargoToRemove.keySet()){

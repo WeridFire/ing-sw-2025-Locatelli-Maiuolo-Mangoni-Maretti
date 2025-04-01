@@ -37,7 +37,7 @@ public class PIRActivateTiles extends PIR {
 	}
 
 	@Override
-	public void endTurn() {
+	void endTurn() {
 		//This function gets called by the player when they're done activating stuff.
 		lock.notifyAll();
 	}
@@ -64,7 +64,6 @@ public class PIRActivateTiles extends PIR {
 	 * @throws NotEnoughItemsException If the player does not have enough batteries to activate the tiles.
 	 * @throws TileNotAvailableException If the tile is not supported for this action in this turn.
 	 */
-	@Override
 	public void activateTiles(Player player, Set<Coordinates> coordinates) throws WrongPlayerTurnException, NotEnoughItemsException, TileNotAvailableException {
 		checkForTurn(player);
 		for(Coordinates c : coordinates){

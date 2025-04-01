@@ -39,13 +39,12 @@ public class PIRChoice extends PIR {
 	}
 
 	@Override
-	public void endTurn() {
+	void endTurn() {
 		synchronized (lock){
 			lock.notifyAll();
 		}
 	}
 
-	@Override
 	public void makeChoice(Player player, boolean choice) throws WrongPlayerTurnException {
 		checkForTurn(player);
 		this.choice = choice;
