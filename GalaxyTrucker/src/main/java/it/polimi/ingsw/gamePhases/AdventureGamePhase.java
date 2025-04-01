@@ -29,13 +29,4 @@ public class AdventureGamePhase extends PlayableGamePhase{
         card.playEffect(gameData);
     }
 
-    @Override
-    public void onTick() {
-
-    }
-
-    @Override
-    public void onTimerEnd() {
-
-    }
 }

@@ -1,21 +1,22 @@
 package it.polimi.ingsw.gamePhases;
 
-import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
-import it.polimi.ingsw.enums.GameState;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTypeException;
-import it.polimi.ingsw.gamePhases.exceptions.NoMoreTimerResetLeftException;
-import it.polimi.ingsw.timer.Timer;
+import it.polimi.ingsw.network.GameServer;
 
+
+import java.rmi.RemoteException;
 import java.util.UUID;
 
 public class AssembleGamePhase extends PlayableGamePhase{
 
     private int howManyTimerRotationsLeft;
 
-    private final Timer timer;
+    private final Object timerLock = new Object();
+
+    private boolean timerRunning;
 
     /**
      * Constructs a new PlayableGamePhase.
@@ -24,7 +25,7 @@ public class AssembleGamePhase extends PlayableGamePhase{
      * @param gamePhaseType The type of the game phase.
      * @param gameData      The game data.
      */
-    public AssembleGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameData gameData) throws IncorrectGamePhaseTypeException {
+    public AssembleGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameData gameData) throws IncorrectGamePhaseTypeException{
         super(gameId, gamePhaseType, gameData);
 
         if (!gamePhaseType.equals(GamePhaseType.ASSEMBLE)){
@@ -33,48 +34,35 @@ public class AssembleGamePhase extends PlayableGamePhase{
 
         if (gameData.getLevel().equals(GameLevel.TESTFLIGHT)){
             this.howManyTimerRotationsLeft = -1;
-        } else if (gameData.getLevel().equals(GameLevel.TWO)){
+        } else if (gameData.getLevel().equals(GameLevel.TWO)) {
             this.howManyTimerRotationsLeft = 3;
         }
 
-        this.timer = GamesHandler.getInstance().getGame(gameId).getTimer();
+        this.timerRunning = false;
+
     }
 
-    @Override
-    public void playLoop() {
-        if (howManyTimerRotationsLeft < 0){
-            // testflight logic
-            return;
+    public void playLoop() throws RemoteException, InterruptedException {
+
+        while(howManyTimerRotationsLeft > 0){
+            GameServer.getInstance().broadcastUpdate(gameData.getGameId());
+            timerRunning = true;
+            Thread thread = new Thread(() -> {
+                try {
+                    Thread.sleep(30000); // Il thread dorme per 30 secondi
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+            thread.join();
+            timerRunning = false;
+
+            synchronized (timerLock){
+                wait();
+            }
+            howManyTimerRotationsLeft -= 1;
         }
-        // level two game logic
-        // metto server in ascolto
 
-        //possono arrivare 2 cose:
-            //gira clessidra
-            //pacchetti relativi al mettere e togliere tessere dalla shipboard
-
-        timer.start();
-        howManyTimerRotationsLeft--;
-    }
-
-    @Override
-    public void onTick() {
-        //TBD some JavaFX things probably
-    }
-
-    @Override
-    public void onTimerEnd() {
-        if (howManyTimerRotationsLeft == 0){
-            //close server logic
-
-        }
-    }
-
-    private void resetTimer() throws NoMoreTimerResetLeftException {
-        if (howManyTimerRotationsLeft == 0){
-            throw new NoMoreTimerResetLeftException("No more timer reset");
-        }
-        timer.restart();
     }
 
 }

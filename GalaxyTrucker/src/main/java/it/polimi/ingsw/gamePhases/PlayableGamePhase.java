@@ -1,10 +1,8 @@
 package it.polimi.ingsw.gamePhases;
 
 import it.polimi.ingsw.enums.GamePhaseType;
-import it.polimi.ingsw.enums.GameState;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.network.exceptions.CantFindClientException;
-import it.polimi.ingsw.timer.TimerBehavior;
 
 import java.rmi.RemoteException;
 import java.util.UUID;
@@ -13,7 +11,7 @@ import java.util.UUID;
  * Represents an abstract playable game phase.
  * Defines the structure for different game phases that can be played.
  */
-public abstract class PlayableGamePhase implements TimerBehavior {
+public abstract class PlayableGamePhase {
 
     /** The type of the game phase. */
     GamePhaseType gamePhaseType;
@@ -51,5 +49,5 @@ public abstract class PlayableGamePhase implements TimerBehavior {
      * Defines the main gameplay loop for this phase.
      * To be implemented by subclasses.
      */
-    public abstract void playLoop() throws RemoteException, CantFindClientException;
+    public abstract void playLoop() throws RemoteException, CantFindClientException, InterruptedException;
 }
