@@ -126,6 +126,7 @@ public class PIRHandler {
 		return genericReference.getPlayerTurnType();
 	}
 
+
 	public void endTurn(Player player) throws WrongPlayerTurnException {
 		if(!isAnyTurnActive()) {
 			return;
@@ -134,5 +135,11 @@ public class PIRHandler {
 			throw new WrongPlayerTurnException(getCurrentPlayer(), player, getType());
 		}
 		genericReference.endTurn();
+		/*
+		We don't need in here to nullify generic reference! In fact, check what happens when genericReference ends
+		and the caller of genericReference.run() resumes. This happens in this class PIRHandler#setGenericReference.
+		As you can see in there the nullification of the reference is already handled.
+		 */
+
 	}
 }
