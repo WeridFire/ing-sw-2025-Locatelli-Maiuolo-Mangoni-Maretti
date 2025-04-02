@@ -338,4 +338,8 @@ public class ShipBoard {
 		smugglers.removeMostValuableItems(quantityToRemove);
 	}
 
+	public GameLevel getLevel(){
+		return level;
+	}
+
 }

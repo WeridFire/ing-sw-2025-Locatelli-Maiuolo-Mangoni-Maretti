@@ -1,15 +1,20 @@
 package it.polimi.ingsw.player;
 
+import it.polimi.ingsw.enums.Direction;
+import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.exceptions.TooManyReservedTilesException;
 import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.util.Coordinates;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Map;
 
 public class Player implements Serializable {
 
@@ -156,4 +161,198 @@ public class Player implements Serializable {
         }
         // TODO: actually draw component  // setTileInHand();
     }
+
+    public void printCliShipboard()
+    {
+        int gridWidth = 7;
+        int gridHeight = 5;
+
+        char[][] grid = new char[gridHeight][gridWidth];
+        Map<Coordinates, TileSkeleton<SideType>> tiles = this.getShipBoard().getTilesOnBoard();
+
+        for (int i = 0; i < gridHeight; i++) {
+            for (int j = 0; j < gridWidth; j++) {
+                grid[i][j] = ' ';
+            }
+        }
+
+        for (Map.Entry<Coordinates, TileSkeleton<SideType>> entry : tiles.entrySet()) {
+            Coordinates coord = entry.getKey();
+            TileSkeleton<SideType> tile = entry.getValue();
+
+            // Calcola posizione nella griglia di caratteri
+            int startx = (coord.getColumn() - 4) * 5;
+            int starty = (coord.getRow() - 5) * 5;
+
+            // Renderizza la tessera (adatta questo metodo in base ai tuoi SideType)
+            try{
+                renderTile(grid, startx, starty, tile);
+            }
+            catch (ArrayIndexOutOfBoundsException e)
+            {
+                System.err.println("Errore rendering tile [" + coord.getColumn() + "," + coord.getRow() + "]");
+            }
+        }
+
+        //Stampa la griglia
+        for (int i = 0; i < gridHeight; i++) {
+            for (int j = 0; j < gridWidth; j++) {
+                System.out.print(grid[i][j]);
+            }
+            System.out.println();
+        }
+    }
+
+    private void renderTile(char[][] grid, int startx, int starty, TileSkeleton<SideType> tile) {
+        grid[startx][starty] = '┌';
+        grid[startx+4][starty] = '┐';
+        grid[startx][starty+4] = '└';
+        grid[startx+4][starty+4] = '┘';
+        renderNorthSide(grid, startx, starty, tile.getSide(Direction.NORTH));
+        renderWestSide(grid, startx, starty, tile.getSide(Direction.WEST));
+        renderEastSide(grid, startx, starty, tile.getSide(Direction.EAST));
+        renderSouthSide(grid, startx, starty, tile.getSide(Direction.SOUTH));
+    }
+
+    private void renderNorthSide(char[][] grid, int startx, int starty, SideType side) {
+        switch(side){
+            case SMOOTH:
+                grid[startx+1][starty] = ' ';
+                grid[startx+2][starty] = ' ';
+                grid[startx+3][starty] = ' ';
+                break;
+            case SINGLE:
+                grid[startx+1][starty] = ' ';
+                grid[startx+2][starty] = '|';
+                grid[startx+3][starty] = ' ';
+                break;
+            case DOUBLE:
+                grid[startx+1][starty] = '|';
+                grid[startx+2][starty] = ' ';
+                grid[startx+3][starty] = '|';
+                break;
+            case UNIVERSAL:
+                grid[startx+1][starty] = '|';
+                grid[startx+2][starty] = '|';
+                grid[startx+3][starty] = '|';
+                break;
+            case CANNON:
+                grid[startx+1][starty] = ' ';
+                grid[startx+2][starty] = '▴';
+                grid[startx+3][starty] = ' ';
+                break;
+            case ENGINE:
+                grid[startx+1][starty] = ' ';
+                grid[startx+2][starty] = 'E';
+                grid[startx+3][starty] = ' ';
+                break;
+        }
+    }
+
+    public void renderWestSide(char[][] grid, int startx, int starty, SideType side) {
+        switch(side){
+            case SMOOTH:
+                grid[startx][starty+1] = ' ';
+                grid[startx][starty+2] = ' ';
+                grid[startx][starty+3] = ' ';
+                break;
+            case SINGLE:
+                grid[startx][starty+1] = ' ';
+                grid[startx][starty+2] = '-';
+                grid[startx][starty+3] = ' ';
+                break;
+            case DOUBLE:
+                grid[startx][starty+1] = '-';
+                grid[startx][starty+2] = ' ';
+                grid[startx][starty+3] = '-';
+                break;
+            case UNIVERSAL:
+                grid[startx][starty+1] = '-';
+                grid[startx][starty+2] = '-';
+                grid[startx][starty+3] = '-';
+                break;
+            case CANNON:
+                grid[startx][starty+1] = ' ';
+                grid[startx][starty+2] = '◂';
+                grid[startx][starty+3] = ' ';
+                break;
+            case ENGINE:
+                grid[startx][starty+1] = ' ';
+                grid[startx][starty+2] = 'E';
+                grid[startx][starty+3] = ' ';
+                break;
+        }
+    }
+
+    public void renderEastSide(char[][] grid, int startx, int starty, SideType side) {
+        switch(side){
+            case SMOOTH:
+                grid[startx+4][starty+1] = ' ';
+                grid[startx+4][starty+2] = ' ';
+                grid[startx+4][starty+3] = ' ';
+                break;
+            case SINGLE:
+                grid[startx+4][starty+1] = ' ';
+                grid[startx+4][starty+2] = '-';
+                grid[startx+4][starty+3] = ' ';
+                break;
+            case DOUBLE:
+                grid[startx+4][starty+1] = '-';
+                grid[startx+4][starty+2] = ' ';
+                grid[startx+4][starty+3] = '-';
+                break;
+            case UNIVERSAL:
+                grid[startx+4][starty+1] = '-';
+                grid[startx+4][starty+2] = '-';
+                grid[startx+4][starty+3] = '-';
+                break;
+            case CANNON:
+                grid[startx+4][starty+1] = ' ';
+                grid[startx+4][starty+2] = '▸';
+                grid[startx+4][starty+3] = ' ';
+                break;
+            case ENGINE:
+                grid[startx+4][starty+1] = ' ';
+                grid[startx+4][starty+2] = 'E';
+                grid[startx+4][starty+3] = ' ';
+                break;
+        }
+
+    }
+
+    private void renderSouthSide(char[][] grid, int startx, int starty, SideType side){
+        switch(side){
+            case SMOOTH:
+                grid[startx+1][starty+4] = ' ';
+                grid[startx+2][starty+4] = ' ';
+                grid[startx+3][starty+4] = ' ';
+                break;
+            case SINGLE:
+                grid[startx+1][starty+4] = ' ';
+                grid[startx+2][starty+4] = '|';
+                grid[startx+3][starty+4] = ' ';
+                break;
+            case DOUBLE:
+                grid[startx+1][starty+4] = '|';
+                grid[startx+2][starty+4] = ' ';
+                grid[startx+3][starty+4] = '|';
+                break;
+            case UNIVERSAL:
+                grid[startx+1][starty+4] = '|';
+                grid[startx+2][starty+4] = '|';
+                grid[startx+3][starty+4] = '|';
+                break;
+            case CANNON:
+                grid[startx+1][starty+4] = ' ';
+                grid[startx+2][starty+4] = '▾';
+                grid[startx+3][starty+4] = ' ';
+                break;
+            case ENGINE:
+                grid[startx+1][starty+4] = ' ';
+                grid[startx+2][starty+4] = 'E';
+                grid[startx+3][starty+4] = ' ';
+                break;
+        }
+    }
+
 }
