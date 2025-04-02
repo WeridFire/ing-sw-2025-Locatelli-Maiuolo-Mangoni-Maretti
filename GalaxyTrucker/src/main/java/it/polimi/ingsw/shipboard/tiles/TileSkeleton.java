@@ -14,6 +14,7 @@ public abstract class TileSkeleton implements Tile {
     private final SideType[] sides;
     private Rotation appliedRotation;
     private Coordinates fixedAt;
+    private String cliSymbol = "?";
 
     /**
      * Construct the tile with specified parameters.
@@ -107,6 +108,14 @@ public abstract class TileSkeleton implements Tile {
         return fixedAt.getNeighborDirection(neighbor.fixedAt);
     }
 
+    public void setCLISymbol(String cliSymbol){
+        this.cliSymbol = cliSymbol;
+    }
+
+    public String getCLISymbol() {
+        return cliSymbol;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -116,5 +125,14 @@ public abstract class TileSkeleton implements Tile {
             sb.append("; ").append(directions[i]).append(" -> ").append(sides[directions[i].getValue()]);
         }
         return sb.append("]").toString();
+    }
+
+    public String[] getCLIRepresentation(){
+        String firstLine = "┌" + SideType.getCLIRepresentation(getSide(Direction.NORTH), Direction.NORTH) + "┐";
+        String secondLine = SideType.getCLIRepresentation(getSide(Direction.WEST), Direction.WEST) +
+                            getCLISymbol() +
+                            SideType.getCLIRepresentation(getSide(Direction.EAST), Direction.EAST);
+        String thirdLine = "└" + SideType.getCLIRepresentation(getSide(Direction.SOUTH), Direction.SOUTH) + "┘";
+        return new String[]{firstLine, secondLine, thirdLine};
     }
 }
