@@ -179,7 +179,6 @@ public class RmiServer implements IServer {
 			return;
 		}
 
-		player.setTileInHand(tile);
 		GameServer.getInstance().broadcastUpdate(game);
 	}
 }

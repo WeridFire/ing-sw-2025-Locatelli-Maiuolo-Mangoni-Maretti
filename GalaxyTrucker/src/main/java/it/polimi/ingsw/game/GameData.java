@@ -159,7 +159,9 @@ public class GameData implements Serializable {
         if (getDrawnTiles().isEmpty()) {
             return null;
         }
-        return coveredTiles.removeFirst();
+        TileSkeleton<SideType> t = coveredTiles.removeFirst();
+        coveredTiles.add(t);
+        return t;
     }
 
     /**
