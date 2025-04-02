@@ -17,7 +17,7 @@ import java.util.*;
 public class ShipBoard {
 
 	private final GameLevel level;
-	private final Map<Coordinates, TileSkeleton<SideType>> board;
+	private final Map<Coordinates, TileSkeleton> board;
 
 	private VisitorCalculateCargoInfo visitorCalculateCargoInfo;
 	private VisitorCalculatePowers visitorCalculatePowers;
@@ -35,7 +35,7 @@ public class ShipBoard {
 		visitorCalculateShieldedSides = new VisitorCalculateShieldedSides();
 		visitorCheckIntegrity = new VisitorCheckIntegrity();
 
-		for (TileSkeleton<SideType> tile : board.values()) {
+		for (TileSkeleton tile : board.values()) {
 			tile.accept(visitorCalculateCargoInfo);
 			tile.accept(visitorCalculatePowers);
 			tile.accept(visitorCalculateShieldedSides);
@@ -65,7 +65,7 @@ public class ShipBoard {
 	 *
 	 * @return A copy of the board.
 	 */
-	public Map<Coordinates, TileSkeleton<SideType>> getTilesOnBoard() {
+	public Map<Coordinates, TileSkeleton> getTilesOnBoard() {
 		return Map.copyOf(board);
 	}
 
@@ -85,7 +85,7 @@ public class ShipBoard {
 	 *
 	 * @return An unmodifiable set of all and only the tiles placed onto the shipboard.
 	 */
-	public Set<TileSkeleton<SideType>> getTiles() {
+	public Set<TileSkeleton> getTiles() {
 		return Set.copyOf(board.values());
 	}
 
@@ -116,12 +116,12 @@ public class ShipBoard {
 	 * @throws OutOfBuildingAreaException If the coordinates are outside the valid building area.
 	 * @throws NoTileFoundException If no tile is found at the given coordinates.
 	 */
-	public TileSkeleton<SideType> getTile(Coordinates coordinates)
+	public TileSkeleton getTile(Coordinates coordinates)
 			throws OutOfBuildingAreaException, NoTileFoundException {
 		if (!BoardCoordinates.isOnBoard(level, coordinates)) {
 			throw new OutOfBuildingAreaException(level, coordinates);
 		}
-		TileSkeleton<SideType> result = board.get(coordinates);
+		TileSkeleton result = board.get(coordinates);
 		if (result == null) {
 			throw new NoTileFoundException(coordinates);
 		}
@@ -138,7 +138,7 @@ public class ShipBoard {
 	 * @throws IllegalArgumentException If the provided tile is null.
 	 * @throws FixedTileException If the provided tile has already been placed.
 	 */
-	public void setTile(TileSkeleton<SideType> tile, Coordinates coordinates) throws OutOfBuildingAreaException,
+	public void setTile(TileSkeleton tile, Coordinates coordinates) throws OutOfBuildingAreaException,
             TileAlreadyPresentException, IllegalArgumentException, FixedTileException {
 		if (tile == null) {
 			throw new IllegalArgumentException("Tile cannot be null");
@@ -332,7 +332,7 @@ public class ShipBoard {
 	 */
 	public void acceptSmugglers(int quantityToRemove) {
 		VisitorSmugglers smugglers = new VisitorSmugglers(quantityToRemove);
-		for (TileSkeleton<SideType> tile : board.values()) {
+		for (TileSkeleton tile : board.values()) {
 			tile.accept(smugglers);
 		}
 		smugglers.removeMostValuableItems(quantityToRemove);

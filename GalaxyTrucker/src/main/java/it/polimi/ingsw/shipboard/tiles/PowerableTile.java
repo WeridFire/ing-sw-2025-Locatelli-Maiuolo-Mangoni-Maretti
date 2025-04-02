@@ -5,7 +5,7 @@ import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 
-public abstract class PowerableTile extends TileSkeleton<SideType> {
+public abstract class PowerableTile extends TileSkeleton {
     private final Boolean[] sidesWithPower;
     private final boolean batteryNeeded;
 

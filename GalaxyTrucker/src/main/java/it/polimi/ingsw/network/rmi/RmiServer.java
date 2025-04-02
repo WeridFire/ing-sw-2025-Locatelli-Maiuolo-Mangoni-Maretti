@@ -165,7 +165,7 @@ public class RmiServer implements IServer {
 			return;
 		}
 
-		TileSkeleton<SideType> tile = game.getGameData().drawTile();
+		TileSkeleton tile = game.getGameData().drawTile();
 
 		if (tile == null){
 			// no more covered tiles

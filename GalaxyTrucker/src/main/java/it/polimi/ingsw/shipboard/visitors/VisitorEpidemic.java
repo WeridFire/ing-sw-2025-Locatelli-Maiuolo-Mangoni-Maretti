@@ -68,7 +68,7 @@ public class VisitorEpidemic implements TileVisitor {
 	 * so the whole visitor should be recalculated at the end.
 	 * @param shipBoard as coordinate-tile entries in the shipboard
 	 */
-	public void applyEpidemicEffect(Map<Coordinates, TileSkeleton<SideType>> shipBoard){
+	public void applyEpidemicEffect(Map<Coordinates, TileSkeleton> shipBoard){
 		Set<Coordinates> result = new HashSet<>();
 		for (Coordinates c : nonEmptyCabins) {
 			Set<Coordinates> neighbors = c.getNeighbors();

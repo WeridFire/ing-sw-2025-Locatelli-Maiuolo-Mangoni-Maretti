@@ -24,17 +24,17 @@ public class Player implements Serializable {
     /**
      * Tile currently held by the player
      */
-    private TileSkeleton<SideType> tileInHand;
+    private TileSkeleton tileInHand;
 
     /**
      * Tiles reserved by the player during building phase (MAX 2)
      */
-    private final List<TileSkeleton<SideType>> reservedTiles;
+    private final List<TileSkeleton> reservedTiles;
 
     /**
      * Number of tiles that the player will have to pay for at the end of the game (destroyed tiles or reserved and not used tiles)
      */
-    private final List<TileSkeleton<SideType>> discardedTiles;
+    private final List<TileSkeleton> discardedTiles;
 
     /**
      * The player's shipboard
@@ -75,7 +75,7 @@ public class Player implements Serializable {
      *
      * @return tile held by the player
      */
-    public TileSkeleton<SideType> getTileInHand() {
+        public TileSkeleton getTileInHand() {
         return tileInHand;
     }
 
@@ -83,7 +83,7 @@ public class Player implements Serializable {
      *
      * @param tileInHand tile held by the player
      */
-    public void setTileInHand(TileSkeleton<SideType> tileInHand) {
+    public void setTileInHand(TileSkeleton tileInHand) {
         this.tileInHand = tileInHand;
     }
 
@@ -91,7 +91,7 @@ public class Player implements Serializable {
      *
      * @return reserved tiles array
      */
-    public List<TileSkeleton<SideType>> getReservedTiles() {
+    public List<TileSkeleton> getReservedTiles() {
         return reservedTiles;
     }
 
@@ -100,7 +100,7 @@ public class Player implements Serializable {
      * @param reservedTile tile to save in the array
      * @throws TooManyReservedTilesException called if the array is already full
      */
-    public void setReservedTiles(TileSkeleton<SideType> reservedTile) throws TooManyReservedTilesException {
+    public void setReservedTiles(TileSkeleton reservedTile) throws TooManyReservedTilesException {
         if (reservedTiles.size() == 2) {
             throw new TooManyReservedTilesException();
         }
@@ -111,7 +111,7 @@ public class Player implements Serializable {
      *
      * @return the list of discarded tiles
      */
-    public List<TileSkeleton<SideType>> getDiscardedTiles() {
+    public List<TileSkeleton> getDiscardedTiles() {
         return discardedTiles;
     }
 
@@ -119,7 +119,7 @@ public class Player implements Serializable {
      *
      * @param tile tile to add to the list
      */
-    public void addDiscardedTiles(TileSkeleton<SideType> tile) {
+    public void addDiscardedTiles(TileSkeleton tile) {
         discardedTiles.add(tile);
     }
 
@@ -168,7 +168,7 @@ public class Player implements Serializable {
         int gridHeight = 5;
 
         char[][] grid = new char[gridWidth*5][gridHeight*5];
-        Map<Coordinates, TileSkeleton<SideType>> tiles = this.getShipBoard().getTilesOnBoard();
+        Map<Coordinates, TileSkeleton> tiles = this.getShipBoard().getTilesOnBoard();
 
         for (int i = 0; i < gridHeight; i++) {
             for (int j = 0; j < gridWidth; j++) {
@@ -176,9 +176,9 @@ public class Player implements Serializable {
             }
         }
 
-        for (Map.Entry<Coordinates, TileSkeleton<SideType>> entry : tiles.entrySet()) {
+        for (Map.Entry<Coordinates, TileSkeleton> entry : tiles.entrySet()) {
             Coordinates coord = entry.getKey();
-            TileSkeleton<SideType> tile = entry.getValue();
+            TileSkeleton tile = entry.getValue();
 
             // Calcola posizione nella griglia di caratteri
             int startx = (coord.getColumn() - 4) * 5;
@@ -203,7 +203,7 @@ public class Player implements Serializable {
         }
     }
 
-    private void renderTile(char[][] grid, int startx, int starty, TileSkeleton<SideType> tile) {
+    private void renderTile(char[][] grid, int startx, int starty, TileSkeleton tile) {
         grid[startx][starty] = '┌';
         grid[startx+4][starty] = '┐';
         grid[startx][starty+4] = '└';

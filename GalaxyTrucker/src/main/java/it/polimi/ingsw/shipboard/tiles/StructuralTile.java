@@ -7,7 +7,7 @@ import it.polimi.ingsw.shipboard.visitors.TileVisitor;
  * Represents a structural tile, which defines the shape and connectivity
  * of a structure but does not provide additional functionality.
  */
-public class StructuralTile extends TileSkeleton<SideType> {
+public class StructuralTile extends TileSkeleton {
 
     /**
      * Constructs a StructuralTile with the specified sides.

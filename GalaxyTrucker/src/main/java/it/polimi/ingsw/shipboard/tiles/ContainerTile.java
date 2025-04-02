@@ -13,7 +13,7 @@ import java.util.*;
  * Represents a container tile that can store specific types of loadable items.
  * Each container has a defined capacity and a set of allowed items.
  */
-public abstract class ContainerTile extends TileSkeleton<SideType> {
+public abstract class ContainerTile extends TileSkeleton {
 
     private final Set<LoadableType> maxAllowedItems;
 

@@ -12,8 +12,8 @@ import java.util.Set;
  * A tile cluster groups tiles that are considered part of the same unit (e.g. all and only those welded together).
  */
 public class TileCluster {
-    private final Set<TileSkeleton<SideType>> tiles;
-    private TileSkeleton<SideType> mainTile;
+    private final Set<TileSkeleton> tiles;
+    private TileSkeleton mainTile;
 
     /**
      * Creates an empty tile cluster with no main tile.
@@ -28,7 +28,7 @@ public class TileCluster {
      *
      * @param mainTile the tile to be set as the main tile
      */
-    public TileCluster(TileSkeleton<SideType> mainTile) {
+    public TileCluster(TileSkeleton mainTile) {
         tiles = new HashSet<>();
         tiles.add(mainTile);
         this.mainTile = mainTile;
@@ -40,7 +40,7 @@ public class TileCluster {
      *
      * @param tiles the list of tiles to be added to the cluster
      */
-    public TileCluster(Set<TileSkeleton<SideType>> tiles) {
+    public TileCluster(Set<TileSkeleton> tiles) {
         this.tiles = new HashSet<>(tiles);
         mainTile = null;
     }
@@ -51,7 +51,7 @@ public class TileCluster {
      *
      * @param tile the tile to be added
      */
-    public void addTile(TileSkeleton<SideType> tile) {
+    public void addTile(TileSkeleton tile) {
         tiles.add(tile);
     }
 
@@ -61,7 +61,7 @@ public class TileCluster {
      * @param tile the tile to be set as the main tile
      * @throws TileAlreadyPresentException if there is already a main tile in the cluster
      */
-    public void addAsMainTile(TileSkeleton<SideType> tile) throws TileAlreadyPresentException {
+    public void addAsMainTile(TileSkeleton tile) throws TileAlreadyPresentException {
         if (mainTile != null) {
             throw new TileAlreadyPresentException(
                     "Attempt to add a tile as main tile in a cluster with an already set main tile");
@@ -94,7 +94,7 @@ public class TileCluster {
      *
      * @return a set of tiles in the cluster
      */
-    public Set<TileSkeleton<SideType>> getTiles() {
+    public Set<TileSkeleton> getTiles() {
         return tiles;
     }
 

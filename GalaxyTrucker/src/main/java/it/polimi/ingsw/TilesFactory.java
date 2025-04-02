@@ -98,9 +98,9 @@ public class TilesFactory {
      * @return a list of the generated tiles
      * @throws IllegalArgumentException if the reference numbers are inconsistent with the size of the input list
      */
-    private static List<TileSkeleton<SideType>> createListOfTiles(List<String> compactTilesSides,
+    private static List<TileSkeleton> createListOfTiles(List<String> compactTilesSides,
                                                 int firstReferenceNumber, int lastReferenceNumber,
-                                                Function<String, TileSkeleton<SideType>> tileConstructor) {
+                                                Function<String, TileSkeleton> tileConstructor) {
         if (lastReferenceNumber < firstReferenceNumber) {
             throw new IllegalArgumentException("lastReferenceNumber must be greater or equal to firstReferenceNumber");
         }
@@ -110,7 +110,7 @@ public class TilesFactory {
 
         int i, referenceNumber;
         String compactTileSides;
-        List<TileSkeleton<SideType>> result = new ArrayList<>(compactTilesSides.size());
+        List<TileSkeleton> result = new ArrayList<>(compactTilesSides.size());
 
         for (i = 0, referenceNumber = firstReferenceNumber;
              referenceNumber <= lastReferenceNumber; referenceNumber++, i++) {
@@ -134,8 +134,8 @@ public class TilesFactory {
      *
      * @return A {@code List<Tile>} containing a set of predefined tiles.
      */
-    public static List<TileSkeleton<SideType>> createPileTiles() {
-        ArrayList<TileSkeleton<SideType>> pile = new ArrayList<>();
+    public static List<TileSkeleton> createPileTiles() {
+        ArrayList<TileSkeleton> pile = new ArrayList<>();
 
         // Battery Components with 2 battery slots
         pile.addAll(createListOfTiles(

@@ -8,7 +8,7 @@ import it.polimi.ingsw.shipboard.visitors.TileVisitor;
  * Represents a tile that provides life support in a given system.
  * This tile has specific sides and offers life support to a certain crew type.
  */
-public class LifeSupportSystemTile extends TileSkeleton<SideType> {
+public class LifeSupportSystemTile extends TileSkeleton {
 
     private final LoadableType providedLifeSupport;
 

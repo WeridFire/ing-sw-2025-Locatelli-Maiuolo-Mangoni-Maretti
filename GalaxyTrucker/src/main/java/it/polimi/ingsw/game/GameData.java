@@ -51,7 +51,7 @@ public class GameData implements Serializable {
     private Deck deck;
 
     /** List of covered tiles in the game. */
-    private List<TileSkeleton<SideType>> coveredTiles;
+    private List<TileSkeleton> coveredTiles;
 
     /** List of drawn tiles I.E. all the tiles that:
      *  - are not part of a shipboard
@@ -59,7 +59,7 @@ public class GameData implements Serializable {
      *  - are not in hand
      *  - are not reserved by anybody
      */
-    private List<TileSkeleton<SideType>> drawnTiles;
+    private List<TileSkeleton> drawnTiles;
 
     private int requiredPlayers;
 
@@ -142,7 +142,7 @@ public class GameData implements Serializable {
      *
      * @return The list of covered tiles.
      */
-    public List<TileSkeleton<SideType>> getCoveredTiles() {
+    public List<TileSkeleton> getCoveredTiles() {
         return coveredTiles;
     }
 
@@ -151,15 +151,15 @@ public class GameData implements Serializable {
      *
      * @return The list of uncovered tiles.
      */
-    public List<TileSkeleton<SideType>> getDrawnTiles() {
+    public List<TileSkeleton> getDrawnTiles() {
         return drawnTiles;
     }
 
-    public TileSkeleton<SideType> drawTile() {
+    public TileSkeleton drawTile() {
         if (getDrawnTiles().isEmpty()) {
             return null;
         }
-        TileSkeleton<SideType> t = coveredTiles.removeFirst();
+        TileSkeleton t = coveredTiles.removeFirst();
         coveredTiles.add(t);
         return t;
     }
@@ -198,7 +198,7 @@ public class GameData implements Serializable {
      *
      * @param coveredTiles The new list of covered tiles.
      */
-    public void setCoveredTiles(List<TileSkeleton<SideType>> coveredTiles) {
+    public void setCoveredTiles(List<TileSkeleton> coveredTiles) {
         this.coveredTiles = coveredTiles;
     }
 

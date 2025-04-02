@@ -56,16 +56,16 @@ public class IntegrityProblem {
     }
 
 
-    public IntegrityProblem(Map<Coordinates, TileSkeleton<SideType>> visitedTiles,
+    public IntegrityProblem(Map<Coordinates, TileSkeleton> visitedTiles,
                             List<TileCluster> clusters,
-                            Set<TileSkeleton<SideType>> intrinsicallyWrongTiles,
-                            List<Map.Entry<TileSkeleton<SideType>, TileSkeleton<SideType>>> illegallyWeldedTiles) {
+                            Set<TileSkeleton> intrinsicallyWrongTiles,
+                            List<Map.Entry<TileSkeleton, TileSkeleton>> illegallyWeldedTiles) {
 
         this.clustersToRemove = new ArrayList<>();
         this.clustersToKeep = new ArrayList<>();
 
         // add intrinsically wrong tiles as 1-tile clusters to remove
-        for (TileSkeleton<SideType> intrinsicallyWrongTile : intrinsicallyWrongTiles) {
+        for (TileSkeleton intrinsicallyWrongTile : intrinsicallyWrongTiles) {
             clustersToRemove.add(new TileCluster(intrinsicallyWrongTile));
         }
 
@@ -77,7 +77,7 @@ public class IntegrityProblem {
             note: with implementation that keeps intersection of clusters to keep, is ok to mask with
             previously set clusters.
          */
-        for (Map.Entry<TileSkeleton<SideType>, TileSkeleton<SideType>> illegallyWeldedTile : illegallyWeldedTiles) {
+        for (Map.Entry<TileSkeleton, TileSkeleton> illegallyWeldedTile : illegallyWeldedTiles) {
             clustersToKeep.add(exploreCluster(visitedTiles,
                     illegallyWeldedTile.getKey(), illegallyWeldedTile.getValue()));
             clustersToKeep.add(exploreCluster(visitedTiles,
@@ -95,17 +95,17 @@ public class IntegrityProblem {
      * @return The updated TileCluster containing all connected tiles.
      * @throws RuntimeException If the tile's neighbors cannot be determined.
      */
-    private TileCluster exploreCluster(Map<Coordinates, TileSkeleton<SideType>> visitedTiles,
-                                       TileSkeleton<SideType> startingTile, TileSkeleton<SideType> tileToIgnore) {
+    private TileCluster exploreCluster(Map<Coordinates, TileSkeleton> visitedTiles,
+                                       TileSkeleton startingTile, TileSkeleton tileToIgnore) {
 
         TileCluster cluster = new TileCluster(startingTile);
 
         // Use a queue to explore tiles iteratively (BFS)
-        Queue<TileSkeleton<SideType>> queue = new LinkedList<>();
+        Queue<TileSkeleton> queue = new LinkedList<>();
         queue.add(startingTile);
 
         while (!queue.isEmpty()) {
-            TileSkeleton<SideType> tile = queue.poll();
+            TileSkeleton tile = queue.poll();
 
             // Skip if already processed
             if (cluster.getTiles().contains(tile)) {
@@ -125,7 +125,7 @@ public class IntegrityProblem {
 
             // Collect valid neighbors (tiles that exist and are not ignored)
             for (Coordinates coord : neighborsLocations) {
-                TileSkeleton<SideType> neighbor = visitedTiles.get(coord);
+                TileSkeleton neighbor = visitedTiles.get(coord);
                 if (neighbor != null && neighbor != tileToIgnore && !cluster.getTiles().contains(neighbor)) {
                     queue.add(neighbor);
                 }

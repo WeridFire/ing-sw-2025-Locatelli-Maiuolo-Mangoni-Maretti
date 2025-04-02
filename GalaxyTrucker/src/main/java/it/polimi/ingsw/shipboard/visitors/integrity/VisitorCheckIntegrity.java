@@ -17,10 +17,10 @@ import java.util.*;
  * Visitor to check for integrity problems. The first encountered must be resolved.
  */
 public class VisitorCheckIntegrity implements TileVisitor {
-    private final Map<Coordinates, TileSkeleton<SideType>> visitedTiles;
+    private final Map<Coordinates, TileSkeleton> visitedTiles;
     private final List<TileCluster> clusters;
-    private final Set<TileSkeleton<SideType>> intrinsicallyWrongTiles;
-    private final List<Map.Entry<TileSkeleton<SideType>, TileSkeleton<SideType>>> illegallyWeldedTiles;
+    private final Set<TileSkeleton> intrinsicallyWrongTiles;
+    private final List<Map.Entry<TileSkeleton, TileSkeleton>> illegallyWeldedTiles;
 
     public VisitorCheckIntegrity() {
         visitedTiles = new HashMap<>();
@@ -77,13 +77,13 @@ public class VisitorCheckIntegrity implements TileVisitor {
         addToClusters(tile);
     }
 
-    private static boolean areDirectlyWelded(TileSkeleton<SideType> tile1, TileSkeleton<SideType> tile2) {
+    private static boolean areDirectlyWelded(TileSkeleton tile1, TileSkeleton tile2) {
         Direction dir = tile1.getNeighborDirection(tile2);
         if (dir == null) return false;
         return SideType.areWeldable(tile1.getSide(dir), tile2.getSide(dir.getRotated(Rotation.OPPOSITE)));
     }
 
-    private void addToClusters(TileSkeleton<SideType> tile) {
+    private void addToClusters(TileSkeleton tile) {
         List<TileCluster> weldedClusters = new ArrayList<>();
 
         // store as visited tile
@@ -95,7 +95,7 @@ public class VisitorCheckIntegrity implements TileVisitor {
 
         // store all the clusters welded to this tile
         for (TileCluster cluster : clusters) {
-            for (TileSkeleton<SideType> clusterTile : cluster.getTiles()) {
+            for (TileSkeleton clusterTile : cluster.getTiles()) {
                 if (areDirectlyWelded(tile, clusterTile)) {
                     weldedClusters.add(cluster);
                     break;

@@ -9,7 +9,7 @@ public class TileAlreadyPresentException extends Exception {
         super(message);
     }
 
-    public TileAlreadyPresentException(Coordinates coordinates, TileSkeleton<SideType> tile) {
+    public TileAlreadyPresentException(Coordinates coordinates, TileSkeleton tile) {
         super("Tile " + tile + " already present at coordinates " + coordinates);
     }
 }

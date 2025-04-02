@@ -2,15 +2,15 @@ package it.polimi.ingsw.shipboard.tiles;
 
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.Rotation;
+import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
 import it.polimi.ingsw.util.Coordinates;
 
 /**
  * Generic structure of a Tile.
- * @param <SideType> Tile's single side type
  */
-public abstract class TileSkeleton<SideType> implements Tile {
+public abstract class TileSkeleton implements Tile {
     private final SideType[] sides;
     private Rotation appliedRotation;
     private Coordinates fixedAt;
@@ -102,7 +102,7 @@ public abstract class TileSkeleton<SideType> implements Tile {
      * @return {@code null} if this tile is not placed adjacent to {@code other} tile,
      * otherwise the direction to go from this tile to the {@code other}.
      */
-    public Direction getNeighborDirection(TileSkeleton<SideType> neighbor) {
+    public Direction getNeighborDirection(TileSkeleton neighbor) {
         if (fixedAt == null) return null;
         return fixedAt.getNeighborDirection(neighbor.fixedAt);
     }
