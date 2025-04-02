@@ -85,4 +85,9 @@ public class ServerSocketHandler implements IServer {
 	public void forceEndTurn(IClient client) {
 
 	}
+
+	@Override
+	public void startTimer(IClient client) {
+
+	}
 }

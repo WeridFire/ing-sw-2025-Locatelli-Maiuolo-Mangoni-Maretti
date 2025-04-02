@@ -4,6 +4,7 @@ import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTypeException;
+import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
 import it.polimi.ingsw.network.GameServer;
 
 
@@ -44,7 +45,7 @@ public class AssembleGamePhase extends PlayableGamePhase{
 
     public void playLoop() throws RemoteException, InterruptedException {
 
-        while(howManyTimerRotationsLeft > 0){
+        while(howManyTimerRotationsLeft > 0) {
             GameServer.getInstance().broadcastUpdate(gameData.getGameId());
             timerRunning = true;
             Thread thread = new Thread(() -> {
@@ -57,12 +58,19 @@ public class AssembleGamePhase extends PlayableGamePhase{
             thread.join();
             timerRunning = false;
 
-            synchronized (timerLock){
+            // wait that a player starts the timer
+            synchronized (timerLock) {
                 wait();
             }
             howManyTimerRotationsLeft -= 1;
         }
+    }
 
+    public void startTimer(){
+        if (timerRunning) {
+            throw new TimerIsAlreadyRunningException("Timer is already running");
+        }
+        timerLock.notifyAll();
     }
 
 }

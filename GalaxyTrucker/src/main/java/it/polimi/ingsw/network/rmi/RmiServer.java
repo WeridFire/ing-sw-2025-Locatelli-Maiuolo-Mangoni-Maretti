@@ -1,6 +1,7 @@
 package it.polimi.ingsw.network.rmi;
 
 import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.exceptions.GameNotFoundException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
@@ -148,6 +149,15 @@ public class RmiServer implements IServer {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
 		client.updateClient(new ClientUpdate(connectionUUID));
+	}
+
+	@Override
+	public void startTimer(IClient client) {
+		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
+		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
+		if (!game.getGameData().getCurrentGamePhaseType().equals(GamePhaseType.ASSEMBLE)){
+			game.getGameData().getCurrentGamePhase().startTimer();
+		}
 	}
 
 

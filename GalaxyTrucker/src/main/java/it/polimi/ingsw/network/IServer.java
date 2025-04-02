@@ -21,4 +21,7 @@ public interface IServer extends Remote {
 	void activateTiles(IClient client, Set<Coordinates> tilesToActivate) throws RemoteException;
 	void allocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException;
 	void forceEndTurn(IClient client) throws RemoteException;
+
+	// Assemble Phase
+	void startTimer(IClient client);
 }

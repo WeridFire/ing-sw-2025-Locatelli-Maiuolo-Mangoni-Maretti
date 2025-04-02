@@ -50,4 +50,9 @@ public abstract class PlayableGamePhase {
      * To be implemented by subclasses.
      */
     public abstract void playLoop() throws RemoteException, CantFindClientException, InterruptedException;
+
+    /**
+     * Used to implement starting timer logic
+     * */
+    public abstract void startTimer();
 }

@@ -11,7 +11,7 @@ import java.util.UUID;
 public class AdventureGamePhase extends PlayableGamePhase{
 
     /**Card that determins the andventure*/
-    private Card card;
+    private final Card card;
 
     /**
      * Constructs a new PlayableGamePhase.
@@ -22,11 +22,17 @@ public class AdventureGamePhase extends PlayableGamePhase{
      */
     public AdventureGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameData gameData, Card card) {
         super(gameId, gamePhaseType, gameData);
+        this.card = card;
     }
 
     @Override
     public void playLoop() {
         card.playEffect(gameData);
+    }
+
+    @Override
+    public void startTimer() {
+
     }
 
 }
