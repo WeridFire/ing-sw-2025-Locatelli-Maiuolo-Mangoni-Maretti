@@ -5,9 +5,15 @@ import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.cards.exceptions.PlanetsCardException;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
+import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class PlanetsCard extends Card {
 
@@ -32,9 +38,9 @@ public class PlanetsCard extends Card {
 	 * @throws PlanetsCardException the planet does not exists in the list of planets n the card.
 	 * @return
 	 */
-	public Planet getPlanet(int i) throws PlanetsCardException{
+	public Planet getPlanet(int i){
 		if(i<0 || i >= planets.length){
-			throw new PlanetsCardException("Could not find a planet with this index.");
+			return null;
 		}
 		return planets[i];
 	}
@@ -46,14 +52,29 @@ public class PlanetsCard extends Card {
 	@Override
 	public void playEffect(GameData game) {
 		for (Player p : game.getPlayers()){
-			//TODO: ask player if they wanna land. We should get here directly the reference to the planet to land on.
-			//TODO: the check that ID is valid AND the planet is free should be handled in the controller.
-			Planet planet = null;
-			try {
-				planet = getPlanet(0);
-				planet.landPlayer(p);
-			} catch (PlanetsCardException e) {
-				//TODO: get singleton of controller for the game, send message of error to player.
+			List<Planet> availablePlanets = Arrays.stream(planets)
+					.filter(planet -> planet.getCurrentPlayer() == null).toList();
+			List<String> planetsOption = new ArrayList<String>();
+			availablePlanets.forEach(planet -> planetsOption.add("Loot: " + planet.getAvailableGoods()));
+			planetsOption.addFirst("Don't land");
+			int choice = game.getPIRHandler().setAndRunTurn(
+					new PIRMultipleChoice(p, 30, "On what planet do you want to land? " +
+							"(-" + lostDays +" travel days)",
+							planetsOption.toArray(new String[0]), 0)
+			);
+			if(choice > 0){
+				Planet planet = availablePlanets.get(choice-1);
+				if(planet != null){
+					try {
+						planet.landPlayer(p);
+					} catch (PlanetsCardException e) {
+						throw new RuntimeException("Somehow a player choose to land on a planet that was already");
+					}
+					//TODO: allow rearrrangement / discard of goods
+					game.getPIRHandler().setAndRunTurn(
+							new PIRAddLoadables(p, 30, planet.getAvailableGoods())
+					);
+				}
 			}
 		}
 		for(Player p : game.getPlayers().reversed()){
@@ -63,7 +84,6 @@ public class PlanetsCard extends Card {
 					.orElse(null);
 
 			if(landedPlanet != null){
-				landedPlanet.lootPlanet();
 				landedPlanet.leavePlanet();
 				game.movePlayerBackward(p, lostDays);
 			}

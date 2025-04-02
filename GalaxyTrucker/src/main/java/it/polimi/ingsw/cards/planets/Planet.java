@@ -54,27 +54,6 @@ public class Planet {
 	}
 
 	/**
-	 * Assigns a good from the planet available goods to a player.
-	 * @param good the good to load on the ship. The good must be present on the planet.
-	 * @throws PlanetsCardException if the good is not present on the planet.
-	 */
-	public void assignGood(LoadableType good) throws PlanetsCardException {
-		if(availableGoods.contains(good)){
-			availableGoods.remove(good);
-			//TODO: Ask player the Tile where to put the good on. Add the good in the correct position on the ship.
-			return;
-		}
-		throw new PlanetsCardException("The good is not present on the planet.");
-	}
-
-	/**
-	 * Loots the planet, asking iteratively the player what cargo item to load / discard.
-	 */
-	public void lootPlanet(){
-		//TODO: whole implementation, iterate through cargo, ask, perform.
-	}
-
-	/**
 	 * Frees up the planet, making the landed player leave.
 	 */
 	public void leavePlanet(){
