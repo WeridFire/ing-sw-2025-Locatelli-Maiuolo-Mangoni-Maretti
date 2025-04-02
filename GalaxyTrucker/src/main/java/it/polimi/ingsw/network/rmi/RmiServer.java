@@ -5,6 +5,7 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.exceptions.GameNotFoundException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
+import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.network.IClient;
@@ -14,6 +15,8 @@ import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.SideType;
+import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
@@ -74,18 +77,6 @@ public class RmiServer implements IServer {
 	public void quitGame(IClient client) throws RemoteException {
 		//assume we left the game
 		client.updateClient(new ClientUpdate(gameServer.getUUIDbyConnection(client)));
-	}
-
-	@Override
-	public void drawComponent(IClient client) {
-		/*
-		Game playerGame = gamesHandler.getGame("uuid del game");
-		if(playerGame != null){
-			// do nothing
-		}
-		//playerGame.getGameData().getPlayers().drawComponent(playerGame);
-		client.updateClient(new ClientUpdate(gameServer.getUUIDbyConnection(client)));
-		*/
 	}
 
 	@Override
@@ -151,14 +142,44 @@ public class RmiServer implements IServer {
 		client.updateClient(new ClientUpdate(connectionUUID));
 	}
 
+	// ASSEMBLE PHASE
+
 	@Override
-	public void startTimer(IClient client) {
+	public void startTimer(IClient client) throws RemoteException {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
-		if (!game.getGameData().getCurrentGamePhaseType().equals(GamePhaseType.ASSEMBLE)){
+
+		if (game.getGameData().getCurrentGamePhaseType().equals(GamePhaseType.ASSEMBLE)){
 			game.getGameData().getCurrentGamePhase().startTimer();
 		}
+		GameServer.getInstance().broadcastUpdate(game);
 	}
 
+	@Override
+	public void drawTile(IClient client) throws RemoteException {
+		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
+		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
+		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
 
+		if (!game.getGameData().getCurrentGamePhaseType().equals(GamePhaseType.ASSEMBLE)){
+			return;
+		}
+
+		TileSkeleton<SideType> tile = game.getGameData().drawTile();
+
+		if (tile == null){
+			// no more covered tiles
+			client.updateClient(new ClientUpdate(connectionUUID));
+			return;
+		}
+
+		if (player.getTileInHand() != null){
+			// maybe an exception? dk
+			client.updateClient(new ClientUpdate(connectionUUID));
+			return;
+		}
+
+		player.setTileInHand(tile);
+		GameServer.getInstance().broadcastUpdate(game);
+	}
 }

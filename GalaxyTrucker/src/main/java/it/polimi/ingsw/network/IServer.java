@@ -16,12 +16,12 @@ public interface IServer extends Remote {
 	void createGame(IClient client, String username) throws RemoteException;
 	void joinGame(IClient client, UUID gameId, String username) throws RemoteException;
 	void quitGame(IClient client) throws RemoteException;
-	void drawComponent(IClient client) throws RemoteException;
 	void ping(IClient client) throws RemoteException;
 	void activateTiles(IClient client, Set<Coordinates> tilesToActivate) throws RemoteException;
 	void allocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException;
 	void forceEndTurn(IClient client) throws RemoteException;
 
 	// Assemble Phase
-	void startTimer(IClient client);
+	void startTimer(IClient client) throws RemoteException;
+	void drawTile(IClient client) throws RemoteException;
 }

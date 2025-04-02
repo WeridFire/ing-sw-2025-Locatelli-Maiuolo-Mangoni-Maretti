@@ -60,7 +60,7 @@ public class ServerSocketHandler implements IServer {
 	}
 
 	@Override
-	public void drawComponent(IClient client) {
+	public void drawTile(IClient client) {
 
 	}
 
