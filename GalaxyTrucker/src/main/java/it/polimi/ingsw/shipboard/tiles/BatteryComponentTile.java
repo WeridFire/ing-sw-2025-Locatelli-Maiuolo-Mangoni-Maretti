@@ -19,6 +19,10 @@ public class BatteryComponentTile extends ContainerTile {
      */
     public BatteryComponentTile(SideType[] sides, int capacity) {
         super(sides, Set.of(LoadableType.BATTERY), Set.of(LoadableType.BATTERY), capacity);
+        switch(capacity){
+            case 2 -> setCLISymbol("︓");
+            case 3 -> setCLISymbol("︙");
+        }
     }
 
     @Override

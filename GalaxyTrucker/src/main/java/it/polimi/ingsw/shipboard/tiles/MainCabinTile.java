@@ -16,6 +16,7 @@ public class MainCabinTile extends CabinTile {
         super(Direction.sortedArray(SideType.UNIVERSAL, SideType.UNIVERSAL,
                         SideType.UNIVERSAL, SideType.UNIVERSAL).toArray(new SideType[0]),
                 Set.of(LoadableType.HUMAN));
+        setCLISymbol("⭗");
     }
 
     @Override

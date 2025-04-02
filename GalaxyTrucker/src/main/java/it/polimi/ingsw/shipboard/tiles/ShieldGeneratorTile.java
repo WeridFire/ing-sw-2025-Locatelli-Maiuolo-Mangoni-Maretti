@@ -17,6 +17,16 @@ public class ShieldGeneratorTile extends PowerableTile {
      */
     public ShieldGeneratorTile(SideType[] sides, Boolean[] protectedSides) {
         super(sides, protectedSides, true);
+        if(protectedSides[0] && protectedSides[1]){
+            //WN
+            setCLISymbol("◴");
+        }else if(protectedSides[1] && protectedSides[2]){
+            setCLISymbol("◷");
+        }else if(protectedSides[2] && protectedSides[3]){
+            setCLISymbol("◶");
+        }else{
+            setCLISymbol("◵");
+        }
     }
 
     @Override

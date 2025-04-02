@@ -17,6 +17,10 @@ public class SpecialCargoHoldTile extends CargoHoldTile {
     public SpecialCargoHoldTile(SideType[] sides, int capacity) {
         super(sides, Set.of(LoadableType.BLUE_GOODS, LoadableType.GREEN_GOODS,
                 LoadableType.YELLOW_GOODS, LoadableType.RED_GOODS), capacity);
+        switch (capacity){
+            case 1 -> setCLISymbol("❶");
+            case 2 -> setCLISymbol("❷");
+        }
     }
 
 }

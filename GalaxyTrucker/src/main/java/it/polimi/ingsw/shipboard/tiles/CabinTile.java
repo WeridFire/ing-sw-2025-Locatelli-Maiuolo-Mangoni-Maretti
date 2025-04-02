@@ -20,6 +20,7 @@ public class CabinTile extends ContainerTile {
      */
     protected CabinTile(SideType[] sides, Set<LoadableType> maxAllowedCrew) {
         super(sides, maxAllowedCrew, Set.of(LoadableType.HUMAN), 2);
+        setCLISymbol("⭘");
     }
 
     /**
