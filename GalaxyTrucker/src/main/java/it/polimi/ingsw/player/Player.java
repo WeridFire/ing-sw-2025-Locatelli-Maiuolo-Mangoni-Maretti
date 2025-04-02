@@ -184,7 +184,7 @@ public class Player implements Serializable {
             int startx = (coord.getColumn() - 4) * 5;
             int starty = (coord.getRow() - 5) * 5;
 
-            // Renderizza la tessera (adatta questo metodo in base ai tuoi SideType)
+            // Renderizza la tessera
             try{
                 renderTile(grid, startx, starty, tile);
             }
@@ -212,6 +212,7 @@ public class Player implements Serializable {
         renderWestSide(grid, startx, starty, tile.getSide(Direction.WEST));
         renderEastSide(grid, startx, starty, tile.getSide(Direction.EAST));
         renderSouthSide(grid, startx, starty, tile.getSide(Direction.SOUTH));
+        //TODO: aggiungere il carattere centrale
     }
 
     private void renderNorthSide(char[][] grid, int startx, int starty, SideType side) {
