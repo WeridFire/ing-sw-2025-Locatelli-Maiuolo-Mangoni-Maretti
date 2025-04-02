@@ -1,4 +1,4 @@
-package src.main.java.it.polimi.ingsw.cards.enemy;
+package it.polimi.ingsw.cards.enemy;
 
 import it.polimi.ingsw.cards.enemy.PiratesCard;
 import it.polimi.ingsw.cards.projectile.Projectile;
