@@ -9,6 +9,7 @@ import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.SideType;
+import it.polimi.ingsw.shipboard.tiles.Tile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.io.Serializable;
@@ -51,6 +52,14 @@ public class GameData implements Serializable {
 
     /** List of covered tiles in the game. */
     private List<TileSkeleton<SideType>> coveredTiles;
+
+    /** List of drawn tiles I.E. all the tiles that:
+     *  - are not part of a shipboard
+     *  - are not covered
+     *  - are not in hand
+     *  - are not reserved by anybody
+     */
+    private List<TileSkeleton<SideType>> drawnTiles;
 
     private int requiredPlayers;
 
@@ -135,6 +144,22 @@ public class GameData implements Serializable {
      */
     public List<TileSkeleton<SideType>> getCoveredTiles() {
         return coveredTiles;
+    }
+
+    /**
+     * Gets the list of uncovered tiles.
+     *
+     * @return The list of uncovered tiles.
+     */
+    public List<TileSkeleton<SideType>> getDrawnTiles() {
+        return drawnTiles;
+    }
+
+    public TileSkeleton<SideType> drawTile() {
+        if (getDrawnTiles().isEmpty()) {
+            return null;
+        }
+        return coveredTiles.removeFirst();
     }
 
     /**
