@@ -167,7 +167,7 @@ public class Player implements Serializable {
         int gridWidth = 7;
         int gridHeight = 5;
 
-        char[][] grid = new char[gridHeight][gridWidth];
+        char[][] grid = new char[gridWidth][gridHeight];
         Map<Coordinates, TileSkeleton<SideType>> tiles = this.getShipBoard().getTilesOnBoard();
 
         for (int i = 0; i < gridHeight; i++) {
@@ -195,8 +195,8 @@ public class Player implements Serializable {
         }
 
         //Stampa la griglia
-        for (int i = 0; i < gridHeight; i++) {
-            for (int j = 0; j < gridWidth; j++) {
+        for (int i = 0; i < gridWidth; i++) {
+            for (int j = 0; j < gridHeight; j++) {
                 System.out.print(grid[i][j]);
             }
             System.out.println();
