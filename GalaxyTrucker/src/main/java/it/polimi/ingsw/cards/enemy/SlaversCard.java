@@ -2,8 +2,9 @@ package it.polimi.ingsw.cards.enemy;
 
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PIRs.PIRChoice;
+import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.playerInput.PIRs.PIRRemoveLoadables;
+import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.LoadableType;
 
 public class SlaversCard extends EnemyCard {
@@ -35,12 +36,12 @@ public class SlaversCard extends EnemyCard {
 
 	@Override
 	public void givePrize(Player player, GameData game) {
-		PIRChoice pirChoice = new PIRChoice(player,
+		PIRYesNoChoice pirYesNoChoice = new PIRYesNoChoice(player,
 				30,
 				"You will receive " + prizeBounty +" credits, but you will lose "
 						+ getLostDays() + " days.",
 				true);
-		boolean wantToAccept = game.getPIRHandler().setAndRunTurn(pirChoice);
+		boolean wantToAccept = game.getPIRHandler().setAndRunTurn(pirYesNoChoice);
 		if(wantToAccept){
 			player.addCredits(prizeBounty);
 			game.movePlayerBackward(player, getLostDays());

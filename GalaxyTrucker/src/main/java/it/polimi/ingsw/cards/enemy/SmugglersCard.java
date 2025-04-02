@@ -3,7 +3,8 @@ package it.polimi.ingsw.cards.enemy;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
-import it.polimi.ingsw.playerInput.PIRs.PIRChoice;
+import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
+import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.LoadableType;
 
 import java.util.Arrays;
@@ -30,11 +31,11 @@ public class SmugglersCard extends EnemyCard {
 
 	@Override
 	public void givePrize(Player player, GameData game) {
-		PIRChoice pirChoice = new PIRChoice(player,
+		PIRYesNoChoice pirYesOrNoChoice = new PIRYesNoChoice(player,
 				30,
 				"You will receive the following goods: " + prizeGoods + " but you will lose " + getLostDays() + " travel days.",
 				true);
-		boolean wantToAccept = game.getPIRHandler().setAndRunTurn(pirChoice);
+		boolean wantToAccept = game.getPIRHandler().setAndRunTurn(pirYesOrNoChoice);
 		if(wantToAccept){
 			PIRAddLoadables pirAddLoadables = new PIRAddLoadables(player, 30, Arrays.stream(prizeGoods).toList());
 			game.getPIRHandler().setAndRunTurn(pirAddLoadables);

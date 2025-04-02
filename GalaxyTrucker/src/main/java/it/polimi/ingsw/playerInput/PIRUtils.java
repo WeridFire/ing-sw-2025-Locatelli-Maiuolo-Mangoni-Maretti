@@ -6,8 +6,9 @@ import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRActivateTiles;
-import it.polimi.ingsw.playerInput.PIRs.PIRChoice;
+import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.playerInput.PIRs.PIRRemoveLoadables;
+import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.visitors.VisitorCalculatePowers;
 import it.polimi.ingsw.util.Coordinates;
@@ -97,7 +98,7 @@ public class PIRUtils {
 
 			String message = "You are being hit from direction " + projectile.getDirection().toString() + ". You can defend yourself " +
 					"with a shield. Do you want to activate it?";
-			PIRChoice choiceReq = new PIRChoice(player, 30, message, false);
+			PIRYesNoChoice choiceReq = new PIRYesNoChoice(player, 30, message, false);
 
 			boolean choice = game.getPIRHandler().setAndRunTurn(choiceReq);
 			if(!choice){
@@ -113,7 +114,7 @@ public class PIRUtils {
 			//TODO: check that projectile is defendable by a double cannon, if so proceed with request
 			String message = "You are being hit from direction " + projectile.getDirection().toString() + ". You can defend yourself " +
 					"with a double cannon. Do you want to activate it?";
-			PIRChoice choiceReq = new PIRChoice(player, 30, message, false);
+			PIRYesNoChoice choiceReq = new PIRYesNoChoice(player, 30, message, false);
 			boolean choice = game.getPIRHandler().setAndRunTurn(choiceReq);;
 			if(!choice){
 				return false;

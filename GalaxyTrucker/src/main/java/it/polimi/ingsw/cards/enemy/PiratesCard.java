@@ -3,8 +3,9 @@ package it.polimi.ingsw.cards.enemy;
 import it.polimi.ingsw.cards.projectile.Projectile;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PIRs.PIRChoice;
+import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.playerInput.PIRUtils;
+import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 
 public class PiratesCard extends EnemyCard {
 
@@ -27,12 +28,12 @@ public class PiratesCard extends EnemyCard {
 
     @Override
     public void givePrize(Player player, GameData game) {
-        PIRChoice pirChoice = new PIRChoice(player,
+        PIRYesNoChoice pirYesOrNoChoice = new PIRYesNoChoice(player,
                                     30,
                                 "You will receive " + prizeBounty +" credits, but you will lose "
                                              + getLostDays() + " days.",
                                 true);
-        boolean wantToAccept = game.getPIRHandler().setAndRunTurn(pirChoice);
+        boolean wantToAccept = game.getPIRHandler().setAndRunTurn(pirYesOrNoChoice);
         if(wantToAccept){
             player.addCredits(prizeBounty);
             game.movePlayerBackward(player, getLostDays());

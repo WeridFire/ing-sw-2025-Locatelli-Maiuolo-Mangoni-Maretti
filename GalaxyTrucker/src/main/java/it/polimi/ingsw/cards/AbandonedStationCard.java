@@ -1,16 +1,13 @@
 package it.polimi.ingsw.cards;
 
-import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
-import it.polimi.ingsw.playerInput.PIRs.PIRChoice;
-import it.polimi.ingsw.playerInput.PIRs.PIRRemoveLoadables;
+import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
+import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.LoadableType;
 
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 public class AbandonedStationCard extends Card{
 	/**
@@ -50,7 +47,7 @@ public class AbandonedStationCard extends Card{
 		for(Player p : game.getPlayers()){
 			if(p.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().countAll(LoadableType.CREW_SET) >= requiredCrew){
 				boolean result = game.getPIRHandler().setAndRunTurn(
-						new PIRChoice(p, 30, "Do you want to loot the station? " +
+						new PIRYesNoChoice(p, 30, "Do you want to loot the station? " +
 								"You will lose " + lostDays + " travel days, but you will receive the " +
 								"following loot: " + availableCargo
 								, false)
