@@ -167,7 +167,7 @@ public class Player implements Serializable {
         int gridWidth = 7;
         int gridHeight = 5;
 
-        char[][] grid = new char[gridWidth][gridHeight];
+        char[][] grid = new char[gridWidth*5][gridHeight*5];
         Map<Coordinates, TileSkeleton<SideType>> tiles = this.getShipBoard().getTilesOnBoard();
 
         for (int i = 0; i < gridHeight; i++) {
