@@ -7,15 +7,11 @@ import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
 import it.polimi.ingsw.shipboard.tiles.CabinTile;
-import it.polimi.ingsw.shipboard.tiles.CannonTile;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.util.Coordinates;
-import javafx.geometry.Side;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerTest {
 
@@ -37,6 +33,9 @@ class PlayerTest {
         shipBoard1.setTile(cabin1, cabinCord1);
         shipBoard1.setTile(cabin2, cabinCord2);
         player1.printCliShipboard();
+        for(String s : player1.getShipBoard().getCLIRepresentation()){
+            System.out.println(s);
+        }
         System.out.println("Test2");
     }
 }

@@ -342,4 +342,43 @@ public class ShipBoard {
 		return level;
 	}
 
+	public List<String> getCLIRepresentation() {
+		// Determine the board boundaries.
+		int minRow = 1;
+		int maxRow = 7;
+		int minCol = 1;
+		int maxCol = 5;
+		List<String> result = new ArrayList<>();
+		// Iterate over each row on the board.
+		for (int row = minRow; row <= maxRow; row++) {
+			// Each tile has 3 rows in its CLI representation.
+			StringBuilder line1 = new StringBuilder();
+			StringBuilder line2 = new StringBuilder();
+			StringBuilder line3 = new StringBuilder();
+
+			// Iterate over each column for the current row.
+			for (int col = minCol; col <= maxCol; col++) {
+				Coordinates coord = new Coordinates(row, col);
+				TileSkeleton tile = board.get(coord);
+				String[] tileRep;
+
+				if (tile != null) {
+					tileRep = tile.getCLIRepresentation();
+				} else {
+					tileRep = TileSkeleton.getNullTileRepresentation();
+				}
+
+				line1.append(tileRep[0]);
+				line2.append(tileRep[1]);
+				line3.append(tileRep[2]);
+			}
+
+			result.add(line1.toString());
+			result.add(line2.toString());
+			result.add(line3.toString());
+		}
+		return result;
+	}
+
+
 }

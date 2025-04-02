@@ -135,4 +135,11 @@ public abstract class TileSkeleton implements Tile {
         String thirdLine = "└" + SideType.getCLIRepresentation(getSide(Direction.SOUTH), Direction.SOUTH) + "┘";
         return new String[]{firstLine, secondLine, thirdLine};
     }
+
+    public static String[] getNullTileRepresentation(){
+        String firstLine = "┌-┐";
+        String secondLine = "|*|";
+        String thirdLine = "└-┘";
+        return new String[]{firstLine, secondLine, thirdLine};
+    }
 }
