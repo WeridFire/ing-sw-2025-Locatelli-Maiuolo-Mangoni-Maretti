@@ -12,7 +12,7 @@ public class PIRHandler {
 
 	private PIRActivateTiles activateTiles = null;
 	private PIRAddLoadables addLoadables = null;
-	private PIRChoice choice = null;
+	private PIRMultipleChoice choice = null;
 	private PIRRemoveLoadables removeLoadables = null;
 	private PIR genericReference;
 
@@ -51,7 +51,7 @@ public class PIRHandler {
 	 *
 	 * @return the PIR of making a 2 ways choice, or null if the current turn doesn't match this type.
 	 */
-	public PIRChoice getChoice() throws InputNotSupportedException {
+	public PIRMultipleChoice getChoice() throws InputNotSupportedException {
 		if(choice == null){
 			throw new InputNotSupportedException(getType());
 		}
@@ -104,13 +104,24 @@ public class PIRHandler {
 		this.addLoadables = null;
 	}
 
-	public boolean setAndRunTurn(PIRChoice choice) {
+	public boolean setAndRunTurn(PIRYesNoChoice choice) {
 		if(isAnyTurnActive()){
 			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
 		}
 		this.choice = choice;
 		setGenericReference(choice);
-		boolean result = choice.getChoice();
+		boolean result = choice.isChoiceYes();
+		this.choice = null;
+		return result;
+	}
+
+	public int setAndRunTurn(PIRMultipleChoice choice) {
+		if(isAnyTurnActive()){
+			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
+		}
+		this.choice = choice;
+		setGenericReference(choice);
+		int result = choice.getChoice();
 		this.choice = null;
 		return result;
 	}

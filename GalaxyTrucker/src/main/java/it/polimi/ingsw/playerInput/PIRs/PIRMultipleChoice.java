@@ -6,9 +6,10 @@ import it.polimi.ingsw.util.Coordinates;
 
 import java.util.Set;
 
-public class PIRChoice extends PIR {
+public class PIRMultipleChoice extends PIR {
 
-	private boolean choice;
+	private int choice;
+	private final String[] possibleOptions;
 	private final String choiceMessage;
 
 	/**
@@ -17,13 +18,14 @@ public class PIRChoice extends PIR {
 	 *
 	 * @param currentPlayer  The player the game waits for
 	 * @param cooldown       The cooldown duration.
-	 * @param choiceMessage The message to pass with the choice.
+	 * @param message The message to pass with the choice.
 	 * @param defaultChoice The default choice if the player does not respond on the action
 	 */
-	public PIRChoice(Player currentPlayer, int cooldown, String choiceMessage, boolean defaultChoice) {
+	public PIRMultipleChoice(Player currentPlayer, int cooldown, String message, String[] possibleOptions, int defaultChoice) {
 		super(currentPlayer, cooldown, it.polimi.ingsw.playerInput.PIRType.CHOICE);
+		this.possibleOptions = possibleOptions;
+		this.choiceMessage = message;
 		this.choice = defaultChoice;
-		this.choiceMessage = choiceMessage;
 	}
 
 	@Override
@@ -45,14 +47,18 @@ public class PIRChoice extends PIR {
 		}
 	}
 
-	public void makeChoice(Player player, boolean choice) throws WrongPlayerTurnException {
+	public void makeChoice(Player player, int choice) throws WrongPlayerTurnException {
 		checkForTurn(player);
 		this.choice = choice;
 		endTurn();
 	}
 
-	 boolean getChoice() {
+	 int getChoice() {
 		return choice;
+	}
+
+	public String[] getPossibleOptions(){
+		return possibleOptions;
 	}
 
 	public String getChoiceMessage() {
