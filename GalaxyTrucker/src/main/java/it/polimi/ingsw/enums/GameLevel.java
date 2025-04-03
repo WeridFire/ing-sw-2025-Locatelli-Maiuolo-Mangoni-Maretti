@@ -1,5 +1,7 @@
 package it.polimi.ingsw.enums;
 
-public enum GameLevel {
+import java.io.Serializable;
+
+public enum GameLevel implements Serializable {
     TESTFLIGHT, ONE, TWO
 }
