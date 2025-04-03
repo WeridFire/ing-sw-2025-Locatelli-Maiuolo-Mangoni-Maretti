@@ -87,7 +87,7 @@ public class ServerSocketHandler implements IServer {
 	}
 
 	@Override
-	public void startTimer(IClient client) {
+	public void flipHourglass(IClient client) {
 
 	}
 }

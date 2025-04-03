@@ -22,6 +22,6 @@ public interface IServer extends Remote {
 	void forceEndTurn(IClient client) throws RemoteException;
 
 	// Assemble Phase
-	void startTimer(IClient client) throws RemoteException;
+	void flipHourglass(IClient client) throws RemoteException;
 	void drawTile(IClient client) throws RemoteException;
 }
