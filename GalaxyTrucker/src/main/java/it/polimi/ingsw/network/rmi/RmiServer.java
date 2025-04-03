@@ -3,6 +3,7 @@ package it.polimi.ingsw.network.rmi;
 import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.game.exceptions.DrawTileException;
 import it.polimi.ingsw.game.exceptions.GameNotFoundException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
@@ -11,6 +12,7 @@ import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
 import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
@@ -145,12 +147,17 @@ public class RmiServer implements IServer {
 	// ASSEMBLE PHASE
 
 	@Override
-	public void startTimer(IClient client) throws RemoteException {
+	public void flipHourglass(IClient client) throws RemoteException {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
 
 		if (game.getGameData().getCurrentGamePhaseType().equals(GamePhaseType.ASSEMBLE)){
-			game.getGameData().getCurrentGamePhase().startTimer();
+			try {
+				game.getGameData().getCurrentGamePhase().startTimer();
+			} catch (TimerIsAlreadyRunningException e) {
+				client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
+				return;
+			}
 		}
 		GameServer.getInstance().broadcastUpdate(game);
 	}
@@ -161,21 +168,10 @@ public class RmiServer implements IServer {
 		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
 		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
 
-		if (!game.getGameData().getCurrentGamePhaseType().equals(GamePhaseType.ASSEMBLE)){
-			return;
-		}
-
-		TileSkeleton tile = game.getGameData().drawTile();
-
-		if (tile == null){
-			// no more covered tiles
-			client.updateClient(new ClientUpdate(connectionUUID));
-			return;
-		}
-
-		if (player.getTileInHand() != null){
-			// maybe an exception? dk
-			client.updateClient(new ClientUpdate(connectionUUID));
+		try {
+			game.getGameData().drawTile(player);
+		} catch (DrawTileException | AlreadyHaveTileInHandException e) {
+			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 			return;
 		}
 

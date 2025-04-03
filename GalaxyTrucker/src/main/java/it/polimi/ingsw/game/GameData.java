@@ -3,9 +3,11 @@ package it.polimi.ingsw.game;
 import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.game.exceptions.DrawTileException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
 import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.SideType;
@@ -155,13 +157,27 @@ public class GameData implements Serializable {
         return drawnTiles;
     }
 
-    public TileSkeleton drawTile() {
-        if (getDrawnTiles().isEmpty()) {
-            return null;
+    /**
+     * Randomly picks a tile from the covered tiles pile. Removes it from the pile and assigns it to the player.
+     * @return
+     * @throws DrawTileException
+     */
+    public void drawTile(Player player) throws DrawTileException, AlreadyHaveTileInHandException {
+        if(getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE){
+            throw new DrawTileException("You can only do this during Assembly.");
         }
-        TileSkeleton t = coveredTiles.removeFirst();
-        coveredTiles.add(t);
-        return t;
+        if (getCoveredTiles().isEmpty()) {
+            throw new DrawTileException("There are no covered tiles available.");
+        }
+        TileSkeleton t = getCoveredTiles().removeFirst();
+        try{
+            player.setTileInHand(t);
+        }catch(Exception e){
+            //put tile back in place and transmit the error
+            getCoveredTiles().add(t);
+            throw e;
+        }
+
     }
 
     /**

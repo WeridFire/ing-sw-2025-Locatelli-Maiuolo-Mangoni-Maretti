@@ -4,6 +4,7 @@ import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
 import it.polimi.ingsw.player.exceptions.TooManyReservedTilesException;
 import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.ShipBoard;
@@ -83,7 +84,10 @@ public class Player implements Serializable {
      *
      * @param tileInHand tile held by the player
      */
-    public void setTileInHand(TileSkeleton tileInHand) {
+    public void setTileInHand(TileSkeleton tileInHand) throws AlreadyHaveTileInHandException {
+        if(tileInHand != null){
+            throw new AlreadyHaveTileInHandException("You already are holding a tile.");
+        }
         this.tileInHand = tileInHand;
     }
 
