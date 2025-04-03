@@ -45,11 +45,11 @@ public enum SideType {
     public static String getCLIRepresentation(SideType side, Direction pointing) {
         List<String> reps = null;
         switch (side) {
-            case UNIVERSAL -> reps = Direction.sortedArray("≡", "⦀", "≡", "⦀");
-            case DOUBLE -> reps = Direction.sortedArray("╞", "╨", "╡", "╥");
-            case SINGLE -> reps = Direction.sortedArray("├", "┴", "┤", "┬");
-            case SMOOTH -> reps = Direction.sortedArray("│", "─", "│", "─");
-            case CANNON, ENGINE -> reps = Direction.sortedArray("⯈", "⯅", "⯇", "⯆");
+            case UNIVERSAL -> reps = Direction.sortedArray("⁅", "╨┴", "⁆", "╥┬");
+            case DOUBLE -> reps = Direction.sortedArray("╞", "╨─", "╡", "╥─");
+            case SINGLE -> reps = Direction.sortedArray("├", "─┴", "┤", "─┬");
+            case SMOOTH -> reps = Direction.sortedArray("│", "──", "│", "──");
+            case CANNON, ENGINE -> reps = Direction.sortedArray("⯈", "/\\", "⯇", "\\/");
         }
         return reps.toArray(new String[0])[pointing.getValue()];
     }
