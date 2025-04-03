@@ -2,6 +2,8 @@ package it.polimi.ingsw.shipboard;
 
 import it.polimi.ingsw.enums.Direction;
 
+import java.util.List;
+
 /**
  * Represents different types of sides that a tile can have.
  */
@@ -41,14 +43,14 @@ public enum SideType {
     }
 
     public static String getCLIRepresentation(SideType side, Direction pointing) {
-        String[] reps = null;
+        List<String> reps = null;
         switch (side) {
-            case UNIVERSAL -> reps = new String[]{"≡", "⦀", "≡", "⦀"};
-            case DOUBLE -> reps = new String[]{"╡", "╨", "╞", "╥"};
-            case SINGLE -> reps = new String[]{"┤", "┴", "├", "┬"};
-            case SMOOTH -> reps = new String[]{"|", "―", "|", "―"};
-            case CANNON, ENGINE -> reps = new String[]{"⯇", "⯅", "⯈", "⯆"};
+            case UNIVERSAL -> reps = Direction.sortedArray("≡", "⦀", "≡", "⦀");
+            case DOUBLE -> reps = Direction.sortedArray("╞", "╨", "╡", "╥");
+            case SINGLE -> reps = Direction.sortedArray("├", "┴", "┤", "┬");
+            case SMOOTH -> reps = Direction.sortedArray("│", "─", "│", "─");
+            case CANNON, ENGINE -> reps = Direction.sortedArray("⯈", "⯅", "⯇", "⯆");
         }
-        return reps[pointing.getValue()];
+        return reps.toArray(new String[0])[pointing.getValue()];
     }
 }
