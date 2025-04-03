@@ -2,6 +2,7 @@ package it.polimi.ingsw.gamePhases;
 
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
 import it.polimi.ingsw.network.exceptions.CantFindClientException;
 
 import java.rmi.RemoteException;
@@ -54,5 +55,5 @@ public abstract class PlayableGamePhase {
     /**
      * Used to implement starting timer logic
      * */
-    public abstract void startTimer();
+    public abstract void startTimer() throws TimerIsAlreadyRunningException;
 }

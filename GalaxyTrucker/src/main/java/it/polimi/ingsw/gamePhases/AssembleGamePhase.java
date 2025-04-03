@@ -66,9 +66,9 @@ public class AssembleGamePhase extends PlayableGamePhase{
         }
     }
 
-    public void startTimer(){
+    public void startTimer() throws TimerIsAlreadyRunningException {
         if (timerRunning) {
-            throw new TimerIsAlreadyRunningException("Timer is already running");
+            throw new TimerIsAlreadyRunningException("You must wait for the hourglass to finish before flipping it.");
         }
         timerLock.notifyAll();
     }
