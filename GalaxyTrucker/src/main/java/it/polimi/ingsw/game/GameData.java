@@ -44,7 +44,7 @@ public class GameData implements Serializable {
     private Player currentPlayerTurn;
      */
 
-    private PIRHandler pirHandler;
+    transient private PIRHandler pirHandler;
 
     /** Mapping of available cargo goods and their quantities. */
     private Map<LoadableType, Integer> availableGoods;
@@ -75,6 +75,7 @@ public class GameData implements Serializable {
         this.deck = null;
         this.gameId = gameId;
         this.pirHandler = new PIRHandler();
+        this.level = GameLevel.TESTFLIGHT;
         this.setCurrentGamePhaseType(GamePhaseType.LOBBY);
         this.setRequiredPlayers(4);
     }
