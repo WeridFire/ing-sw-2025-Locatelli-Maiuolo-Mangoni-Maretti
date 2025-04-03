@@ -344,10 +344,10 @@ public class ShipBoard {
 
 	public List<String> getCLIRepresentation() {
 		// Determine the board boundaries.
-		int minRow = 5;
-		int maxRow = 9;
-		int minCol = 4;
-		int maxCol = 10;
+		int minRow = 4;
+		int maxRow = 10;
+		int minCol = 3;
+		int maxCol = 11;
 		List<String> result = new ArrayList<>();
 		// Iterate over each row on the board.
 		for (int row = minRow; row <= maxRow; row++) {
