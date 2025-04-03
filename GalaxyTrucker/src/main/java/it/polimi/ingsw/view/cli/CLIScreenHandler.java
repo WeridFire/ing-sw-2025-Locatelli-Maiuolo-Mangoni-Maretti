@@ -38,6 +38,7 @@ public class CLIScreenHandler {
 		this.gameClient = gameClient;
 		allScreens = new HashSet<>();
 		allScreens.add(new MenuCLIScreen()); //menu
+		allScreens.add(new LobbyCLIScreen()); //lobby
 	}
 
 	// END OF SINGLETON LOGIC
@@ -51,10 +52,20 @@ public class CLIScreenHandler {
 			throw new RuntimeException("Newly received update cannot be null.");
 		}
 		this.lastUpdate = newUpdate;
-		if(currentScreen == null){
+		if(getCurrentScreen() == null){
 			activateScreen("Menu");
 		}
-		currentScreen.refresh();
+		CLIScreen forceActivate = getAvailableScreens()
+									.stream()
+									.filter(CLIScreen::isForceActivate)
+									.findFirst()
+									.orElse(null);
+		System.out.println(getAvailableScreens());
+		if(forceActivate != null){
+			System.out.println(forceActivate.screenName);
+			activateScreen(forceActivate.screenName);
+		}
+		getCurrentScreen().refresh();
 	}
 
 	/**
@@ -108,6 +119,9 @@ public class CLIScreenHandler {
 			String cmd = commandParts.removeFirst();
 			String[] args = commandParts.toArray(new String[0]);
 			switch (cmd) {
+				case "":
+					currentScreen.refresh();
+					break;
 				case "ping":
 					gameClient.getServer().ping(gameClient.getClient());
 					break;
@@ -122,6 +136,10 @@ public class CLIScreenHandler {
 					break;
 				case "help":
 					currentScreen.printAvailableCommands();
+					break;
+				case "debug":
+					currentScreen.setScreenMessage("The current game state was saved to update.json");
+					ClientUpdate.saveDebugUpdate(getLastUpdate());
 					break;
 				default:
 					//if the command is not recognized as a global command, it lets the active screen process it.
@@ -138,5 +156,9 @@ public class CLIScreenHandler {
 
 	protected ClientUpdate getLastUpdate() {
 		return lastUpdate;
+	}
+
+	protected CLIScreen getCurrentScreen(){
+		return currentScreen;
 	}
 }
