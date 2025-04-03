@@ -344,10 +344,10 @@ public class ShipBoard {
 
 	public List<String> getCLIRepresentation() {
 		// Determine the board boundaries.
-		int minRow = 1;
-		int maxRow = 7;
-		int minCol = 1;
-		int maxCol = 5;
+		int minRow = 5;
+		int maxRow = 9;
+		int minCol = 4;
+		int maxCol = 10;
 		List<String> result = new ArrayList<>();
 		// Iterate over each row on the board.
 		for (int row = minRow; row <= maxRow; row++) {
@@ -365,7 +365,12 @@ public class ShipBoard {
 				if (tile != null) {
 					tileRep = tile.getCLIRepresentation();
 				} else {
-					tileRep = TileSkeleton.getNullTileRepresentation();
+					if(BoardCoordinates.isOnBoard(getLevel(), coord)){
+						tileRep = TileSkeleton.getFreeTileCLIRepresentation();
+					}else{
+						tileRep = TileSkeleton.getForbiddenTileCLIRepresentation();
+					}
+
 				}
 
 				line1.append(tileRep[0]);
