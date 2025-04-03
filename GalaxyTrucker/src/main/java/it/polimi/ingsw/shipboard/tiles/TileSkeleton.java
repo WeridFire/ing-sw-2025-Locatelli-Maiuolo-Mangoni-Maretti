@@ -137,9 +137,9 @@ public abstract class TileSkeleton implements Tile {
     }
 
     public static String[] getFreeTileCLIRepresentation(){
-        String firstLine = "┌┉┐";
-        String secondLine = "┊+┊";
-        String thirdLine = "└┉┘";
+        String firstLine = "┌┉┉┐";
+        String secondLine = "┊++┊";
+        String thirdLine = "└┉┉┘";
         return new String[]{firstLine, secondLine, thirdLine};
     }
     public static String[] getForbiddenTileCLIRepresentation(){
@@ -148,9 +148,9 @@ public abstract class TileSkeleton implements Tile {
         String secondLine = "┊+┊";
         String thirdLine = "└┉┘";
          */
-        String firstLine = "   ";
-        String secondLine = "   ";
-        String thirdLine = "   ";
+        String firstLine = "████";
+        String secondLine = "████";
+        String thirdLine = "████";
         return new String[]{firstLine, secondLine, thirdLine};
     }
 }
