@@ -5,6 +5,7 @@ package it.polimi.ingsw.network;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.rmi.RmiClient;
 import it.polimi.ingsw.network.socket.SocketClient;
+import it.polimi.ingsw.view.cli.CLIScreenHandler;
 
 import java.io.*;
 import java.net.Socket;
@@ -12,15 +13,12 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.Scanner;
-import java.util.UUID;
 
 public class GameClient implements IClient{
 
 	private boolean useRMI;
 	private RmiClient rmiClient = null;
 	private SocketClient socketClient = null;
-	private final ClientCLIView cliView;
 
 	/**
 	 * The main game client. Based on the selected options, this client will instance a connection using either RMI or
@@ -52,7 +50,6 @@ public class GameClient implements IClient{
 				}
 			}).start();
 		}
-		this.cliView = new ClientCLIView(null);
 	}
 
 	/**
@@ -66,51 +63,6 @@ public class GameClient implements IClient{
 		}
 	}
 
-	/**
-	 * Runs the CLI on the client, allowing player to input commands to send to the server. These commands will be
-	 * executed automatically on the desired client.
-	 * @throws RemoteException
-	 */
-	private void runCli() throws RemoteException {
-		Scanner scan = new Scanner(System.in);
-		while (true) {
-			System.out.print("> ");
-			String command = scan.nextLine().trim();  // Reading the full line for commands with arguments
-
-			String[] commandParts = command.split(" ");  // Split the command by spaces
-
-			switch (commandParts[0]) {
-				case "ping":
-					getServer().ping(getClient());
-					break;
-
-				case "join":
-					if (commandParts.length == 3) {
-						UUID uuid = UUID.fromString(commandParts[1]);
-						String username = commandParts[2];
-						// Call the appropriate method to handle join logic here
-						getServer().joinGame(getClient(), uuid, username);
-					} else {
-						System.out.println("Usage: join <uuid> <username>");
-					}
-					break;
-
-				case "create":
-					if (commandParts.length == 2) {
-						String username = commandParts[1];
-						// Call the appropriate method to handle create logic here
-						getServer().createGame(getClient(), username);
-					} else {
-						System.out.println("Usage: create <username>");
-					}
-					break;
-				default:
-					System.out.println("Invalid command. Available commands are: ping, join <uuid> <username>, create <username>");
-					break;
-			}
-		}
-	}
-
 	@Override
 	public IServer getServer() throws RemoteException {
 		return getClient().getServer();
@@ -118,12 +70,13 @@ public class GameClient implements IClient{
 
 	@Override
 	public void updateClient(ClientUpdate clientUpdate) {
-		cliView.setLastUpdate(clientUpdate);
+		CLIScreenHandler.getInstance().setLastUpdate(clientUpdate);
 	}
 
 	public static void main(String[] args) throws IOException, NotBoundException {
 		GameClient gameClient = new GameClient(Boolean.parseBoolean(args[0]), args[1], Integer.parseInt(args[2]));
+		CLIScreenHandler.init(gameClient);
 		gameClient.getServer().connect(gameClient.getClient());
-		gameClient.runCli();
+		CLIScreenHandler.getInstance().runCli();
 	}
 }
