@@ -10,7 +10,7 @@ public class MenuCLIScreen extends CLIScreen{
 	 * and allows commands to join and create a match.
 	 */
 	public MenuCLIScreen() {
-		super("menu");
+		super("menu", true);
 	}
 
 	@Override
@@ -20,16 +20,17 @@ public class MenuCLIScreen extends CLIScreen{
 
 	@Override
 	protected void printScreen() {
-		if(!getLastUpdate().getAvailableGames().isEmpty()){
-			System.out.println("- AVAILABLE GAMES -");
+		if (!getLastUpdate().getAvailableGames().isEmpty()) {
+			System.out.println(ANSI.ANSI_YELLOW + "\n======= AVAILABLE GAMES =======" + ANSI.ANSI_RESET);
 			getLastUpdate().getAvailableGames().forEach((g) ->
-						System.out.printf("[%s] (%d/%d players) %n", g.getGameId().toString(),
-								g.getPlayers().size(),
-								g.getRequiredPlayers())
+					System.out.printf(ANSI.ANSI_GREEN + "[%s] " + ANSI.ANSI_BLUE + "(%d/%d players)" + ANSI.ANSI_RESET + " %n",
+							g.getGameId().toString(),
+							g.getPlayers().size(),
+							g.getRequiredPlayers())
 			);
-			System.out.println("------------------");
-		}else{
-			System.out.println("There are no available games.");
+			System.out.println(ANSI.ANSI_YELLOW + "================================" + ANSI.ANSI_RESET);
+		} else {
+			System.out.println(ANSI.ANSI_RED + "There are no available games." + ANSI.ANSI_RESET);
 		}
 	}
 
