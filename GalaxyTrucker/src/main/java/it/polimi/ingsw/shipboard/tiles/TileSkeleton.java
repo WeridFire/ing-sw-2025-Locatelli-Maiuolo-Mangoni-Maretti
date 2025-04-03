@@ -136,10 +136,21 @@ public abstract class TileSkeleton implements Tile {
         return new String[]{firstLine, secondLine, thirdLine};
     }
 
-    public static String[] getNullTileRepresentation(){
-        String firstLine = "┌-┐";
-        String secondLine = "|*|";
-        String thirdLine = "└-┘";
+    public static String[] getFreeTileCLIRepresentation(){
+        String firstLine = "┌┉┐";
+        String secondLine = "┊+┊";
+        String thirdLine = "└┉┘";
+        return new String[]{firstLine, secondLine, thirdLine};
+    }
+    public static String[] getForbiddenTileCLIRepresentation(){
+        /*
+        String firstLine = "┌┉┐";
+        String secondLine = "┊+┊";
+        String thirdLine = "└┉┘";
+         */
+        String firstLine = "   ";
+        String secondLine = "   ";
+        String thirdLine = "   ";
         return new String[]{firstLine, secondLine, thirdLine};
     }
 }
