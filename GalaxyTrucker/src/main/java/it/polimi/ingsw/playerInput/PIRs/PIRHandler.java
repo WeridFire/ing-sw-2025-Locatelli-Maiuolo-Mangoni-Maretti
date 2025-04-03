@@ -23,7 +23,7 @@ public class PIRHandler implements Serializable {
 	 */
 	private boolean isAnyTurnActive(){
 		//if first is not null, second is usually never null but check anyways
-		return genericReference == null || genericReference.getPIRType() == null;
+		return genericReference != null && genericReference.getPIRType() != null;
 	}
 
 	/**
