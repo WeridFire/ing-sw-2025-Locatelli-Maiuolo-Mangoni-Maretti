@@ -109,18 +109,18 @@ public class TilesFactory {
         }
 
         int i, referenceNumber;
-        String compactTileSides;
+        String currentTileSidesString;
         List<TileSkeleton> result = new ArrayList<>(compactTilesSides.size());
 
         for (i = 0, referenceNumber = firstReferenceNumber;
              referenceNumber <= lastReferenceNumber; referenceNumber++, i++) {
             // "GT-new_tiles_16_for web{referenceNumber}.jpg"
-            compactTileSides = compactTilesSides.get(i);
-            if (compactTilesSides.size() != 4) {
+            currentTileSidesString = compactTilesSides.get(i);
+            if (currentTileSidesString.length() != 4) {
                 throw new IllegalArgumentException
-                        ("compactTilesSides must all have 4 and only 4 characters: invalid for " + compactTileSides);
+                        ("compactTilesSides must all have 4 and only 4 characters: invalid for " + currentTileSidesString);
             }
-            result.add(tileConstructor.apply(compactTileSides));
+            result.add(tileConstructor.apply(currentTileSidesString));
         }
 
         return result;
