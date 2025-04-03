@@ -48,17 +48,24 @@ public class ClientSocketHandler implements IClient {
 				e.printStackTrace();
 			}
 			if(message != null){
-				System.out.println("Received new command: " + message.getType());
-				switch (message.getType()) {
-					case PING -> getServer().ping(this);
-					case JOIN_GAME -> getServer()
-									.joinGame(
-											this,
-											(UUID) message.getArgs().getFirst(),
-											(String) message.getArgs().get(1));
-					case CREATE_GAME -> getServer().createGame(
-											this,
-											(String) message.getArgs().getFirst());
+				System.out.println("Received new command: " + message.getType() + " args: " + message.getArgs());
+				try{
+					switch (message.getType()) {
+						case PING -> getServer().ping(this);
+						case JOIN_GAME -> getServer()
+										.joinGame(
+												this,
+												(UUID) message.getArgs().getFirst(),
+												(String) message.getArgs().get(1));
+						case CREATE_GAME -> getServer().createGame(
+												this,
+												(String) message.getArgs().getFirst());
+					}
+				}catch(IllegalArgumentException e){
+					System.err.println("ERROR WHILE PARSING MESSAGE! Message:");
+					System.err.println("cmd: " + message.getType() + "args: " + message.getArgs());
+					System.err.println("Make sure the arguments are passed in the correct order by the client!");
+					e.printStackTrace();
 				}
 			}
 
