@@ -1,5 +1,6 @@
 package it.polimi.ingsw.player;
 
+import it.polimi.ingsw.TilesFactory;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.shipboard.ShipBoard;
@@ -7,10 +8,13 @@ import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
 import it.polimi.ingsw.shipboard.tiles.CabinTile;
+import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.util.Coordinates;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 class PlayerTest {
@@ -30,8 +34,18 @@ class PlayerTest {
     void testCliPrint() throws OutOfBuildingAreaException,FixedTileException, TileAlreadyPresentException {
         System.out.println("Test1");
         player1.setShipBoard(shipBoard1);
-        shipBoard1.setTile(cabin1, cabinCord1);
-        shipBoard1.setTile(cabin2, cabinCord2);
+        List<TileSkeleton> tilesPool = TilesFactory.createPileTiles();
+        for(int i=0; i<10; i++){
+            for(int j=0; j<10; j++){
+                Coordinates c = new Coordinates(i, j);
+                Collections.shuffle(tilesPool);
+                TileSkeleton t = tilesPool.removeFirst();
+                try{
+                    shipBoard1.setTile(t, c);
+                }catch(Exception e){}
+            }
+        }
+
         player1.printCliShipboard();
         for(String s : player1.getShipBoard().getCLIRepresentation()){
             System.out.println(s);
