@@ -96,7 +96,7 @@ public class SocketMessage implements Serializable{
 	 * @return The socket message containing the desired information.
 	 */
 	public static SocketMessage joinGameMessage(UUID gameId, String username){
-		return new SocketMessage(MessageType.JOIN_GAME, List.of(username, gameId));
+		return new SocketMessage(MessageType.JOIN_GAME, List.of(gameId, username));
 	}
 
 	/**
