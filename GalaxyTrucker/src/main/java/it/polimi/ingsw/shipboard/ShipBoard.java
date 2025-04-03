@@ -344,17 +344,32 @@ public class ShipBoard {
 
 	public List<String> getCLIRepresentation() {
 		// Determine the board boundaries.
-		int minRow = 4;
-		int maxRow = 10;
+		int minRow = 5;
+		int maxRow = 9;
 		int minCol = 3;
 		int maxCol = 11;
 		List<String> result = new ArrayList<>();
+		StringBuilder frame = new StringBuilder();
+		frame.append(" "); //offset by 1 to account for the vertical frame
+		for (int col = minCol; col <= maxCol; col++) {
+			if(col < 10){
+				frame.append("│").append(col).append(" │");
+			}else{
+				frame.append("│").append(col).append("│");
+			}
+
+		}
+		result.add(frame.toString());
 		// Iterate over each row on the board.
 		for (int row = minRow; row <= maxRow; row++) {
 			// Each tile has 3 rows in its CLI representation.
 			StringBuilder line1 = new StringBuilder();
 			StringBuilder line2 = new StringBuilder();
 			StringBuilder line3 = new StringBuilder();
+
+			line1.append("─");
+			line2.append(row);
+			line3.append("─");
 
 			// Iterate over each column for the current row.
 			for (int col = minCol; col <= maxCol; col++) {
@@ -366,9 +381,9 @@ public class ShipBoard {
 					tileRep = tile.getCLIRepresentation();
 				} else {
 					if(BoardCoordinates.isOnBoard(getLevel(), coord)){
-						tileRep = TileSkeleton.getFreeTileCLIRepresentation();
+						tileRep = TileSkeleton.getFreeTileCLIRepresentation(row, col);
 					}else{
-						tileRep = TileSkeleton.getForbiddenTileCLIRepresentation();
+						tileRep = TileSkeleton.getForbiddenTileCLIRepresentation(row, col);
 					}
 
 				}
@@ -378,10 +393,17 @@ public class ShipBoard {
 				line3.append(tileRep[2]);
 			}
 
+			line1.append("─");
+			line2.append(row);
+			line3.append("─");
+
 			result.add(line1.toString());
 			result.add(line2.toString());
 			result.add(line3.toString());
+
+
 		}
+		result.add(frame.toString());
 		return result;
 	}
 
