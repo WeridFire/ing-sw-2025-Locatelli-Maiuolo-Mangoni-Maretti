@@ -56,7 +56,6 @@ public class GamesHandler {
     public Game newGame() {
         Game game = new Game();
         games.add(game);
-        System.out.println(games);
         return game;
     }
 
@@ -91,7 +90,7 @@ public class GamesHandler {
 		try {
 			addPlayerToGame(username, createdGame.getId(), connectionUUID);
 		} catch (GameNotFoundException e) {
-			//Ignore, we are sure the game exists
+			throw new RuntimeException(e.getMessage());
 		}
         return createdGame;
 	}
