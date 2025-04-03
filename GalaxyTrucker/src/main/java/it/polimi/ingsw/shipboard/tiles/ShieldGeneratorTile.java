@@ -19,13 +19,13 @@ public class ShieldGeneratorTile extends PowerableTile {
         super(sides, protectedSides, true);
         if(protectedSides[0] && protectedSides[1]){
             //WN
-            setCLISymbol("◴");
+            setCLISymbol("/s");
         }else if(protectedSides[1] && protectedSides[2]){
-            setCLISymbol("◷");
+            setCLISymbol("s\\");
         }else if(protectedSides[2] && protectedSides[3]){
-            setCLISymbol("◶");
+            setCLISymbol("s/");
         }else{
-            setCLISymbol("◵");
+            setCLISymbol("\\s");
         }
     }
 

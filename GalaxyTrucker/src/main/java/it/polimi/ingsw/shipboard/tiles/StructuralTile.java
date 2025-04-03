@@ -18,7 +18,7 @@ public class StructuralTile extends TileSkeleton {
      */
     public StructuralTile(SideType[] sides) {
         super(sides);
-        setCLISymbol("⛝");
+        setCLISymbol("╳╳");
     }
 
     /**

@@ -25,8 +25,8 @@ public class CargoHoldTile extends ContainerTile {
                         LoadableType.YELLOW_GOODS, LoadableType.RED_GOODS),
                 allowedCargo, capacity);
         switch (capacity){
-            case 2 -> setCLISymbol("②");
-            case 3 -> setCLISymbol("③");
+            case 2 -> setCLISymbol("2+");
+            case 3 -> setCLISymbol("3+");
         }
     }
 

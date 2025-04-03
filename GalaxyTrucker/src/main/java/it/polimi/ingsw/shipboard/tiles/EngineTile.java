@@ -27,7 +27,7 @@ public class EngineTile extends PowerableTile {
                         .map(side -> (side == SideType.ENGINE))
                         .toArray(Boolean[]::new),
                 batteryNeeded);
-        setCLISymbol(batteryNeeded ? "E" : "e");
+        setCLISymbol(batteryNeeded ? "2E" : "1e");
     }
 
     @Override

@@ -27,7 +27,7 @@ public class CannonTile extends PowerableTile {
                 .map(side -> (side == SideType.CANNON))
                 .toArray(Boolean[]::new),
                 batteryNeeded);
-        setCLISymbol(batteryNeeded ? "T" : "t");
+        setCLISymbol(batteryNeeded ? "2T" : "1t");
     }
 
     @Override

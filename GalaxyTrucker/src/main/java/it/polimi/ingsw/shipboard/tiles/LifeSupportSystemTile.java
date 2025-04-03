@@ -25,7 +25,7 @@ public class LifeSupportSystemTile extends TileSkeleton {
             throw new IllegalArgumentException("The life support should be for either a brown or a purple alien.");
         }
         this.providedLifeSupport = providedLifeSupport;
-        setCLISymbol(providedLifeSupport == LoadableType.PURPLE_ALIEN ? "♥" : "♡");
+        setCLISymbol(providedLifeSupport == LoadableType.PURPLE_ALIEN ? "HP" : "HB");
     }
 
     /**
