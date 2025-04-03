@@ -150,6 +150,10 @@ public class RmiServer implements IServer {
 	public void flipHourglass(IClient client) throws RemoteException {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
+		if(game == null){
+			client.updateClient(new ClientUpdate(connectionUUID, "You are not in a game."));
+			return;
+		}
 
 		if (game.getGameData().getCurrentGamePhaseType().equals(GamePhaseType.ASSEMBLE)){
 			try {
@@ -167,6 +171,11 @@ public class RmiServer implements IServer {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
 		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
+
+		if(player == null || game == null){
+			client.updateClient(new ClientUpdate(connectionUUID, "You are not in a game."));
+			return;
+		}
 
 		try {
 			game.getGameData().drawTile(player);
