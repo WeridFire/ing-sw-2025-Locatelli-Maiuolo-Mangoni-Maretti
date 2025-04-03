@@ -50,8 +50,9 @@ public class LobbyCLIScreen extends CLIScreen{
 	}
 
 	@Override
-	protected void printAvailableCommands() {
-		super.printAvailableCommands();
+	protected void printScreenSpecificCommands() {
 		printCommands(screenName, null);
 	}
+
+
 }

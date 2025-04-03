@@ -28,12 +28,8 @@ public abstract class CLIScreen {
 	}
 
 	/**
-	 * Abstract class for a CLI screen. Contains the standardized methods and fields to design a new screen.
-	 * A screen is an object that displays information on the CLI based on the current game state.
-	 * The user, based on the screen they are on, can perform different commands.
-	 * A user can swap between screens using the screen global command. Screens differ in availability, and
-	 * based on the current state of the game there might be different available screens.
 	 * @param screenName The identifier of the screen.
+	 * @see #CLIScreen(String, boolean)  CLIScreen
 	 */
 	public CLIScreen(String screenName){
 		this(screenName, false);
@@ -79,20 +75,37 @@ public abstract class CLIScreen {
 		System.out.print("\n> ");
 	};
 
+	/**
+	 * This function should call inside of it the method printCommands, passing the commands available
+	 * in the specific screen.
+	 * Check out the examples in {@link MenuCLIScreen#printScreenSpecificCommands()}.
+	 */
+	abstract void printScreenSpecificCommands();
 
-	protected IClient getClient(){
+	/*
+	!!!BELOW THIS YOU DON'T NEED TO OVERRIDE ANYTHING!!!
+	 */
+
+	protected final void printAvailableCommands(){
+		clear();
+		printCommands("global", "ping|Ping the host server.", "screen|Navigate screens.", "help|Get all the available commands.", "debug|Create a json containing the current game state.");
+		printScreenSpecificCommands();
+	}
+
+
+	protected final IClient getClient(){
 		return CLIScreenHandler.getInstance().getGameClient().getClient();
 	}
 
-	protected IServer getServer() throws RemoteException {
+	protected final IServer getServer() throws RemoteException {
 		return getClient().getServer();
 	}
 
-	protected  ClientUpdate getLastUpdate(){
+	protected final ClientUpdate getLastUpdate(){
 		return CLIScreenHandler.getInstance().getLastUpdate();
 	}
 
-	public boolean isForceActivate() {
+	public final boolean isForceActivate() {
 		return forceActivate;
 	}
 
@@ -109,7 +122,7 @@ public abstract class CLIScreen {
 		}
 	}
 
-	void setScreenMessage(String message){
+	final void setScreenMessage(String message){
 		this.screenMessage = message;
 		this.refresh();
 	}
@@ -120,12 +133,19 @@ public abstract class CLIScreen {
 		}
 	}
 
-	protected void printAvailableCommands(){
-		clear();
-		printCommands("global", "ping|Ping the host server.", "screen|Navigate screens.", "help|Get all the available commands.", "debug|Create a json containing the current game state.");
-	}
-
-	public void printCommands(String screenName, String... commands) {
+	/**
+	 * Prints commands for a specific screen name.
+	 * This method will display a blue header with the screen name, followed by each command on a new line.
+	 * Each command should be formatted as <b>command</b>|<b>description</b>, where:
+	 * <ul>
+	 *     <li><b>command</b> is the name or identifier of the command.</li>
+	 *     <li><b>description</b> is a brief explanation of what the command does.</li>
+	 * </ul>
+	 *
+	 * @param screenName The name of the screen for which the commands are printed. This will be displayed as the header.
+	 * @param commands An array or list of commands to be printed, each formatted as <command>|<description>.
+	 */
+	public final void printCommands(String screenName, String... commands) {
 		String stringBuilder = ANSI.ANSI_BLUE_BACKGROUND +
 				ANSI.ANSI_RED +
 				" " + screenName.toUpperCase() +
