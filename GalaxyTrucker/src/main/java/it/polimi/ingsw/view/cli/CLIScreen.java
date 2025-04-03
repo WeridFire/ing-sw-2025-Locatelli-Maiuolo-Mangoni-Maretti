@@ -10,6 +10,23 @@ public abstract class CLIScreen {
 
 	protected final String screenName;
 	private String screenMessage;
+	private final boolean forceActivate;
+
+
+	/**
+	 * Abstract class for a CLI screen. Contains the standardized methods and fields to design a new screen.
+	 * A screen is an object that displays information on the CLI based on the current game state.
+	 * The user, based on the screen they are on, can perform different commands.
+	 * A user can swap between screens using the screen global command. Screens differ in availability, and
+	 * based on the current state of the game there might be different available screens.
+	 * @param screenName The identifier of the screen.
+	 * @param forceActivate if to forcefully activate this screen whenever an update satisfying it will be received.
+	 */
+	public CLIScreen(String screenName, boolean forceActivate){
+		this.screenName = screenName;
+		this.forceActivate = forceActivate;
+	}
+
 	/**
 	 * Abstract class for a CLI screen. Contains the standardized methods and fields to design a new screen.
 	 * A screen is an object that displays information on the CLI based on the current game state.
@@ -19,7 +36,7 @@ public abstract class CLIScreen {
 	 * @param screenName The identifier of the screen.
 	 */
 	public CLIScreen(String screenName){
-		this.screenName = screenName;
+		this(screenName, false);
 	}
 
 	/**
@@ -75,6 +92,10 @@ public abstract class CLIScreen {
 		return CLIScreenHandler.getInstance().getLastUpdate();
 	}
 
+	public boolean isForceActivate() {
+		return forceActivate;
+	}
+
 	private void displayError(){
 		if(getLastUpdate().getError() != null){
 			System.out.println(ANSI.ANSI_RED + "[SERVER ERROR] " + getLastUpdate().getError() + ANSI.ANSI_RESET);
@@ -101,26 +122,31 @@ public abstract class CLIScreen {
 
 	protected void printAvailableCommands(){
 		clear();
-		printCommands("GLOBAL", "ping|Ping the host server.", "screen|Navigate screens.");
+		printCommands("global", "ping|Ping the host server.", "screen|Navigate screens.", "help|Get all the available commands.", "debug|Create a json containing the current game state.");
 	}
 
 	public void printCommands(String screenName, String... commands) {
 		String stringBuilder = ANSI.ANSI_BLUE_BACKGROUND +
 				ANSI.ANSI_RED +
-				screenName.toUpperCase() +
+				" " + screenName.toUpperCase() +
 				ANSI.ANSI_RESET +
 				ANSI.ANSI_BLUE_BACKGROUND +
-				" SPECIFIC COMMANDS" +
+				" SPECIFIC COMMANDS " +
 				ANSI.ANSI_RESET;
 		System.out.println(stringBuilder);
-
-		for (String command : commands) {
-			String[] parts = command.split("\\|", 2);
-			if (parts.length == 2) {
-				System.out.println(ANSI.ANSI_CYAN + ">" + parts[0] + ANSI.ANSI_RESET + " | " + parts[1]);
-			} else {
-				System.out.println(ANSI.ANSI_CYAN + ">" + command + ANSI.ANSI_RESET);
+		if(commands != null){
+			for (String command : commands) {
+				String[] parts = command.split("\\|", 2);
+				if (parts.length == 2) {
+					System.out.println(ANSI.ANSI_CYAN + ">" + parts[0] + ANSI.ANSI_RESET + " | " + parts[1]);
+				} else {
+					System.out.println(ANSI.ANSI_CYAN + ">" + command + ANSI.ANSI_RESET);
+				}
 			}
+		}
+
+		if(!screenName.equals("global")){
+			System.out.print(ANSI.ANSI_RED_BACKGROUND+" <- BACK TO " +screenName.toUpperCase() +" " +ANSI.ANSI_RESET);
 		}
 	}
 
