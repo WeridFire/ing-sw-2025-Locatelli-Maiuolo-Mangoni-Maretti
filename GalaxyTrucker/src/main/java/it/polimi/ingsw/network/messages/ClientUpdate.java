@@ -1,6 +1,7 @@
 package it.polimi.ingsw.network.messages;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.GamePhaseType;
@@ -12,6 +13,7 @@ import java.io.*;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import com.fasterxml.jackson.core.Versioned;
 
 public class ClientUpdate implements Serializable {
 
@@ -125,5 +127,23 @@ public class ClientUpdate implements Serializable {
 
 	public String getError() {
 		return error;
+	}
+
+
+	public static void saveDebugUpdate(Object lastUpdate) {
+
+
+		if (lastUpdate == null) {
+			throw new IllegalArgumentException("No update to serialize.");
+		}
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		File file = new File("update.json");
+
+		try (FileWriter fileWriter = new FileWriter(file)) {
+			objectMapper.writerWithDefaultPrettyPrinter().writeValue(fileWriter, lastUpdate);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
