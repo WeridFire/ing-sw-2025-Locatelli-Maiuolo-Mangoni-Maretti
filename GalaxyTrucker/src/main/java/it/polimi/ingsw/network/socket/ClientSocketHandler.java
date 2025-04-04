@@ -62,7 +62,9 @@ public class ClientSocketHandler implements IClient {
 												this,
 												(String) message.getArgs().getFirst());
 						case UPDATE_SETTINGS -> getServer().updateGameSettings(
-								this, (GameLevel) message.getArgs().getFirst(), (int) message.getArgs().get(1)
+								this,
+								(GameLevel) message.getArgs().getFirst(),
+								(int) message.getArgs().get(1)
 						);
 					}
 				}catch(IllegalArgumentException e){

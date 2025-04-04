@@ -123,7 +123,11 @@ public class LobbyCLIScreen extends CLIScreen{
 
 	@Override
 	protected void printScreenSpecificCommands() {
-		printCommands(screenName, "settings|Change the game settings.", "leave|Leave the current lobby.");
+		if(getLastUpdate().isGameLeader()){
+			printCommands(screenName, "settings|Change the game settings.", "leave|Leave the current lobby.");
+		}else{
+			printCommands(screenName, "leave|Leave the current lobby.");
+		}
 	}
 
 

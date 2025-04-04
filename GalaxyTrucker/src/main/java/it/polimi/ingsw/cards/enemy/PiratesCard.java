@@ -7,6 +7,8 @@ import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.playerInput.PIRUtils;
 import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 
+import java.util.List;
+
 public class PiratesCard extends EnemyCard {
 
     /**
@@ -43,7 +45,17 @@ public class PiratesCard extends EnemyCard {
     @Override
     public void applyPunishment(Player player, GameData game) {
         for(Projectile proj : punishHits){
-            //TODO: make player roll coordinates
+
+            game.getPIRHandler().setAndRunTurn(new PIRMultipleChoice(
+                    player,
+                    30,
+                    "Do you want to roll the dice?",
+					new String[]{"Yes"},
+                    0
+            ));
+
+            //TODO: use factory, roll random coords
+
             boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, game);
             if(!defended){
                 //TODO: HIT PLAYER

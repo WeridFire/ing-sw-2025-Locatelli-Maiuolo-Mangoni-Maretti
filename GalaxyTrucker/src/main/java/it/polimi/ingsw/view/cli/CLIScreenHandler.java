@@ -60,9 +60,7 @@ public class CLIScreenHandler {
 									.filter(CLIScreen::isForceActivate)
 									.findFirst()
 									.orElse(null);
-		System.out.println(getAvailableScreens());
 		if(forceActivate != null){
-			System.out.println(forceActivate.screenName);
 			activateScreen(forceActivate.screenName);
 		}
 		getCurrentScreen().refresh();
