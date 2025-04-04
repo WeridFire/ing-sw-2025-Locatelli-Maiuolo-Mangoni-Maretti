@@ -6,11 +6,13 @@ import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.CLIFrame;
+import it.polimi.ingsw.view.cli.ICLIPrintable;
 
 /**
  * Generic structure of a Tile.
  */
-public abstract class TileSkeleton implements Tile {
+public abstract class TileSkeleton implements Tile, ICLIPrintable {
     private final SideType[] sides;
     private Rotation appliedRotation;
     private Coordinates fixedAt;
@@ -127,13 +129,14 @@ public abstract class TileSkeleton implements Tile {
         return sb.append("]").toString();
     }
 
-    public String[] getCLIRepresentation(){
+    @Override
+    public CLIFrame getCLIRepresentation(){
         String firstLine = "┌" + SideType.getCLIRepresentation(getSide(Direction.NORTH), Direction.NORTH) + "┐";
         String secondLine = SideType.getCLIRepresentation(getSide(Direction.WEST), Direction.WEST) +
                             getCLISymbol() +
                             SideType.getCLIRepresentation(getSide(Direction.EAST), Direction.EAST);
         String thirdLine = "└" + SideType.getCLIRepresentation(getSide(Direction.SOUTH), Direction.SOUTH) + "┘";
-        return new String[]{firstLine, secondLine, thirdLine};
+        return new CLIFrame(new String[]{firstLine, secondLine, thirdLine});
     }
 
     public static String[] getFreeTileCLIRepresentation(int row, int col){
@@ -146,12 +149,12 @@ public abstract class TileSkeleton implements Tile {
         String thirdLine = "└┉┉┘";
         return new String[]{firstLine, secondLine, thirdLine};
     }
+
     public static String[] getForbiddenTileCLIRepresentation(int row, int col){
         String c = "▒▒▒▒";
         if((row + col) % 2 == 0){
             c = "░░░░";
         }
-
         return new String[]{c, c, c};
     }
 }
