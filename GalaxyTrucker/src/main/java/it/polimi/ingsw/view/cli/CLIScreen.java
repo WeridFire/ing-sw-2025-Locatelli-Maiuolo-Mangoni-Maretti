@@ -181,20 +181,24 @@ public abstract class CLIScreen implements ICLIPrintable {
 		System.out.print(ANSI.ANSI_RED_BACKGROUND+" <- BACK TO " +screenName.toUpperCase() +" " +ANSI.ANSI_RESET);
 	}
 
-	public static CLIFrame getScreenFrame(int rows, int columns) {
-		StringBuilder top = new StringBuilder("┏");
-		StringBuilder middle = new StringBuilder("┃");
-		StringBuilder bottom = new StringBuilder("┗");
+	public static CLIFrame getScreenFrame(int rows, int columns){
+		return getScreenFrame(rows, columns, ANSI.ANSI_RESET);
+	}
+
+	public static CLIFrame getScreenFrame(int rows, int columns, String bg_color) {
+		StringBuilder top = new StringBuilder(ANSI.ANSI_RESET).append("┏");
+		StringBuilder middle = new StringBuilder(ANSI.ANSI_RESET).append("┃").append(bg_color);
+		StringBuilder bottom = new StringBuilder(ANSI.ANSI_RESET).append("┗");
 
 		for (int i = 0; i < columns; i++) {
-			top.append("━");
-			middle.append(" ");
-			bottom.append("━");
+			top.append(ANSI.ANSI_RESET).append("━");
+			middle.append(bg_color).append(" ");
+			bottom.append(ANSI.ANSI_RESET).append("━");
 		}
 
-		top.append("┓");
-		middle.append("┃");
-		bottom.append("┛");
+		top.append(ANSI.ANSI_RESET).append("┓");
+		middle.append(ANSI.ANSI_RESET).append("┃");
+		bottom.append(ANSI.ANSI_RESET).append("┛");
 
 		String[] frame = new String[rows + 2];
 		frame[0] = top.toString();
