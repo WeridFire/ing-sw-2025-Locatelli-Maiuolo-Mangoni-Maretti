@@ -171,8 +171,12 @@ public abstract class CLIScreen {
 		}
 
 		if(!screenName.equals("global")){
-			System.out.print(ANSI.ANSI_RED_BACKGROUND+" <- BACK TO " +screenName.toUpperCase() +" " +ANSI.ANSI_RESET);
+			printBackButton(screenName);
 		}
+	}
+
+	public static void printBackButton(String screenName){
+		System.out.print(ANSI.ANSI_RED_BACKGROUND+" <- BACK TO " +screenName.toUpperCase() +" " +ANSI.ANSI_RESET);
 	}
 
 
