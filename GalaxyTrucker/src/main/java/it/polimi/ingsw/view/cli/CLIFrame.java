@@ -3,6 +3,8 @@ package it.polimi.ingsw.view.cli;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 
+import java.util.Arrays;
+
 /**
  * Represents a character-based frame used in a Command Line Interface.
  * <p>
@@ -12,7 +14,9 @@ import it.polimi.ingsw.enums.Direction;
 public class CLIFrame {
     public static final char INVISIBLE = ' ';
 
-    private final int rows, columns;
+    private final int rows;
+    // Internal columns now equals logical columns * 3 (foreground, background, visible char)
+    private final int columns;
     private final char[][] content;
     private final String[] contentAsLines;
 
@@ -20,31 +24,76 @@ public class CLIFrame {
 
     /**
      * Creates a CLI frame from an array of strings.
+     * Each visible character is preceded by a foreground and background color.
+     *
+     * By default both foreground and background are ANSI_RESET.
      *
      * @param lines The array of strings representing the frame's content.
      */
     public CLIFrame(String[] lines) {
         contentAsLines = lines;
 
+        // Calculate rows and maximum logical columns (ignoring ANSI placeholders)
         rows = lines.length;
-        int tmpCols, cols = 0;
+        int logicalCols = 0;
+        int tmpCols;
         for (int r = 0; r < rows; r++) {
-            tmpCols = lines[r].length();
-            if (tmpCols > cols) {
-                cols = tmpCols;
+            tmpCols = ANSI.stripAnsi(lines[r]).length();
+            if (tmpCols > logicalCols) {
+                logicalCols = tmpCols;
             }
         }
-        columns = cols;
+        // Each cell occupies 3 internal slots (foreground, background, char)
+        columns = logicalCols * 3;
 
         content = new char[rows][columns];
         for (int r = 0; r < rows; r++) {
-            int len = lines[r].length();
-            for (int c = 0; c < columns; c++) {
-                if (c < len) {
-                    content[r][c] = lines[r].charAt(c);
+            String line = lines[r];
+            int len = line.length();
+            // Start with default colors for foreground and background
+            char currentForeground = ANSI.ANSI_RESET.charAt(0);
+            char currentBackground = ANSI.ANSI_RESET.charAt(0);
+            // writeIndex counts logical cells
+            int writeIndex = 0;
+
+            for (int c = 0; c < len; c++) {
+                char ch = line.charAt(c);
+                if (ANSI.isAnsi(ch)) {
+                    // If it's an ANSI_RESET, reset both colors
+                    if (ch == ANSI.ANSI_RESET.charAt(0)) {
+                        currentForeground = ANSI.ANSI_RESET.charAt(0);
+                        currentBackground = ANSI.ANSI_RESET.charAt(0);
+                    } else if (ANSI.isForeground(ch)) {
+                        currentForeground = ch;
+                    } else if (ANSI.isBackground(ch)) {
+                        currentBackground = ch;
+                    }
                 } else {
-                    content[r][c] = INVISIBLE;
+                    // Before storing, ensure colors are in proper order:
+                    // Foreground should be a foreground code and background a background code.
+                    if (ANSI.isBackground(currentForeground) && ANSI.isForeground(currentBackground)) {
+                        // swap if they are in wrong order
+                        char temp = currentForeground;
+                        currentForeground = currentBackground;
+                        currentBackground = temp;
+                    }
+                    // Commit cell only if there is space for one logical cell
+                    if (writeIndex < columns / 3) {
+                        int pos = writeIndex * 3;
+                        content[r][pos] = currentForeground;
+                        content[r][pos + 1] = currentBackground;
+                        content[r][pos + 2] = ch;
+                        writeIndex++;
+                    }
                 }
+            }
+            // Fill remaining cells with default colors and INVISIBLE character
+            while (writeIndex < columns / 3) {
+                int pos = writeIndex * 3;
+                content[r][pos] = ANSI.ANSI_RESET.charAt(0);
+                content[r][pos + 1] = ANSI.ANSI_RESET.charAt(0);
+                content[r][pos + 2] = INVISIBLE;
+                writeIndex++;
             }
         }
 
@@ -75,7 +124,7 @@ public class CLIFrame {
      * @param line The string representing the frame's content.
      */
     public CLIFrame(String line) {
-        this(new String[] {line});
+        this(new String[] { line });
     }
 
     /**
@@ -85,6 +134,15 @@ public class CLIFrame {
      */
     public int getRows() {
         return rows;
+    }
+
+    /**
+     * Gets the number of logical columns (each representing one visible character).
+     *
+     * @return The number of logical columns.
+     */
+    public int getColumns() {
+        return columns / 3;
     }
 
     /**
@@ -106,50 +164,74 @@ public class CLIFrame {
     }
 
     /**
-     * Gets the number of columns in the frame.
+     * Gets the starting logical column index, including the offset.
      *
-     * @return The number of columns.
-     */
-    public int getColumns() {
-        return columns;
-    }
-
-    /**
-     * Gets the starting column index, including the offset.
-     *
-     * @return The first column index.
+     * @return The first logical column index.
      */
     public int getFirstColumnInclusive() {
         return offset_column;
     }
 
     /**
-     * Gets the ending column index, excluding the offset.
+     * Gets the ending logical column index, excluding the offset.
      *
-     * @return The last column index (exclusive).
+     * @return The last logical column index (exclusive).
      */
     public int getLastColumnExclusive() {
-        return columns + offset_column;
+        return getColumns() + offset_column;
     }
 
     /**
-     * Retrieves the character at the specified position in the frame.
+     * Retrieves the visible character at the specified logical position in the frame.
      *
-     * @param row The row index.
-     * @param col The column index.
-     * @return The character at the given position, or {@link #INVISIBLE} if out of bounds.
+     * @param row The logical row index.
+     * @param col The logical column index.
+     * @return The visible character at the given position, or {@link #INVISIBLE} if out of bounds.
      */
-    public char getAt(int row, int col) {
-        row -= offset_row;
-        col -= offset_column;
-        if (row < 0 || row >= rows || col < 0 || col >= columns) {
+    public char getCharAt(int row, int col) {
+        int logicalRow = row - offset_row;
+        int logicalCol = col - offset_column;
+        if (logicalRow < 0 || logicalRow >= rows || logicalCol < 0 || logicalCol >= getColumns()) {
             return INVISIBLE;
         }
-        return content[row][col];
+        // Visible char is stored at slot index 2 of the cell.
+        return content[logicalRow][logicalCol * 3 + 2];
     }
 
     /**
-     * Gets the frame content as an array of lines.
+     * Retrieves the foreground color at the specified logical position in the frame.
+     *
+     * @param row The logical row index.
+     * @param col The logical column index.
+     * @return The foreground color placeholder at the given position, or ANSI_RESET if out of bounds.
+     */
+    public char getForegroundAt(int row, int col) {
+        int logicalRow = row - offset_row;
+        int logicalCol = col - offset_column;
+        if (logicalRow < 0 || logicalRow >= rows || logicalCol < 0 || logicalCol >= getColumns()) {
+            return ANSI.ANSI_RESET.charAt(0);
+        }
+        return content[logicalRow][logicalCol * 3];
+    }
+
+    /**
+     * Retrieves the background color at the specified logical position in the frame.
+     *
+     * @param row The logical row index.
+     * @param col The logical column index.
+     * @return The background color placeholder at the given position, or ANSI_RESET if out of bounds.
+     */
+    public char getBackgroundAt(int row, int col) {
+        int logicalRow = row - offset_row;
+        int logicalCol = col - offset_column;
+        if (logicalRow < 0 || logicalRow >= rows || logicalCol < 0 || logicalCol >= getColumns()) {
+            return ANSI.ANSI_RESET.charAt(0);
+        }
+        return content[logicalRow][logicalCol * 3 + 1];
+    }
+
+    /**
+     * Gets the frame content as the original array of strings.
      *
      * @return The content as an array of strings.
      */
@@ -211,6 +293,12 @@ public class CLIFrame {
     /**
      * Merges this frame with another frame, aligning them according to specified anchor points.
      *
+     * When merging, for each logical cell:
+     * - If the added frame's visible character is not INVISIBLE, its cell (foreground, background, char) is used.
+     * - If the visible character is INVISIBLE but its foreground is not ANSI_RESET, the added frame’s colors (even with INVISIBLE)
+     *   are used.
+     * - Otherwise, the base frame's cell is used.
+     *
      * @param add The frame to merge.
      * @param selfAnchor The anchor point for this frame.
      * @param addAnchor The anchor point for the frame being added.
@@ -225,19 +313,41 @@ public class CLIFrame {
         int colStart = Math.min(baseFrame.getFirstColumnInclusive(), addFrame.getFirstColumnInclusive());
         int colEnd = Math.max(baseFrame.getLastColumnExclusive(), addFrame.getLastColumnExclusive());
 
-        // build lines the shortest possible to contain both frames
+        // Build merged lines over logical cells
         String[] lines = new String[rowEnd - rowStart];
         StringBuilder lineBuilder;
-        char overwrite;
         for (int row = rowStart; row < rowEnd; row++) {
             lineBuilder = new StringBuilder();
             for (int col = colStart; col < colEnd; col++) {
-                overwrite = addFrame.getAt(row, col);
-                // default: override the content with added frame, but if invisible there: draw base frame instead
-                if (overwrite != CLIFrame.INVISIBLE) {
-                    lineBuilder.append(overwrite);
+                char addVisible = addFrame.getCharAt(row, col);
+                if (addVisible != INVISIBLE) {
+                    // Use the cell from addFrame (foreground, background, and visible char)
+                    lineBuilder.append(addFrame.getForegroundAt(row, col));
+                    if(addFrame.getBackgroundAt(row, col) == ANSI.ANSI_RESET.charAt(0)){
+                        lineBuilder.append(baseFrame.getBackgroundAt(row, col));
+                    }else{
+                        lineBuilder.append(addFrame.getBackgroundAt(row, col));
+                    }
+                    lineBuilder.append(addVisible);
                 } else {
-                    lineBuilder.append(baseFrame.getAt(row, col));
+                    // If the added cell is invisible but its foreground (or background) is not reset, keep its colors.
+                    char addForeground = addFrame.getForegroundAt(row, col);
+                    char addBackground = addFrame.getBackgroundAt(row, col);
+                    if (addForeground != ANSI.ANSI_RESET.charAt(0) && addBackground != ANSI.ANSI_RESET.charAt(0)) {
+                        lineBuilder.append(addForeground);
+                        lineBuilder.append(addBackground);
+                        lineBuilder.append(INVISIBLE);
+                    } else {
+                        // Otherwise, use the background frame's cell.
+                        lineBuilder.append(baseFrame.getForegroundAt(row, col));
+                        if(addBackground != ANSI.ANSI_RESET.charAt(0)){
+                            lineBuilder.append(addFrame.getBackgroundAt(row, col));
+                        }else{
+                            lineBuilder.append(baseFrame.getBackgroundAt(row, col));
+                        }
+
+                        lineBuilder.append(baseFrame.getCharAt(row, col));
+                    }
                 }
             }
             lines[row - rowStart] = lineBuilder.toString();
@@ -292,10 +402,10 @@ public class CLIFrame {
     /**
      * Merges this CLI frame with another one in a specified direction, adding space between them.
      *
-     * @param add The {@link CLIFrame} to merge with the current one.
+     * @param add The CLIFrame to merge with the current one.
      * @param direction The direction in which to merge the additional frame.
-     * @param space The number of spaces to insert between the two frames.
-     * @return A new {@link CLIFrame} representing the merged result.
+     * @param space The number of logical cells (spaces) to insert between the two frames.
+     * @return A new CLIFrame representing the merged result.
      */
     public CLIFrame merge(CLIFrame add, Direction direction, int space) {
         return switch (direction) {
@@ -308,6 +418,22 @@ public class CLIFrame {
 
     @Override
     public String toString() {
-        return String.join("\n", contentAsLines);
+        // Rebuild the frame from internal content (logical row by logical row)
+        String[] lines = new String[rows];
+        for (int r = 0; r < rows; r++) {
+            StringBuilder sb = new StringBuilder();
+            int logicalCells = getColumns();
+            for (int c = 0; c < logicalCells; c++) {
+                int pos = c * 3;
+                sb.append(content[r][pos]);       // foreground
+                sb.append(content[r][pos + 1]);     // background
+                sb.append(content[r][pos + 2]);     // visible character
+            }
+            lines[r] = sb.toString();
+        }
+        return String.join("\n",
+                Arrays.stream(lines)
+                        .map(ANSI::replacePlaceholders)
+                        .toArray(String[]::new));
     }
 }
