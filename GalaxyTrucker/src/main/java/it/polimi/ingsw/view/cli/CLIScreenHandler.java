@@ -78,10 +78,22 @@ public class CLIScreenHandler {
 	/**
 	 * Prints an informative message displaying the currently available and activable screens.
 	 */
-	private void printAvailableScreens(){
-		StringBuilder screensList = new StringBuilder();
-		getAvailableScreens().forEach(cli -> screensList.append(cli.screenName).append(", "));
-		System.out.println("Available screens: " + screensList);
+	private void printAvailableScreens() {
+		CLIScreen.clear();
+		Set<CLIScreen> screens = getAvailableScreens();
+		if (screens.isEmpty()) {
+			System.out.println(ANSI.ANSI_RED + "There are no available screens." + ANSI.ANSI_RESET);
+		}else{
+			String header = ANSI.ANSI_PURPLE_BACKGROUND + ANSI.ANSI_WHITE + " AVAILABLE SCREENS " + ANSI.ANSI_RESET;
+			System.out.println("\n" + header);
+			System.out.println(ANSI.ANSI_PURPLE + "List of available screens:" + ANSI.ANSI_RESET);
+
+			StringBuilder screensList = new StringBuilder();
+			screens.forEach(cli -> screensList.append("- ").append(cli.screenName).append("\n"));
+			System.out.print(ANSI.ANSI_WHITE + screensList + ANSI.ANSI_RESET);
+		}
+
+		CLIScreen.printBackButton(getCurrentScreen().screenName);
 	}
 
 	/**
