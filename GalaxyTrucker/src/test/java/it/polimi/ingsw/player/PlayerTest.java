@@ -12,6 +12,7 @@ import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.util.Coordinates;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -50,7 +51,11 @@ class PlayerTest {
         player1.printCliShipboard();
          */
 
-        System.out.println("\n\nTest2\n");
+        System.out.println("\nTest before flight start\n");
+        System.out.println(player1.getShipBoard().getCLIRepresentation());
+
+        assertDoesNotThrow(() -> player1.getShipBoard().startFlight());
+        System.out.println("\nTest AFTER flight start\n");
         System.out.println(player1.getShipBoard().getCLIRepresentation());
     }
 }
