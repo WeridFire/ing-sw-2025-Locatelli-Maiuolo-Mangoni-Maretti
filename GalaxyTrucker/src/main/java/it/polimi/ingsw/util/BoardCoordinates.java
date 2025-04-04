@@ -156,7 +156,7 @@ public class BoardCoordinates {
         StringBuilder frame = new StringBuilder();
 
         // column numbers to easily identify the shipboard
-        frame.append(" ");  // offset by 1 to account for the vertical frame
+        frame.append("  ");  // offset by 2 to account for the vertical frame
         for (int col = minCol; col <= maxCol; col++) {
             if(col < 10){
                 frame.append("│").append(col).append(" │");
