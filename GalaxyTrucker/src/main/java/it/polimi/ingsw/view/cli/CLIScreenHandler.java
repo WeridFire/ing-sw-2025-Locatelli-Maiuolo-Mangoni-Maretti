@@ -144,7 +144,13 @@ public class CLIScreenHandler {
 				default:
 					//if the command is not recognized as a global command, it lets the active screen process it.
 					if (currentScreen != null){
-						currentScreen.processCommand(cmd, args);
+						try{
+							currentScreen.processCommand(cmd, args);
+						}catch(IllegalArgumentException e){
+							currentScreen.setScreenMessage(e.getMessage());
+							break;
+						}
+
 					}
 			}
 		}
