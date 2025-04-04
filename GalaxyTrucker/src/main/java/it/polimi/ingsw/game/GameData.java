@@ -65,6 +65,8 @@ public class GameData implements Serializable {
 
     private int requiredPlayers;
 
+    private String gameLeader;
+
     /**
      * Constructs a new GameData object with a default game level.
      */
@@ -221,7 +223,8 @@ public class GameData implements Serializable {
 
 
     /**
-     * Adds a player to the game.
+     * Adds a player to the game. If the player was the first to be added, they will be considered
+     * the game leader, and will be assigned to the field. Game leader can change game settings.
      *
      * @param player The player to add.
      * @throws PlayerAlreadyInGameException If the player is already in the game.
@@ -234,6 +237,9 @@ public class GameData implements Serializable {
             throw new PlayerAlreadyInGameException("Player with this username is already present.");
         }
         players.add(player);
+        if(players.size() == 1){
+            this.gameLeader = player.getUsername();
+        }
     }
 
     /**
@@ -308,5 +314,9 @@ public class GameData implements Serializable {
 
     public UUID getGameId() {
         return gameId;
+    }
+
+    public String getGameLeader() {
+        return gameLeader;
     }
 }
