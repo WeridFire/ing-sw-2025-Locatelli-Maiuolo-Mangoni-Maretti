@@ -108,13 +108,12 @@ public class GameServer{
 		getInstance();
 	}
 
-	public void broadcastUpdate(Game game) throws RemoteException, CantFindClientException {
+	public void broadcastUpdate(Game game) throws RemoteException {
 		for (Player player: game.getGameData().getPlayers()){
 			IClient client = clients.get(player.getConnectionUUID());
-			if (client == null){
-				throw new CantFindClientException();
+			if (client != null){
+				client.updateClient(new ClientUpdate(player.getConnectionUUID()));
 			}
-			client.updateClient(new ClientUpdate(player.getConnectionUUID()));
 		}
 	}
 
