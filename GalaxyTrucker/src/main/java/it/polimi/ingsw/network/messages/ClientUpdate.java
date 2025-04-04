@@ -11,6 +11,7 @@ import it.polimi.ingsw.player.Player;
 
 import java.io.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.Versioned;
@@ -145,5 +146,28 @@ public class ClientUpdate implements Serializable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public Player getClientPlayer(){
+		if(getCurrentGame() == null){
+			return null;
+		}
+		return getCurrentGame()
+				.getPlayers()
+				.stream()
+				.filter((p) -> p.getConnectionUUID().equals(getClientUUID()))
+				.findFirst().orElse(null);
+	}
+
+	/**
+	 * Utility function to tell if the client this message  was sent to is the game leader or not.
+	 * Returns false if the player is not in a game.
+	 * @return Whether the client is the game leader (the one that created the game) or not.
+	 */
+	public boolean isGameLeader(){
+		if(getCurrentGame() == null || getClientPlayer() == null){
+			return false;
+		}
+		return Objects.equals(getClientPlayer().getUsername(), getCurrentGame().getGameLeader());
 	}
 }
