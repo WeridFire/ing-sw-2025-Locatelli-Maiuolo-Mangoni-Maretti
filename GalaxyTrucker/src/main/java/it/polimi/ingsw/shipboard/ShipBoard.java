@@ -20,6 +20,8 @@ public class ShipBoard implements ICLIPrintable {
 
 	private final CLIFrame emptyRepresentation;
 
+	private boolean flightStarted;
+
 	private VisitorCalculateCargoInfo visitorCalculateCargoInfo;
 	private VisitorCalculatePowers visitorCalculatePowers;
 	private VisitorCalculateShieldedSides visitorCalculateShieldedSides;
@@ -29,6 +31,7 @@ public class ShipBoard implements ICLIPrintable {
 		board = new HashMap<>();
 		this.level = level;
 		emptyRepresentation = BoardCoordinates.getCLIRepresentation(level);
+		flightStarted = false;
 	}
 
 	private void resetVisitors() {
@@ -160,8 +163,12 @@ public class ShipBoard implements ICLIPrintable {
 	 * Prepares the ship for flight.
 	 * @implNote Resets all visitors (also integrity check is called).
 	 */
-	public void startFlight() {
+	public void startFlight() throws AlreadyStartedFlightException {
+		if (flightStarted) {
+			throw new AlreadyStartedFlightException();
+		}
 		resetVisitors();
+		flightStarted = true;
 	}
 
 	/**
@@ -344,6 +351,55 @@ public class ShipBoard implements ICLIPrintable {
 		return level;
 	}
 
+	private CLIFrame getInfoCliRepresentation() {
+		/* info example
+				"+--------------------+",
+				"|      Overview      |",
+				"+--------------------+",
+				"| Total Crew: 8      |",
+				"| Humans: 7          |",
+				"| Purple Alien: Yes  |",
+				"| Brown Alien: No    |",
+				"+--------------------+",
+				"| Red Goods: 0       |",
+				"| Yellow Goods: 2    |",
+				"| Green Goods: 0     |",
+				"| Blue Goods: 3      |",
+				"+--------------------+",
+				"| Batteries: 5       |",
+				"+--------------------+"
+		 */
+
+		String line =  "+--------------------+";
+		String empty = "|                    |";
+		CLIFrame info = new CLIFrame(new String[] {
+				line, empty,
+				line, empty, empty, empty, empty,
+				line, empty, empty, empty, empty,
+				line, empty, line
+		});
+		info = info.merge(new CLIFrame("Overview"), AnchorPoint.TOP, AnchorPoint.TOP, 1, 0);
+		info = info.merge(new CLIFrame(new String[] {
+				"Total Crew: " + visitorCalculateCargoInfo.getCrewInfo().countAll(LoadableType.CREW_SET),
+				"Humans: " + visitorCalculateCargoInfo.getCrewInfo().count(LoadableType.HUMAN),
+				"Purple Alien: " + ((visitorCalculateCargoInfo.getCrewInfo().count(LoadableType.PURPLE_ALIEN) > 0)
+						? "Yes" : "No"),
+				"Brown Alien: " + ((visitorCalculateCargoInfo.getCrewInfo().count(LoadableType.BROWN_ALIEN) > 0)
+						? "Yes" : "No"),
+		}), AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT, 3, 2);
+		info = info.merge(new CLIFrame(new String[] {
+				"Red Goods: " + visitorCalculateCargoInfo.getGoodsInfo().count(LoadableType.RED_GOODS),
+				"Yellow Goods: " + visitorCalculateCargoInfo.getGoodsInfo().count(LoadableType.YELLOW_GOODS),
+				"Green Goods: " + visitorCalculateCargoInfo.getGoodsInfo().count(LoadableType.GREEN_GOODS),
+				"Blue Goods: " + visitorCalculateCargoInfo.getGoodsInfo().count(LoadableType.BLUE_GOODS)
+		}), AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT, 8, 2);
+		info = info.merge(new CLIFrame(new String[] {
+				"Batteries: " + visitorCalculateCargoInfo.getBatteriesInfo().count(LoadableType.BATTERY)
+		}), AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT, 13, 2);
+
+		return info;
+	}
+
 	@Override
 	public CLIFrame getCLIRepresentation() {
 		int minRow = BoardCoordinates.getFirstCoordinateFromDirection(Direction.NORTH);
@@ -356,20 +412,9 @@ public class ShipBoard implements ICLIPrintable {
 					AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT,
 					(c.getRow() - minRow) * 3, (c.getColumn() - minCol) * 4);
 		}
-		tilesRepresentation.applyOffset(1, 1);  // consider the numbers offset in the empty representation
+		tilesRepresentation.applyOffset(3 + 1, 4 + 2);  // consider the numbers offset in the empty representation
 
-		CLIFrame info = new CLIFrame(new String[] {
-				"+-------------------+",
-				"|    Info Example   |",
-				"+-------------------+",
-				"| Humans: 7         |",
-				"| Brown Alien: Yes  |",
-				"| Purple Alien: No  |",
-				"+-------------------+",
-				"| Credits: 4        |",
-				"| Etc...            |",
-				"+-------------------+"
-		});
+		CLIFrame info = flightStarted ? getInfoCliRepresentation() : new CLIFrame();
 
 		return emptyRepresentation.merge(tilesRepresentation).merge(info, Direction.EAST, 5);
 	}

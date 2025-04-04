@@ -70,6 +70,15 @@ public class CLIFrame {
     }
 
     /**
+     * Creates a CLI frame from a single line string.
+     *
+     * @param line The string representing the frame's content.
+     */
+    public CLIFrame(String line) {
+        this(new String[] {line});
+    }
+
+    /**
      * Gets the number of rows in the frame.
      *
      * @return The number of rows.
