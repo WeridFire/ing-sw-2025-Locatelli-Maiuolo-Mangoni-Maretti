@@ -5,9 +5,11 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.player.Player;
 
 import java.rmi.RemoteException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class LobbyCLIScreen extends CLIScreen{
 
@@ -24,26 +26,48 @@ public class LobbyCLIScreen extends CLIScreen{
 
 	@Override
 	protected void printScreen() {
-		List<String> lobbyMembers = getLastUpdate().getCurrentGame().getPlayers().stream().map(Player::getUsername).toList();
+		List<String> lobbyMembers = getLastUpdate().getCurrentGame().getPlayers().stream()
+				.map(Player::getUsername)
+				.toList();
+
 		String lobbyID = getLastUpdate().getCurrentGame().getGameId().toString();
 		String requiredPlayersAmount = String.valueOf(getLastUpdate().getCurrentGame().getRequiredPlayers());
-		String flightLevel = String.valueOf(getLastUpdate().getCurrentGame().getLevel());
+		GameLevel currentLevel = getLastUpdate().getCurrentGame().getLevel();
 		String host = getLastUpdate().getCurrentGame().getGameLeader();
 		String yourName = getLastUpdate().getClientPlayer() != null ?
-												getLastUpdate().getClientPlayer().getUsername()
-												:
-												"Unknown";
+				getLastUpdate().getClientPlayer().getUsername()
+				:
+				"Unknown";
 
 		System.out.println(ANSI.ANSI_YELLOW + "\n======= LOBBY INFO =======" + ANSI.ANSI_RESET);
 		System.out.println(ANSI.ANSI_GREEN + "Lobby ID: " + ANSI.ANSI_CYAN + lobbyID + ANSI.ANSI_RESET);
 		System.out.println(ANSI.ANSI_GREEN + "Leader: " + ANSI.ANSI_CYAN + host + ANSI.ANSI_RESET);
 		System.out.println(ANSI.ANSI_GREEN + "Your Name: " + ANSI.ANSI_CYAN + yourName + ANSI.ANSI_RESET);
 		System.out.println(ANSI.ANSI_GREEN + "Required Players: " + ANSI.ANSI_CYAN + requiredPlayersAmount + ANSI.ANSI_RESET);
-		System.out.println(ANSI.ANSI_GREEN + "Flight Level: " + ANSI.ANSI_CYAN + flightLevel + ANSI.ANSI_RESET);
+
+		// Print all levels, highlight current one
+		String levelsDisplay = Arrays.stream(GameLevel.values())
+				.map(level -> level == currentLevel
+						? ANSI.ANSI_YELLOW_BACKGROUND + ANSI.ANSI_BLACK + level.toString() + ANSI.ANSI_RESET
+						: ANSI.ANSI_CYAN + level.toString() + ANSI.ANSI_RESET
+				)
+				.collect(Collectors.joining(ANSI.ANSI_WHITE + " | " + ANSI.ANSI_RESET));
+
+		System.out.println(ANSI.ANSI_GREEN + "Flight Level: " + levelsDisplay);
+
 		System.out.println(ANSI.ANSI_YELLOW + "============================" + ANSI.ANSI_RESET);
 		System.out.println(ANSI.ANSI_BLUE + "\nLobby Members:" + ANSI.ANSI_RESET);
-		lobbyMembers.forEach(member -> System.out.println(ANSI.ANSI_CYAN + "- " + member + ANSI.ANSI_RESET));
+		lobbyMembers.forEach(member ->
+				System.out.println(ANSI.ANSI_CYAN + "- " + member + ANSI.ANSI_RESET)
+		);
+		if (getLastUpdate().isGameLeader()) {
+			System.out.println("\n" + ANSI.ANSI_GREEN_BACKGROUND + ANSI.ANSI_BLACK
+					+ " Tip: " + ANSI.ANSI_RESET + ANSI.ANSI_GREEN
+					+ "Change the game settings with the command " + ANSI.ANSI_YELLOW + ">settings"
+					+ ANSI.ANSI_RESET);
+		}
 	}
+
 
 
 	@Override
@@ -59,7 +83,16 @@ public class LobbyCLIScreen extends CLIScreen{
 					int minPlayers = getLastUpdate().getCurrentGame().getRequiredPlayers();
 					switch(args[0].toLowerCase()){
 						case "level":
-							level = GameLevel.valueOf(args[1]);
+							try{
+								level = GameLevel.valueOf(args[1]);
+							}catch(IllegalArgumentException e){
+								setScreenMessage("Available levels: " +
+										Arrays.stream(GameLevel.values())
+												.map(Enum::toString)
+												.collect(Collectors.joining(", "))
+								);
+								return;
+							}
 							break;
 						case "minplayers": //fallthrough
 						case "requiredplayers":
@@ -73,11 +106,12 @@ public class LobbyCLIScreen extends CLIScreen{
 						refresh();
 						break;
 					}else{
-						//TODO: call to set the settings to the server.
+						getServer().updateGameSettings(getClient(), level, minPlayers);
 						break;
 					}
 				}
 				setScreenMessage("Usage: settings <level|minplayers>");
+				break;
 			case "leave":
 				setScreenMessage("Function not implemented yet.");
 				break;
