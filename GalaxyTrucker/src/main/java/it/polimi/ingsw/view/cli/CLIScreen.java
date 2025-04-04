@@ -63,7 +63,7 @@ public abstract class CLIScreen {
 	 * Refreshes the whole screen. Causes the CLI to clear, print newly the screen using the specific screen logic,
 	 * and then prints any eventual error or message.
 	 */
-	protected void refresh(){
+	protected final void refresh(){
 		clear();
 		printScreen();
 		if(getLastUpdate().getError() != null){
@@ -91,7 +91,6 @@ public abstract class CLIScreen {
 		printCommands("global", "ping|Ping the host server.", "screen|Navigate screens.", "help|Get all the available commands.", "debug|Create a json containing the current game state.");
 		printScreenSpecificCommands();
 	}
-
 
 	protected final IClient getClient(){
 		return CLIScreenHandler.getInstance().getGameClient().getClient();
