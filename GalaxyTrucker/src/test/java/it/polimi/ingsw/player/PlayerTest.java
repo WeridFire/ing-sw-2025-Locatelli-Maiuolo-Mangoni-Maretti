@@ -32,7 +32,6 @@ class PlayerTest {
 
     @Test
     void testCliPrint() throws OutOfBuildingAreaException,FixedTileException, TileAlreadyPresentException {
-        System.out.println("Test1");
         player1.setShipBoard(shipBoard1);
         List<TileSkeleton> tilesPool = TilesFactory.createPileTiles();
         for(int i=0; i<10; i++){
@@ -46,10 +45,12 @@ class PlayerTest {
             }
         }
 
+        /* DEPRECATED
+        System.out.println("Test1");
         player1.printCliShipboard();
-        for(String s : player1.getShipBoard().getCLIRepresentation()){
-            System.out.println(s);
-        }
-        System.out.println("Test2");
+         */
+
+        System.out.println("\n\nTest2\n");
+        System.out.println(player1.getShipBoard().getCLIRepresentation());
     }
 }
