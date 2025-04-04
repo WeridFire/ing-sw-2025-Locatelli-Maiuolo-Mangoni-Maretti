@@ -1,9 +1,6 @@
 package it.polimi.ingsw.shipboard;
 
-import it.polimi.ingsw.enums.Direction;
-import it.polimi.ingsw.enums.GameLevel;
-import it.polimi.ingsw.enums.ProtectionType;
-import it.polimi.ingsw.enums.Rotation;
+import it.polimi.ingsw.enums.*;
 import it.polimi.ingsw.shipboard.tiles.*;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.shipboard.visitors.*;
@@ -11,13 +8,17 @@ import it.polimi.ingsw.shipboard.visitors.integrity.*;
 import it.polimi.ingsw.shipboard.exceptions.*;
 import it.polimi.ingsw.util.BoardCoordinates;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.CLIFrame;
+import it.polimi.ingsw.view.cli.ICLIPrintable;
 
 import java.util.*;
 
-public class ShipBoard {
+public class ShipBoard implements ICLIPrintable {
 
 	private final GameLevel level;
 	private final Map<Coordinates, TileSkeleton> board;
+
+	private final CLIFrame emptyRepresentation;
 
 	private VisitorCalculateCargoInfo visitorCalculateCargoInfo;
 	private VisitorCalculatePowers visitorCalculatePowers;
@@ -27,6 +28,7 @@ public class ShipBoard {
 	public ShipBoard(GameLevel level) {
 		board = new HashMap<>();
 		this.level = level;
+		emptyRepresentation = BoardCoordinates.getCLIRepresentation(level);
 	}
 
 	private void resetVisitors() {
@@ -342,69 +344,33 @@ public class ShipBoard {
 		return level;
 	}
 
-	public List<String> getCLIRepresentation() {
-		// Determine the board boundaries.
-		int minRow = 5;
-		int maxRow = 9;
-		int minCol = 3;
-		int maxCol = 11;
-		List<String> result = new ArrayList<>();
-		StringBuilder frame = new StringBuilder();
-		frame.append(" "); //offset by 1 to account for the vertical frame
-		for (int col = minCol; col <= maxCol; col++) {
-			if(col < 10){
-				frame.append("│").append(col).append(" │");
-			}else{
-				frame.append("│").append(col).append("│");
-			}
+	@Override
+	public CLIFrame getCLIRepresentation() {
+		int minRow = BoardCoordinates.getFirstCoordinateFromDirection(Direction.NORTH);
+		int minCol = BoardCoordinates.getFirstCoordinateFromDirection(Direction.WEST);
 
+		CLIFrame tilesRepresentation = new CLIFrame();
+		for (Map.Entry<Coordinates, TileSkeleton> entry : board.entrySet()) {
+			Coordinates c = entry.getKey();
+			tilesRepresentation = tilesRepresentation.merge(entry.getValue().getCLIRepresentation(),
+					AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT,
+					(c.getRow() - minRow) * 3 + 1, (c.getColumn() - minCol) * 4 + 1);
 		}
-		result.add(frame.toString());
-		// Iterate over each row on the board.
-		for (int row = minRow; row <= maxRow; row++) {
-			// Each tile has 3 rows in its CLI representation.
-			StringBuilder line1 = new StringBuilder();
-			StringBuilder line2 = new StringBuilder();
-			StringBuilder line3 = new StringBuilder();
 
-			line1.append("─");
-			line2.append(row);
-			line3.append("─");
+		CLIFrame info = new CLIFrame(new String[] {
+				"+-------------------+",
+				"|    Info Example   |",
+				"+-------------------+",
+				"| Humans: 7         |",
+				"| Brown Alien: Yes  |",
+				"| Purple Alien: No  |",
+				"+-------------------+",
+				"| Credits: 4        |",
+				"| Etc...            |",
+				"+-------------------+"
+		});
 
-			// Iterate over each column for the current row.
-			for (int col = minCol; col <= maxCol; col++) {
-				Coordinates coord = new Coordinates(row, col);
-				TileSkeleton tile = board.get(coord);
-				String[] tileRep;
-
-				if (tile != null) {
-					tileRep = tile.getCLIRepresentation();
-				} else {
-					if(BoardCoordinates.isOnBoard(getLevel(), coord)){
-						tileRep = TileSkeleton.getFreeTileCLIRepresentation(row, col);
-					}else{
-						tileRep = TileSkeleton.getForbiddenTileCLIRepresentation(row, col);
-					}
-
-				}
-
-				line1.append(tileRep[0]);
-				line2.append(tileRep[1]);
-				line3.append(tileRep[2]);
-			}
-
-			line1.append("─");
-			line2.append(row);
-			line3.append("─");
-
-			result.add(line1.toString());
-			result.add(line2.toString());
-			result.add(line3.toString());
-
-
-		}
-		result.add(frame.toString());
-		return result;
+		return emptyRepresentation.merge(tilesRepresentation).merge(info, Direction.EAST, 5);
 	}
 
 
