@@ -57,7 +57,7 @@ public abstract class CLIScreen {
 	 * @param args The args to pass
 	 * @throws RemoteException
 	 */
-	protected abstract void processCommand(String command, String[] args) throws RemoteException;
+	protected abstract void processCommand(String command, String[] args) throws RemoteException, IllegalArgumentException;
 
 	/**
 	 * Refreshes the whole screen. Causes the CLI to clear, print newly the screen using the specific screen logic,
@@ -117,11 +117,16 @@ public abstract class CLIScreen {
 
 	private void displayScreenMessage(){
 		if(this.screenMessage != null){
-			System.out.println(ANSI.ANSI_YELLOW + "[SCREEN ERROR] " + screenMessage + ANSI.ANSI_RESET);
+			System.out.println(ANSI.ANSI_YELLOW + "[SCREEN INFO] " + screenMessage + ANSI.ANSI_RESET);
 			this.screenMessage = null;
 		}
 	}
 
+	/**
+	 * Sets an informative message on the client's screen, to inform about something (usually the failed
+	 * execution of the command on the client-side checks). Causes a full screen refresh.
+	 * @param message The message to display in yellow under the screen.
+	 */
 	final void setScreenMessage(String message){
 		this.screenMessage = message;
 		this.refresh();
