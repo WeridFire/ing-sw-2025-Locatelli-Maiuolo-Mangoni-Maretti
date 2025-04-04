@@ -2,8 +2,12 @@ package it.polimi.ingsw.util;
 
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.view.cli.CLIFrame;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -129,4 +133,76 @@ public class BoardCoordinates {
         };
     }
 
+    /**
+     * Generates a CLI representation of the game board for the specified game level.
+     * <p>
+     * The representation includes a grid structure with row and column numbers for easy identification.
+     * It distinguishes between playable board tiles and forbidden tiles.
+     *
+     * @param level The game level for which the CLI representation should be generated.
+     * @return A {@link CLIFrame} representing the game board for the given level.
+     * @throws RuntimeException If the CLI representation for the given level is not implemented.
+     */
+    public static CLIFrame getCLIRepresentation(GameLevel level) {
+        if (level != GameLevel.TESTFLIGHT && level != GameLevel.ONE && level != GameLevel.TWO) {
+            throw new RuntimeException("Unimplemented CLI representation for level " + level);
+        }
+
+        int minRow = getFirstCoordinateFromDirection(Direction.NORTH);
+        int maxRow = getFirstCoordinateFromDirection(Direction.SOUTH);
+        int minCol = getFirstCoordinateFromDirection(Direction.WEST);
+        int maxCol = getFirstCoordinateFromDirection(Direction.EAST);
+        List<String> result = new ArrayList<>();
+        StringBuilder frame = new StringBuilder();
+
+        // column numbers to easily identify the shipboard
+        frame.append(" ");  // offset by 1 to account for the vertical frame
+        for (int col = minCol; col <= maxCol; col++) {
+            if(col < 10){
+                frame.append("│").append(col).append(" │");
+            }else{
+                frame.append("│").append(col).append("│");
+            }
+        }
+        result.add(frame.toString());
+
+        // Iterate over each row on the board.
+        for (int row = minRow; row <= maxRow; row++) {
+            // Each tile has 3 rows in its CLI representation.
+            StringBuilder line1 = new StringBuilder();
+            StringBuilder line2 = new StringBuilder();
+            StringBuilder line3 = new StringBuilder();
+
+            line1.append("─");
+            line2.append(row);
+            line3.append("─");
+
+            // Iterate over each column for the current row.
+            for (int col = minCol; col <= maxCol; col++) {
+                Coordinates coord = new Coordinates(row, col);
+                String[] tileRep;
+
+                if (BoardCoordinates.isOnBoard(level, coord)) {
+                    tileRep = TileSkeleton.getFreeTileCLIRepresentation(row, col);
+                }
+                else {
+                    tileRep = TileSkeleton.getForbiddenTileCLIRepresentation(row, col);
+                }
+
+                line1.append(tileRep[0]);
+                line2.append(tileRep[1]);
+                line3.append(tileRep[2]);
+            }
+
+            line1.append("─");
+            line2.append(row);
+            line3.append("─");
+
+            result.add(line1.toString());
+            result.add(line2.toString());
+            result.add(line3.toString());
+        }
+
+        return new CLIFrame(result.toArray(new String[0]));
+    }
 }
