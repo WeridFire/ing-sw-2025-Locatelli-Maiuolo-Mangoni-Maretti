@@ -133,12 +133,18 @@ public class LobbyCLIScreen extends CLIScreen{
 		}
 	}
 
-
 	@Override
 	public CLIFrame getCLIRepresentation() {
-		CLIFrame screenBorder = getScreenFrame(24, 100);
-		CLIFrame lobbyInfoFrame = getScreenFrame(18, 80);
-		CLIFrame title = new CLIFrame(new String[]{"LOBBY INFO"});
+		// Screen border with white background (and default foreground)
+		CLIFrame screenBorder = getScreenFrame(24, 100, ANSI.ANSI_WHITE_BACKGROUND);
+
+		// Lobby info frame with blue background (and default foreground)
+		CLIFrame lobbyInfoFrame = getScreenFrame(18, 80, ANSI.ANSI_BLUE_BACKGROUND);
+
+		// Title in yellow foreground on blue background, then reset
+		CLIFrame title = new CLIFrame(new String[]{
+				ANSI.ANSI_WHITE + "LOBBY INFO" + ANSI.ANSI_RESET
+		});
 		lobbyInfoFrame = lobbyInfoFrame.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 1, 0);
 
 		GameData currentGame = getLastUpdate().getCurrentGame();
@@ -154,45 +160,53 @@ public class LobbyCLIScreen extends CLIScreen{
 				? getLastUpdate().getClientPlayer().getUsername()
 				: "Unknown";
 
-		// Game info block
+		// Build game info block with contrasting label and value colors.
 		List<String> lobbyInfoLines = new ArrayList<>();
-		lobbyInfoLines.add("Lobby ID: " + lobbyID);
-		lobbyInfoLines.add("Leader: " + host);
-		lobbyInfoLines.add("Your Name: " + yourName);
-		lobbyInfoLines.add("Required Players: " + requiredPlayers);
+		lobbyInfoLines.add(ANSI.ANSI_BLACK + "Lobby ID: " + lobbyID + ANSI.ANSI_RESET);
+		lobbyInfoLines.add(ANSI.ANSI_BLACK + "Leader: " + host + ANSI.ANSI_RESET);
+		lobbyInfoLines.add(ANSI.ANSI_BLACK + "Your Name: " + yourName + ANSI.ANSI_RESET);
+		lobbyInfoLines.add(ANSI.ANSI_BLACK + "Required Players: " + requiredPlayers + ANSI.ANSI_RESET);
 
-		// Flight levels display
+		// Flight levels: highlight the current level in purple, others in white.
 		String levelsDisplay = Arrays.stream(GameLevel.values())
 				.map(level -> level == currentLevel
-						? "[*" + level.toString() + "*]"
-						: level.toString()
-				)
-				.collect(Collectors.joining(" | "));
-		lobbyInfoLines.add("Flight Level: " + levelsDisplay);
+						? ANSI.ANSI_YELLOW_BACKGROUND + ANSI.ANSI_BLACK + level.toString() + ANSI.ANSI_RESET
+						: ANSI.ANSI_CYAN + level.toString() + ANSI.ANSI_RESET)
+				.collect(Collectors.joining(ANSI.ANSI_YELLOW + " | " + ANSI.ANSI_RESET));
+		lobbyInfoLines.add(ANSI.ANSI_BLACK + "Flight Level: " + ANSI.ANSI_RESET + levelsDisplay);
 
+		CLIFrame gameInfoBG = getScreenFrame(8, 60, ANSI.ANSI_WHITE_BACKGROUND);
 		CLIFrame gameInfoBlock = new CLIFrame(lobbyInfoLines.toArray(new String[0]));
-		lobbyInfoFrame = lobbyInfoFrame.merge(gameInfoBlock, AnchorPoint.TOP, AnchorPoint.CENTER, 5, 0);
+		System.out.println(gameInfoBlock);
+		gameInfoBlock = gameInfoBG.merge(gameInfoBlock, AnchorPoint.CENTER, AnchorPoint.CENTER);
+		// Merge the game info block into the lobby info frame (with some vertical offset)
+		lobbyInfoFrame = lobbyInfoFrame.merge(gameInfoBlock, AnchorPoint.TOP, AnchorPoint.CENTER, 8, 0);
 
-		// Lobby members
+		// Build the lobby members block
 		List<String> membersLines = new ArrayList<>();
 		membersLines.add("");
-		membersLines.add("Lobby Members:");
-		lobbyMembers.forEach(member -> membersLines.add(" - " + member));
+		membersLines.add(ANSI.ANSI_CYAN + "Lobby Members:" + ANSI.ANSI_RESET);
+		lobbyMembers.forEach(member ->
+				membersLines.add(ANSI.ANSI_GREEN + " - " + member + ANSI.ANSI_RESET)
+		);
+
 		CLIFrame membersFrame = new CLIFrame(membersLines.toArray(new String[0]));
-		lobbyInfoFrame = lobbyInfoFrame.merge(membersFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 2, 0);
+		// Merge lobby members block in the center of the lobby info frame
+		lobbyInfoFrame = lobbyInfoFrame.merge(membersFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 4, 0);
 
-
+		// Merge the lobby info frame into the screen border
 		CLIFrame res = screenBorder.merge(lobbyInfoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
 
-		// Tip for game leader
+		// Tip for game leader (in red) at the bottom, if applicable
 		if (getLastUpdate().isGameLeader()) {
 			CLIFrame tip = new CLIFrame(new String[]{
 					"",
-					"Tip: Change the game settings with the command >settings"
+					ANSI.ANSI_GREEN_BACKGROUND + "Tip: Change the game settings with the command >settings" + ANSI.ANSI_RESET
 			});
 			res = res.merge(tip, AnchorPoint.BOTTOM, AnchorPoint.CENTER, -2, 0);
 		}
 		return res;
 	}
+
 
 }

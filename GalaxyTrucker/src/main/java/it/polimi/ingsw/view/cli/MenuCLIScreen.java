@@ -89,36 +89,48 @@ public class MenuCLIScreen extends CLIScreen {
 
 	@Override
 	public CLIFrame getCLIRepresentation() {
-		CLIFrame screenBorder = getScreenFrame(24, 100);
-		CLIFrame gamesListBorder = getScreenFrame(16, 60);
-		CLIFrame title = new CLIFrame(new String[]{"AVAILABLE GAMES"});
+		// Create the borders with colored backgrounds.
+		CLIFrame screenBorder = getScreenFrame(24, 100, ANSI.ANSI_WHITE_BACKGROUND);
+		CLIFrame gamesListBorder = getScreenFrame(16, 60, ANSI.ANSI_YELLOW_BACKGROUND);
+
+		// Create a title with a red foreground and a default (reset) background.
+		CLIFrame title = new CLIFrame(new String[]{ANSI.ANSI_RED_BACKGROUND + ANSI.ANSI_WHITE + "AVAILABLE GAMES" + ANSI.ANSI_RESET});
 		gamesListBorder = gamesListBorder.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 1, 0);
 
 		List<GameData> availableGames = getLastUpdate().getAvailableGames();
 		if (!availableGames.isEmpty()) {
 			List<String> gameLines = new ArrayList<>();
 			availableGames.stream()
-					.limit(50)
+					.limit(13)
 					.forEach(g -> gameLines.add(String.format(
-							"> [%-10s] (%d/%d players)",
+							"> " + ANSI.ANSI_BLACK + "[%-10s]" + ANSI.ANSI_RESET + " (%d/%d players)",
 							g.getGameId().toString(),
 							g.getPlayers().size(),
 							g.getRequiredPlayers()
 					)));
 			CLIFrame gamesContent = new CLIFrame(gameLines.toArray(new String[0]));
-			gamesListBorder = gamesListBorder.merge(gamesContent, AnchorPoint.TOP_LEFT, AnchorPoint.LEFT, 3, 2);
+			gamesListBorder = gamesListBorder.merge(gamesContent, AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT, 3, 2);
 		} else {
-			CLIFrame noGames = new CLIFrame(new String[]{"There are no available games."});
-			gamesListBorder = gamesListBorder.merge(noGames, AnchorPoint.TOP, AnchorPoint.CENTER, 2, 0);
+			// Add a fallback message in magenta.
+			CLIFrame noGames = new CLIFrame(new String[]{
+									ANSI.ANSI_RED_BACKGROUND + "There are no available games." + ANSI.ANSI_RESET
+			});
+			CLIFrame startOne = new CLIFrame(new String[]{ANSI.ANSI_RED_BACKGROUND + "Start one with "+ANSI.ANSI_WHITE+">create" + ANSI.ANSI_RESET});
+			gamesListBorder = gamesListBorder.merge(noGames, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
+			gamesListBorder = gamesListBorder.merge(startOne, AnchorPoint.CENTER, AnchorPoint.CENTER, 1, 0);
+
 		}
 
-
+		// Merge the games border into the screen.
 		CLIFrame res = screenBorder.merge(gamesListBorder, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
+
+		// Create a tip message in green.
+		String tipText = availableGames.isEmpty()
+				? "Create a game with >create"
+				: "Join a game with >join";
 		CLIFrame tip = new CLIFrame(new String[]{
 				"",
-				"Tip: " + (availableGames.isEmpty()
-						? "Create a game with >create"
-						: "Join a game with >join")
+				ANSI.ANSI_GREEN_BACKGROUND + ANSI.ANSI_WHITE + "Tip" + ": " + tipText + ANSI.ANSI_RESET
 		});
 		res = res.merge(tip, AnchorPoint.BOTTOM, AnchorPoint.CENTER, -2, 0);
 
