@@ -354,8 +354,9 @@ public class ShipBoard implements ICLIPrintable {
 			Coordinates c = entry.getKey();
 			tilesRepresentation = tilesRepresentation.merge(entry.getValue().getCLIRepresentation(),
 					AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT,
-					(c.getRow() - minRow) * 3 + 1, (c.getColumn() - minCol) * 4 + 1);
+					(c.getRow() - minRow) * 3, (c.getColumn() - minCol) * 4);
 		}
+		tilesRepresentation.applyOffset(1, 1);  // consider the numbers offset in the empty representation
 
 		CLIFrame info = new CLIFrame(new String[] {
 				"+-------------------+",
