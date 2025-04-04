@@ -1,12 +1,13 @@
 package it.polimi.ingsw.view.cli;
 
+import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 
 import java.rmi.RemoteException;
 
-public abstract class CLIScreen {
+public abstract class CLIScreen implements ICLIPrintable {
 
 	protected final String screenName;
 	private String screenMessage;
@@ -47,7 +48,9 @@ public abstract class CLIScreen {
 	 * juice of the screen. This does not include "service" messages such as server errors, which
 	 * are handled in their own functions.
 	 */
-	protected abstract void printScreen();
+	protected final void printScreen(){
+		System.out.println(getCLIRepresentation());
+	}
 
 	/**
 	 * This function basically allows the main CLI logic to delegate to the active screen the handling of a command.
@@ -177,6 +180,32 @@ public abstract class CLIScreen {
 	public static void printBackButton(String screenName){
 		System.out.print(ANSI.ANSI_RED_BACKGROUND+" <- BACK TO " +screenName.toUpperCase() +" " +ANSI.ANSI_RESET);
 	}
+
+	public static CLIFrame getScreenFrame(int rows, int columns) {
+		StringBuilder top = new StringBuilder("┏");
+		StringBuilder middle = new StringBuilder("┃");
+		StringBuilder bottom = new StringBuilder("┗");
+
+		for (int i = 0; i < columns; i++) {
+			top.append("━");
+			middle.append(" ");
+			bottom.append("━");
+		}
+
+		top.append("┓");
+		middle.append("┃");
+		bottom.append("┛");
+
+		String[] frame = new String[rows + 2];
+		frame[0] = top.toString();
+		for (int i = 1; i <= rows; i++) {
+			frame[i] = middle.toString();
+		}
+		frame[rows + 1] = bottom.toString();
+
+		return new CLIFrame(frame);
+	}
+
 
 
 }

@@ -24,8 +24,11 @@ public class LobbyCLIScreen extends CLIScreen{
 				getLastUpdate().getCurrentGame().getCurrentGamePhaseType() == GamePhaseType.LOBBY;
 	}
 
+
+	/*
 	@Override
 	protected void printScreen() {
+
 		List<String> lobbyMembers = getLastUpdate().getCurrentGame().getPlayers().stream()
 				.map(Player::getUsername)
 				.toList();
@@ -67,6 +70,7 @@ public class LobbyCLIScreen extends CLIScreen{
 					+ ANSI.ANSI_RESET);
 		}
 	}
+	 */
 
 
 
@@ -131,4 +135,8 @@ public class LobbyCLIScreen extends CLIScreen{
 	}
 
 
+	@Override
+	public CLIFrame getCLIRepresentation() {
+		return null;
+	}
 }
