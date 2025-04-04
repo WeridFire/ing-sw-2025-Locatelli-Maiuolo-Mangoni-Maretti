@@ -29,8 +29,16 @@ public class MenuCLIScreen extends CLIScreen{
 							g.getRequiredPlayers())
 			);
 			System.out.println(ANSI.ANSI_YELLOW + "================================" + ANSI.ANSI_RESET);
+			System.out.println("\n" + ANSI.ANSI_GREEN_BACKGROUND + ANSI.ANSI_BLACK
+					+ " Tip: " + ANSI.ANSI_RESET + ANSI.ANSI_GREEN
+					+ "Join a game with " + ANSI.ANSI_YELLOW + ">join"
+					+ ANSI.ANSI_RESET);
 		} else {
 			System.out.println(ANSI.ANSI_RED + "There are no available games." + ANSI.ANSI_RESET);
+			System.out.println("\n" + ANSI.ANSI_GREEN_BACKGROUND + ANSI.ANSI_BLACK
+					+ " Tip: " + ANSI.ANSI_RESET + ANSI.ANSI_GREEN
+					+ "Create a game with " + ANSI.ANSI_YELLOW + ">create"
+					+ ANSI.ANSI_RESET);
 		}
 	}
 
