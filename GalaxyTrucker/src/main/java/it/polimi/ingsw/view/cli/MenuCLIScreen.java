@@ -35,7 +35,7 @@ public class MenuCLIScreen extends CLIScreen{
 	}
 
 	@Override
-	protected void processCommand(String command, String[] args) throws RemoteException {
+	protected void processCommand(String command, String[] args) throws RemoteException, IllegalArgumentException {
 		switch(command){
 			case "refresh":
 				getServer().ping(getClient());
@@ -59,7 +59,7 @@ public class MenuCLIScreen extends CLIScreen{
 				}
 				break;
 			default:
-				setScreenMessage("Invalid command. Available commands are: join, create, help, screen");
+				setScreenMessage("Invalid command. Use help to view available commands.");
 				break;
 		}
 	}
