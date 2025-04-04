@@ -148,10 +148,10 @@ public class BoardCoordinates {
             throw new RuntimeException("Unimplemented CLI representation for level " + level);
         }
 
-        int minRow = getFirstCoordinateFromDirection(Direction.NORTH);
-        int maxRow = getFirstCoordinateFromDirection(Direction.SOUTH);
-        int minCol = getFirstCoordinateFromDirection(Direction.WEST);
-        int maxCol = getFirstCoordinateFromDirection(Direction.EAST);
+        int minRow = getFirstCoordinateFromDirection(Direction.NORTH) - 1;
+        int maxRow = getFirstCoordinateFromDirection(Direction.SOUTH) + 1;
+        int minCol = getFirstCoordinateFromDirection(Direction.WEST) - 1;
+        int maxCol = getFirstCoordinateFromDirection(Direction.EAST) + 1;
         List<String> result = new ArrayList<>();
         StringBuilder frame = new StringBuilder();
 
@@ -173,9 +173,9 @@ public class BoardCoordinates {
             StringBuilder line2 = new StringBuilder();
             StringBuilder line3 = new StringBuilder();
 
-            line1.append("─");
-            line2.append(row);
-            line3.append("─");
+            line1.append("──");
+            line2.append((row < 10) ? " " : "").append(row);
+            line3.append("──");
 
             // Iterate over each column for the current row.
             for (int col = minCol; col <= maxCol; col++) {
