@@ -112,15 +112,16 @@ public class MenuCLIScreen extends CLIScreen {
 			gamesListBorder = gamesListBorder.merge(noGames, AnchorPoint.TOP, AnchorPoint.CENTER, 2, 0);
 		}
 
+
+		CLIFrame res = screenBorder.merge(gamesListBorder, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
 		CLIFrame tip = new CLIFrame(new String[]{
 				"",
 				"Tip: " + (availableGames.isEmpty()
 						? "Create a game with >create"
 						: "Join a game with >join")
 		});
-		gamesListBorder = gamesListBorder.merge(tip, AnchorPoint.BOTTOM, AnchorPoint.CENTER, -2, 0);
+		res = res.merge(tip, AnchorPoint.BOTTOM, AnchorPoint.CENTER, -2, 0);
 
-		CLIFrame res = screenBorder.merge(gamesListBorder, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
 		return res;
 	}
 

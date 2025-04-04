@@ -1,14 +1,13 @@
 package it.polimi.ingsw.view.cli;
 
+import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 
 import java.rmi.RemoteException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class LobbyCLIScreen extends CLIScreen{
@@ -137,6 +136,63 @@ public class LobbyCLIScreen extends CLIScreen{
 
 	@Override
 	public CLIFrame getCLIRepresentation() {
-		return null;
+		CLIFrame screenBorder = getScreenFrame(24, 100);
+		CLIFrame lobbyInfoFrame = getScreenFrame(18, 80);
+		CLIFrame title = new CLIFrame(new String[]{"LOBBY INFO"});
+		lobbyInfoFrame = lobbyInfoFrame.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 1, 0);
+
+		GameData currentGame = getLastUpdate().getCurrentGame();
+		List<String> lobbyMembers = currentGame.getPlayers().stream()
+				.map(Player::getUsername)
+				.toList();
+
+		String lobbyID = currentGame.getGameId().toString();
+		String requiredPlayers = String.valueOf(currentGame.getRequiredPlayers());
+		GameLevel currentLevel = currentGame.getLevel();
+		String host = currentGame.getGameLeader();
+		String yourName = getLastUpdate().getClientPlayer() != null
+				? getLastUpdate().getClientPlayer().getUsername()
+				: "Unknown";
+
+		// Game info block
+		List<String> lobbyInfoLines = new ArrayList<>();
+		lobbyInfoLines.add("Lobby ID: " + lobbyID);
+		lobbyInfoLines.add("Leader: " + host);
+		lobbyInfoLines.add("Your Name: " + yourName);
+		lobbyInfoLines.add("Required Players: " + requiredPlayers);
+
+		// Flight levels display
+		String levelsDisplay = Arrays.stream(GameLevel.values())
+				.map(level -> level == currentLevel
+						? "[*" + level.toString() + "*]"
+						: level.toString()
+				)
+				.collect(Collectors.joining(" | "));
+		lobbyInfoLines.add("Flight Level: " + levelsDisplay);
+
+		CLIFrame gameInfoBlock = new CLIFrame(lobbyInfoLines.toArray(new String[0]));
+		lobbyInfoFrame = lobbyInfoFrame.merge(gameInfoBlock, AnchorPoint.TOP, AnchorPoint.CENTER, 5, 0);
+
+		// Lobby members
+		List<String> membersLines = new ArrayList<>();
+		membersLines.add("");
+		membersLines.add("Lobby Members:");
+		lobbyMembers.forEach(member -> membersLines.add(" - " + member));
+		CLIFrame membersFrame = new CLIFrame(membersLines.toArray(new String[0]));
+		lobbyInfoFrame = lobbyInfoFrame.merge(membersFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 2, 0);
+
+
+		CLIFrame res = screenBorder.merge(lobbyInfoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
+
+		// Tip for game leader
+		if (getLastUpdate().isGameLeader()) {
+			CLIFrame tip = new CLIFrame(new String[]{
+					"",
+					"Tip: Change the game settings with the command >settings"
+			});
+			res = res.merge(tip, AnchorPoint.BOTTOM, AnchorPoint.CENTER, -2, 0);
+		}
+		return res;
 	}
+
 }
