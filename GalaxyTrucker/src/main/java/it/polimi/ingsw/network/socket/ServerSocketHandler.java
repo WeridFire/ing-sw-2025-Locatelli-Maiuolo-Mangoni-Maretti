@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.socket;
 
+import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.network.messages.SocketMessage;
@@ -56,12 +57,12 @@ public class ServerSocketHandler implements IServer {
 
 	@Override
 	public void quitGame(IClient client) {
-		//TODO
+		//TODO quit game socket function
 	}
 
 	@Override
 	public void drawTile(IClient client) {
-
+		//TODO draw tiles socket function
 	}
 
 	@Override
@@ -72,22 +73,28 @@ public class ServerSocketHandler implements IServer {
 
 	@Override
 	public void activateTiles(IClient client, Set<Coordinates> tilesToActivate) {
-
+		//TODO activate tiles socket function
 	}
 
 	@Override
 	public void allocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException {
-
+		//TODO allocate loadables socket function
 	}
 
 
 	@Override
 	public void forceEndTurn(IClient client) {
+		//TODO force end turn socket function
+	}
 
+	@Override
+	public void updateGameSettings(IClient client, GameLevel level, int minPlayers) throws RemoteException {
+		SocketMessage mess = SocketMessage.updateSettingsMessage(level, minPlayers);
+		sendSocketMessage(mess);
 	}
 
 	@Override
 	public void flipHourglass(IClient client) {
-
+		//TODO flip hourglass socket function
 	}
 }

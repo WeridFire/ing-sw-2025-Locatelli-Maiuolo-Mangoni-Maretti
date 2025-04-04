@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network;
 
+import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.util.Coordinates;
 
@@ -20,6 +21,9 @@ public interface IServer extends Remote {
 	void activateTiles(IClient client, Set<Coordinates> tilesToActivate) throws RemoteException;
 	void allocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException;
 	void forceEndTurn(IClient client) throws RemoteException;
+
+	//Lobby phase
+	void updateGameSettings(IClient client, GameLevel level, int minPlayers) throws RemoteException;
 
 	// Assemble Phase
 	void flipHourglass(IClient client) throws RemoteException;

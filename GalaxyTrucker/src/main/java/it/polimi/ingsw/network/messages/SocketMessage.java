@@ -1,5 +1,7 @@
 package it.polimi.ingsw.network.messages;
 
+import it.polimi.ingsw.enums.GameLevel;
+
 import java.io.*;
 import java.util.List;
 import java.util.UUID;
@@ -10,7 +12,7 @@ public class SocketMessage implements Serializable{
 		PING,
 		JOIN_GAME,
 		CREATE_GAME,
-		// Add other message types as necessary
+		UPDATE_SETTINGS
 	}
 
 	private MessageType type;
@@ -97,6 +99,16 @@ public class SocketMessage implements Serializable{
 	 */
 	public static SocketMessage joinGameMessage(UUID gameId, String username){
 		return new SocketMessage(MessageType.JOIN_GAME, List.of(gameId, username));
+	}
+
+	/**
+	 * Creates a socket message to tell the server to update a games settings with the new values.
+	 * @param gameLevel the new gameLevel.
+	 * @param minPlayers the minimum players for the game to start.
+	 * @return The socket message containing the desired information.
+	 */
+	public static SocketMessage updateSettingsMessage(GameLevel gameLevel, int minPlayers){
+		return new SocketMessage(MessageType.UPDATE_SETTINGS, List.of(gameLevel, minPlayers));
 	}
 
 	/**

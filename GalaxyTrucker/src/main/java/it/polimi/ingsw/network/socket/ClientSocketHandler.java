@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.socket;
 
+import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.network.*;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.messages.SocketMessage;
@@ -60,6 +61,9 @@ public class ClientSocketHandler implements IClient {
 						case CREATE_GAME -> getServer().createGame(
 												this,
 												(String) message.getArgs().getFirst());
+						case UPDATE_SETTINGS -> getServer().updateGameSettings(
+								this, (GameLevel) message.getArgs().getFirst(), (int) message.getArgs().get(2)
+						);
 					}
 				}catch(IllegalArgumentException e){
 					System.err.println("ERROR WHILE PARSING MESSAGE! Message:");

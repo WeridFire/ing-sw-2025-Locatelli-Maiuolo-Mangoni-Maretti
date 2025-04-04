@@ -1,6 +1,7 @@
 package it.polimi.ingsw.network.rmi;
 
 import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.exceptions.DrawTileException;
@@ -25,10 +26,7 @@ import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemExcepti
 import it.polimi.ingsw.util.Coordinates;
 
 import java.rmi.RemoteException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class RmiServer implements IServer {
 
@@ -68,8 +66,11 @@ public class RmiServer implements IServer {
 	public void joinGame(IClient client, UUID gameId, String username) throws RemoteException {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		try {
-			gamesHandler.addPlayerToGame(username, gameId, connectionUUID);
-			client.updateClient(new ClientUpdate(connectionUUID));
+			Game result = gamesHandler.addPlayerToGame(username, gameId, connectionUUID);
+			if(result != null){
+				//notify everyone that a new player has joined -> refreshes their view
+				GameServer.getInstance().broadcastUpdate(result);
+			}
 		} catch (PlayerAlreadyInGameException | GameNotFoundException e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
@@ -142,6 +143,25 @@ public class RmiServer implements IServer {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
 		client.updateClient(new ClientUpdate(connectionUUID));
+	}
+
+	@Override
+	public void updateGameSettings(IClient client, GameLevel level, int minPlayers) throws RemoteException {
+		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
+		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
+		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
+		if(game == null || player == null){
+			client.updateClient(new ClientUpdate(connectionUUID, "You are not in a game."));
+			return;
+		}
+		if(!Objects.equals(game.getGameData().getGameLeader(), player.getUsername())){
+			client.updateClient(new ClientUpdate(connectionUUID, "You must be the game leader to perform this."));
+			return;
+		}
+
+		game.getGameData().setLevel(level);
+		game.getGameData().setRequiredPlayers(minPlayers);
+		GameServer.getInstance().broadcastUpdate(game);
 	}
 
 	// ASSEMBLE PHASE

@@ -1,10 +1,13 @@
 package it.polimi.ingsw.view.cli;
 
+import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.player.Player;
 
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 public class LobbyCLIScreen extends CLIScreen{
 
@@ -25,16 +28,15 @@ public class LobbyCLIScreen extends CLIScreen{
 		String lobbyID = getLastUpdate().getCurrentGame().getGameId().toString();
 		String requiredPlayersAmount = String.valueOf(getLastUpdate().getCurrentGame().getRequiredPlayers());
 		String flightLevel = String.valueOf(getLastUpdate().getCurrentGame().getLevel());
-		String host = lobbyMembers.getFirst();
-		String yourName = getLastUpdate().getCurrentGame().getPlayers().stream()
-				.filter(p -> p.getConnectionUUID().equals(CLIScreenHandler.getInstance().getLastUpdate().getClientUUID()))
-				.map(Player::getUsername)
-				.findFirst()
-				.orElse("Unknown");
+		String host = getLastUpdate().getCurrentGame().getGameLeader();
+		String yourName = getLastUpdate().getClientPlayer() != null ?
+												getLastUpdate().getClientPlayer().getUsername()
+												:
+												"Unknown";
 
 		System.out.println(ANSI.ANSI_YELLOW + "\n======= LOBBY INFO =======" + ANSI.ANSI_RESET);
 		System.out.println(ANSI.ANSI_GREEN + "Lobby ID: " + ANSI.ANSI_CYAN + lobbyID + ANSI.ANSI_RESET);
-		System.out.println(ANSI.ANSI_GREEN + "Host: " + ANSI.ANSI_CYAN + host + ANSI.ANSI_RESET);
+		System.out.println(ANSI.ANSI_GREEN + "Leader: " + ANSI.ANSI_CYAN + host + ANSI.ANSI_RESET);
 		System.out.println(ANSI.ANSI_GREEN + "Your Name: " + ANSI.ANSI_CYAN + yourName + ANSI.ANSI_RESET);
 		System.out.println(ANSI.ANSI_GREEN + "Required Players: " + ANSI.ANSI_CYAN + requiredPlayersAmount + ANSI.ANSI_RESET);
 		System.out.println(ANSI.ANSI_GREEN + "Flight Level: " + ANSI.ANSI_CYAN + flightLevel + ANSI.ANSI_RESET);
@@ -45,13 +47,49 @@ public class LobbyCLIScreen extends CLIScreen{
 
 
 	@Override
-	protected void processCommand(String command, String[] args) throws RemoteException {
-
+	protected void processCommand(String command, String[] args) throws RemoteException, IllegalArgumentException {
+		switch(command){
+			case "settings":
+				if(!getLastUpdate().isGameLeader()){
+					setScreenMessage("You must be the game leader to perform this command.");
+					break;
+				}
+				if (args.length == 2){
+					GameLevel level = getLastUpdate().getCurrentGame().getLevel();
+					int minPlayers = getLastUpdate().getCurrentGame().getRequiredPlayers();
+					switch(args[0].toLowerCase()){
+						case "level":
+							level = GameLevel.valueOf(args[1]);
+							break;
+						case "minplayers": //fallthrough
+						case "requiredplayers":
+							minPlayers = Integer.parseInt(args[1]);
+							break;
+					}
+					//if player specified already set settings, we don't bother with sending the update to
+					// the server.
+					if(level == getLastUpdate().getCurrentGame().getLevel() &&
+					minPlayers == getLastUpdate().getCurrentGame().getRequiredPlayers()){
+						refresh();
+						break;
+					}else{
+						//TODO: call to set the settings to the server.
+						break;
+					}
+				}
+				setScreenMessage("Usage: settings <level|minplayers>");
+			case "leave":
+				setScreenMessage("Function not implemented yet.");
+				break;
+			default:
+				setScreenMessage("Invalid command. Use help to view available commands.");
+				break;
+		}
 	}
 
 	@Override
 	protected void printScreenSpecificCommands() {
-		printCommands(screenName, null);
+		printCommands(screenName, "settings|Change the game settings.", "leave|Leave the current lobby.");
 	}
 
 
