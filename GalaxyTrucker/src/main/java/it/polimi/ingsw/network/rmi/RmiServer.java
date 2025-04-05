@@ -14,6 +14,7 @@ import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
+import it.polimi.ingsw.player.exceptions.NoTileInHandException;
 import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
@@ -197,7 +198,7 @@ public class RmiServer implements IServer {
 		}
 
 		try {
-			game.getGameData().drawTile(player);
+			player.drawTile(game.getGameData());
 		} catch (DrawTileException | AlreadyHaveTileInHandException e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 			return;
@@ -217,18 +218,11 @@ public class RmiServer implements IServer {
 			return;
 		}
 
-		if (player.getTileInHand() == null){
-			client.updateClient(new ClientUpdate(connectionUUID, "You have no tile in hand."));
-			return;
+		try {
+			player.discardTile(game.getGameData());
+		} catch (NoTileInHandException e) {
+			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
-
-		TileSkeleton t = player.getTileInHand();
-        try {
-            player.setTileInHand(null);
-        } catch (AlreadyHaveTileInHandException e) {
-            throw new RuntimeException(e);  // already checked before: should never happen -> runtime error
-        }
-        game.getGameData().getDrawnTiles().add(t);
 
 		GameServer.getInstance().broadcastUpdate(game);
 	}
