@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.cli;
 
+import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 
@@ -78,21 +79,32 @@ public class CLIScreenHandler {
 	 * Prints an informative message displaying the currently available and activable screens.
 	 */
 	private void printAvailableScreens() {
+
 		CLIScreen.clear();
 		Set<CLIScreen> screens = getAvailableScreens();
+		CLIFrame frame = CLIScreen.getScreenFrame(12, 40, ANSI.ANSI_BLACK_BACKGROUND);
+		frame = frame.merge(new CLIFrame(ANSI.ANSI_RED + "AVAILABLE SCREENS"), AnchorPoint.TOP, AnchorPoint.CENTER, 1, 0);
 		if (screens.isEmpty()) {
-			System.out.println(ANSI.ANSI_RED + "There are no available screens." + ANSI.ANSI_RESET);
+			frame = frame.merge(new CLIFrame(ANSI.ANSI_RED_BACKGROUND + ANSI.ANSI_WHITE + "No Screens Available"), AnchorPoint.CENTER, AnchorPoint.CENTER, -1, 0);
 		}else{
-			String header = ANSI.ANSI_PURPLE_BACKGROUND + ANSI.ANSI_WHITE + " AVAILABLE SCREENS " + ANSI.ANSI_RESET;
-			System.out.println("\n" + header);
-			System.out.println(ANSI.ANSI_PURPLE + "List of available screens:" + ANSI.ANSI_RESET);
-
 			StringBuilder screensList = new StringBuilder();
-			screens.forEach(cli -> screensList.append("- ").append(cli.screenName).append("\n"));
-			System.out.print(ANSI.ANSI_WHITE + screensList + ANSI.ANSI_RESET);
+			screens.forEach(cli -> screensList
+									.append(ANSI.ANSI_WHITE_BACKGROUND)
+									.append(ANSI.ANSI_BLACK)
+									.append(" > ")
+									.append(ANSI.ANSI_WHITE)
+									.append(cli.screenName).append("\n"));
+			//TODO: use ARRAY of strings to create the CLIFrame instead of a stringbuilder, which breaks the thing.
+			// See printCommands for a correct implementation of this. Once there will be more than 1 screen available
+			// at once I will get to implement it - davide
+			CLIFrame s = new CLIFrame(screensList.toString());
+			frame = frame.merge(s, AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT, 1, 1);
 		}
-
-		CLIScreen.printBackButton(getCurrentScreen().screenName);
+		frame = frame.merge(new CLIFrame(ANSI.ANSI_RED_BACKGROUND + ANSI.ANSI_WHITE + "Enter to close"),
+										AnchorPoint.BOTTOM, AnchorPoint.CENTER, -2, 0);
+		CLIFrame currentScr = getCurrentScreen().getCLIRepresentation();
+		currentScr = currentScr.merge(frame, AnchorPoint.CENTER, AnchorPoint.CENTER);
+		System.out.println(currentScr);
 	}
 
 	/**
