@@ -17,6 +17,7 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
     private Rotation appliedRotation;
     private Coordinates fixedAt;
     private String cliSymbol = "?";
+    private int id;
 
     /**
      * Construct the tile with specified parameters.
@@ -116,6 +117,10 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
 
     public String getCLISymbol() {
         return cliSymbol;
+    }
+
+    public void setTileId(int id){
+        this.id = id;
     }
 
     @Override

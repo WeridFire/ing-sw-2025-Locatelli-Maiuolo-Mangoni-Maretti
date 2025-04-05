@@ -123,6 +123,12 @@ public class Game {
 
         List<TileSkeleton> t = TilesFactory.createPileTiles();
         Collections.shuffle(t);
+
+        //assign numeric progressive id to shuffled tiles
+        for (int i = 0; i < t.size(); i++) {
+            t.get(i).setTileId(i);
+        }
+
         gameData.setCoveredTiles(t);
 
         gameData.setDeck(new Deck(gameData.getLevel()));
