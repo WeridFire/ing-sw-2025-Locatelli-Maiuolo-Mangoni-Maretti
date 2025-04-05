@@ -111,21 +111,42 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
         return fixedAt.getNeighborDirection(neighbor.fixedAt);
     }
 
-    public void setCLISymbol(String cliSymbol){
+    /**
+     * Sets the CLI (Command Line Interface) symbol representing this tile or entity.
+     *
+     * @param cliSymbol the symbol to be displayed in the CLI
+     */
+    public void setCLISymbol(String cliSymbol) {
         this.cliSymbol = cliSymbol;
     }
 
+    /**
+     * Returns the CLI (Command Line Interface) symbol representing this tile or entity.
+     *
+     * @return the CLI symbol
+     */
     public String getCLISymbol() {
         return cliSymbol;
     }
 
-    public int getTileId(){
+    /**
+     * Returns the unique identifier of the tile.
+     *
+     * @return the tile ID
+     */
+    public int getTileId() {
         return id;
     }
 
-    public void setTileId(int id){
+    /**
+     * Sets the unique identifier of the tile.
+     *
+     * @param id the tile ID to set
+     */
+    public void setTileId(int id) {
         this.id = id;
     }
+
 
     @Override
     public String toString() {
