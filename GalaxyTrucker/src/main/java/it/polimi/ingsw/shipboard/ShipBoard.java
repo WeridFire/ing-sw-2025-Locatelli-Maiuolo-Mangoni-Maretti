@@ -20,7 +20,7 @@ public class ShipBoard implements ICLIPrintable {
 
 	private final CLIFrame emptyRepresentation;
 
-	private boolean flightStarted;
+	private boolean endedAssembly;
 
 	private VisitorCalculateCargoInfo visitorCalculateCargoInfo;
 	private VisitorCalculatePowers visitorCalculatePowers;
@@ -31,7 +31,7 @@ public class ShipBoard implements ICLIPrintable {
 		board = new HashMap<>();
 		this.level = level;
 		emptyRepresentation = BoardCoordinates.getCLIRepresentation(level);
-		flightStarted = false;
+		endedAssembly = false;
 	}
 
 	private void resetVisitors() {
@@ -163,12 +163,12 @@ public class ShipBoard implements ICLIPrintable {
 	 * Prepares the ship for flight.
 	 * @implNote Resets all visitors (also integrity check is called).
 	 */
-	public void startFlight() throws AlreadyStartedFlightException {
-		if (flightStarted) {
-			throw new AlreadyStartedFlightException();
+	public void endAssembly() throws AlreadyEndedAssemblyException {
+		if (endedAssembly) {
+			throw new AlreadyEndedAssemblyException();
 		}
 		resetVisitors();
-		flightStarted = true;
+		endedAssembly = true;
 	}
 
 	/**
@@ -414,7 +414,7 @@ public class ShipBoard implements ICLIPrintable {
 		}
 		tilesRepresentation.applyOffset(3 + 1, 4 + 2);  // consider the numbers offset in the empty representation
 
-		CLIFrame info = flightStarted ? getInfoCliRepresentation() : new CLIFrame();
+		CLIFrame info = endedAssembly ? getInfoCliRepresentation() : new CLIFrame();
 
 		return emptyRepresentation.merge(tilesRepresentation).merge(info, Direction.EAST, 5);
 	}

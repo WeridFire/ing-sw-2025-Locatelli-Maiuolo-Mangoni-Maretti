@@ -51,11 +51,11 @@ class PlayerTest {
         player1.printCliShipboard();
          */
 
-        System.out.println("\nTest before flight start\n");
+        System.out.println("\nTest BEFORE assembly's ended\n");
         System.out.println(player1.getShipBoard().getCLIRepresentation());
 
-        assertDoesNotThrow(() -> player1.getShipBoard().startFlight());
-        System.out.println("\nTest AFTER flight start\n");
+        assertDoesNotThrow(() -> player1.getShipBoard().endAssembly());
+        System.out.println("\nTest AFTER assembly's ended\n");
         System.out.println(player1.getShipBoard().getCLIRepresentation());
     }
 }
