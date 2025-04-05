@@ -3,16 +3,12 @@ package it.polimi.ingsw.game;
 import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
-import it.polimi.ingsw.game.exceptions.DrawTileException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
 import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.shipboard.LoadableType;
-import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
-import it.polimi.ingsw.shipboard.tiles.Tile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.io.Serializable;
