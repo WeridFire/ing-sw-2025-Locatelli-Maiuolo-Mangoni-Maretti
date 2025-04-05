@@ -119,6 +119,10 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
         return cliSymbol;
     }
 
+    public int getTileId(){
+        return id;
+    }
+
     public void setTileId(int id){
         this.id = id;
     }
@@ -162,4 +166,6 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
         }
         return new String[]{c, c, c};
     }
+
+
 }
