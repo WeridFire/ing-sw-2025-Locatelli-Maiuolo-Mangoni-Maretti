@@ -66,6 +66,8 @@ public class ClientSocketHandler implements IClient {
 								(GameLevel) message.getArgs().getFirst(),
 								(int) message.getArgs().get(1)
 						);
+						case FLIP_HOUR_GLASS -> getServer().flipHourglass(this);
+						case DRAW_TILE -> getServer().drawTile(this);
 					}
 				}catch(IllegalArgumentException e){
 					System.err.println("ERROR WHILE PARSING MESSAGE! Message:");

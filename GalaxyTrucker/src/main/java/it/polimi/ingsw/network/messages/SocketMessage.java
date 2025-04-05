@@ -12,7 +12,9 @@ public class SocketMessage implements Serializable{
 		PING,
 		JOIN_GAME,
 		CREATE_GAME,
-		UPDATE_SETTINGS
+		UPDATE_SETTINGS,
+		FLIP_HOUR_GLASS,
+		DRAW_TILE
 	}
 
 	private MessageType type;
@@ -119,5 +121,15 @@ public class SocketMessage implements Serializable{
 		return new SocketMessage(MessageType.PING);
 	}
 
+	/**
+	 * Creates a socket message to tell the server to flip the timer.
+	 * @return The socket message containing the desired information.
+	 */
+	public static SocketMessage flipHourglass(){
+		return new SocketMessage(MessageType.FLIP_HOUR_GLASS);
+	}
 
+	public static SocketMessage drawTile(){
+		return new SocketMessage(MessageType.DRAW_TILE);
+	}
 }

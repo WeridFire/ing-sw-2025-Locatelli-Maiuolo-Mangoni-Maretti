@@ -61,11 +61,6 @@ public class ServerSocketHandler implements IServer {
 	}
 
 	@Override
-	public void drawTile(IClient client) {
-		//TODO draw tiles socket function
-	}
-
-	@Override
 	public void ping(IClient client) {
 		SocketMessage mess = SocketMessage.pingMessage();
 		sendSocketMessage(mess);
@@ -93,8 +88,17 @@ public class ServerSocketHandler implements IServer {
 		sendSocketMessage(mess);
 	}
 
+	// ASSEMBLE PHASE
+
 	@Override
 	public void flipHourglass(IClient client) {
-		//TODO flip hourglass socket function
+		SocketMessage mess = SocketMessage.flipHourglass();
+		sendSocketMessage(mess);
+	}
+
+	@Override
+	public void drawTile(IClient client) {
+		SocketMessage mess = SocketMessage.drawTile();
+		sendSocketMessage(mess);
 	}
 }
