@@ -94,7 +94,7 @@ public class GameData implements Serializable {
         this.pirHandler = new PIRHandler();
         this.level = GameLevel.TESTFLIGHT;
         this.setCurrentGamePhaseType(GamePhaseType.LOBBY);
-        this.setRequiredPlayers(4);
+        this.setRequiredPlayers(2);
     }
 
     /**
