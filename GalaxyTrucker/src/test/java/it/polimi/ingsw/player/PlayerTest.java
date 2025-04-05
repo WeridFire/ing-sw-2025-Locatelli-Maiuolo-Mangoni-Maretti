@@ -12,6 +12,7 @@ import it.polimi.ingsw.player.exceptions.NoTileInHandException;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
+import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
 import it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
 import it.polimi.ingsw.shipboard.tiles.CabinTile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
@@ -83,6 +84,25 @@ class PlayerTest {
         player1.drawTile(gameData);
         player1.discardTile(gameData);
         assertNull(player1.getTileInHand());
+    }
+
+    @Test
+    void testPickTile() throws DrawTileException, AlreadyHaveTileInHandException, NoTileInHandException, ThatTileIdDoesNotExistsException {
+        List<TileSkeleton> drawnTiles = new ArrayList<>();
+        List<TileSkeleton> MockTiles = new ArrayList<>();
+        TileSkeleton mockTile1 = createMockTile(1);
+        TileSkeleton mockTile2 = createMockTile(2);
+        MockTiles.add(mockTile1);
+        MockTiles.add(mockTile2);
+        gameData.setCoveredTiles(MockTiles);
+        gameData.setDrawnTiles(drawnTiles);
+        gameData.setCurrentGamePhaseType(ASSEMBLE);
+        player1.drawTile(gameData);
+        player1.discardTile(gameData);
+        player1.drawTile(gameData);
+        player1.discardTile(gameData);
+        player1.pickTile(gameData, 2);
+        assertEquals(2, player1.getTileInHand().getTileId());
     }
 
 
