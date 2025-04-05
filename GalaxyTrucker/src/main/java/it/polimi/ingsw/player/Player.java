@@ -142,18 +142,38 @@ public class Player implements Serializable {
         this.shipBoard = shipBoard;
     }
 
+    /**
+     * Adds the specified number of credits to the current total.
+     *
+     * @param credits the number of credits to add
+     */
     public void addCredits(int credits) {
         this.credits += credits;
     }
 
+    /**
+     * Returns the current number of credits.
+     *
+     * @return the current credit balance
+     */
     public int getCredits() {
         return credits;
     }
 
+    /**
+     * Sets the current position of the player or entity.
+     *
+     * @param position the new position to set
+     */
     public void setPosition(int position) {
         this.position = position;
     }
 
+    /**
+     * Returns the current position of the player or entity.
+     *
+     * @return the current position
+     */
     public int getPosition() {
         return position;
     }
