@@ -35,7 +35,8 @@ public class AssembleCLIScreen extends CLIScreen{
     @Override
     void printScreenSpecificCommands() {
         printCommands(screenName,
-                "timerflip|Flips the hourglass of the game."
+                "timerflip | Flips the hourglass of the game.",
+                "drawtile | Draws a tile from the covered tiles"
         );
     }
 
