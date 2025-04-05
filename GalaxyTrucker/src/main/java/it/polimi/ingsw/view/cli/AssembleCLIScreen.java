@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.cli;
 
 import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
 
 import java.rmi.RemoteException;
 
@@ -20,15 +21,19 @@ public class AssembleCLIScreen extends CLIScreen{
     }
 
     @Override
-    protected void processCommand(String command, String[] args) throws RemoteException, IllegalArgumentException {
+    protected void processCommand(String command, String[] args) throws RemoteException, IllegalArgumentException, AlreadyHaveTileInHandException {
         command = command.toLowerCase();
         switch(command){
             case "timerflip":
                 getServer().flipHourglass(getClient());
                 break;
 
-            case "drawtile":
+            case "draw":
                 getServer().drawTile(getClient());
+                break;
+
+            case "discard":
+                getServer().discardTile(getClient());
         }
     }
 
@@ -36,7 +41,8 @@ public class AssembleCLIScreen extends CLIScreen{
     void printScreenSpecificCommands() {
         printCommands(screenName,
                 "timerflip | Flips the hourglass of the game.",
-                "drawtile | Draws a tile from the covered tiles"
+                "draw | Draws a tile from the covered tiles",
+                "discard | Discard the tile you have in hand"
         );
     }
 

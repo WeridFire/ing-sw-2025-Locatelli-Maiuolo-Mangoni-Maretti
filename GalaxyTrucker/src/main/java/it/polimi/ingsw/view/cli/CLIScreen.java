@@ -4,6 +4,7 @@ import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.network.messages.ClientUpdate;
+import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
 
 import java.rmi.RemoteException;
 
@@ -60,7 +61,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * @param args The args to pass
 	 * @throws RemoteException
 	 */
-	protected abstract void processCommand(String command, String[] args) throws RemoteException, IllegalArgumentException;
+	protected abstract void processCommand(String command, String[] args) throws RemoteException, IllegalArgumentException, AlreadyHaveTileInHandException;
 
 	/**
 	 * Refreshes the whole screen. Causes the CLI to clear, print newly the screen using the specific screen logic,
