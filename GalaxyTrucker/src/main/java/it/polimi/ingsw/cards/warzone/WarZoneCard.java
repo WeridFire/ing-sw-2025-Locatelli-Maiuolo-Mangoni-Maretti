@@ -3,6 +3,7 @@ package it.polimi.ingsw.cards.warzone;
 import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.UUID;
 
@@ -35,5 +36,16 @@ public class WarZoneCard extends Card {
 				wl.applyPunishment(p, game);
 			}
 		}
+	}
+
+	/**
+	 * Generates a CLI representation of the implementing object.
+	 *
+	 * @return A {@link CLIFrame} containing the CLI representation.
+	 */
+	@Override
+	public CLIFrame getCLIRepresentation() {
+		// TODO
+		return null;
 	}
 }

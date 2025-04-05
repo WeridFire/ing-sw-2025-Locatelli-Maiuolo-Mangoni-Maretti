@@ -8,6 +8,7 @@ import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.shipboard.visitors.VisitorEpidemic;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -37,4 +38,14 @@ public class EpidemicCard extends Card{
 		}
 	}
 
+	/**
+	 * Generates a CLI representation of the implementing object.
+	 *
+	 * @return A {@link CLIFrame} containing the CLI representation.
+	 */
+	@Override
+	public CLIFrame getCLIRepresentation() {
+		// TODO
+		return null;
+	}
 }

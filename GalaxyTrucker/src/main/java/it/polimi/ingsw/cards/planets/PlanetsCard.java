@@ -7,6 +7,7 @@ import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
 import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
+import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,5 +89,16 @@ public class PlanetsCard extends Card {
 				game.movePlayerBackward(p, lostDays);
 			}
 		}
+	}
+
+	/**
+	 * Generates a CLI representation of the implementing object.
+	 *
+	 * @return A {@link CLIFrame} containing the CLI representation.
+	 */
+	@Override
+	public CLIFrame getCLIRepresentation() {
+		// TODO
+		return null;
 	}
 }

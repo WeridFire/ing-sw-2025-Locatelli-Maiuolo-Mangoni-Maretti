@@ -6,6 +6,7 @@ import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.playerInput.PIRs.PIRRemoveLoadables;
 import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.view.cli.CLIFrame;
 
 public class AbandonedShipCard extends Card{
 
@@ -60,5 +61,16 @@ public class AbandonedShipCard extends Card{
 				}
 			}
 		}
+	}
+
+	/**
+	 * Generates a CLI representation of the implementing object.
+	 *
+	 * @return A {@link CLIFrame} containing the CLI representation.
+	 */
+	@Override
+	public CLIFrame getCLIRepresentation() {
+		// TODO
+		return null;
 	}
 }

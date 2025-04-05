@@ -6,6 +6,7 @@ import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
 import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.List;
 
@@ -61,5 +62,16 @@ public class AbandonedStationCard extends Card{
 				}
 			}
 		}
+	}
+
+	/**
+	 * Generates a CLI representation of the implementing object.
+	 *
+	 * @return A {@link CLIFrame} containing the CLI representation.
+	 */
+	@Override
+	public CLIFrame getCLIRepresentation() {
+		// TODO
+		return null;
 	}
 }

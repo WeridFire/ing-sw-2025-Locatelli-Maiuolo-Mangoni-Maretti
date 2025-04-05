@@ -3,10 +3,11 @@ package it.polimi.ingsw.cards;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.view.cli.ICLIPrintable;
 
 import java.util.UUID;
 
-public abstract class Card {
+public abstract class Card implements ICLIPrintable {
 
     /**
      * The level this card is part of.

@@ -6,6 +6,7 @@ import it.polimi.ingsw.cards.projectile.Projectile;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRUtils;
+import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.UUID;
 
@@ -41,5 +42,16 @@ public class MeteorStormCard extends Card {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Generates a CLI representation of the implementing object.
+	 *
+	 * @return A {@link CLIFrame} containing the CLI representation.
+	 */
+	@Override
+	public CLIFrame getCLIRepresentation() {
+		// TODO
+		return null;
 	}
 }

@@ -6,10 +6,11 @@ import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.playerInput.PIRUtils;
 import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
+import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.List;
 
-public class PiratesCard extends EnemyCard {
+public class PiratesCard extends EnemyCard{
 
     /**
      * The amount of cash bounty given to the player that defeats this pirate.
@@ -63,5 +64,15 @@ public class PiratesCard extends EnemyCard {
         }
     }
 
+    /**
+     * Generates a CLI representation of the implementing object.
+     *
+     * @return A {@link CLIFrame} containing the CLI representation.
+     */
+    @Override
+    public CLIFrame getCLIRepresentation(){
+        // TODO
+        return null;
+    }
 
 }

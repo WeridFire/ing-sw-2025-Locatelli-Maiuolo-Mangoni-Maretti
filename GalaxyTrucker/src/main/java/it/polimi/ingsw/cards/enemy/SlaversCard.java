@@ -6,6 +6,7 @@ import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.playerInput.PIRs.PIRRemoveLoadables;
 import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.view.cli.CLIFrame;
 
 public class SlaversCard extends EnemyCard {
 
@@ -56,5 +57,16 @@ public class SlaversCard extends EnemyCard {
 	public void applyPunishment(Player player, GameData game) {
 		PIRRemoveLoadables pirRemoveLoadables = new PIRRemoveLoadables(player, 30, LoadableType.CREW_SET, punishCrewAmount);
 		game.getPIRHandler().setAndRunTurn(pirRemoveLoadables);
+	}
+
+	/**
+	 * Generates a CLI representation of the implementing object.
+	 *
+	 * @return A {@link CLIFrame} containing the CLI representation.
+	 */
+	@Override
+	public CLIFrame getCLIRepresentation() {
+		// TODO
+		return null;
 	}
 }

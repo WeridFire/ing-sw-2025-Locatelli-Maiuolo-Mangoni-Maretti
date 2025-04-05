@@ -6,6 +6,7 @@ import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRUtils;
+import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.UUID;
 
@@ -30,5 +31,16 @@ public class OpenSpaceCard extends Card{
 			//Here we just round, but know for sure that the thrusters tiles won't return numbers with decimals.
 			game.movePlayerForward(p, Math.round(steps));
 		}
+	}
+
+	/**
+	 * Generates a CLI representation of the implementing object.
+	 *
+	 * @return A {@link CLIFrame} containing the CLI representation.
+	 */
+	@Override
+	public CLIFrame getCLIRepresentation() {
+		// TODO
+		return null;
 	}
 }

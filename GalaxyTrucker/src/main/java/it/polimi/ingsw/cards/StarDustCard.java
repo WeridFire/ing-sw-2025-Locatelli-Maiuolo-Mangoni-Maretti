@@ -3,6 +3,7 @@ package it.polimi.ingsw.cards;
 import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.UUID;
 
@@ -27,5 +28,16 @@ public class StarDustCard extends Card{
 			//TODO: count how many exposed connectors there are, and move accordingly
 			game.movePlayerBackward(p, 4);
 		}
+	}
+
+	/**
+	 * Generates a CLI representation of the implementing object.
+	 *
+	 * @return A {@link CLIFrame} containing the CLI representation.
+	 */
+	@Override
+	public CLIFrame getCLIRepresentation() {
+		// TODO
+		return null;
 	}
 }

@@ -5,6 +5,8 @@ import it.polimi.ingsw.enums.PowerType;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRUtils;
+import it.polimi.ingsw.view.cli.CLIFrame;
+import it.polimi.ingsw.view.cli.CLIScreen;
 
 public abstract class EnemyCard extends Card {
 
