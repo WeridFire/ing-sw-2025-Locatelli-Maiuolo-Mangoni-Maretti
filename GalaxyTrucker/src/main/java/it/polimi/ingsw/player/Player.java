@@ -103,7 +103,7 @@ public class Player implements Serializable {
      * @param reservedTile tile to save in the array
      * @throws TooManyReservedTilesException called if the array is already full
      */
-    public void setReservedTiles(TileSkeleton reservedTile) throws TooManyReservedTilesException {
+    public void setReservedTiles(TileSkeleton reservedTile) throws TooManyReservedTilesException, NoTileInHandException {
         if (reservedTiles.size() == 2) {
             throw new TooManyReservedTilesException();
         }
