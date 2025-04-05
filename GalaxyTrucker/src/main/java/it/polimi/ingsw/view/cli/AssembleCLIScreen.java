@@ -10,12 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AssembleCLIScreen extends CLIScreen{
-    public AssembleCLIScreen(String screenName, boolean forceActivate) {
-        super(screenName, forceActivate);
-    }
 
-    public AssembleCLIScreen(String screenName) {
-        super(screenName);
+    public AssembleCLIScreen() {
+        super("assemble", true);
     }
 
     @Override
@@ -77,26 +74,13 @@ public class AssembleCLIScreen extends CLIScreen{
         //white bg
         CLIFrame screenBorder = getScreenFrame(40, 120, ANSI.ANSI_WHITE_BACKGROUND);
 
-        //shipboard
-        ShipBoard shipBoard = null;
-        if (getLastUpdate().getClientPlayer() != null) {
-            shipBoard = getLastUpdate().getClientPlayer().getShipBoard();
-        }
-
         //title
         CLIFrame shipboardTitle = new CLIFrame(new String[]{
                 ANSI.ANSI_BLUE_BACKGROUND + ANSI.ANSI_WHITE + " YOUR SHIPBOARD " + ANSI.ANSI_RESET
         });
 
         //shipboard frame
-        CLIFrame shipboardFrame;
-        if (shipBoard != null) {
-            shipboardFrame = shipBoard.getCLIRepresentation();
-        } else {
-            shipboardFrame = new CLIFrame(new String[]{
-                    ANSI.ANSI_RED + "No shipboard available" + ANSI.ANSI_RESET
-            });
-        }
+        CLIFrame shipboardFrame = getLastUpdate().getClientPlayer().getShipBoard().getCLIRepresentation();
 
         CLIFrame shipboardWithTitle = shipboardTitle.merge(
                 shipboardFrame,
@@ -107,10 +91,8 @@ public class AssembleCLIScreen extends CLIScreen{
         );
 
         //drawn tiles
-        List<TileSkeleton> drawnTiles = new ArrayList<>();
-        if (getLastUpdate().getCurrentGame() != null) {
-            drawnTiles = getLastUpdate().getCurrentGame().getDrawnTiles();
-        }
+        List<TileSkeleton> drawnTiles = getLastUpdate().getCurrentGame().getDrawnTiles();
+
         CLIFrame tilesTitle = new CLIFrame(new String[]{
                 ANSI.ANSI_BLUE_BACKGROUND + ANSI.ANSI_WHITE + " DRAWN TILES " + ANSI.ANSI_RESET
         });
@@ -175,14 +157,12 @@ public class AssembleCLIScreen extends CLIScreen{
                 0
         );
 
-        CLIFrame finalFrame = screenBorder.merge(
+		return screenBorder.merge(
                 contentFrame,
                 AnchorPoint.CENTER,
                 AnchorPoint.CENTER,
                 0,
                 0
         );
-
-        return finalFrame;
     }
 }
