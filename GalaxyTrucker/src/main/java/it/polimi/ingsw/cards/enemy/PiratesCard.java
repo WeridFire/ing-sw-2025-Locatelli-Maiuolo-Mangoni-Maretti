@@ -29,16 +29,16 @@ public class PiratesCard extends EnemyCard {
 	}
 
     @Override
-    public void givePrize(Player player, GameData game) {
+    public void givePrize(Player player, GameData gameData) {
         PIRYesNoChoice pirYesOrNoChoice = new PIRYesNoChoice(player,
                                     30,
                                 "You will receive " + prizeBounty +" credits, but you will lose "
                                              + getLostDays() + " days.",
                                 true);
-        boolean wantToAccept = game.getPIRHandler().setAndRunTurn(pirYesOrNoChoice);
+        boolean wantToAccept = gameData.getPIRHandler().setAndRunTurn(pirYesOrNoChoice);
         if(wantToAccept){
             player.addCredits(prizeBounty);
-            game.movePlayerBackward(player, getLostDays());
+            gameData.movePlayerBackward(player, getLostDays());
         }
     }
 

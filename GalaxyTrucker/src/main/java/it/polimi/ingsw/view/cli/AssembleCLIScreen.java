@@ -30,9 +30,12 @@ public class AssembleCLIScreen extends CLIScreen{
             case "draw":
                 getServer().drawTile(getClient());
                 break;
-
             case "discard":
                 getServer().discardTile(getClient());
+                break;
+            case "reserve":
+                getServer().reserveTile(getClient());
+                break;
         }
     }
 

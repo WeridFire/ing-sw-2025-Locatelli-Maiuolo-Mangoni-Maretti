@@ -35,6 +35,8 @@ class PiratesCardTest {
 
     }
 
+
+
     @Test
     void applyPunishment() {
     }

@@ -29,4 +29,5 @@ public interface IServer extends Remote {
 	void flipHourglass(IClient client) throws RemoteException;
 	void drawTile(IClient client) throws RemoteException;
 	void discardTile(IClient client) throws RemoteException;
+	void reserveTile(IClient client) throws RemoteException;
 }

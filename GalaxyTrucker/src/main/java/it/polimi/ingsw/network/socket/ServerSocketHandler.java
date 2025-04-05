@@ -107,4 +107,9 @@ public class ServerSocketHandler implements IServer {
 		SocketMessage mess = SocketMessage.discardTile();
 		sendSocketMessage(mess);
 	}
+
+	@Override
+	public void reserveTile(IClient client) throws RemoteException {
+		SocketMessage mess = SocketMessage.reserveTile();
+	}
 }

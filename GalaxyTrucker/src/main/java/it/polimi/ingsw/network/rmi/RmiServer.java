@@ -15,6 +15,7 @@ import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
 import it.polimi.ingsw.player.exceptions.NoTileInHandException;
+import it.polimi.ingsw.player.exceptions.TooManyReservedTilesException;
 import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
@@ -225,5 +226,29 @@ public class RmiServer implements IServer {
 		}
 
 		GameServer.getInstance().broadcastUpdate(game);
+	}
+
+	@Override
+	public void reserveTile(IClient client) throws RemoteException {
+		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
+		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
+		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
+
+		if (player == null || game == null) {
+			client.updateClient(new ClientUpdate(connectionUUID, "You are not in a game."));
+			return;
+		}
+
+		try {
+			player.setReservedTiles(player.getTileInHand());
+			player.discardTile(game.getGameData());
+		}catch (NoTileInHandException e){
+			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
+		}catch (TooManyReservedTilesException e){
+			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
+		}
+
+		GameServer.getInstance().broadcastUpdate(game);
+
 	}
 }

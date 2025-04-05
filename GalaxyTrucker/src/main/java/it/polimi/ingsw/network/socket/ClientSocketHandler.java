@@ -69,6 +69,7 @@ public class ClientSocketHandler implements IClient {
 						case FLIP_HOUR_GLASS -> getServer().flipHourglass(this);
 						case DRAW_TILE -> getServer().drawTile(this);
 						case DISCARD_TILE -> getServer().discardTile(this);
+						case RESERVE_TILE -> getServer().reserveTile(this);
 					}
 				}catch(IllegalArgumentException e){
 					System.err.println("ERROR WHILE PARSING MESSAGE! Message:");
