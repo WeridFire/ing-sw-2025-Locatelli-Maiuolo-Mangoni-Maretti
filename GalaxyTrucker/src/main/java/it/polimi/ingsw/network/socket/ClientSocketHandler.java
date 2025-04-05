@@ -4,7 +4,6 @@ import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.network.*;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.messages.SocketMessage;
-import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
 
 import java.io.BufferedReader;
 import java.io.IOException;

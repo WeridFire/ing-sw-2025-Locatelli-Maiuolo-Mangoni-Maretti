@@ -1,10 +1,8 @@
 package it.polimi.ingsw.view.cli;
 
-import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.network.messages.ClientUpdate;
-import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
 
 import java.rmi.RemoteException;
 
@@ -77,7 +75,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 			displayScreenMessage();
 		}
 		System.out.print("\n> ");
-	};
+	}
 
 	/**
 	 * This function should call inside of it the method printCommands, passing the commands available

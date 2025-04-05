@@ -1,7 +1,6 @@
 package it.polimi.ingsw.view.cli;
 
 import it.polimi.ingsw.enums.GamePhaseType;
-import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
 
 import java.rmi.RemoteException;
 
