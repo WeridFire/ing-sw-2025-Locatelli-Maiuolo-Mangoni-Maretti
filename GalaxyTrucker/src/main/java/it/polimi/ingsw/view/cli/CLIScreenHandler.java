@@ -39,6 +39,7 @@ public class CLIScreenHandler {
 		allScreens = new HashSet<>();
 		allScreens.add(new MenuCLIScreen()); //menu
 		allScreens.add(new LobbyCLIScreen()); //lobby
+		allScreens.add(new AssembleCLIScreen()); //assemble
 	}
 
 	// END OF SINGLETON LOGIC
