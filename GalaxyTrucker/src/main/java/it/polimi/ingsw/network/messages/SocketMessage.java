@@ -130,10 +130,18 @@ public class SocketMessage implements Serializable{
 		return new SocketMessage(MessageType.FLIP_HOUR_GLASS);
 	}
 
+	/**
+	 * Creates a socket message to tell the server to draw a tile.
+	 * @return The socket message containing the desired information.
+	 */
 	public static SocketMessage drawTile(){
 		return new SocketMessage(MessageType.DRAW_TILE);
 	}
 
+	/**
+	 * Creates a socket message to tell the server to discard the tile in hand.
+	 * @return The socket message containing the desired information.
+	 */
 	public static SocketMessage discardTile(){
 		return new SocketMessage(MessageType.DISCARD_TILE);
 	}
