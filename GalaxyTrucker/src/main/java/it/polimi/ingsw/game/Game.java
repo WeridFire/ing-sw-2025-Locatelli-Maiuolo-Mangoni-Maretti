@@ -8,8 +8,12 @@ import it.polimi.ingsw.gamePhases.AdventureGamePhase;
 import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTypeException;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -116,7 +120,11 @@ public class Game {
             case TESTFLIGHT, ONE -> gameData.setLapSize(18);
             case TWO -> gameData.setLapSize(24);
         }
-        gameData.setCoveredTiles(TilesFactory.createPileTiles());
+
+        List<TileSkeleton> t = TilesFactory.createPileTiles();
+        Collections.shuffle(t);
+        gameData.setCoveredTiles(t);
+
         gameData.setDeck(new Deck(gameData.getLevel()));
 
         if(gameData.getCurrentGamePhaseType() == GamePhaseType.LOBBY){
