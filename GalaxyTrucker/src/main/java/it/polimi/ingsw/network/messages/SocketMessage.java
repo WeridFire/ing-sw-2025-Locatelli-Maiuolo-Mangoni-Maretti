@@ -17,6 +17,7 @@ public class SocketMessage implements Serializable{
 		DRAW_TILE,
 		DISCARD_TILE,
 		RESERVE_TILE,
+		PICK_TILE,
 	}
 
 	private MessageType type;
@@ -149,5 +150,9 @@ public class SocketMessage implements Serializable{
 
 	public static SocketMessage reserveTile(){
 		return new SocketMessage(MessageType.RESERVE_TILE);
+	}
+
+	public static SocketMessage pickTile(Integer id){
+		return new SocketMessage(MessageType.PICK_TILE, List.of(id));
 	}
 }

@@ -111,5 +111,12 @@ public class ServerSocketHandler implements IServer {
 	@Override
 	public void reserveTile(IClient client) throws RemoteException {
 		SocketMessage mess = SocketMessage.reserveTile();
+		sendSocketMessage(mess);
+	}
+
+	@Override
+	public void pickTile(IClient client, Integer id) throws RemoteException {
+		SocketMessage mess = SocketMessage.pickTile(id);
+		sendSocketMessage(mess);
 	}
 }

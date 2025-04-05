@@ -25,16 +25,34 @@ public class AssembleCLIScreen extends CLIScreen{
         switch(command){
             case "timerflip":
                 getServer().flipHourglass(getClient());
+                setScreenMessage("Done");
                 break;
 
             case "draw":
                 getServer().drawTile(getClient());
+                setScreenMessage("Done");
                 break;
+
             case "discard":
                 getServer().discardTile(getClient());
+                setScreenMessage("Done");
                 break;
+
             case "reserve":
                 getServer().reserveTile(getClient());
+                setScreenMessage("Done");
+                break;
+
+            case "pick":
+                if (args.length == 1) {
+                    int id = Integer.parseInt(args[0]);
+                    getServer().pickTile(getClient(), id);
+                }
+                setScreenMessage("Done");
+                break;
+
+            default:
+                setScreenMessage("Invalid command. Use help to view available commands.");
                 break;
         }
     }
@@ -44,7 +62,8 @@ public class AssembleCLIScreen extends CLIScreen{
         printCommands(screenName,
                 "timerflip | Flips the hourglass of the game.",
                 "draw | Draws a tile from the covered tiles",
-                "discard | Discard the tile you have in hand"
+                "discard | Discard the tile you have in hand",
+                "pick <tileId> | Pick in hand the tile with Id <tileId>"
         );
     }
 

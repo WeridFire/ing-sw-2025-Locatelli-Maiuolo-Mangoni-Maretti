@@ -20,6 +20,7 @@ import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
@@ -251,4 +252,21 @@ public class RmiServer implements IServer {
 		GameServer.getInstance().broadcastUpdate(game);
 
 	}
+
+	@Override
+	public void pickTile(IClient client, Integer id) throws RemoteException {
+		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
+		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
+		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
+
+		try{
+			player.pickTile(game.getGameData(), id);
+		} catch (AlreadyHaveTileInHandException e) {
+			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
+        } catch (ThatTileIdDoesNotExistsException e) {
+			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
+        }
+
+		GameServer.getInstance().broadcastUpdate(game);
+    }
 }
