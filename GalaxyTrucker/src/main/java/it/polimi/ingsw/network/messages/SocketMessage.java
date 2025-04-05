@@ -148,10 +148,21 @@ public class SocketMessage implements Serializable{
 		return new SocketMessage(MessageType.DISCARD_TILE);
 	}
 
+	/**
+	 * Creates a socket message to tell the server to reserve the tile in hand.
+	 * @return The socket message containing the desired information.
+	 */
 	public static SocketMessage reserveTile(){
 		return new SocketMessage(MessageType.RESERVE_TILE);
 	}
 
+	/**
+	 * Creates a socket message to tell the server to pick the tile with a specific id.
+	 *
+	 * @param id : id of the tile to pick
+	 *
+	 * @return The socket message containing the desired information.
+	 */
 	public static SocketMessage pickTile(Integer id){
 		return new SocketMessage(MessageType.PICK_TILE, List.of(id));
 	}
