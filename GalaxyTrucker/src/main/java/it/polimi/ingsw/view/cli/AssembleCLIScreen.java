@@ -1,8 +1,13 @@
 package it.polimi.ingsw.view.cli;
 
+import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.shipboard.ShipBoard;
+import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AssembleCLIScreen extends CLIScreen{
     public AssembleCLIScreen(String screenName, boolean forceActivate) {
@@ -69,7 +74,115 @@ public class AssembleCLIScreen extends CLIScreen{
 
     @Override
     public CLIFrame getCLIRepresentation() {
-        //TODO: think about the assemble game screen
-        return null;
+        //white bg
+        CLIFrame screenBorder = getScreenFrame(40, 120, ANSI.ANSI_WHITE_BACKGROUND);
+
+        //shipboard
+        ShipBoard shipBoard = null;
+        if (getLastUpdate().getClientPlayer() != null) {
+            shipBoard = getLastUpdate().getClientPlayer().getShipBoard();
+        }
+
+        //title
+        CLIFrame shipboardTitle = new CLIFrame(new String[]{
+                ANSI.ANSI_BLUE_BACKGROUND + ANSI.ANSI_WHITE + " YOUR SHIPBOARD " + ANSI.ANSI_RESET
+        });
+
+        //shipboard frame
+        CLIFrame shipboardFrame;
+        if (shipBoard != null) {
+            shipboardFrame = shipBoard.getCLIRepresentation();
+        } else {
+            shipboardFrame = new CLIFrame(new String[]{
+                    ANSI.ANSI_RED + "No shipboard available" + ANSI.ANSI_RESET
+            });
+        }
+
+        CLIFrame shipboardWithTitle = shipboardTitle.merge(
+                shipboardFrame,
+                AnchorPoint.BOTTOM,
+                AnchorPoint.TOP,
+                1,
+                0
+        );
+
+        //drawn tiles
+        List<TileSkeleton> drawnTiles = new ArrayList<>();
+        if (getLastUpdate().getCurrentGame() != null) {
+            drawnTiles = getLastUpdate().getCurrentGame().getDrawnTiles();
+        }
+        CLIFrame tilesTitle = new CLIFrame(new String[]{
+                ANSI.ANSI_BLUE_BACKGROUND + ANSI.ANSI_WHITE + " DRAWN TILES " + ANSI.ANSI_RESET
+        });
+
+        //frame for drawn tiles
+        CLIFrame tilesFrame;
+        if (!drawnTiles.isEmpty()) {
+            //individual frames for each tile with its Id
+            List<CLIFrame> tileFrames = new ArrayList<>();
+
+            for (TileSkeleton tile : drawnTiles) {
+                CLIFrame tileRepresentation = tile.getCLIRepresentation();
+
+                CLIFrame idLabel = new CLIFrame(new String[]{
+                        ANSI.ANSI_YELLOW_BACKGROUND + ANSI.ANSI_BLACK + " ID: " +
+                                tile.getTileId() + " " + ANSI.ANSI_RESET
+                });
+
+                CLIFrame tileWithId = tileRepresentation.merge(
+                        idLabel,
+                        AnchorPoint.BOTTOM,
+                        AnchorPoint.TOP,
+                        1,
+                        0
+                );
+
+                tileFrames.add(tileWithId);
+            }
+
+            //Merge all tile frames horizontally with some spacing
+            tilesFrame = new CLIFrame();
+            int horizontalOffset = 0;
+            for (CLIFrame tileFrame : tileFrames) {
+                tilesFrame = tilesFrame.merge(
+                        tileFrame,
+                        AnchorPoint.TOP_LEFT,
+                        AnchorPoint.TOP_LEFT,
+                        0,
+                        horizontalOffset
+                );
+                horizontalOffset += 10;
+            }
+        } else {
+            tilesFrame = new CLIFrame(new String[]{
+                    ANSI.ANSI_RED + "No tiles drawn" + ANSI.ANSI_RESET
+            });
+        }
+
+        CLIFrame tilesWithTitle = tilesTitle.merge(
+                tilesFrame,
+                AnchorPoint.BOTTOM,
+                AnchorPoint.TOP,
+                1,
+                0
+        );
+
+        CLIFrame contentFrame = shipboardWithTitle.merge(
+                tilesWithTitle,
+                AnchorPoint.BOTTOM,
+                AnchorPoint.TOP,
+                2,
+                0
+        );
+
+        CLIFrame finalFrame = screenBorder.merge(
+                contentFrame,
+                AnchorPoint.CENTER,
+                AnchorPoint.CENTER,
+                0,
+                0
+        );
+
+        return finalFrame;
     }
 }
