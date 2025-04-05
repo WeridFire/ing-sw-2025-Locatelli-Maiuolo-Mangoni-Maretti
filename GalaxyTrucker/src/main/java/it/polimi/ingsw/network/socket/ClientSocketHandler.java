@@ -76,9 +76,7 @@ public class ClientSocketHandler implements IClient {
 					System.err.println("cmd: " + message.getType() + "args: " + message.getArgs());
 					System.err.println("Make sure the arguments are passed in the correct order by the client!");
 					e.printStackTrace();
-				} catch (AlreadyHaveTileInHandException e) {
-                    throw new RuntimeException(e);
-                }
+				}
             }
 
 		}

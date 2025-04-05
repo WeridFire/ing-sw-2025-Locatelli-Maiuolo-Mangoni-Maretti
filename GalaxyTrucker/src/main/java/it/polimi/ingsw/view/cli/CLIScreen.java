@@ -61,7 +61,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * @param args The args to pass
 	 * @throws RemoteException
 	 */
-	protected abstract void processCommand(String command, String[] args) throws RemoteException, IllegalArgumentException, AlreadyHaveTileInHandException;
+	protected abstract void processCommand(String command, String[] args) throws RemoteException, IllegalArgumentException;
 
 	/**
 	 * Refreshes the whole screen. Causes the CLI to clear, print newly the screen using the specific screen logic,

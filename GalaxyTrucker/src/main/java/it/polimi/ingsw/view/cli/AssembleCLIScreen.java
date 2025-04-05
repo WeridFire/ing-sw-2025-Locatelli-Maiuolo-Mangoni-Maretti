@@ -21,7 +21,7 @@ public class AssembleCLIScreen extends CLIScreen{
     }
 
     @Override
-    protected void processCommand(String command, String[] args) throws RemoteException, IllegalArgumentException, AlreadyHaveTileInHandException {
+    protected void processCommand(String command, String[] args) throws RemoteException, IllegalArgumentException {
         command = command.toLowerCase();
         switch(command){
             case "timerflip":
