@@ -11,6 +11,7 @@ import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
 import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.SideType;
+import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
 import it.polimi.ingsw.shipboard.tiles.Tile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
@@ -296,5 +297,15 @@ public class GameData implements Serializable {
 
     public String getGameLeader() {
         return gameLeader;
+    }
+
+    public TileSkeleton getTileWithId(Integer id) throws ThatTileIdDoesNotExistsException {
+        for (TileSkeleton t: getDrawnTiles()){
+            if (t.getTileId() == id){
+                drawnTiles.remove(t);
+                return t;
+            }
+        }
+        throw new ThatTileIdDoesNotExistsException("that tile id doesn't exist.");
     }
 }

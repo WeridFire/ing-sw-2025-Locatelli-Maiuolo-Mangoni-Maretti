@@ -8,6 +8,7 @@ import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
 import it.polimi.ingsw.player.exceptions.NoTileInHandException;
 import it.polimi.ingsw.player.exceptions.TooManyReservedTilesException;
 import it.polimi.ingsw.shipboard.ShipBoard;
+import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.io.Serializable;
@@ -190,4 +191,8 @@ public class Player implements Serializable {
         this.tileInHand = null;
     }
 
+    public void pickTile(GameData gameData, Integer id) throws AlreadyHaveTileInHandException, ThatTileIdDoesNotExistsException {
+        TileSkeleton tile = gameData.getTileWithId(id);
+        setTileInHand(tile);
+    }
 }
