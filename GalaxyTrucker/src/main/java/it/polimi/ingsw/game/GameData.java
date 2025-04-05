@@ -160,28 +160,6 @@ public class GameData implements Serializable {
         return drawnTiles;
     }
 
-    /**
-     * Randomly picks a tile from the covered tiles pile. Removes it from the pile and assigns it to the player.
-     * @return
-     * @throws DrawTileException
-     */
-    public void drawTile(Player player) throws DrawTileException, AlreadyHaveTileInHandException {
-        if(getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE){
-            throw new DrawTileException("You can only do this during Assembly.");
-        }
-        if (getCoveredTiles().isEmpty()) {
-            throw new DrawTileException("There are no covered tiles available.");
-        }
-        TileSkeleton t = getCoveredTiles().removeFirst();
-        try{
-            player.setTileInHand(t);
-        }catch(Exception e){
-            //put tile back in place and transmit the error
-            getCoveredTiles().add(t);
-            throw e;
-        }
-
-    }
 
     /**
      * Gets the quantity of a specific cargo type.
