@@ -14,7 +14,8 @@ public class SocketMessage implements Serializable{
 		CREATE_GAME,
 		UPDATE_SETTINGS,
 		FLIP_HOUR_GLASS,
-		DRAW_TILE
+		DRAW_TILE,
+		DISCARD_TILE,
 	}
 
 	private MessageType type;
@@ -131,5 +132,9 @@ public class SocketMessage implements Serializable{
 
 	public static SocketMessage drawTile(){
 		return new SocketMessage(MessageType.DRAW_TILE);
+	}
+
+	public static SocketMessage discardTile(){
+		return new SocketMessage(MessageType.DISCARD_TILE);
 	}
 }

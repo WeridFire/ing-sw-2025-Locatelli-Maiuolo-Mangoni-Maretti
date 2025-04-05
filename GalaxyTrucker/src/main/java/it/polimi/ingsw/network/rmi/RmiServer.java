@@ -206,4 +206,26 @@ public class RmiServer implements IServer {
 
 		GameServer.getInstance().broadcastUpdate(game);
 	}
+
+	@Override
+	public void discardTile(IClient client) throws RemoteException, AlreadyHaveTileInHandException {
+		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
+		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
+		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
+
+		if(player == null || game == null){
+			client.updateClient(new ClientUpdate(connectionUUID, "You are not in a game."));
+			return;
+		}
+
+		if (player.getTileInHand() == null){
+			client.updateClient(new ClientUpdate(connectionUUID, "You have no tile in hand."));
+		}
+
+		TileSkeleton t = player.getTileInHand();
+		player.setTileInHand(null);
+		game.getGameData().getDrawnTiles().add(t);
+
+		GameServer.getInstance().broadcastUpdate(game);
+	}
 }

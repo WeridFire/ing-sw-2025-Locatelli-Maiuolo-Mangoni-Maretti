@@ -101,4 +101,10 @@ public class ServerSocketHandler implements IServer {
 		SocketMessage mess = SocketMessage.drawTile();
 		sendSocketMessage(mess);
 	}
+
+	@Override
+	public void discardTile(IClient client) throws RemoteException {
+		SocketMessage mess = SocketMessage.discardTile();
+		sendSocketMessage(mess);
+	}
 }

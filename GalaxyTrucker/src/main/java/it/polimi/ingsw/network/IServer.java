@@ -1,6 +1,7 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.util.Coordinates;
 
@@ -28,4 +29,5 @@ public interface IServer extends Remote {
 	// Assemble Phase
 	void flipHourglass(IClient client) throws RemoteException;
 	void drawTile(IClient client) throws RemoteException;
+	void discardTile(IClient client) throws RemoteException, AlreadyHaveTileInHandException;
 }

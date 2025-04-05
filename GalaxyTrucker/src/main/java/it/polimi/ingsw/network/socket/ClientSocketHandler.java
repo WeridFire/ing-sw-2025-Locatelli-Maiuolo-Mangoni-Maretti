@@ -4,6 +4,7 @@ import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.network.*;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.messages.SocketMessage;
+import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -68,14 +69,17 @@ public class ClientSocketHandler implements IClient {
 						);
 						case FLIP_HOUR_GLASS -> getServer().flipHourglass(this);
 						case DRAW_TILE -> getServer().drawTile(this);
+						case DISCARD_TILE -> getServer().discardTile(this);
 					}
 				}catch(IllegalArgumentException e){
 					System.err.println("ERROR WHILE PARSING MESSAGE! Message:");
 					System.err.println("cmd: " + message.getType() + "args: " + message.getArgs());
 					System.err.println("Make sure the arguments are passed in the correct order by the client!");
 					e.printStackTrace();
-				}
-			}
+				} catch (AlreadyHaveTileInHandException e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
 		}
 	}
