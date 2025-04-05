@@ -1,21 +1,19 @@
 package it.polimi.ingsw.player;
 
-import it.polimi.ingsw.enums.Direction;
-import it.polimi.ingsw.enums.GameLevel;
-import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.game.exceptions.DrawTileException;
+import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
+import it.polimi.ingsw.player.exceptions.NoTileInHandException;
 import it.polimi.ingsw.player.exceptions.TooManyReservedTilesException;
-import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
-import it.polimi.ingsw.util.Coordinates;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.Map;
 
 public class Player implements Serializable {
 
@@ -85,7 +83,7 @@ public class Player implements Serializable {
      * @param tileInHand tile held by the player
      */
     public void setTileInHand(TileSkeleton tileInHand) throws AlreadyHaveTileInHandException {
-        if(tileInHand != null){
+        if(getTileInHand() != null){
             throw new AlreadyHaveTileInHandException("You already are holding a tile.");
         }
         this.tileInHand = tileInHand;
@@ -159,205 +157,37 @@ public class Player implements Serializable {
         return position;
     }
 
-    public void drawComponent(Game game){
-        if(getTileInHand() != null){
-            //throw errror
+    /**
+     * Randomly picks a tile from the covered tiles pile. Removes it from the pile and assigns it to the player.
+     * @return
+     * @throws DrawTileException
+     */
+    public void drawTile(GameData gameData) throws DrawTileException, AlreadyHaveTileInHandException {
+        if(gameData.getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE){
+            throw new DrawTileException("You can only do this during Assembly.");
         }
-        // TODO: actually draw component  // setTileInHand();
-    }
-
-    public void printCliShipboard()
-    {
-        int gridWidth = 7;
-        int gridHeight = 5;
-
-        char[][] grid = new char[gridWidth*5][gridHeight*5];
-        Map<Coordinates, TileSkeleton> tiles = this.getShipBoard().getTilesOnBoard();
-
-        for (int i = 0; i < gridHeight; i++) {
-            for (int j = 0; j < gridWidth; j++) {
-                grid[i][j] = ' ';
-            }
+        if (gameData.getCoveredTiles().isEmpty()) {
+            throw new DrawTileException("There are no covered tiles available.");
         }
-
-        for (Map.Entry<Coordinates, TileSkeleton> entry : tiles.entrySet()) {
-            Coordinates coord = entry.getKey();
-            TileSkeleton tile = entry.getValue();
-
-            // Calcola posizione nella griglia di caratteri
-            int startx = (coord.getColumn() - 4) * 5;
-            int starty = (coord.getRow() - 5) * 5;
-
-            // Renderizza la tessera
-            try{
-                renderTile(grid, startx, starty, tile);
-            }
-            catch (ArrayIndexOutOfBoundsException e)
-            {
-                System.err.println("Errore rendering tile [" + coord.getColumn() + "," + coord.getRow() + "]");
-            }
-        }
-
-        //Stampa la griglia
-        for (int i = 0; i < gridWidth; i++) {
-            for (int j = 0; j < gridHeight; j++) {
-                System.out.print(grid[i][j]);
-            }
-            System.out.println();
+        TileSkeleton t = gameData.getCoveredTiles().removeFirst();
+        try{
+            setTileInHand(t);
+        }catch(Exception e){
+            //put tile back in place and transmit the error
+            gameData.getCoveredTiles().add(t);
+            throw e;
         }
     }
 
-    private void renderTile(char[][] grid, int startx, int starty, TileSkeleton tile) {
-        grid[startx][starty] = '┌';
-        grid[startx+4][starty] = '┐';
-        grid[startx][starty+4] = '└';
-        grid[startx+4][starty+4] = '┘';
-        renderNorthSide(grid, startx, starty, tile.getSide(Direction.NORTH));
-        renderWestSide(grid, startx, starty, tile.getSide(Direction.WEST));
-        renderEastSide(grid, startx, starty, tile.getSide(Direction.EAST));
-        renderSouthSide(grid, startx, starty, tile.getSide(Direction.SOUTH));
-        //TODO: aggiungere il carattere centrale
-    }
+    public void discardTile(GameData gameData) throws NoTileInHandException {
 
-    private void renderNorthSide(char[][] grid, int startx, int starty, SideType side) {
-        switch(side){
-            case SMOOTH:
-                grid[startx+1][starty] = ' ';
-                grid[startx+2][starty] = ' ';
-                grid[startx+3][starty] = ' ';
-                break;
-            case SINGLE:
-                grid[startx+1][starty] = ' ';
-                grid[startx+2][starty] = '|';
-                grid[startx+3][starty] = ' ';
-                break;
-            case DOUBLE:
-                grid[startx+1][starty] = '|';
-                grid[startx+2][starty] = ' ';
-                grid[startx+3][starty] = '|';
-                break;
-            case UNIVERSAL:
-                grid[startx+1][starty] = '|';
-                grid[startx+2][starty] = '|';
-                grid[startx+3][starty] = '|';
-                break;
-            case CANNON:
-                grid[startx+1][starty] = ' ';
-                grid[startx+2][starty] = '▴';
-                grid[startx+3][starty] = ' ';
-                break;
-            case ENGINE:
-                grid[startx+1][starty] = ' ';
-                grid[startx+2][starty] = 'E';
-                grid[startx+3][starty] = ' ';
-                break;
-        }
-    }
-
-    public void renderWestSide(char[][] grid, int startx, int starty, SideType side) {
-        switch(side){
-            case SMOOTH:
-                grid[startx][starty+1] = ' ';
-                grid[startx][starty+2] = ' ';
-                grid[startx][starty+3] = ' ';
-                break;
-            case SINGLE:
-                grid[startx][starty+1] = ' ';
-                grid[startx][starty+2] = '-';
-                grid[startx][starty+3] = ' ';
-                break;
-            case DOUBLE:
-                grid[startx][starty+1] = '-';
-                grid[startx][starty+2] = ' ';
-                grid[startx][starty+3] = '-';
-                break;
-            case UNIVERSAL:
-                grid[startx][starty+1] = '-';
-                grid[startx][starty+2] = '-';
-                grid[startx][starty+3] = '-';
-                break;
-            case CANNON:
-                grid[startx][starty+1] = ' ';
-                grid[startx][starty+2] = '◂';
-                grid[startx][starty+3] = ' ';
-                break;
-            case ENGINE:
-                grid[startx][starty+1] = ' ';
-                grid[startx][starty+2] = 'E';
-                grid[startx][starty+3] = ' ';
-                break;
-        }
-    }
-
-    public void renderEastSide(char[][] grid, int startx, int starty, SideType side) {
-        switch(side){
-            case SMOOTH:
-                grid[startx+4][starty+1] = ' ';
-                grid[startx+4][starty+2] = ' ';
-                grid[startx+4][starty+3] = ' ';
-                break;
-            case SINGLE:
-                grid[startx+4][starty+1] = ' ';
-                grid[startx+4][starty+2] = '-';
-                grid[startx+4][starty+3] = ' ';
-                break;
-            case DOUBLE:
-                grid[startx+4][starty+1] = '-';
-                grid[startx+4][starty+2] = ' ';
-                grid[startx+4][starty+3] = '-';
-                break;
-            case UNIVERSAL:
-                grid[startx+4][starty+1] = '-';
-                grid[startx+4][starty+2] = '-';
-                grid[startx+4][starty+3] = '-';
-                break;
-            case CANNON:
-                grid[startx+4][starty+1] = ' ';
-                grid[startx+4][starty+2] = '▸';
-                grid[startx+4][starty+3] = ' ';
-                break;
-            case ENGINE:
-                grid[startx+4][starty+1] = ' ';
-                grid[startx+4][starty+2] = 'E';
-                grid[startx+4][starty+3] = ' ';
-                break;
+        if (getTileInHand() == null){
+            throw new NoTileInHandException();
         }
 
-    }
-
-    private void renderSouthSide(char[][] grid, int startx, int starty, SideType side){
-        switch(side){
-            case SMOOTH:
-                grid[startx+1][starty+4] = ' ';
-                grid[startx+2][starty+4] = ' ';
-                grid[startx+3][starty+4] = ' ';
-                break;
-            case SINGLE:
-                grid[startx+1][starty+4] = ' ';
-                grid[startx+2][starty+4] = '|';
-                grid[startx+3][starty+4] = ' ';
-                break;
-            case DOUBLE:
-                grid[startx+1][starty+4] = '|';
-                grid[startx+2][starty+4] = ' ';
-                grid[startx+3][starty+4] = '|';
-                break;
-            case UNIVERSAL:
-                grid[startx+1][starty+4] = '|';
-                grid[startx+2][starty+4] = '|';
-                grid[startx+3][starty+4] = '|';
-                break;
-            case CANNON:
-                grid[startx+1][starty+4] = ' ';
-                grid[startx+2][starty+4] = '▾';
-                grid[startx+3][starty+4] = ' ';
-                break;
-            case ENGINE:
-                grid[startx+1][starty+4] = ' ';
-                grid[startx+2][starty+4] = 'E';
-                grid[startx+3][starty+4] = ' ';
-                break;
-        }
+        TileSkeleton t = getTileInHand();
+        gameData.getDrawnTiles().add(t);
+        this.tileInHand = null;
     }
 
 }
