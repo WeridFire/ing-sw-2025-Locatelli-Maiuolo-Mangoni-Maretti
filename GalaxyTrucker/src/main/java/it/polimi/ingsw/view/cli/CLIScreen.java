@@ -1,10 +1,15 @@
 package it.polimi.ingsw.view.cli;
 
+import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 
 import java.rmi.RemoteException;
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class CLIScreen implements ICLIPrintable {
 
@@ -90,7 +95,6 @@ public abstract class CLIScreen implements ICLIPrintable {
 
 	protected final void printAvailableCommands(){
 		clear();
-		printCommands("global", "ping|Ping the host server.", "screen|Navigate screens.", "help|Get all the available commands.", "debug|Create a json containing the current game state.");
 		printScreenSpecificCommands();
 	}
 
@@ -152,33 +156,54 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * @param commands An array or list of commands to be printed, each formatted as <command>|<description>.
 	 */
 	public final void printCommands(String screenName, String... commands) {
-		String stringBuilder = ANSI.ANSI_BLUE_BACKGROUND +
-				ANSI.ANSI_RED +
-				" " + screenName.toUpperCase() +
-				ANSI.ANSI_RESET +
-				ANSI.ANSI_BLUE_BACKGROUND +
-				" SPECIFIC COMMANDS " +
+		CLIScreen.clear();
+		CLIFrame frame = CLIScreen.getScreenFrame(14, 60, ANSI.ANSI_BLACK_BACKGROUND);
+
+		String header = ANSI.ANSI_BLUE_BACKGROUND +
+				ANSI.ANSI_RED + " " + screenName.toUpperCase() +
+				ANSI.ANSI_RESET + ANSI.ANSI_BLUE_BACKGROUND + " SPECIFIC COMMANDS " +
 				ANSI.ANSI_RESET;
-		System.out.println(stringBuilder);
-		if(commands != null){
-			for (String command : commands) {
+		List<String> cmds = null;
+		if(commands == null){
+			cmds = new ArrayList<>();
+		}else{
+			cmds = new ArrayList<>(Arrays.asList(commands));
+		}
+		cmds.addFirst("ping|Ping the host server.");
+		cmds.addFirst("screen|Navigate screens.");
+		cmds.addFirst("help|Get all the available commands.");
+		cmds.addFirst("debug|Create a json containing the current game state.");
+		frame = frame.merge(new CLIFrame(header), AnchorPoint.TOP, AnchorPoint.CENTER, 1, 0);
+
+		if (!cmds.isEmpty()) {
+			List<String> cmdList = new ArrayList<>();
+			for (String command : cmds) {
+				StringBuilder cmdBuilder = new StringBuilder();
 				String[] parts = command.split("\\|", 2);
 				if (parts.length == 2) {
-					System.out.println(ANSI.ANSI_CYAN + ">" + parts[0] + ANSI.ANSI_RESET + " | " + parts[1]);
+					cmdBuilder.append(ANSI.ANSI_CYAN).append("> ").append(parts[0])
+							.append(ANSI.ANSI_RESET).append(" | ").append(parts[1]);
 				} else {
-					System.out.println(ANSI.ANSI_CYAN + ">" + command + ANSI.ANSI_RESET);
+					cmdBuilder.append(ANSI.ANSI_CYAN).append("> ").append(command);
 				}
+				cmdList.add(cmdBuilder.toString());
 			}
+			CLIFrame cmdFrame = new CLIFrame(cmdList.toArray(new String[0]));
+			frame = frame.merge(cmdFrame, AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT, 3, 1);
+		} else {
+			frame = frame.merge(new CLIFrame(ANSI.ANSI_RED_BACKGROUND + ANSI.ANSI_WHITE + "No Commands Available"),
+					AnchorPoint.CENTER, AnchorPoint.CENTER, -1, 0);
 		}
 
-		if(!screenName.equals("global")){
-			printBackButton(screenName);
-		}
+		frame = frame.merge(new CLIFrame(ANSI.ANSI_RED_BACKGROUND + ANSI.ANSI_WHITE + "Enter to close"),
+				AnchorPoint.BOTTOM, AnchorPoint.CENTER, -2, 0);
+
+		CLIFrame currentScr = CLIScreenHandler.getInstance().getCurrentScreen().getCLIRepresentation();
+		currentScr = currentScr.merge(frame, AnchorPoint.CENTER, AnchorPoint.CENTER);
+		System.out.println(currentScr);
 	}
 
-	public static void printBackButton(String screenName){
-		System.out.print(ANSI.ANSI_RED_BACKGROUND+" <- BACK TO " +screenName.toUpperCase() +" " +ANSI.ANSI_RESET);
-	}
+
 
 	public static CLIFrame getScreenFrame(int rows, int columns){
 		return getScreenFrame(rows, columns, ANSI.ANSI_RESET);
@@ -206,7 +231,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 		}
 		frame[rows + 1] = bottom.toString();
 
-		return new CLIFrame(frame);
+		return new CLIFrame(frame, false);
 	}
 
 
