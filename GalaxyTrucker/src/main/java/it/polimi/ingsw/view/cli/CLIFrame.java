@@ -19,8 +19,20 @@ public class CLIFrame {
     private final int columns;
     private final char[][] content;
     private final String[] contentAsLines;
-
+    private boolean transparent = true;
     private int offset_row, offset_column;
+
+
+    /**
+     * @see #CLIFrame(String[])  CLIFrame
+     * @param lines The array of strings representing the frame's content
+     * @param transparent Wether the frame is transparent or not.
+     */
+    public CLIFrame(String[] lines, boolean transparent){
+        this(lines);
+        this.transparent = transparent;
+    }
+
 
     /**
      * Creates a CLI frame from an array of strings.
@@ -346,14 +358,20 @@ public class CLIFrame {
                             lineBuilder.append(baseFrame.getBackgroundAt(row, col));
                         }
 
-                        lineBuilder.append(baseFrame.getCharAt(row, col));
+                        if(addFrame.transparent || addBackground == ANSI.ANSI_RESET.charAt(0)){
+                            lineBuilder.append(baseFrame.getCharAt(row, col));
+                        }else{
+                            lineBuilder.append(addFrame.getCharAt(row, col));
+                        }
+
+
                     }
                 }
             }
             lines[row - rowStart] = lineBuilder.toString();
         }
 
-        return new CLIFrame(lines);
+        return new CLIFrame(lines, transparent);
     }
 
     /**
