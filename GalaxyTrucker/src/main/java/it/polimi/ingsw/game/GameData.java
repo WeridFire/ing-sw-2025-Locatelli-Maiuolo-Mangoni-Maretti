@@ -363,4 +363,12 @@ public class GameData implements Serializable {
         }
         throw new ThatTileIdDoesNotExistsException("that tile id doesn't exist.");
     }
+
+    /**
+     * Sets the drawnTiles Deck (used for testing)
+     * @param drawnTiles the deck to set
+     */
+    public void setDrawnTiles(List<TileSkeleton> drawnTiles) {
+        this.drawnTiles = drawnTiles;
+    }
 }

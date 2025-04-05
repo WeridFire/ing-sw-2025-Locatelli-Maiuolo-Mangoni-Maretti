@@ -8,6 +8,7 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.game.exceptions.DrawTileException;
 import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
+import it.polimi.ingsw.player.exceptions.NoTileInHandException;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
@@ -66,6 +67,22 @@ class PlayerTest {
         gameData.setCurrentGamePhaseType(ASSEMBLE);
         player1.drawTile(gameData);
         assertNotNull(player1.getTileInHand());
+    }
+
+    @Test
+    void testDiscardTile() throws DrawTileException, AlreadyHaveTileInHandException, NoTileInHandException {
+        List<TileSkeleton> drawnTiles = new ArrayList<>();
+        List<TileSkeleton> MockTiles = new ArrayList<>();
+        TileSkeleton mockTile1 = createMockTile(1);
+        TileSkeleton mockTile2 = createMockTile(2);
+        MockTiles.add(mockTile1);
+        MockTiles.add(mockTile2);
+        gameData.setCoveredTiles(MockTiles);
+        gameData.setDrawnTiles(drawnTiles);
+        gameData.setCurrentGamePhaseType(ASSEMBLE);
+        player1.drawTile(gameData);
+        player1.discardTile(gameData);
+        assertNull(player1.getTileInHand());
     }
 
 
