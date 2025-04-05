@@ -24,43 +24,61 @@ import java.util.stream.Collectors;
  */
 public class GameData implements Serializable {
 
-    /** The game level configuration. */
+    /**
+     * The game level configuration.
+     */
     private GameLevel level;
 
-    /** The current phase type of the game. */
+    /**
+     * The current phase type of the game.
+     */
     private GamePhaseType currentGamePhaseType;
 
-    /** The current playable game phase. */
+    /**
+     * The current playable game phase.
+     */
     private PlayableGamePhase currentGamePhase;
 
-    /** List of players in the game. */
+    /**
+     * List of players in the game.
+     */
     private final Set<Player> players;
 
-    /** Number of positions in 1 lap */
+    /**
+     * Number of positions in 1 lap
+     */
     private int lapSize;
 
     private UUID gameId;
 
-    /** The player whose turn it is.
-    private Player currentPlayerTurn;
+    /**
+     * The player whose turn it is.
+     * private Player currentPlayerTurn;
      */
 
     transient private PIRHandler pirHandler;
 
-    /** Mapping of available cargo goods and their quantities. */
+    /**
+     * Mapping of available cargo goods and their quantities.
+     */
     private Map<LoadableType, Integer> availableGoods;
 
-    /** List of game deck. */
+    /**
+     * List of game deck.
+     */
     private Deck deck;
 
-    /** List of covered tiles in the game. */
+    /**
+     * List of covered tiles in the game.
+     */
     private List<TileSkeleton> coveredTiles;
 
-    /** List of drawn tiles I.E. all the tiles that:
-     *  - are not part of a shipboard
-     *  - are not covered
-     *  - are not in hand
-     *  - are not reserved by anybody
+    /**
+     * List of drawn tiles I.E. all the tiles that:
+     * - are not part of a shipboard
+     * - are not covered
+     * - are not in hand
+     * - are not reserved by anybody
      */
     private List<TileSkeleton> drawnTiles;
 
@@ -92,7 +110,7 @@ public class GameData implements Serializable {
         return level;
     }
 
-    public void setLevel(GameLevel level){
+    public void setLevel(GameLevel level) {
         this.level = level;
     }
 
@@ -121,8 +139,8 @@ public class GameData implements Serializable {
      */
     public List<Player> getPlayers() {
         return players.stream()
-                        .sorted(Comparator.comparingInt(Player::getPosition))
-                        .toList();
+                .sorted(Comparator.comparingInt(Player::getPosition))
+                .toList();
     }
 
     /**
@@ -130,7 +148,7 @@ public class GameData implements Serializable {
      *
      * @return The current turn player.
      */
-    public PIRHandler getPIRHandler(){
+    public PIRHandler getPIRHandler() {
         return pirHandler;
     }
 
@@ -209,23 +227,24 @@ public class GameData implements Serializable {
      * @throws PlayerAlreadyInGameException If the player is already in the game.
      */
     protected void addPlayer(Player player) throws PlayerAlreadyInGameException {
-        if(players.stream()
-                    .map(Player::getUsername)
-                    .collect(Collectors.toSet())
-                    .contains(player.getUsername())) {
+        if (players.stream()
+                .map(Player::getUsername)
+                .collect(Collectors.toSet())
+                .contains(player.getUsername())) {
             throw new PlayerAlreadyInGameException("Player with this username is already present.");
         }
         players.add(player);
-        if(players.size() == 1){
+        if (players.size() == 1) {
             this.gameLeader = player.getUsername();
         }
     }
 
     /**
      * Moves a player on the board, accounting for players they may pass.
+     *
      * @param playerToMove player that is going to move
-     * @param steps number of steps the player is moving
-     * @param forward true if moving forward, false if moving backward
+     * @param steps        number of steps the player is moving
+     * @param forward      true if moving forward, false if moving backward
      */
     private void movePlayer(Player playerToMove, int steps, boolean forward) {
 
@@ -256,8 +275,9 @@ public class GameData implements Serializable {
 
     /**
      * Moves a player forward on the board.
+     *
      * @param playerToMove player that is going to move
-     * @param steps number of steps the player is moving
+     * @param steps        number of steps the player is moving
      */
     public void movePlayerForward(Player playerToMove, int steps) {
         movePlayer(playerToMove, steps, true);
@@ -265,43 +285,82 @@ public class GameData implements Serializable {
 
     /**
      * Moves a player backward on the board.
+     *
      * @param playerToMove player that is going to move
-     * @param steps number of steps the player is moving
+     * @param steps        number of steps the player is moving
      */
     public void movePlayerBackward(Player playerToMove, int steps) {
         movePlayer(playerToMove, steps, false);
     }
 
+    /**
+     * Sets the current game phase type.
+     *
+     * @param currentGamePhaseType the current phase of the game to set
+     */
     public void setCurrentGamePhaseType(GamePhaseType currentGamePhaseType) {
         this.currentGamePhaseType = currentGamePhaseType;
     }
 
+    /**
+     * Gets the number of players required to start the game.
+     *
+     * @return the required number of players
+     */
     public int getRequiredPlayers() {
         return requiredPlayers;
     }
 
+    /**
+     * Sets the number of required players to start the game.
+     * The value must be between 2 and 4 (inclusive).
+     *
+     * @param requiredPlayers the number of required players
+     */
     public void setRequiredPlayers(int requiredPlayers) {
-        if(requiredPlayers > 4 || requiredPlayers < 2){
+        if (requiredPlayers > 4 || requiredPlayers < 2) {
             return;
         }
         this.requiredPlayers = requiredPlayers;
     }
 
+    /**
+     * Sets the size of a lap in the game.
+     *
+     * @param lapSize the number of steps or tiles in a lap
+     */
     public void setLapSize(int lapSize) {
         this.lapSize = lapSize;
     }
 
+    /**
+     * Gets the unique identifier of the game.
+     *
+     * @return the game's UUID
+     */
     public UUID getGameId() {
         return gameId;
     }
 
+    /**
+     * Gets the username or identifier of the game leader.
+     *
+     * @return the game leader's name
+     */
     public String getGameLeader() {
         return gameLeader;
     }
 
+    /**
+     * Retrieves and removes a tile from the drawn tiles list based on its ID.
+     *
+     * @param id the ID of the tile to retrieve
+     * @return the tile with the specified ID
+     * @throws ThatTileIdDoesNotExistsException if no tile with the specified ID exists in the drawn tiles
+     */
     public TileSkeleton getTileWithId(Integer id) throws ThatTileIdDoesNotExistsException {
-        for (TileSkeleton t: getDrawnTiles()){
-            if (t.getTileId() == id){
+        for (TileSkeleton t : getDrawnTiles()) {
+            if (t.getTileId() == id) {
                 drawnTiles.remove(t);
                 return t;
             }
