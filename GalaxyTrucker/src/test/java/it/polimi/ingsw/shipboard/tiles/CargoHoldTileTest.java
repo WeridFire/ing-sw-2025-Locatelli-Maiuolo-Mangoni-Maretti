@@ -68,7 +68,7 @@ class CargoHoldTileTest {
     void testConstructor() {
         assertEquals("2+", regularDoubleCargoHoldTile.getCLISymbol());
         assertEquals("3+", regularTripleCargoHoldTile.getCLISymbol());
-        assertEquals(1, specialSingleCargoHoldTile.getCapacityLeft());
+        assertEquals("?", specialSingleCargoHoldTile.getCLISymbol());
     }
 
     @Test
@@ -102,6 +102,16 @@ class CargoHoldTileTest {
 
         assertEquals(0, specialSingleCargoHoldTile.getCapacityLeft());
         assertEquals(1, specialDoubleCargoHoldTile.getCapacityLeft());
+    }
+
+    @Test
+    void getMostValuableTest() throws TooMuchLoadException, UnsupportedLoadableItemException {
+            PriorityQueue testQueue = new PriorityQueue();
+            testQueue.add(LoadableType.RED_GOODS);
+            specialDoubleCargoHoldTile.loadItems(LoadableType.BLUE_GOODS, 1);
+            specialDoubleCargoHoldTile.loadItems(LoadableType.RED_GOODS, 1);
+            assertEquals(testQueue.toString(), specialDoubleCargoHoldTile.getContrabandMostValuableItems(1, 2).toString());
+
     }
 
 }
