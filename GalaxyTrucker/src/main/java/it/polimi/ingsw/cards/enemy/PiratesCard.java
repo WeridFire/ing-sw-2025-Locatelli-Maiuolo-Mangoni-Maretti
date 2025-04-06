@@ -1,12 +1,15 @@
 package it.polimi.ingsw.cards.enemy;
 
 import it.polimi.ingsw.cards.projectile.Projectile;
+import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.playerInput.PIRUtils;
 import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
+import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
+import it.polimi.ingsw.view.cli.CLIScreen;
 
 import java.util.List;
 
@@ -71,7 +74,21 @@ public class PiratesCard extends EnemyCard{
      */
     @Override
     public CLIFrame getCLIRepresentation(){
-        // TODO
+        /**
+         * sembrano in obliquo i bordi ma è
+         * perche è un commento
+         *
+         * +--------------+
+         * |   PIRATES    |
+         * | lost days: x |
+         * | firepower: x |
+         * | bounty: x    |
+         * |              |
+         * | hits:        |
+         * | ............ |
+         * | ............ |
+         * +--------------+
+         * */
         return null;
     }
 
