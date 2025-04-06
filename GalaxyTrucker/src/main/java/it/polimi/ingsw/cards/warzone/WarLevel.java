@@ -1,14 +1,11 @@
 package it.polimi.ingsw.cards.warzone;
 
-import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
-import java.util.List;
-import java.util.UUID;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
-public class WarLevel {
+import java.io.Serializable;
+
+public class WarLevel implements Serializable {
 
 	/**
 	 * The criteria used to select the worst player in this level.
@@ -18,17 +15,16 @@ public class WarLevel {
 	/**
 	 * The function applied to the worst player, the punishment.
 	 */
-	private final BiConsumer<Player, GameData> punishmentFunction;
+	private final WarPunishment warPunishment;
 
 	/**
 	 * Instances a war level. Multiple war levels build up to a war zone.
 	 * @param warCriteria Use a warfactory to generate this. A criteria to decide the worst player to punish.
-	 * @param punishmentFunction Use a warfactory to generate this. The punishment function to
-	 *                              apply to the selected player
+	 * @param warPunishment Use a warfactory to generate this. The punishment to apply to the selected player
 	 */
-	public WarLevel(WarCriteria warCriteria, BiConsumer<Player, GameData> punishmentFunction) {
+	public WarLevel(WarCriteria warCriteria, WarPunishment warPunishment) {
 		this.warCriteria = warCriteria;
-		this.punishmentFunction = punishmentFunction;
+		this.warPunishment = warPunishment;
 	}
 
 	/**
@@ -38,7 +34,7 @@ public class WarLevel {
 	 */
 	public Player getWorstPlayer(GameData game) {
 		return game.getPlayers()
-				.stream().min(warCriteria.getComparator()).orElse(null);
+				.stream().min(warCriteria).orElse(null);
 	}
 
 	/**
@@ -46,6 +42,6 @@ public class WarLevel {
 	 * @param p
 	 */
 	public void applyPunishment(Player p, GameData game) {
-		punishmentFunction.accept(p, game);
+		warPunishment.apply(p, game);
 	}
 }
