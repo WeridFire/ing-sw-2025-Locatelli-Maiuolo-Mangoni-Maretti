@@ -14,6 +14,7 @@ class EngineTileTest {
 
     @BeforeEach
     void setUp() {
+        //Creates a single engine
         SideType[] singleEngine = Direction.sortedArray(
                 SideType.UNIVERSAL,  // NORTH
                 SideType.UNIVERSAL,  // EAST
@@ -23,6 +24,7 @@ class EngineTileTest {
 
         singleEngineTile = new EngineTile(singleEngine, false);
 
+        //Creates a double engine
         SideType[] doubleEngine = Direction.sortedArray(
                 SideType.UNIVERSAL,  // NORTH
                 SideType.UNIVERSAL,  // EAST
@@ -35,9 +37,26 @@ class EngineTileTest {
 
     @Test
     void testConstructor() {
+
         // Test CLI symbols
         assertEquals("1e", singleEngineTile.getCLISymbol());
         assertEquals("2E", doubleEngineTile.getCLISymbol());
     }
 
+    @Test
+    void testisDoubleEngine() {
+
+        // Single Cannon returns false
+        assertFalse(singleEngineTile.isDoubleEngine());
+
+        // Double Cannon returns true
+        assertTrue(doubleEngineTile.isDoubleEngine());
+    }
+
+    @Test
+    void testCalculateEnginePower() {
+
+        // non funza x ora
+        assertEquals(1f, singleEngineTile.calculateThrustPower());
+    }
 }
