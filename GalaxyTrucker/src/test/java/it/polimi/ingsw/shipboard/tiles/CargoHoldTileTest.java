@@ -113,5 +113,4 @@ class CargoHoldTileTest {
             assertEquals(testQueue.toString(), specialDoubleCargoHoldTile.getContrabandMostValuableItems(1, 2).toString());
 
     }
-
 }
