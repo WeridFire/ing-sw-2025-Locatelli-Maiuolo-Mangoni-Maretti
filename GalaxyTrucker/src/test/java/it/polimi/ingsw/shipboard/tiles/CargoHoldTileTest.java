@@ -8,8 +8,7 @@ import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemExcepti
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,7 +19,12 @@ class CargoHoldTileTest {
     private CargoHoldTile specialSingleCargoHoldTile;
     private CargoHoldTile specialDoubleCargoHoldTile;
 
-    @BeforeEach
+    Set<LoadableType> allowedCargoTest = Set.of(LoadableType.BLUE_GOODS, LoadableType.GREEN_GOODS, LoadableType.YELLOW_GOODS, LoadableType.RED_GOODS);
+
+
+
+
+        @BeforeEach
     void setUp() {
         SideType[] regularDoubleCargo = Direction.sortedArray(
                 SideType.UNIVERSAL,  // NORTH
@@ -47,7 +51,7 @@ class CargoHoldTileTest {
                 SideType.UNIVERSAL   // WEST
         ).toArray(SideType[]::new);
 
-        specialSingleCargoHoldTile = new CargoHoldTile(specialSingleCargo, 1);
+        specialSingleCargoHoldTile = new CargoHoldTile(specialSingleCargo, allowedCargoTest,1);
 
         SideType[] specialDoubleCargo = Direction.sortedArray(
                 SideType.UNIVERSAL,  // NORTH
@@ -56,7 +60,7 @@ class CargoHoldTileTest {
                 SideType.UNIVERSAL   // WEST
         ).toArray(SideType[]::new);
 
-        specialDoubleCargoHoldTile = new CargoHoldTile(specialDoubleCargo, 2);
+        specialDoubleCargoHoldTile = new CargoHoldTile(specialDoubleCargo, allowedCargoTest,2);
 
     }
 
@@ -64,6 +68,7 @@ class CargoHoldTileTest {
     void testConstructor() {
         assertEquals("2+", regularDoubleCargoHoldTile.getCLISymbol());
         assertEquals("3+", regularTripleCargoHoldTile.getCLISymbol());
+        assertEquals(1, specialSingleCargoHoldTile.getCapacityLeft());
     }
 
     @Test
@@ -74,6 +79,29 @@ class CargoHoldTileTest {
         regularDoubleCargoHoldTile.loadItems(LoadableType.GREEN_GOODS, 2);
         assertEquals(0, regularDoubleCargoHoldTile.getCapacityLeft());
         assertEquals(testList.toString(), regularDoubleCargoHoldTile.getLoadedItems().toString());
+    }
+
+    @Test
+    void RedCantGetLoadedInRegular() {
+        assertThrows(UnsupportedLoadableItemException.class, () -> {
+            regularDoubleCargoHoldTile.loadItems(LoadableType.RED_GOODS, 1);
+        });
+
+        assertThrows(UnsupportedLoadableItemException.class, () -> {
+            regularTripleCargoHoldTile.loadItems(LoadableType.RED_GOODS, 1);
+        });
+    }
+
+    @Test
+    void RedCanGetLoadedInSpecial() throws TooMuchLoadException, UnsupportedLoadableItemException {
+        assertEquals(1, specialSingleCargoHoldTile.getCapacityLeft());
+        assertEquals(2, specialDoubleCargoHoldTile.getCapacityLeft());
+
+        specialSingleCargoHoldTile.loadItems(LoadableType.RED_GOODS, 1);
+        specialDoubleCargoHoldTile.loadItems(LoadableType.RED_GOODS, 1);
+
+        assertEquals(0, specialSingleCargoHoldTile.getCapacityLeft());
+        assertEquals(1, specialDoubleCargoHoldTile.getCapacityLeft());
     }
 
 }
