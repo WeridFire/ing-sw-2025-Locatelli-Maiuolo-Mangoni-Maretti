@@ -11,11 +11,11 @@ import it.polimi.ingsw.network.GameServer;
 import java.rmi.RemoteException;
 import java.util.UUID;
 
-public class AssembleGamePhase extends PlayableGamePhase{
+public class AssembleGamePhase extends PlayableGamePhase {
 
     private int howManyTimerRotationsLeft;
 
-    private final Object timerLock = new Object();
+    transient private final Object timerLock = new Object();
 
     private boolean timerRunning;
 
@@ -45,6 +45,8 @@ public class AssembleGamePhase extends PlayableGamePhase{
 
     public void playLoop() throws RemoteException, InterruptedException {
 
+        gameData.setCurrentGamePhase(this);
+
         while(howManyTimerRotationsLeft > 0) {
             GameServer.getInstance().broadcastUpdate(gameData.getGameId());
             timerRunning = true;
@@ -60,7 +62,7 @@ public class AssembleGamePhase extends PlayableGamePhase{
 
             // wait that a player starts the timer
             synchronized (timerLock) {
-                wait();
+                timerLock.wait();
             }
             howManyTimerRotationsLeft -= 1;
         }
@@ -70,7 +72,9 @@ public class AssembleGamePhase extends PlayableGamePhase{
         if (timerRunning) {
             throw new TimerIsAlreadyRunningException("You must wait for the hourglass to finish before flipping it.");
         }
-        timerLock.notifyAll();
+        synchronized (timerLock) {
+            timerLock.notifyAll();
+        }
     }
 
 }
