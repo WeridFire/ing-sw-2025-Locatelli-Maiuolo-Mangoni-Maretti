@@ -11,9 +11,10 @@ import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import it.polimi.ingsw.view.cli.ICLIPrintable;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class ShipBoard implements ICLIPrintable {
+public class ShipBoard implements ICLIPrintable, Serializable {
 
 	private final GameLevel level;
 	private final Map<Coordinates, TileSkeleton> board;
@@ -339,7 +340,7 @@ public class ShipBoard implements ICLIPrintable {
 	 *
 	 * @param quantityToRemove the number of contraband items to remove
 	 */
-	public void acceptSmugglers(int quantityToRemove) {
+	public void loseBestGoods(int quantityToRemove) {
 		VisitorSmugglers smugglers = new VisitorSmugglers(quantityToRemove);
 		for (TileSkeleton tile : board.values()) {
 			tile.accept(smugglers);
@@ -414,9 +415,12 @@ public class ShipBoard implements ICLIPrintable {
 		}
 		tilesRepresentation.applyOffset(3 + 1, 4 + 2);  // consider the numbers offset in the empty representation
 
-		CLIFrame info = endedAssembly ? getInfoCliRepresentation() : new CLIFrame();
+		CLIFrame rep = emptyRepresentation.merge(tilesRepresentation);
+		if (endedAssembly) {
+			rep = rep.merge(getInfoCliRepresentation(), Direction.EAST, 5);
+		}
 
-		return emptyRepresentation.merge(tilesRepresentation).merge(info, Direction.EAST, 5);
+		return rep;
 	}
 
 

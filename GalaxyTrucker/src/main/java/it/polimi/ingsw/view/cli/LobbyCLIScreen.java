@@ -136,14 +136,14 @@ public class LobbyCLIScreen extends CLIScreen{
 	@Override
 	public CLIFrame getCLIRepresentation() {
 		// Screen border with white background (and default foreground)
-		CLIFrame screenBorder = getScreenFrame(24, 100, ANSI.ANSI_WHITE_BACKGROUND);
+		CLIFrame screenBorder = getScreenFrame(24, 100, ANSI.BACKGROUND_WHITE);
 
 		// Lobby info frame with blue background (and default foreground)
-		CLIFrame lobbyInfoFrame = getScreenFrame(18, 80, ANSI.ANSI_BLUE_BACKGROUND);
+		CLIFrame lobbyInfoFrame = getScreenFrame(18, 80, ANSI.BACKGROUND_BLUE);
 
 		// Title in yellow foreground on blue background, then reset
 		CLIFrame title = new CLIFrame(new String[]{
-				ANSI.ANSI_WHITE + "LOBBY INFO" + ANSI.ANSI_RESET
+				ANSI.WHITE + "LOBBY INFO" + ANSI.RESET
 		});
 		lobbyInfoFrame = lobbyInfoFrame.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 1, 0);
 
@@ -162,20 +162,20 @@ public class LobbyCLIScreen extends CLIScreen{
 
 		// Build game info block with contrasting label and value colors.
 		List<String> lobbyInfoLines = new ArrayList<>();
-		lobbyInfoLines.add(ANSI.ANSI_BLACK + "Lobby ID: " + lobbyID + ANSI.ANSI_RESET);
-		lobbyInfoLines.add(ANSI.ANSI_BLACK + "Leader: " + host + ANSI.ANSI_RESET);
-		lobbyInfoLines.add(ANSI.ANSI_BLACK + "Your Name: " + yourName + ANSI.ANSI_RESET);
-		lobbyInfoLines.add(ANSI.ANSI_BLACK + "Required Players: " + requiredPlayers + ANSI.ANSI_RESET);
+		lobbyInfoLines.add(ANSI.BLACK + "Lobby ID: " + lobbyID + ANSI.RESET);
+		lobbyInfoLines.add(ANSI.BLACK + "Leader: " + host + ANSI.RESET);
+		lobbyInfoLines.add(ANSI.BLACK + "Your Name: " + yourName + ANSI.RESET);
+		lobbyInfoLines.add(ANSI.BLACK + "Required Players: " + requiredPlayers + ANSI.RESET);
 
 		// Flight levels: highlight the current level in purple, others in white.
 		String levelsDisplay = Arrays.stream(GameLevel.values())
 				.map(level -> level == currentLevel
-						? ANSI.ANSI_YELLOW_BACKGROUND + ANSI.ANSI_BLACK + level.toString() + ANSI.ANSI_RESET
-						: ANSI.ANSI_CYAN + level.toString() + ANSI.ANSI_RESET)
-				.collect(Collectors.joining(ANSI.ANSI_YELLOW + " | " + ANSI.ANSI_RESET));
-		lobbyInfoLines.add(ANSI.ANSI_BLACK + "Flight Level: " + ANSI.ANSI_RESET + levelsDisplay);
+						? ANSI.BACKGROUND_YELLOW + ANSI.BLACK + level.toString() + ANSI.RESET
+						: ANSI.CYAN + level.toString() + ANSI.RESET)
+				.collect(Collectors.joining(ANSI.YELLOW + " | " + ANSI.RESET));
+		lobbyInfoLines.add(ANSI.BLACK + "Flight Level: " + ANSI.RESET + levelsDisplay);
 
-		CLIFrame gameInfoBG = getScreenFrame(8, 60, ANSI.ANSI_WHITE_BACKGROUND);
+		CLIFrame gameInfoBG = getScreenFrame(8, 60, ANSI.BACKGROUND_WHITE);
 		CLIFrame gameInfoBlock = new CLIFrame(lobbyInfoLines.toArray(new String[0]));
 		System.out.println(gameInfoBlock);
 		gameInfoBlock = gameInfoBG.merge(gameInfoBlock, AnchorPoint.CENTER, AnchorPoint.CENTER);
@@ -185,9 +185,9 @@ public class LobbyCLIScreen extends CLIScreen{
 		// Build the lobby members block
 		List<String> membersLines = new ArrayList<>();
 		membersLines.add("");
-		membersLines.add(ANSI.ANSI_CYAN + "Lobby Members:" + ANSI.ANSI_RESET);
+		membersLines.add(ANSI.CYAN + "Lobby Members:" + ANSI.RESET);
 		lobbyMembers.forEach(member ->
-				membersLines.add(ANSI.ANSI_GREEN + " - " + member + ANSI.ANSI_RESET)
+				membersLines.add(ANSI.GREEN + " - " + member + ANSI.RESET)
 		);
 
 		CLIFrame membersFrame = new CLIFrame(membersLines.toArray(new String[0]));
@@ -201,7 +201,7 @@ public class LobbyCLIScreen extends CLIScreen{
 		if (getLastUpdate().isGameLeader()) {
 			CLIFrame tip = new CLIFrame(new String[]{
 					"",
-					ANSI.ANSI_GREEN_BACKGROUND + "Tip: Change the game settings with the command >settings" + ANSI.ANSI_RESET
+					ANSI.BACKGROUND_GREEN + "Tip: Change the game settings with the command >settings" + ANSI.RESET
 			});
 			res = res.merge(tip, AnchorPoint.BOTTOM, AnchorPoint.CENTER, -2, 0);
 		}

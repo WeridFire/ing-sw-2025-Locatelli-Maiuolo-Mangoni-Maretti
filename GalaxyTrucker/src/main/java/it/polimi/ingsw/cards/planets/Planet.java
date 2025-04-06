@@ -4,9 +4,10 @@ import it.polimi.ingsw.cards.exceptions.PlanetsCardException;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.LoadableType;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Planet {
+public class Planet implements Serializable {
 	/**
 	 * Dynamic list of the currently available goods on the planet.
 	 */

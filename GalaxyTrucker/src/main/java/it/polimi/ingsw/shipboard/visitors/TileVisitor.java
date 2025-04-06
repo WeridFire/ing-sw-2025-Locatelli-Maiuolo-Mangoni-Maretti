@@ -2,7 +2,9 @@ package it.polimi.ingsw.shipboard.visitors;
 
 import it.polimi.ingsw.shipboard.tiles.*;
 
-public interface TileVisitor {
+import java.io.Serializable;
+
+public interface TileVisitor extends Serializable {
 
     /**
      * What to do when visiting the provided structural tile.
@@ -67,6 +69,4 @@ public interface TileVisitor {
      */
     void visitShieldGenerator(ShieldGeneratorTile tile);
 
-
-    // TODO: add all the other concrete Tiles
 }

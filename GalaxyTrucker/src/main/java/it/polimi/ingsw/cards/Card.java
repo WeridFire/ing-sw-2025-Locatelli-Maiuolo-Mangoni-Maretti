@@ -1,13 +1,11 @@
 package it.polimi.ingsw.cards;
 
 import it.polimi.ingsw.game.GameData;
-import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.view.cli.ICLIPrintable;
 
-import java.util.UUID;
+import java.io.Serializable;
 
-public abstract class Card implements ICLIPrintable {
+public abstract class Card implements ICLIPrintable, Serializable {
 
     /**
      * The level this card is part of.

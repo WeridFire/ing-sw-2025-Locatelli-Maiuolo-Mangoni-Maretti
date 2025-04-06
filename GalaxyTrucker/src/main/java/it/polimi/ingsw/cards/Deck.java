@@ -1,12 +1,12 @@
 package it.polimi.ingsw.cards;
 
 import it.polimi.ingsw.enums.GameLevel;
-import it.polimi.ingsw.gamePhases.exceptions.NoMoreCardsException;
 import it.polimi.ingsw.player.Player;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Deck {
+public class Deck implements Serializable {
     /**
      * The list of cards present in the deck.
      */

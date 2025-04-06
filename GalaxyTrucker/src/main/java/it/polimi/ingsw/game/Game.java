@@ -8,10 +8,10 @@ import it.polimi.ingsw.gamePhases.AdventureGamePhase;
 import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTypeException;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -71,7 +71,7 @@ public class Game {
      */
     public void gameLoop() throws IncorrectGamePhaseTypeException, InterruptedException, RemoteException {
 
-        //nota sta nel playloop di una phase cambiare il suo stato in "ENDED"
+        //nota sta nel playloop di una phase cambiare il suo stato in "ENDED" e cambiare il gameDate.currentGamePhase
         AssembleGamePhase a = new AssembleGamePhase(id, GamePhaseType.ASSEMBLE, gameData);
         a.playLoop();
 
@@ -132,6 +132,10 @@ public class Game {
         gameData.setCoveredTiles(t);
 
         gameData.setDeck(new Deck(gameData.getLevel()));
+
+        for (Player player : gameData.getPlayers()) {
+            player.setShipBoard(new ShipBoard(gameData.getLevel()));
+        }
 
         if(gameData.getCurrentGamePhaseType() == GamePhaseType.LOBBY){
 			try {

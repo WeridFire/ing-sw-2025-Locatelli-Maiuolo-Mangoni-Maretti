@@ -3,6 +3,7 @@ package it.polimi.ingsw.view.cli;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Arrays;
  * This class allows storing and manipulating a grid of characters, supporting merging with other frames
  * and applying offsets to align elements properly within the CLI display.
  */
-public class CLIFrame {
+public class CLIFrame implements Serializable {
     public static final char INVISIBLE = ' ';
 
     private final int rows;
@@ -63,8 +64,8 @@ public class CLIFrame {
             String line = lines[r];
             int len = line.length();
             // Start with default colors for foreground and background
-            char currentForeground = ANSI.ANSI_RESET.charAt(0);
-            char currentBackground = ANSI.ANSI_RESET.charAt(0);
+            char currentForeground = ANSI.RESET.charAt(0);
+            char currentBackground = ANSI.RESET.charAt(0);
             // writeIndex counts logical cells
             int writeIndex = 0;
 
@@ -72,9 +73,9 @@ public class CLIFrame {
                 char ch = line.charAt(c);
                 if (ANSI.isAnsi(ch)) {
                     // If it's an ANSI_RESET, reset both colors
-                    if (ch == ANSI.ANSI_RESET.charAt(0)) {
-                        currentForeground = ANSI.ANSI_RESET.charAt(0);
-                        currentBackground = ANSI.ANSI_RESET.charAt(0);
+                    if (ch == ANSI.RESET.charAt(0)) {
+                        currentForeground = ANSI.RESET.charAt(0);
+                        currentBackground = ANSI.RESET.charAt(0);
                     } else if (ANSI.isForeground(ch)) {
                         currentForeground = ch;
                     } else if (ANSI.isBackground(ch)) {
@@ -102,8 +103,8 @@ public class CLIFrame {
             // Fill remaining cells with default colors and INVISIBLE character
             while (writeIndex < columns / 3) {
                 int pos = writeIndex * 3;
-                content[r][pos] = ANSI.ANSI_RESET.charAt(0);
-                content[r][pos + 1] = ANSI.ANSI_RESET.charAt(0);
+                content[r][pos] = ANSI.RESET.charAt(0);
+                content[r][pos + 1] = ANSI.RESET.charAt(0);
                 content[r][pos + 2] = INVISIBLE;
                 writeIndex++;
             }
@@ -128,6 +129,7 @@ public class CLIFrame {
         this(other.contentAsLines);
         offset_row = other.offset_row;
         offset_column = other.offset_column;
+        transparent = other.transparent;;
     }
 
     /**
@@ -221,7 +223,7 @@ public class CLIFrame {
         int logicalRow = row - offset_row;
         int logicalCol = col - offset_column;
         if (logicalRow < 0 || logicalRow >= rows || logicalCol < 0 || logicalCol >= getColumns()) {
-            return ANSI.ANSI_RESET.charAt(0);
+            return ANSI.RESET.charAt(0);
         }
         return content[logicalRow][logicalCol * 3];
     }
@@ -237,7 +239,7 @@ public class CLIFrame {
         int logicalRow = row - offset_row;
         int logicalCol = col - offset_column;
         if (logicalRow < 0 || logicalRow >= rows || logicalCol < 0 || logicalCol >= getColumns()) {
-            return ANSI.ANSI_RESET.charAt(0);
+            return ANSI.RESET.charAt(0);
         }
         return content[logicalRow][logicalCol * 3 + 1];
     }
@@ -335,7 +337,7 @@ public class CLIFrame {
                 if (addVisible != INVISIBLE) {
                     // Use the cell from addFrame (foreground, background, and visible char)
                     lineBuilder.append(addFrame.getForegroundAt(row, col));
-                    if(addFrame.getBackgroundAt(row, col) == ANSI.ANSI_RESET.charAt(0)){
+                    if(addFrame.getBackgroundAt(row, col) == ANSI.RESET.charAt(0)){
                         lineBuilder.append(baseFrame.getBackgroundAt(row, col));
                     }else{
                         lineBuilder.append(addFrame.getBackgroundAt(row, col));
@@ -345,20 +347,20 @@ public class CLIFrame {
                     // If the added cell is invisible but its foreground (or background) is not reset, keep its colors.
                     char addForeground = addFrame.getForegroundAt(row, col);
                     char addBackground = addFrame.getBackgroundAt(row, col);
-                    if (addForeground != ANSI.ANSI_RESET.charAt(0) && addBackground != ANSI.ANSI_RESET.charAt(0)) {
+                    if (addForeground != ANSI.RESET.charAt(0) && addBackground != ANSI.RESET.charAt(0)) {
                         lineBuilder.append(addForeground);
                         lineBuilder.append(addBackground);
                         lineBuilder.append(INVISIBLE);
                     } else {
                         // Otherwise, use the background frame's cell.
                         lineBuilder.append(baseFrame.getForegroundAt(row, col));
-                        if(addBackground != ANSI.ANSI_RESET.charAt(0)){
+                        if(addBackground != ANSI.RESET.charAt(0)){
                             lineBuilder.append(addFrame.getBackgroundAt(row, col));
                         }else{
                             lineBuilder.append(baseFrame.getBackgroundAt(row, col));
                         }
 
-                        if(addFrame.transparent || addBackground == ANSI.ANSI_RESET.charAt(0)){
+                        if(addFrame.transparent || addBackground == ANSI.RESET.charAt(0)){
                             lineBuilder.append(baseFrame.getCharAt(row, col));
                         }else{
                             lineBuilder.append(addFrame.getCharAt(row, col));
@@ -427,10 +429,10 @@ public class CLIFrame {
      */
     public CLIFrame merge(CLIFrame add, Direction direction, int space) {
         return switch (direction) {
-            case EAST -> merge(add, AnchorPoint.TOP_RIGHT, AnchorPoint.TOP_LEFT, 0, space);
-            case NORTH -> merge(add, AnchorPoint.TOP_LEFT, AnchorPoint.BOTTOM_LEFT, -space, 0);
-            case WEST -> merge(add, AnchorPoint.TOP_LEFT, AnchorPoint.TOP_RIGHT, 0, -space);
-            case SOUTH -> merge(add, AnchorPoint.BOTTOM_LEFT, AnchorPoint.TOP_LEFT, space, 0);
+            case EAST -> merge(add, AnchorPoint.RIGHT, AnchorPoint.LEFT, 0, space);
+            case NORTH -> merge(add, AnchorPoint.TOP, AnchorPoint.BOTTOM, -space, 0);
+            case WEST -> merge(add, AnchorPoint.LEFT, AnchorPoint.RIGHT, 0, -space);
+            case SOUTH -> merge(add, AnchorPoint.BOTTOM, AnchorPoint.TOP, space, 0);
         };
     }
 
@@ -451,7 +453,7 @@ public class CLIFrame {
         }
         return String.join("\n",
                 Arrays.stream(lines)
-                        .map(ANSI::replacePlaceholders)
+                        .map(ANSI::applyColors)
                         .toArray(String[]::new));
     }
 }

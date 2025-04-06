@@ -82,17 +82,17 @@ public class CLIScreenHandler {
 
 		CLIScreen.clear();
 		Set<CLIScreen> screens = getAvailableScreens();
-		CLIFrame frame = CLIScreen.getScreenFrame(12, 40, ANSI.ANSI_BLACK_BACKGROUND);
-		frame = frame.merge(new CLIFrame(ANSI.ANSI_RED + "AVAILABLE SCREENS"), AnchorPoint.TOP, AnchorPoint.CENTER, 1, 0);
+		CLIFrame frame = CLIScreen.getScreenFrame(12, 40, ANSI.BACKGROUND_BLACK);
+		frame = frame.merge(new CLIFrame(ANSI.RED + "AVAILABLE SCREENS"), AnchorPoint.TOP, AnchorPoint.CENTER, 1, 0);
 		if (screens.isEmpty()) {
-			frame = frame.merge(new CLIFrame(ANSI.ANSI_RED_BACKGROUND + ANSI.ANSI_WHITE + "No Screens Available"), AnchorPoint.CENTER, AnchorPoint.CENTER, -1, 0);
+			frame = frame.merge(new CLIFrame(ANSI.BACKGROUND_RED + ANSI.WHITE + "No Screens Available"), AnchorPoint.CENTER, AnchorPoint.CENTER, -1, 0);
 		}else{
 			StringBuilder screensList = new StringBuilder();
 			screens.forEach(cli -> screensList
-									.append(ANSI.ANSI_WHITE_BACKGROUND)
-									.append(ANSI.ANSI_BLACK)
+									.append(ANSI.BACKGROUND_WHITE)
+									.append(ANSI.BLACK)
 									.append(" > ")
-									.append(ANSI.ANSI_WHITE)
+									.append(ANSI.WHITE)
 									.append(cli.screenName).append("\n"));
 			//TODO: use ARRAY of strings to create the CLIFrame instead of a stringbuilder, which breaks the thing.
 			// See printCommands for a correct implementation of this. Once there will be more than 1 screen available
@@ -100,7 +100,7 @@ public class CLIScreenHandler {
 			CLIFrame s = new CLIFrame(screensList.toString());
 			frame = frame.merge(s, AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT, 1, 1);
 		}
-		frame = frame.merge(new CLIFrame(ANSI.ANSI_RED_BACKGROUND + ANSI.ANSI_WHITE + "Enter to close"),
+		frame = frame.merge(new CLIFrame(ANSI.BACKGROUND_RED + ANSI.WHITE + "Enter to close"),
 										AnchorPoint.BOTTOM, AnchorPoint.CENTER, -2, 0);
 		CLIFrame currentScr = getCurrentScreen().getCLIRepresentation();
 		currentScr = currentScr.merge(frame, AnchorPoint.CENTER, AnchorPoint.CENTER);
