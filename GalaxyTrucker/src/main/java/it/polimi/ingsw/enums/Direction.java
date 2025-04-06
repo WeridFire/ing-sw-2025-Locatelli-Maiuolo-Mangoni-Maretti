@@ -61,17 +61,35 @@ public enum Direction {
         return VALUES[newIndex];
     }
 
+    /**
+     * Returns the name of the direction in a human-readable format.
+     *
+     * @return a verbose string representing this direction
+     */
     public String toVerboseString() {
-        if(this == EAST) return "east";
-        if(this == NORTH) return "north";
-        if(this == WEST) return "west";
-        return "south";
+        return switch (this) {
+            case EAST -> "East";
+            case NORTH -> "North";
+            case WEST -> "West";
+            case SOUTH -> "South";
+        };
     }
 
-    public String toEmogiString() {
-        if (this == EAST) return "←";   // from East
-        if (this == NORTH) return "↓";  // from North
-        if (this == WEST) return "→";   // from West
-        return "↑";                     // from South
+    /**
+     * Returns an emoji arrow representing this direction, with optional reversal.
+     *
+     * @param reversed if {@code true}, returns the emoji pointing in the opposite direction
+     *                 (i.e. something coming FROM this direction);
+     *                 if {@code false}, returns the standard emoji for this direction
+     * @return a string containing a directional arrow emoji
+     */
+    public String toEmojiString(boolean reversed) {
+        return switch (this) {
+            case EAST -> reversed ? "←" : "→";
+            case NORTH -> reversed ? "↓" : "↑";
+            case WEST -> reversed ? "→" : "←";
+            case SOUTH -> reversed ? "↑" : "↓";
+        };
     }
+
 }
