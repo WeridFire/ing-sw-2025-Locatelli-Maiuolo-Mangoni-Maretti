@@ -67,7 +67,7 @@ public class GameData implements Serializable {
     /**
      * List of covered tiles in the game.
      */
-    private List<TileSkeleton> coveredTiles;
+    private final List<TileSkeleton> coveredTiles;
 
     /**
      * List of drawn tiles I.E. all the tiles that:
@@ -76,7 +76,7 @@ public class GameData implements Serializable {
      * - are not in hand
      * - are not reserved by anybody
      */
-    private List<TileSkeleton> drawnTiles;
+    private final List<TileSkeleton> drawnTiles;
 
     private int requiredPlayers;
 
@@ -86,15 +86,16 @@ public class GameData implements Serializable {
      * Constructs a new GameData object with a default game level.
      */
     public GameData(UUID gameId) {
-        this.players = new HashSet<>();
-        this.availableGoods = new HashMap<>();
-        this.coveredTiles = new ArrayList<>();
-        this.deck = null;
         this.gameId = gameId;
-        this.pirHandler = new PIRHandler();
-        this.level = GameLevel.TESTFLIGHT;
-        this.setCurrentGamePhaseType(GamePhaseType.LOBBY);
-        this.setRequiredPlayers(2);
+        players = new HashSet<>();
+        availableGoods = new HashMap<>();
+        coveredTiles = new ArrayList<>();
+        drawnTiles = new ArrayList<>();
+        deck = null;
+        pirHandler = new PIRHandler();
+        level = GameLevel.TESTFLIGHT;
+        setCurrentGamePhaseType(GamePhaseType.LOBBY);
+        setRequiredPlayers(2);
     }
 
     /**
@@ -211,7 +212,10 @@ public class GameData implements Serializable {
      * @param coveredTiles The new list of covered tiles.
      */
     public void setCoveredTiles(List<TileSkeleton> coveredTiles) {
-        this.coveredTiles = coveredTiles;
+        this.coveredTiles.clear();
+        if (coveredTiles != null) {
+            this.coveredTiles.addAll(coveredTiles);
+        }
     }
 
 
@@ -369,6 +373,9 @@ public class GameData implements Serializable {
      * @param drawnTiles the deck to set
      */
     public void setDrawnTiles(List<TileSkeleton> drawnTiles) {
-        this.drawnTiles = drawnTiles;
+        this.drawnTiles.clear();
+        if (drawnTiles != null) {
+            this.drawnTiles.addAll(drawnTiles);
+        }
     }
 }

@@ -1,6 +1,5 @@
 package it.polimi.ingsw.network.messages;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Deck;
@@ -10,11 +9,8 @@ import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 
 import java.io.*;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
-import com.fasterxml.jackson.core.Versioned;
 
 public class ClientUpdate implements Serializable {
 
