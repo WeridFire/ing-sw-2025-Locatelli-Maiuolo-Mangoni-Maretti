@@ -60,4 +60,18 @@ public enum Direction {
         int newIndex = (value + rotation.getValue()) % TOTAL_DIRECTIONS;
         return VALUES[newIndex];
     }
+
+    public String toVerboseString() {
+        if(this == EAST) return "east";
+        if(this == NORTH) return "north";
+        if(this == WEST) return "west";
+        return "south";
+    }
+
+    public String toEmogiString() {
+        if (this == EAST) return "←";   // from East
+        if (this == NORTH) return "↓";  // from North
+        if (this == WEST) return "→";   // from West
+        return "↑";                     // from South
+    }
 }
