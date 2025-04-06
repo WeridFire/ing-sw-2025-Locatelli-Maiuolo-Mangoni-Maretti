@@ -75,4 +75,34 @@ public class Projectile {
     public Direction getDirection() {
         return direction;
     }
+
+    public String toVerboseString() {
+        String type = "";
+        if (bouncy && shieldDefendable && !fireDefendable) {
+            type = "Small Meteor";
+        } else if (!bouncy && !shieldDefendable && fireDefendable) {
+            type = "Large Meteor";
+        } else if (!bouncy && shieldDefendable && !fireDefendable) {
+            type = "Light Cannon Fire";
+        } else if (!bouncy && !shieldDefendable && !fireDefendable) {
+            type = "Heavy Cannon Fire";
+        }
+
+        return type + " from " + direction.toVerboseString() + "]";
+    }
+
+    public String toEmogiString() {
+        String type = "";
+        if (bouncy && shieldDefendable && !fireDefendable) {
+            type = "☄️"; // Small Meteor
+        } else if (!bouncy && !shieldDefendable && fireDefendable) {
+            type = "🌑"; // Large Meteor
+        } else if (!bouncy && shieldDefendable && !fireDefendable) {
+            type = "💥"; // Light Cannon Fire
+        } else if (!bouncy && !shieldDefendable && !fireDefendable) {
+            type = "🔥"; // Heavy Cannon Fire
+        }
+
+        return type + direction.toEmogiString() ;
+    }
 }
