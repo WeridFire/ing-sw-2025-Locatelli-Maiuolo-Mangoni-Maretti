@@ -3,6 +3,7 @@ package it.polimi.ingsw.cards.enemy;
 import it.polimi.ingsw.cards.enemy.PiratesCard;
 import it.polimi.ingsw.cards.projectile.Projectile;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.view.cli.CLIFrame;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.engine.support.descriptor.FileSystemSource;
 import it.polimi.ingsw.GamesHandler;
@@ -35,9 +36,30 @@ class PiratesCardTest {
 
     }
 
-
-
     @Test
     void applyPunishment() {
+    }
+
+    @Test
+    void testGetCLIRepresentation() {
+        // Create a pirate card with specific properties for testing visualization
+        PiratesCard testCard = new PiratesCard(
+                15,  // bounty
+                new Projectile[]{
+                        Projectile.createSmallMeteor(Direction.EAST),
+                        Projectile.createLargeMeteor(Direction.SOUTH),
+                        Projectile.createLightCannonFire(Direction.WEST),
+                        Projectile.createHeavyCannonFire(Direction.NORTH)
+                },
+                8,   // firepower
+                3,   // lost days
+                "test-image.jpg",
+                2    // card ID
+        );
+
+        // Get the CLI representation
+        CLIFrame frame = testCard.getCLIRepresentation();
+
+        System.out.println(frame);
     }
 }
