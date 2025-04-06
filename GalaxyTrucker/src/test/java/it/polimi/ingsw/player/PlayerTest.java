@@ -149,6 +149,7 @@ class PlayerTest {
         assertDoesNotThrow(() -> player1.getShipBoard().endAssembly());
         System.out.println("\nTest AFTER assembly's ended\n");
         System.out.println(player1.getShipBoard().getCLIRepresentation());
+        System.out.println("Test emoji: ☄️ 🌑 💥 🔥");
     }
 
     private TileSkeleton createMockTile(int id) {
