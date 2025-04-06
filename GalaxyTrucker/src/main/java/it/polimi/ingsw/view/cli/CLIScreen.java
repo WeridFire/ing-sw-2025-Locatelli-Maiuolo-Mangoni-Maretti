@@ -6,7 +6,6 @@ import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 
 import java.rmi.RemoteException;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +16,6 @@ public abstract class CLIScreen implements ICLIPrintable {
 	private String screenMessage;
 	private final boolean forceActivate;
 
-
 	/**
 	 * Abstract class for a CLI screen. Contains the standardized methods and fields to design a new screen.
 	 * A screen is an object that displays information on the CLI based on the current game state.
@@ -27,7 +25,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * @param screenName The identifier of the screen.
 	 * @param forceActivate if to forcefully activate this screen whenever an update satisfying it will be received.
 	 */
-	public CLIScreen(String screenName, boolean forceActivate){
+	public CLIScreen(String screenName, boolean forceActivate) {
 		this.screenName = screenName;
 		this.forceActivate = forceActivate;
 	}
@@ -116,13 +114,15 @@ public abstract class CLIScreen implements ICLIPrintable {
 
 	private void displayError(){
 		if(getLastUpdate().getError() != null){
-			System.out.println(ANSI.ANSI_RED + "[SERVER ERROR] " + getLastUpdate().getError() + ANSI.ANSI_RESET);
+			System.out.println(ANSI.applyColors(ANSI.RED + "[SERVER ERROR] "
+					+ getLastUpdate().getError() + ANSI.RESET));
 		}
 	}
 
 	private void displayScreenMessage(){
 		if(this.screenMessage != null){
-			System.out.println(ANSI.ANSI_YELLOW + "[SCREEN INFO] " + screenMessage + ANSI.ANSI_RESET);
+			System.out.println(ANSI.applyColors(ANSI.YELLOW + "[SCREEN INFO] "
+					+ screenMessage + ANSI.RESET));
 			this.screenMessage = null;
 		}
 	}
@@ -157,12 +157,12 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 */
 	public final void printCommands(String screenName, String... commands) {
 		CLIScreen.clear();
-		CLIFrame frame = CLIScreen.getScreenFrame(14, 60, ANSI.ANSI_BLACK_BACKGROUND);
+		CLIFrame frame = CLIScreen.getScreenFrame(14, 60, ANSI.BACKGROUND_BLACK);
 
-		String header = ANSI.ANSI_BLUE_BACKGROUND +
-				ANSI.ANSI_RED + " " + screenName.toUpperCase() +
-				ANSI.ANSI_RESET + ANSI.ANSI_BLUE_BACKGROUND + " SPECIFIC COMMANDS " +
-				ANSI.ANSI_RESET;
+		String header = ANSI.BACKGROUND_BLUE +
+				ANSI.RED + " " + screenName.toUpperCase() +
+				ANSI.RESET + ANSI.BACKGROUND_BLUE + " SPECIFIC COMMANDS " +
+				ANSI.RESET;
 		List<String> cmds = null;
 		if(commands == null){
 			cmds = new ArrayList<>();
@@ -181,21 +181,21 @@ public abstract class CLIScreen implements ICLIPrintable {
 				StringBuilder cmdBuilder = new StringBuilder();
 				String[] parts = command.split("\\|", 2);
 				if (parts.length == 2) {
-					cmdBuilder.append(ANSI.ANSI_CYAN).append("> ").append(parts[0])
-							.append(ANSI.ANSI_RESET).append(" | ").append(parts[1]);
+					cmdBuilder.append(ANSI.CYAN).append("> ").append(parts[0])
+							.append(ANSI.RESET).append(" | ").append(parts[1]);
 				} else {
-					cmdBuilder.append(ANSI.ANSI_CYAN).append("> ").append(command);
+					cmdBuilder.append(ANSI.CYAN).append("> ").append(command);
 				}
 				cmdList.add(cmdBuilder.toString());
 			}
 			CLIFrame cmdFrame = new CLIFrame(cmdList.toArray(new String[0]));
 			frame = frame.merge(cmdFrame, AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT, 3, 1);
 		} else {
-			frame = frame.merge(new CLIFrame(ANSI.ANSI_RED_BACKGROUND + ANSI.ANSI_WHITE + "No Commands Available"),
+			frame = frame.merge(new CLIFrame(ANSI.BACKGROUND_RED + ANSI.WHITE + "No Commands Available"),
 					AnchorPoint.CENTER, AnchorPoint.CENTER, -1, 0);
 		}
 
-		frame = frame.merge(new CLIFrame(ANSI.ANSI_RED_BACKGROUND + ANSI.ANSI_WHITE + "Enter to close"),
+		frame = frame.merge(new CLIFrame(ANSI.BACKGROUND_RED + ANSI.WHITE + "Enter to close"),
 				AnchorPoint.BOTTOM, AnchorPoint.CENTER, -2, 0);
 
 		CLIFrame currentScr = CLIScreenHandler.getInstance().getCurrentScreen().getCLIRepresentation();
@@ -206,23 +206,23 @@ public abstract class CLIScreen implements ICLIPrintable {
 
 
 	public static CLIFrame getScreenFrame(int rows, int columns){
-		return getScreenFrame(rows, columns, ANSI.ANSI_RESET);
+		return getScreenFrame(rows, columns, ANSI.RESET);
 	}
 
 	public static CLIFrame getScreenFrame(int rows, int columns, String bg_color) {
-		StringBuilder top = new StringBuilder(ANSI.ANSI_RESET).append("┏");
-		StringBuilder middle = new StringBuilder(ANSI.ANSI_RESET).append("┃").append(bg_color);
-		StringBuilder bottom = new StringBuilder(ANSI.ANSI_RESET).append("┗");
+		StringBuilder top = new StringBuilder(ANSI.RESET).append("┏");
+		StringBuilder middle = new StringBuilder(ANSI.RESET).append("┃").append(bg_color);
+		StringBuilder bottom = new StringBuilder(ANSI.RESET).append("┗");
 
 		for (int i = 0; i < columns; i++) {
-			top.append(ANSI.ANSI_RESET).append("━");
+			top.append(ANSI.RESET).append("━");
 			middle.append(bg_color).append(" ");
-			bottom.append(ANSI.ANSI_RESET).append("━");
+			bottom.append(ANSI.RESET).append("━");
 		}
 
-		top.append(ANSI.ANSI_RESET).append("┓");
-		middle.append(ANSI.ANSI_RESET).append("┃");
-		bottom.append(ANSI.ANSI_RESET).append("┛");
+		top.append(ANSI.RESET).append("┓");
+		middle.append(ANSI.RESET).append("┃");
+		bottom.append(ANSI.RESET).append("┛");
 
 		String[] frame = new String[rows + 2];
 		frame[0] = top.toString();

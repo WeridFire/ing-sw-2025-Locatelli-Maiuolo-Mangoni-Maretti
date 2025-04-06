@@ -2,7 +2,6 @@ package it.polimi.ingsw.view.cli;
 
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.GamePhaseType;
-import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.rmi.RemoteException;
@@ -72,11 +71,11 @@ public class AssembleCLIScreen extends CLIScreen{
     @Override
     public CLIFrame getCLIRepresentation() {
         //white bg
-        CLIFrame screenBorder = getScreenFrame(40, 120, ANSI.ANSI_WHITE_BACKGROUND);
+        CLIFrame screenBorder = getScreenFrame(40, 120, ANSI.BACKGROUND_WHITE);
 
         //title
         CLIFrame shipboardTitle = new CLIFrame(new String[]{
-                ANSI.ANSI_BLUE_BACKGROUND + ANSI.ANSI_WHITE + " YOUR SHIPBOARD " + ANSI.ANSI_RESET
+                ANSI.BACKGROUND_BLUE + ANSI.WHITE + " YOUR SHIPBOARD " + ANSI.RESET
         });
 
         //shipboard frame
@@ -94,7 +93,7 @@ public class AssembleCLIScreen extends CLIScreen{
         List<TileSkeleton> drawnTiles = getLastUpdate().getCurrentGame().getDrawnTiles();
 
         CLIFrame tilesTitle = new CLIFrame(new String[]{
-                ANSI.ANSI_BLUE_BACKGROUND + ANSI.ANSI_WHITE + " DRAWN TILES " + ANSI.ANSI_RESET
+                ANSI.BACKGROUND_BLUE + ANSI.WHITE + " DRAWN TILES " + ANSI.RESET
         });
 
         //frame for drawn tiles
@@ -107,8 +106,8 @@ public class AssembleCLIScreen extends CLIScreen{
                 CLIFrame tileRepresentation = tile.getCLIRepresentation();
 
                 CLIFrame idLabel = new CLIFrame(new String[]{
-                        ANSI.ANSI_YELLOW_BACKGROUND + ANSI.ANSI_BLACK + " ID: " +
-                                tile.getTileId() + " " + ANSI.ANSI_RESET
+                        ANSI.BACKGROUND_YELLOW + ANSI.BLACK + " ID: " +
+                                tile.getTileId() + " " + ANSI.RESET
                 });
 
                 CLIFrame tileWithId = tileRepresentation.merge(
@@ -137,7 +136,7 @@ public class AssembleCLIScreen extends CLIScreen{
             }
         } else {
             tilesFrame = new CLIFrame(new String[]{
-                    ANSI.ANSI_RED + "No tiles drawn" + ANSI.ANSI_RESET
+                    ANSI.RED + "No tiles drawn" + ANSI.RESET
             });
         }
 
