@@ -2,9 +2,10 @@ package it.polimi.ingsw.cards;
 
 import it.polimi.ingsw.cards.exceptions.CardsGroupException;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class CardsGroup {
+public class CardsGroup implements Serializable {
 
     public List<Card> getGroupCards() {
         return groupCards;

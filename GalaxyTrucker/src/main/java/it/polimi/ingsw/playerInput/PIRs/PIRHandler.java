@@ -6,10 +6,9 @@ import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.util.Coordinates;
 
-import java.io.Serializable;
 import java.util.Set;
 
-public class PIRHandler implements Serializable {
+public class PIRHandler {
 
 	private PIRActivateTiles activateTiles = null;
 	private PIRAddLoadables addLoadables = null;

@@ -5,6 +5,7 @@ import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
 import it.polimi.ingsw.network.exceptions.CantFindClientException;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.UUID;
 
@@ -12,7 +13,7 @@ import java.util.UUID;
  * Represents an abstract playable game phase.
  * Defines the structure for different game phases that can be played.
  */
-public abstract class PlayableGamePhase {
+public abstract class PlayableGamePhase implements Serializable {
 
     /** The type of the game phase. */
     GamePhaseType gamePhaseType;

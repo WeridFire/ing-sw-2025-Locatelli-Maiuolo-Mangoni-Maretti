@@ -2,7 +2,9 @@ package it.polimi.ingsw.cards.projectile;
 
 import it.polimi.ingsw.enums.Direction;
 
-public class Projectile {
+import java.io.Serializable;
+
+public class Projectile implements Serializable {
 
     /**
      * Determines if the projectile bounces on flat sides of the ship.
@@ -91,7 +93,7 @@ public class Projectile {
         return type + " from " + direction.toVerboseString() + "]";
     }
 
-    public String toEmogiString() {
+    public String toEmojiString() {
         String type = "";
         if (bouncy && shieldDefendable && !fireDefendable) {
             type = "☄️"; // Small Meteor
@@ -103,6 +105,6 @@ public class Projectile {
             type = "🔥"; // Heavy Cannon Fire
         }
 
-        return type + direction.toEmogiString() ;
+        return type + direction.toEmojiString(true) ;
     }
 }

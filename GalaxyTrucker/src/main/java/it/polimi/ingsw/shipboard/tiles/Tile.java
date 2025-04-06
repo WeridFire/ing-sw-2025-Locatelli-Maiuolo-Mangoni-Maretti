@@ -2,7 +2,9 @@ package it.polimi.ingsw.shipboard.tiles;
 
 import it.polimi.ingsw.shipboard.visitors.TileVisitor;
 
-public interface Tile {
+import java.io.Serializable;
+
+public interface Tile extends Serializable {
     /**
      * Method to accept a visitor for this tile in the Visitor Pattern.
      *
