@@ -19,7 +19,7 @@ class CargoHoldTileTest {
         SideType[] regularDoubleCargo = Direction.sortedArray(
                 SideType.UNIVERSAL,  // NORTH
                 SideType.UNIVERSAL,  // EAST
-                SideType.CANNON,     // SOUTH
+                SideType.SINGLE,     // SOUTH
                 SideType.UNIVERSAL   // WEST
         ).toArray(SideType[]::new);
 
@@ -28,7 +28,7 @@ class CargoHoldTileTest {
         SideType[] regularTripleCargo = Direction.sortedArray(
                 SideType.UNIVERSAL,  // NORTH
                 SideType.UNIVERSAL,  // EAST
-                SideType.CANNON,     // SOUTH
+                SideType.DOUBLE,     // SOUTH
                 SideType.UNIVERSAL   // WEST
         ).toArray(SideType[]::new);
 
@@ -37,7 +37,7 @@ class CargoHoldTileTest {
         SideType[] specialSingleCargo = Direction.sortedArray(
                 SideType.UNIVERSAL,  // NORTH
                 SideType.UNIVERSAL,  // EAST
-                SideType.CANNON,     // SOUTH
+                SideType.SMOOTH,     // SOUTH
                 SideType.UNIVERSAL   // WEST
         ).toArray(SideType[]::new);
 
@@ -46,7 +46,7 @@ class CargoHoldTileTest {
         SideType[] specialDoubleCargo = Direction.sortedArray(
                 SideType.UNIVERSAL,  // NORTH
                 SideType.UNIVERSAL,  // EAST
-                SideType.CANNON,     // SOUTH
+                SideType.UNIVERSAL,     // SOUTH
                 SideType.UNIVERSAL   // WEST
         ).toArray(SideType[]::new);
 
