@@ -9,6 +9,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class CLIScreen implements ICLIPrintable {
 
@@ -202,36 +203,61 @@ public abstract class CLIScreen implements ICLIPrintable {
 	}
 
 
-
-	public static CLIFrame getScreenFrame(int rows, int columns){
-		return getScreenFrame(rows, columns, ANSI.RESET);
-	}
-
-	public static CLIFrame getScreenFrame(int rows, int columns, String bg_color) {
-		StringBuilder top = new StringBuilder(ANSI.RESET).append("┏");
-		StringBuilder middle = new StringBuilder(ANSI.RESET).append("┃").append(bg_color);
-		StringBuilder bottom = new StringBuilder(ANSI.RESET).append("┗");
+	public static CLIFrame getScreenFrame(int[] rowsBlocks, int columns, String fillColor, String borderColor) {
+		StringBuilder top = new StringBuilder(ANSI.RESET).append(borderColor).append("┏");
+		StringBuilder middle = new StringBuilder(ANSI.RESET).append(borderColor).append("┃");
+		if (!fillColor.equals(ANSI.RESET)) {
+			middle.append(fillColor);
+		}
+		StringBuilder separator = new StringBuilder(ANSI.RESET).append(borderColor).append("┣");
+		StringBuilder bottom = new StringBuilder(ANSI.RESET).append(borderColor).append("┗");
 
 		for (int i = 0; i < columns; i++) {
 			top.append("━");
 			middle.append(" ");
+			separator.append("━");
 			bottom.append("━");
 		}
 
-		top.append("┓");
-		middle.append(ANSI.RESET).append("┃");
-		bottom.append("┛");
+		String sTop = top.append("┓").append(ANSI.RESET).toString();
+		String sMiddle = middle.append(ANSI.RESET).append(borderColor).append("┃").append(ANSI.RESET).toString();
+		String sSeparator = separator.append("┫").append(ANSI.RESET).toString();
+		String sBottom = bottom.append("┛").append(ANSI.RESET).toString();
 
-		String[] frame = new String[rows + 2];
-		frame[0] = top.toString();
-		for (int i = 1; i <= rows; i++) {
-			frame[i] = middle.toString();
+		int totRows = Arrays.stream(rowsBlocks).sum()  // middle empty
+				+ rowsBlocks.length - 1;  // separators
+		String[] frame = new String[totRows + 2];
+		frame[0] = sTop;
+		int contentIndex = 1;
+		for (int rows : rowsBlocks) {
+			for (int i = 0; i < rows; i++) {
+				frame[contentIndex++] = sMiddle;
+			}
+			frame[contentIndex++] = sSeparator;  // last will be overridden
 		}
-		frame[rows + 1] = bottom.toString();
+		frame[totRows + 1] = sBottom;
 
 		return new CLIFrame(frame);
 	}
 
+	public static CLIFrame getScreenFrame(int rows, int columns, String fillColor, String borderColor) {
+		return getScreenFrame(new int[] {rows}, columns, fillColor, borderColor);
+	}
 
+	public static CLIFrame getScreenFrame(int[] rowsBlocks, int columns, String fillColor) {
+		return getScreenFrame(rowsBlocks, columns, fillColor, ANSI.RESET);
+	}
+
+	public static CLIFrame getScreenFrame(int rows, int columns, String fillColor) {
+		return getScreenFrame(new int[] {rows}, columns, fillColor);
+	}
+
+	public static CLIFrame getScreenFrame(int[] rowsBlocks, int columns) {
+		return getScreenFrame(rowsBlocks, columns, ANSI.RESET, ANSI.RESET);
+	}
+
+	public static CLIFrame getScreenFrame(int rows, int columns) {
+		return getScreenFrame(new int[] {rows}, columns);
+	}
 
 }
