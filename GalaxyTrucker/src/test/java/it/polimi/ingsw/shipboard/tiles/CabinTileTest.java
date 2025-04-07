@@ -14,19 +14,33 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import it.polimi.ingsw.util.Coordinates;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CabinTileTest {
 
-    CabinTile cabin = new CabinTile(Direction.sortedArray(
-            SideType.SINGLE, SideType.DOUBLE, SideType.UNIVERSAL, SideType.UNIVERSAL).toArray(SideType[]::new));
-    CabinTile mainCabin = TilesFactory.createMainCabinTile();
-    CabinTile cabinBrown = new CabinTile(Direction.sortedArray(
-            SideType.SINGLE, SideType.DOUBLE, SideType.SMOOTH, SideType.SMOOTH).toArray(SideType[]::new));
-    CabinTile cabinPurple = new CabinTile(Direction.sortedArray(
-            SideType.SINGLE, SideType.DOUBLE, SideType.SMOOTH, SideType.SMOOTH).toArray(SideType[]::new));
+    CabinTile cabin;
+    CabinTile mainCabin;
+    CabinTile cabinBrown;
+    CabinTile cabinPurple;
 
+    @BeforeEach
+    void setUp() {
+
+        //Creates a default cabin
+        cabin = new CabinTile(Direction.sortedArray(
+                SideType.SINGLE, SideType.DOUBLE, SideType.UNIVERSAL, SideType.UNIVERSAL).toArray(SideType[]::new));
+
+        //Creates the main cabin
+        mainCabin = TilesFactory.createMainCabinTile();
+
+        cabinBrown = new CabinTile(Direction.sortedArray(
+                SideType.SINGLE, SideType.DOUBLE, SideType.SMOOTH, SideType.SMOOTH).toArray(SideType[]::new));
+        cabinPurple = new CabinTile(Direction.sortedArray(
+                SideType.SINGLE, SideType.DOUBLE, SideType.SMOOTH, SideType.SMOOTH).toArray(SideType[]::new));
+
+    }
 
     @Test
     public void testFillHumans() {
