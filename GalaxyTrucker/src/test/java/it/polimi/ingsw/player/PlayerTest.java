@@ -20,6 +20,7 @@ import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.shipboard.visitors.TileVisitor;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -148,8 +149,8 @@ class PlayerTest {
 
         assertDoesNotThrow(() -> player1.getShipBoard().endAssembly());
         System.out.println("\nTest AFTER assembly's ended\n");
-        System.out.println(player1.getShipBoard().getCLIRepresentation());
-        System.out.println("Test emoji: ☄️ 🌑 💥 🔥");
+        System.out.println(player1.getShipBoard().getCLIRepresentation().merge(
+                new CLIFrame(new String[] {"Test emoji: " + ANSI.BACKGROUND_BLUE + "☄️ 🌑 💥 🔥", " -- test -- " }), Direction.SOUTH));
     }
 
     private TileSkeleton createMockTile(int id) {

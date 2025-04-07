@@ -8,6 +8,7 @@ import it.polimi.ingsw.shipboard.visitors.integrity.*;
 import it.polimi.ingsw.shipboard.exceptions.*;
 import it.polimi.ingsw.util.BoardCoordinates;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import it.polimi.ingsw.view.cli.ICLIPrintable;
 
@@ -371,8 +372,8 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 				"+--------------------+"
 		 */
 
-		String line =  "+--------------------+";
-		String empty = "|                    |";
+		String line = ANSI.GREEN +  "+--------------------+";
+		String empty = ANSI.GREEN + "|                    |";
 		CLIFrame info = new CLIFrame(new String[] {
 				line, empty,
 				line, empty, empty, empty, empty,
