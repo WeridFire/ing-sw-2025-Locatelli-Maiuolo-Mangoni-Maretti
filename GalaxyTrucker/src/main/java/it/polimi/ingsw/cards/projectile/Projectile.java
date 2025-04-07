@@ -107,4 +107,19 @@ public class Projectile implements Serializable {
 
         return type + direction.toEmojiString(true) ;
     }
+
+    public String toUnicodeString() {
+        String type = "";
+        if (bouncy && shieldDefendable && !fireDefendable) {
+            type = "●"; // ● Small Meteor
+        } else if (!bouncy && !shieldDefendable && fireDefendable) {
+            type = "■"; // ■ Large Meteor
+        } else if (!bouncy && shieldDefendable && !fireDefendable) {
+            type = "*"; // ✹ Light Cannon Fire
+        } else if (!bouncy && !shieldDefendable && !fireDefendable) {
+            type = "⚡"; // ⚡ Heavy Cannon Fire
+        }
+
+        return type + direction.toEmojiString(true) ;
+    }
 }
