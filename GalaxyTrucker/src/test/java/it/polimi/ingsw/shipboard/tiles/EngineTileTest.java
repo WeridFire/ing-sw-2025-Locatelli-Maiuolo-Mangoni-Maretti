@@ -2,6 +2,9 @@ package it.polimi.ingsw.shipboard.tiles;
 
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.shipboard.SideType;
+import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
+import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
+import it.polimi.ingsw.util.Coordinates;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -54,9 +57,29 @@ class EngineTileTest {
     }
 
     @Test
-    void testCalculateEnginePower() {
+    void testCalculateThrustPower() {
 
         // non funza x ora
         assertEquals(1f, singleEngineTile.calculateThrustPower());
+    }
+
+    @Test
+    void testPlace() {
+
+        //Creates coords where to place the tile
+        Coordinates coords = new Coordinates(4, 5);
+
+        //Assures tile gets placed
+        assertDoesNotThrow(() -> singleEngineTile.place(coords));
+
+        //Assures that the tile is placed correctly
+        try {
+            assertEquals(coords, singleEngineTile.getCoordinates());
+        } catch (NotFixedTileException e) {
+            fail("Tile should be fixed but threw NotFixedTileException");
+        }
+
+        // Test that you can't place the tile again
+        assertThrows(FixedTileException.class, () -> singleEngineTile.place(new Coordinates(5, 6)));
     }
 }
