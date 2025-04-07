@@ -77,12 +77,12 @@ public class SlaversCard extends EnemyCard {
 		 * perche è un commento
 		 *
 		 * +--------------+
-		 * |   PIRATES    |
+		 * |   Slavers    |
 		 * | lost days: x |
 		 * | firepower: x |
 		 * | bounty: x    |
 		 * |              |
-		 * | hits:        |
+		 * | crew cost:        |
 		 * | ............ |
 		 * | ............ |
 		 * +--------------+
