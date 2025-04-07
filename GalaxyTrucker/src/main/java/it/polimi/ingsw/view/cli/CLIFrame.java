@@ -323,8 +323,11 @@ public class CLIFrame implements Serializable {
                         lineBuilder.append(ANSI.Helper.codeToAnsi(bg));
                     }
                 }
-                // append the visible character
-                lineBuilder.append(visibleChar);
+
+                if (col < colEnd) {
+                    // append the visible character
+                    lineBuilder.append(visibleChar);
+                }
             }
             lines[row - rowStart] = lineBuilder.toString();
         }
@@ -344,9 +347,10 @@ public class CLIFrame implements Serializable {
      */
     public CLIFrame merge(CLIFrame add, AnchorPoint selfAnchor, AnchorPoint addAnchor,
                           int addOffsetRow, int addOffsetColumn) {
-        CLIFrame addRep = new CLIFrame(add);
-        addRep.applyOffset(addOffsetRow, addOffsetColumn);
-        return merge(addRep, selfAnchor, addAnchor);
+        add.applyOffset(addOffsetRow, addOffsetColumn);
+        CLIFrame result = merge(add, selfAnchor, addAnchor);
+        add.applyOffset(-addOffsetRow, -addOffsetColumn);
+        return result;
     }
 
     /**
