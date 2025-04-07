@@ -114,15 +114,13 @@ public abstract class CLIScreen implements ICLIPrintable {
 
 	private void displayError(){
 		if(getLastUpdate().getError() != null){
-			System.out.println(ANSI.applyColors(ANSI.RED + "[SERVER ERROR] "
-					+ getLastUpdate().getError() + ANSI.RESET));
+			System.out.println(ANSI.RED + "[SERVER ERROR] " + getLastUpdate().getError() + ANSI.RESET);
 		}
 	}
 
 	private void displayScreenMessage(){
 		if(this.screenMessage != null){
-			System.out.println(ANSI.applyColors(ANSI.YELLOW + "[SCREEN INFO] "
-					+ screenMessage + ANSI.RESET));
+			System.out.println(ANSI.YELLOW + "[SCREEN INFO] " + screenMessage + ANSI.RESET);
 			this.screenMessage = null;
 		}
 	}
@@ -215,14 +213,14 @@ public abstract class CLIScreen implements ICLIPrintable {
 		StringBuilder bottom = new StringBuilder(ANSI.RESET).append("┗");
 
 		for (int i = 0; i < columns; i++) {
-			top.append(ANSI.RESET).append("━");
-			middle.append(bg_color).append(" ");
-			bottom.append(ANSI.RESET).append("━");
+			top.append("━");
+			middle.append(" ");
+			bottom.append("━");
 		}
 
-		top.append(ANSI.RESET).append("┓");
+		top.append("┓");
 		middle.append(ANSI.RESET).append("┃");
-		bottom.append(ANSI.RESET).append("┛");
+		bottom.append("┛");
 
 		String[] frame = new String[rows + 2];
 		frame[0] = top.toString();
@@ -231,7 +229,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 		}
 		frame[rows + 1] = bottom.toString();
 
-		return new CLIFrame(frame, false);
+		return new CLIFrame(frame);
 	}
 
 

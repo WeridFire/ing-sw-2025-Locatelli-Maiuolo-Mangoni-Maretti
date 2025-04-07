@@ -1,57 +1,79 @@
 package it.polimi.ingsw.view.cli;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ANSI {
-	public static final String RESET = "Ϟ";
 
-	public static final String BLACK = "Ϡ";
-	public static final String RED = "ϡ";
-	public static final String GREEN = "Ϣ";
-	public static final String YELLOW = "ϣ";
-	public static final String BLUE = "Ϥ";
-	public static final String PURPLE = "ϥ";
-	public static final String CYAN = "Ϧ";
-	public static final String WHITE = "ϧ";
+	public static class Helper {
+		// regex ANSI: ESC + [ + numbers + m
+		private static final String ANSI_REGEX = "\u001B\\[([0-9;]+)m";
+		private static final Pattern ANSI_PATTERN = Pattern.compile(ANSI_REGEX);
 
-	public static final String BACKGROUND_BLACK = "Ϩ";
-	public static final String BACKGROUND_RED = "ϩ";
-	public static final String BACKGROUND_GREEN = "Ϫ";
-	public static final String BACKGROUND_YELLOW = "ϫ";
-	public static final String BACKGROUND_BLUE = "Ϭ";
-	public static final String BACKGROUND_PURPLE = "ϭ";
-	public static final String BACKGROUND_CYAN = "Ϯ";
-	public static final String BACKGROUND_WHITE = "ϯ";
+		public static List<String> splitAnsiAndUnicode(String s) {
+			List<String> result = new ArrayList<>();
+			Matcher m = ANSI_PATTERN.matcher(s);
+			int i = 0;
 
-	private static final Map<String, String> PLACEHOLDER_MAP = new HashMap<>();
+			while (i < s.length()) {
+				// if found an ANSI sequence here
+				if (m.find(i) && m.start() == i) {
+					result.add(m.group());
+					i = m.end();
+				} else {
+					// takes a single code point (even emoji)
+					int cp = s.codePointAt(i);
+					result.add(new String(Character.toChars(cp)));
+					i += Character.charCount(cp);
+				}
+			}
+
+			return result;
+		}
+
+		public static Integer ansiToCode(String ansi) {
+			Matcher matcher = ANSI_PATTERN.matcher(ansi);
+			if (matcher.matches()) {
+				return Integer.parseInt(matcher.group(1));
+			}
+			return null;
+		}
+
+		public static String codeToAnsi(short code) {
+			return "\u001B[" + code + "m";
+		}
+
+		public static String stripAnsi(String input) {
+			return input.replaceAll(ANSI_REGEX, "");
+		}
+	}
+
+	public static final String RESET = "\u001B[0m";
+
+	public static final String BLACK = "\u001B[30m";
+	public static final String RED = "\u001B[31m";
+	public static final String GREEN = "\u001B[32m";
+	public static final String YELLOW = "\u001B[33m";
+	public static final String BLUE = "\u001B[34m";
+	public static final String PURPLE = "\u001B[35m";
+	public static final String CYAN = "\u001B[36m";
+	public static final String WHITE = "\u001B[97m";
+
+	public static final String BACKGROUND_BLACK = "\u001B[40m";
+	public static final String BACKGROUND_RED = "\u001B[41m";
+	public static final String BACKGROUND_GREEN = "\u001B[42m";
+	public static final String BACKGROUND_YELLOW = "\u001B[43m";
+	public static final String BACKGROUND_BLUE = "\u001B[44m";
+	public static final String BACKGROUND_PURPLE = "\u001B[45m";
+	public static final String BACKGROUND_CYAN = "\u001B[46m";
+	public static final String BACKGROUND_WHITE = "\u001B[107m";
+
 	private static final Set<String> FOREGROUND_SET = new HashSet<>();
 	private static final Set<String> BACKGROUND_SET = new HashSet<>();
 
 	static {
-		PLACEHOLDER_MAP.put(RESET, "\u001B[0m");
-		PLACEHOLDER_MAP.put(BLACK, "\u001B[30m");
-		PLACEHOLDER_MAP.put(RED, "\u001B[31m");
-		PLACEHOLDER_MAP.put(GREEN, "\u001B[32m");
-		PLACEHOLDER_MAP.put(YELLOW, "\u001B[33m");
-		PLACEHOLDER_MAP.put(BLUE, "\u001B[34m");
-		PLACEHOLDER_MAP.put(PURPLE, "\u001B[35m");
-		PLACEHOLDER_MAP.put(CYAN, "\u001B[36m");
-		PLACEHOLDER_MAP.put(WHITE, "\u001B[97m");
-
-		PLACEHOLDER_MAP.put(BACKGROUND_BLACK, "\u001B[40m");
-		PLACEHOLDER_MAP.put(BACKGROUND_RED, "\u001B[41m");
-		PLACEHOLDER_MAP.put(BACKGROUND_GREEN, "\u001B[42m");
-		PLACEHOLDER_MAP.put(BACKGROUND_YELLOW, "\u001B[43m");
-		PLACEHOLDER_MAP.put(BACKGROUND_BLUE, "\u001B[44m");
-		PLACEHOLDER_MAP.put(BACKGROUND_PURPLE, "\u001B[45m");
-		PLACEHOLDER_MAP.put(BACKGROUND_CYAN, "\u001B[46m");
-		PLACEHOLDER_MAP.put(BACKGROUND_WHITE, "\u001B[107m");
-
-		// Build foreground set
-		FOREGROUND_SET.add(RESET);
+		// build foreground set
 		FOREGROUND_SET.add(BLACK);
 		FOREGROUND_SET.add(RED);
 		FOREGROUND_SET.add(GREEN);
@@ -61,7 +83,7 @@ public class ANSI {
 		FOREGROUND_SET.add(CYAN);
 		FOREGROUND_SET.add(WHITE);
 
-		// Build background set
+		// build background set
 		BACKGROUND_SET.add(BACKGROUND_BLACK);
 		BACKGROUND_SET.add(BACKGROUND_RED);
 		BACKGROUND_SET.add(BACKGROUND_GREEN);
@@ -72,39 +94,17 @@ public class ANSI {
 		BACKGROUND_SET.add(BACKGROUND_WHITE);
 	}
 
-	public static String applyColors(String input) {
-		String output = input;
-		for (Map.Entry<String, String> entry : PLACEHOLDER_MAP.entrySet()) {
-			output = output.replace(entry.getKey(), entry.getValue());
-		}
-		return output;
-	}
-
-	public static boolean isAnsi(Character c) {
-		return PLACEHOLDER_MAP.containsKey(c.toString());
-	}
-
 	/**
 	 * Returns true if the given character represents a foreground ANSI code.
 	 */
-	public static boolean isForeground(Character c) {
-		return FOREGROUND_SET.contains(c.toString());
+	public static boolean isForeground(String ch) {
+		return FOREGROUND_SET.contains(ch);
 	}
 
 	/**
 	 * Returns true if the given character represents a background ANSI code.
 	 */
-	public static boolean isBackground(Character c) {
-		return BACKGROUND_SET.contains(c.toString());
-	}
-
-	public static String stripAnsi(String input) {
-		StringBuilder output = new StringBuilder();
-		for (char c : input.toCharArray()) {
-			if (!isAnsi(c)) {
-				output.append(c);
-			}
-		}
-		return output.toString();
+	public static boolean isBackground(String ch) {
+		return BACKGROUND_SET.contains(ch);
 	}
 }
