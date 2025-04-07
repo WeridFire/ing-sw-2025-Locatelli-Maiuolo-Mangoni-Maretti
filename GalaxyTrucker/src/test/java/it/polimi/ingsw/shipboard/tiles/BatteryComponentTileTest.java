@@ -136,5 +136,40 @@ class BatteryComponentTileTest {
 
     }
 
+    @Test
+    void tripleTileCantHold4() throws TooMuchLoadException, UnsupportedLoadableItemException {
+
+        //Should throw
+        assertThrows(TooMuchLoadException.class, () -> {
+            tripleBatteryTile.loadItems(LoadableType.BATTERY, 4);
+        });
+
+    }
+
+    @Test
+    void batteryCantHoldCargo() throws TooMuchLoadException, UnsupportedLoadableItemException {
+
+        //Should throw
+        assertThrows(UnsupportedLoadableItemException.class, () -> {
+            tripleBatteryTile.loadItems(LoadableType.BLUE_GOODS, 1);
+        });
+
+        //Should throw
+        assertThrows(UnsupportedLoadableItemException.class, () -> {
+            tripleBatteryTile.loadItems(LoadableType.GREEN_GOODS, 1);
+        });
+
+        //Should throw
+        assertThrows(UnsupportedLoadableItemException.class, () -> {
+            tripleBatteryTile.loadItems(LoadableType.YELLOW_GOODS, 1);
+        });
+
+        //Should throw
+        assertThrows(UnsupportedLoadableItemException.class, () -> {
+            tripleBatteryTile.loadItems(LoadableType.RED_GOODS, 1);
+        });
+
+    }
+
 
 }
