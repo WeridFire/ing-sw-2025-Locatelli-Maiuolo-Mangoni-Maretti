@@ -3,6 +3,7 @@ package it.polimi.ingsw.view.cli;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ import java.util.List;
  * This class allows storing and manipulating a grid of characters, supporting merging with other frames
  * and applying offsets to align elements properly within the CLI display.
  */
-public class CLIFrame {
+public class CLIFrame implements Serializable {
     public static final char INVISIBLE = ' ';
     private static final short ANSI_INVISIBLE = 0;
 
@@ -296,14 +297,14 @@ public class CLIFrame {
                 visibleChar = addFrame.getAt(row, col);
                 // default: override the content with added frame, but if invisible there: draw base frame instead
                 bg = addFrame.getBackgroundAt(row, col);
-                if (visibleChar != CLIFrame.INVISIBLE) {
-                    fg = addFrame.getForegroundAt(row, col);
-                } else {
-                    if (bg == CLIFrame.ANSI_INVISIBLE) {  // keep the added background if present
-                        bg = baseFrame.getBackgroundAt(row, col);
+                fg = addFrame.getForegroundAt(row, col);
+
+                if (bg == CLIFrame.ANSI_INVISIBLE) {  // keep the added background if present
+                    bg = baseFrame.getBackgroundAt(row, col);
+                    if (visibleChar == CLIFrame.INVISIBLE) {
+                        fg = baseFrame.getForegroundAt(row, col);
+                        visibleChar = baseFrame.getAt(row, col);
                     }
-                    fg = baseFrame.getForegroundAt(row, col);
-                    visibleChar = baseFrame.getAt(row, col);
                 }
 
                 // MAYBE ONE IS RESET AND THE OTHER NOT: problem -> do in order
