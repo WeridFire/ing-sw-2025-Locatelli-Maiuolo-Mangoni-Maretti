@@ -11,7 +11,10 @@ import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import it.polimi.ingsw.view.cli.CLIScreen;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static it.polimi.ingsw.view.cli.CLIScreen.getScreenFrame;
 
 public class PiratesCard extends EnemyCard{
 
@@ -89,7 +92,47 @@ public class PiratesCard extends EnemyCard{
          * | ............ |
          * +--------------+
          * */
-        return null;
+
+        CLIFrame cardBorder = getScreenFrame(11, 20, ANSI.BACKGROUND_CYAN);
+
+        // frame title
+        CLIFrame title = new CLIFrame(new String[]{
+                ANSI.WHITE + "PIRATES" + ANSI.RESET
+        });
+        cardBorder = cardBorder.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 0, 0);
+
+        List<String> cardInfoLines = new ArrayList<>();
+        cardInfoLines.add(
+                ANSI.BLACK + "Lost days: " + getLostDays() + ANSI.RESET
+        );
+        cardInfoLines.add(
+                ANSI.BLACK + "Firepower: " + getFirePower() + ANSI.RESET
+        );
+        cardInfoLines.add(
+                ANSI.BLACK + "Bounty: " + prizeBounty + ANSI.RESET
+        );
+        cardInfoLines.add(
+                " "
+        );
+        cardInfoLines.add(
+                ANSI.BLACK + "hits: " + ANSI.RESET
+        );
+
+        StringBuilder line = new StringBuilder();
+        for (int i = 0; i < punishHits.length; i++) {
+            if (i % 2 == 0 && i != 0) {
+                cardInfoLines.add(ANSI.BLACK + line.toString());
+                line = new StringBuilder();
+            }
+            line.append(punishHits[i].toUnicodeString()).append("  ");
+        }
+        cardInfoLines.add(ANSI.BLACK + line.toString());
+
+        CLIFrame infoFrame = new CLIFrame(cardInfoLines.toArray(new String[0]));
+
+        cardBorder = cardBorder.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
+
+        return cardBorder;
     }
 
 }
