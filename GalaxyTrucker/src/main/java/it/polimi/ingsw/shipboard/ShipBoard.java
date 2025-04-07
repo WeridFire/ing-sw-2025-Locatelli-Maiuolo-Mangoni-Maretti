@@ -10,6 +10,7 @@ import it.polimi.ingsw.util.BoardCoordinates;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
+import it.polimi.ingsw.view.cli.CLIScreen;
 import it.polimi.ingsw.view.cli.ICLIPrintable;
 
 import java.io.Serializable;
@@ -372,14 +373,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 				"+--------------------+"
 		 */
 
-		String line = ANSI.GREEN +  "+--------------------+";
-		String empty = ANSI.GREEN + "|                    |";
-		CLIFrame info = new CLIFrame(new String[] {
-				line, empty,
-				line, empty, empty, empty, empty,
-				line, empty, empty, empty, empty,
-				line, empty, line
-		});
+		CLIFrame info = CLIScreen.getScreenFrame(new int[] {1, 4, 4, 1}, 20, ANSI.RESET, ANSI.GREEN);
 		info = info.merge(new CLIFrame("Overview"), AnchorPoint.TOP, AnchorPoint.TOP, 1, 0);
 		info = info.merge(new CLIFrame(new String[] {
 				"Total Crew: " + visitorCalculateCargoInfo.getCrewInfo().countAll(LoadableType.CREW_SET),
