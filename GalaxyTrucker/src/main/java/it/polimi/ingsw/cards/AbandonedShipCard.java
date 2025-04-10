@@ -1,12 +1,19 @@
 package it.polimi.ingsw.cards;
 
+import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.playerInput.PIRs.PIRRemoveLoadables;
 import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static it.polimi.ingsw.view.cli.CLIScreen.getScreenFrame;
 
 public class AbandonedShipCard extends Card{
 
@@ -69,8 +76,46 @@ public class AbandonedShipCard extends Card{
 	 * @return A {@link CLIFrame} containing the CLI representation.
 	 */
 	@Override
-	public CLIFrame getCLIRepresentation() {
-		// TODO
-		return null;
+	public CLIFrame getCLIRepresentation(){
+		/**
+		 * sembrano in obliquo i bordi ma è
+		 * perche è un commento
+		 *
+		 * +--------------+
+		 * |   PIRATES    |
+		 * | lost days: x |
+		 * | firepower: x |
+		 * | bounty: x    |
+		 * |              |
+		 * | hits:        |
+		 * | ............ |
+		 * | ............ |
+		 * +--------------+
+		 * */
+
+		CLIFrame cardBorder = getScreenFrame(11, 20, ANSI.BACKGROUND_CYAN);
+
+		// frame title
+		CLIFrame title = new CLIFrame(new String[]{
+				ANSI.WHITE + "ABANDONED SHIP" + ANSI.RESET
+		});
+		cardBorder = cardBorder.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 0, 0);
+
+		List<String> cardInfoLines = new ArrayList<>();
+		cardInfoLines.add(
+				ANSI.BLACK + "Required Crew: " + requiredCrew + ANSI.RESET
+		);
+		cardInfoLines.add(
+				ANSI.BLACK + "Lost days: " + lostDays + ANSI.RESET
+		);
+		cardInfoLines.add(
+				ANSI.BLACK + "Sell Price:  " + sellPrice + ANSI.RESET
+		);
+
+		CLIFrame infoFrame = new CLIFrame(cardInfoLines.toArray(new String[0]));
+
+		cardBorder = cardBorder.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
+
+		return cardBorder;
 	}
 }
