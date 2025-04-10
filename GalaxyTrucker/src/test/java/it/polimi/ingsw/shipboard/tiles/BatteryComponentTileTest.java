@@ -65,7 +65,6 @@ class BatteryComponentTileTest {
 
     }
 
-    //!!!This one does not work!!!
     @Test
     void testRemoveOneBattery() throws IllegalArgumentException, UnsupportedLoadableItemException, NotEnoughItemsException {
 
@@ -75,7 +74,6 @@ class BatteryComponentTileTest {
 
         //Removes 1 battery
         doubleBatteryTile.removeItems(LoadableType.BATTERY, 1);
-        //this doesnt work
         assertEquals(1, doubleBatteryTile.getCapacityLeft());
 
         //Fills tile
@@ -84,12 +82,10 @@ class BatteryComponentTileTest {
 
         //Removes 1 battery
         tripleBatteryTile.removeItems(LoadableType.BATTERY, 1);
-        //this doesnt work
-        assertEquals(2, tripleBatteryTile.getCapacityLeft());
+        assertEquals(1, tripleBatteryTile.getCapacityLeft());
 
     }
 
-    //!!!This one does not work!!!
     @Test
     void testRemoveTwoBatteries() throws IllegalArgumentException, UnsupportedLoadableItemException, NotEnoughItemsException {
 
@@ -106,23 +102,30 @@ class BatteryComponentTileTest {
         assertEquals(0, tripleBatteryTile.getCapacityLeft());
 
         //Removes 2 batteries
-        tripleBatteryTile.removeItems(LoadableType.BATTERY, 1);
-        //this doesnt work
-        assertEquals(1, tripleBatteryTile.getCapacityLeft());
+        tripleBatteryTile.removeItems(LoadableType.BATTERY, 2);
+        assertEquals(2, tripleBatteryTile.getCapacityLeft());
 
     }
 
-    //!!!This one also doesnt work!!!
     @Test
     void testRemoveThreeBatteries() throws IllegalArgumentException, UnsupportedLoadableItemException, NotEnoughItemsException {
+
+        //Fills tile
+        doubleBatteryTile.fill();
+        assertEquals(0, doubleBatteryTile.getCapacityLeft());
+
+        //Removes 3 batteries
+        assertThrowsExactly(NotEnoughItemsException.class,
+                () -> doubleBatteryTile.removeItems(LoadableType.BATTERY, 3));
+        assertEquals(0, doubleBatteryTile.getCapacityLeft());
 
         //Fills tile
         tripleBatteryTile.fill();
         assertEquals(0, tripleBatteryTile.getCapacityLeft());
 
-        //Removes 1 battery
+        //Removes 3 batteries
         tripleBatteryTile.removeItems(LoadableType.BATTERY, 3);
-        assertEquals(0, tripleBatteryTile.getCapacityLeft());
+        assertEquals(3, tripleBatteryTile.getCapacityLeft());
 
     }
 

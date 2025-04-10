@@ -138,7 +138,10 @@ public abstract class ContainerTile extends TileSkeleton {
                     + " from a container with only " + loadedCount + " of them");
         }
 
-        loadedItems.removeAll(Collections.nCopies(quantity, item));
+        for (int i = 0; i < quantity; i++) {
+            loadedItems.remove(item);
+        }
+
         recalculateOccupiedCapacity();
     }
 
@@ -160,12 +163,12 @@ public abstract class ContainerTile extends TileSkeleton {
             throw new IllegalArgumentException("Quantity must be greater than zero, " + quantity + " provided");
         }
 
-        // creates a list of items to remove
+        // remove items
         List<LoadableType> toRemove = new ArrayList<>(quantity);
         int removed = 0;
         for (LoadableType loadedItem : loadedItems) {
             if (items.contains(loadedItem)) {
-                toRemove.add(loadedItem);
+                loadedItems.remove(loadedItem);
                 removed++;
                 if (removed >= quantity) {
                     break;
@@ -173,8 +176,6 @@ public abstract class ContainerTile extends TileSkeleton {
             }
         }
 
-        // actually removes them
-        loadedItems.removeAll(toRemove);
         recalculateOccupiedCapacity();
         return removed;
     }
