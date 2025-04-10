@@ -167,13 +167,23 @@ public abstract class ContainerTile extends TileSkeleton {
         List<LoadableType> toRemove = new ArrayList<>(quantity);
         int removed = 0;
         for (LoadableType loadedItem : loadedItems) {
-            if (items.contains(loadedItem)) {
-                loadedItems.remove(loadedItem);
-                removed++;
-                if (removed >= quantity) {
+            int howMany = (int)items.stream().filter(i -> i == loadedItem).count();
+            if (howMany > 0) {
+                removed += howMany;
+                if (removed > quantity) {
+                    howMany -= removed - quantity;
+                    removed = quantity;
+                }
+                toRemove.addAll(Collections.nCopies(howMany, loadedItem));
+
+                if (removed == quantity) {
                     break;
                 }
             }
+        }
+
+        for (LoadableType loadedItem : toRemove) {
+            loadedItems.remove(loadedItem);
         }
 
         recalculateOccupiedCapacity();

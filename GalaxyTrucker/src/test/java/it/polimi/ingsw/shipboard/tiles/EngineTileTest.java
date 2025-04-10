@@ -20,20 +20,20 @@ class EngineTileTest {
     void setUp() {
         //Creates a single engine
         SideType[] singleEngine = Direction.sortedArray(
-                SideType.UNIVERSAL,  // NORTH
                 SideType.UNIVERSAL,  // EAST
-                SideType.ENGINE,     // SOUTH
-                SideType.UNIVERSAL   // WEST
+                SideType.UNIVERSAL,  // NORTH
+                SideType.UNIVERSAL,   // WEST
+                SideType.ENGINE     // SOUTH
         ).toArray(SideType[]::new);
 
         singleEngineTile = new EngineTile(singleEngine, false);
 
         //Creates a double engine
         SideType[] doubleEngine = Direction.sortedArray(
-                SideType.UNIVERSAL,  // NORTH
                 SideType.UNIVERSAL,  // EAST
-                SideType.ENGINE,     // SOUTH
-                SideType.UNIVERSAL   // WEST
+                SideType.UNIVERSAL,  // NORTH
+                SideType.UNIVERSAL,   // WEST
+                SideType.ENGINE     // SOUTH
         ).toArray(SideType[]::new);
 
         doubleEngineTile = new EngineTile(doubleEngine, true);
@@ -60,8 +60,9 @@ class EngineTileTest {
     @Test
     void testCalculateThrustPower() {
 
-        // non funza x ora
         assertEquals(1f, singleEngineTile.calculateThrustPower());
+
+        assertEquals(2f, doubleEngineTile.calculateThrustPower());
     }
 
     @Test
