@@ -3,7 +3,7 @@ package it.polimi.ingsw.cards;
 import it.polimi.ingsw.cards.enemy.PiratesCard;
 import it.polimi.ingsw.cards.enemy.SlaversCard;
 import it.polimi.ingsw.cards.enemy.SmugglersCard;
-import it.polimi.ingsw.cards.meteorstorm.MeteorStormCard;
+import it.polimi.ingsw.cards.meteorstorm.MeteorSwarmCard;
 import it.polimi.ingsw.cards.planets.Planet;
 import it.polimi.ingsw.cards.planets.PlanetsCard;
 import it.polimi.ingsw.cards.projectile.Projectile;
@@ -15,7 +15,6 @@ import it.polimi.ingsw.shipboard.LoadableType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class DeckFactory {
 	public static ArrayList<Card> createTutorialDeck() {
@@ -54,7 +53,7 @@ public class DeckFactory {
 				LoadableType.GREEN_GOODS,
 				LoadableType.BLUE_GOODS},
 				4, 1, "GT-cards_I_IT_012.jpg", 0));
-		deckPool.add(new MeteorStormCard(new Projectile[]{
+		deckPool.add(new MeteorSwarmCard(new Projectile[]{
 				Projectile.createLargeMeteor(Direction.SOUTH),
 				Projectile.createSmallMeteor(Direction.EAST),
 				Projectile.createSmallMeteor(Direction.WEST)
@@ -131,13 +130,13 @@ public class DeckFactory {
 				Projectile.createLightCannonFire(Direction.SOUTH),
 		}, 5, 1, "GT-cards_I_IT_013.jpg", 1));
 
-		deckPool.add(new MeteorStormCard(new Projectile[]{
+		deckPool.add(new MeteorSwarmCard(new Projectile[]{
 				Projectile.createLargeMeteor(Direction.SOUTH),
 				Projectile.createSmallMeteor(Direction.SOUTH),
 				Projectile.createLargeMeteor(Direction.SOUTH)
 		}, "GT-cards_I_IT_0111.jpg", 1));
 
-		deckPool.add(new MeteorStormCard(new Projectile[]{
+		deckPool.add(new MeteorSwarmCard(new Projectile[]{
 				Projectile.createSmallMeteor(Direction.SOUTH),
 				Projectile.createSmallMeteor(Direction.SOUTH),
 				Projectile.createSmallMeteor(Direction.EAST),
@@ -254,20 +253,20 @@ public class DeckFactory {
 				LoadableType.YELLOW_GOODS,
 				LoadableType.YELLOW_GOODS
 		} , 8, 1, "GT-cards_II_IT_012.jpg", 2));
-		deckPool.add(new MeteorStormCard(new Projectile[]{
+		deckPool.add(new MeteorSwarmCard(new Projectile[]{
 				Projectile.createSmallMeteor(Direction.NORTH),
 				Projectile.createSmallMeteor(Direction.NORTH),
 				Projectile.createLargeMeteor(Direction.WEST),
 				Projectile.createSmallMeteor(Direction.WEST),
 				Projectile.createSmallMeteor(Direction.WEST)
 		}, "GT-cards_II_IT_019.jpg", 2));
-		deckPool.add(new MeteorStormCard(new Projectile[] {
+		deckPool.add(new MeteorSwarmCard(new Projectile[] {
 				Projectile.createLargeMeteor(Direction.NORTH),
 				Projectile.createLargeMeteor(Direction.NORTH),
 				Projectile.createSmallMeteor(Direction.SOUTH),
 				Projectile.createSmallMeteor(Direction.SOUTH)
 		}, "GT-cards_II_IT_0110.jpg", 2));
-		deckPool.add(new MeteorStormCard(new Projectile[]{
+		deckPool.add(new MeteorSwarmCard(new Projectile[]{
 				Projectile.createSmallMeteor(Direction.NORTH),
 				Projectile.createSmallMeteor(Direction.NORTH),
 				Projectile.createLargeMeteor(Direction.EAST),
