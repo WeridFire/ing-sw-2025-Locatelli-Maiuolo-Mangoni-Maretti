@@ -1,5 +1,7 @@
 package it.polimi.ingsw.shipboard;
 
+import it.polimi.ingsw.view.cli.ANSI;
+
 import java.util.Set;
 
 /**
@@ -39,6 +41,16 @@ public enum LoadableType {
         return switch (this) {
             case PURPLE_ALIEN, BROWN_ALIEN -> 2;
             default -> 1;
+        };
+    }
+
+    public String getUnicodeColoredString() {
+        return switch (this) {
+            case BLUE_GOODS -> ANSI.BLUE + "■ ";
+            case GREEN_GOODS -> ANSI.GREEN + "■ ";
+            case YELLOW_GOODS -> ANSI.YELLOW + "■ ";
+            case RED_GOODS -> ANSI.RED + "■ ";
+            default -> null;
         };
     }
 }
