@@ -45,7 +45,10 @@ public class AssembleGamePhase extends PlayableGamePhase {
 
     public void playLoop() throws RemoteException, InterruptedException {
 
-        gameData.setCurrentGamePhase(this);
+        //gameData.setCurrentGamePhase(this);
+        if(gameData.getCurrentGamePhase() != this){
+            throw new  RuntimeException("Trying to run a game phase which is not active on the game.");
+        }
 
         while(howManyTimerRotationsLeft > 0) {
             GameServer.getInstance().broadcastUpdate(gameData.getGameId());
