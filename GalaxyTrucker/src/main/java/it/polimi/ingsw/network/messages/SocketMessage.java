@@ -18,6 +18,7 @@ public class SocketMessage implements Serializable{
 		DISCARD_TILE,
 		RESERVE_TILE,
 		PICK_TILE,
+		FINISH_ASSEMBLING
 	}
 
 	private MessageType type;
@@ -128,7 +129,7 @@ public class SocketMessage implements Serializable{
 	 * Creates a socket message to tell the server to flip the timer.
 	 * @return The socket message containing the desired information.
 	 */
-	public static SocketMessage flipHourglass(){
+	public static SocketMessage flipHourglassMessage(){
 		return new SocketMessage(MessageType.FLIP_HOUR_GLASS);
 	}
 
@@ -136,7 +137,7 @@ public class SocketMessage implements Serializable{
 	 * Creates a socket message to tell the server to draw a tile.
 	 * @return The socket message containing the desired information.
 	 */
-	public static SocketMessage drawTile(){
+	public static SocketMessage drawTileMessage(){
 		return new SocketMessage(MessageType.DRAW_TILE);
 	}
 
@@ -144,7 +145,7 @@ public class SocketMessage implements Serializable{
 	 * Creates a socket message to tell the server to discard the tile in hand.
 	 * @return The socket message containing the desired information.
 	 */
-	public static SocketMessage discardTile(){
+	public static SocketMessage discardTileMessage(){
 		return new SocketMessage(MessageType.DISCARD_TILE);
 	}
 
@@ -152,7 +153,7 @@ public class SocketMessage implements Serializable{
 	 * Creates a socket message to tell the server to reserve the tile in hand.
 	 * @return The socket message containing the desired information.
 	 */
-	public static SocketMessage reserveTile(){
+	public static SocketMessage reserveTileMessage(){
 		return new SocketMessage(MessageType.RESERVE_TILE);
 	}
 
@@ -163,7 +164,11 @@ public class SocketMessage implements Serializable{
 	 *
 	 * @return The socket message containing the desired information.
 	 */
-	public static SocketMessage pickTile(Integer id){
+	public static SocketMessage pickTileMessage(Integer id){
 		return new SocketMessage(MessageType.PICK_TILE, List.of(id));
+	}
+
+	public static SocketMessage finishAssemblingMessage(){
+		return new SocketMessage(MessageType.FINISH_ASSEMBLING);
 	}
 }
