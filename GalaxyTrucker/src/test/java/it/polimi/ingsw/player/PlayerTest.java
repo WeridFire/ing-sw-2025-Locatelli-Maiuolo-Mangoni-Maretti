@@ -147,7 +147,7 @@ class PlayerTest {
         System.out.println("\nTest BEFORE assembly's ended\n");
         System.out.println(player1.getShipBoard().getCLIRepresentation());
 
-        assertDoesNotThrow(() -> player1.getShipBoard().endAssembly());
+        assertDoesNotThrow(() -> player1.getShipBoard().endAssembly(gameData));
         System.out.println("\nTest AFTER assembly's ended\n");
         System.out.println(player1.getShipBoard().getCLIRepresentation());
     }

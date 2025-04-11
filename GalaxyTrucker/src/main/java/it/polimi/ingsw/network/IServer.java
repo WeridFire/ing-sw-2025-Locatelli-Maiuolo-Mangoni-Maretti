@@ -31,4 +31,5 @@ public interface IServer extends Remote {
 	void discardTile(IClient client) throws RemoteException;
 	void reserveTile(IClient client) throws RemoteException;
 	void pickTile(IClient client, Integer id) throws RemoteException;
+	void finishAssembling(IClient client) throws RemoteException;
 }

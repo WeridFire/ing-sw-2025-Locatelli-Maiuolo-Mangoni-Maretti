@@ -70,6 +70,8 @@ public class ClientSocketHandler implements IClient {
 						case DRAW_TILE -> getServer().drawTile(this);
 						case DISCARD_TILE -> getServer().discardTile(this);
 						case RESERVE_TILE -> getServer().reserveTile(this);
+						case FINISH_ASSEMBLING -> getServer().finishAssembling(this);
+						//TODO: case PICK_TILE
 					}
 				}catch(IllegalArgumentException e){
 					System.err.println("ERROR WHILE PARSING MESSAGE! Message:");

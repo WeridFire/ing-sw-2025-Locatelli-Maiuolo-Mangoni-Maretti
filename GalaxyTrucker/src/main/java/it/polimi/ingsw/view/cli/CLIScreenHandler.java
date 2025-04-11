@@ -14,6 +14,8 @@ public class CLIScreenHandler {
 	private final Set<CLIScreen> allScreens;
 	private final GameClient gameClient;
 	private ClientUpdate lastUpdate;
+	protected boolean isShowingHelpScreen = false;
+	protected boolean isShowingAvailableScreens = false;
 
 	//SINGLETON LOGIC
 
@@ -78,7 +80,7 @@ public class CLIScreenHandler {
 	/**
 	 * Prints an informative message displaying the currently available and activable screens.
 	 */
-	private void printAvailableScreens() {
+	protected void printAvailableScreens() {
 
 		CLIScreen.clear();
 		Set<CLIScreen> screens = getAvailableScreens();
@@ -143,6 +145,10 @@ public class CLIScreenHandler {
 			String[] args = commandParts.toArray(new String[0]);
 			switch (cmd) {
 				case "":
+					//we close any "popup" window we are displaying.
+					isShowingAvailableScreens = false;
+					isShowingHelpScreen = false;
+
 					currentScreen.refresh();
 					break;
 				case "ping":
@@ -155,10 +161,12 @@ public class CLIScreenHandler {
 							break;
 						}
 					}
-					printAvailableScreens();
+					isShowingAvailableScreens = true;
+					currentScreen.refresh();
 					break;
 				case "help":
-					currentScreen.printAvailableCommands();
+					isShowingHelpScreen = true;
+					currentScreen.refresh();
 					break;
 				case "debug":
 					currentScreen.setScreenMessage("The current game state was saved to update.json");
