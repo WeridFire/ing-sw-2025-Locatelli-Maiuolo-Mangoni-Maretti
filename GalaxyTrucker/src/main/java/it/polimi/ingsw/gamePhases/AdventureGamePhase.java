@@ -21,8 +21,8 @@ public class AdventureGamePhase extends PlayableGamePhase{
      * @param gamePhaseType The type of the game phase.
      * @param gameData      The game data.
      */
-    public AdventureGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameData gameData, Card card) {
-        super(gameId, gamePhaseType, gameData);
+    public AdventureGamePhase(UUID gameId, GameData gameData, Card card) {
+        super(gameId, GamePhaseType.ADVENTURE, gameData);
         this.card = card;
     }
 
