@@ -136,18 +136,43 @@ public class AssembleCLIScreen extends CLIScreen{
 
     @Override
     void printScreenSpecificCommands() {
-        printCommands(screenName,
-                "timerflip | Flips the hourglass of the game.",
-                "draw | Draws a tile from the covered tiles",
-                "discard | Discard the tile you have in hand",
-                "pick <tileId> | Pick in hand the tile with Id <tileId>"
-        );
+        // TODO (in parent): if some commands are too verbose insert new lines to not overflow popup
+        List<String> availableCommands = new ArrayList<>();
+        // note: last timerflip only if assemble phase ended for this player
+        availableCommands.add("timerflip|Flips the hourglass of the game.");
+
+        if (tileInHand == null) {
+            availableCommands.add("draw|Draws a tile from the covered tiles");
+            availableCommands.add("pick <tileId>|Pick in hand the tile with Id <tileId>");
+        }
+        else {
+            availableCommands.add("discard|Discard the tile you have in hand");
+            availableCommands.add("rotate <direction>|Rotate the tile you have in hand");
+            availableCommands.add("place <row> <column>|Place the tile from your hand onto your shipboard");
+        }
+
+        printCommands(screenName, availableCommands.toArray(String[]::new));
     }
 
     @Override
     public CLIFrame getCLIRepresentation() {
+        // update tile in hand if different from previous
+        if ((tileInHand == null) || (!tileInHand.equals(getLastUpdate().getClientPlayer().getTileInHand()))) {
+            // note: in here also if both are null, but in that case nothing happens -> no problem
+            tileInHand = getLastUpdate().getClientPlayer().getTileInHand();
+        }
+
         //white bg
-        CLIFrame screenBorder = getScreenFrame(40, 120, ANSI.BACKGROUND_WHITE);
+        CLIFrame screenBorder = getScreenFrame(36, 100, ANSI.BACKGROUND_WHITE);
+
+        // tile in hand frame
+        CLIFrame tileInHandFrame = new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " Tile in Hand ")
+                .merge((tileInHand != null)
+                                ? tileInHand.getCLIRepresentation()
+                                : new CLIFrame(TileSkeleton.getForbiddenTileCLIRepresentation(0, 0)),
+                        Direction.SOUTH, 1)
+                .merge(new CLIFrame(""), Direction.SOUTH)
+                .paintBackground(ANSI.BACKGROUND_BLACK);
 
         //title
         CLIFrame shipboardTitle = new CLIFrame(new String[]{
@@ -155,15 +180,10 @@ public class AssembleCLIScreen extends CLIScreen{
         });
 
         //shipboard frame
-        CLIFrame shipboardFrame = getLastUpdate().getClientPlayer().getShipBoard().getCLIRepresentation();
+        CLIFrame shipboardFrame = getLastUpdate().getClientPlayer().getShipBoard().getCLIRepresentation()
+                .paintForeground(ANSI.BLACK);
 
-        CLIFrame shipboardWithTitle = shipboardTitle.merge(
-                shipboardFrame,
-                AnchorPoint.BOTTOM,
-                AnchorPoint.TOP,
-                1,
-                0
-        );
+        CLIFrame shipboardWithTitle = shipboardTitle.merge(shipboardFrame, Direction.SOUTH, 1);
 
         //drawn tiles
         List<TileSkeleton> drawnTiles = getLastUpdate().getCurrentGame().getDrawnTiles();
@@ -186,29 +206,15 @@ public class AssembleCLIScreen extends CLIScreen{
                                 tile.getTileId() + " " + ANSI.RESET
                 });
 
-                CLIFrame tileWithId = tileRepresentation.merge(
-                        idLabel,
-                        AnchorPoint.BOTTOM,
-                        AnchorPoint.TOP,
-                        1,
-                        0
-                );
+                CLIFrame tileWithId = tileRepresentation.merge(idLabel, Direction.SOUTH, 1);
 
                 tileFrames.add(tileWithId);
             }
 
             //Merge all tile frames horizontally with some spacing
             tilesFrame = new CLIFrame();
-            int horizontalOffset = 0;
             for (CLIFrame tileFrame : tileFrames) {
-                tilesFrame = tilesFrame.merge(
-                        tileFrame,
-                        AnchorPoint.TOP_LEFT,
-                        AnchorPoint.TOP_LEFT,
-                        0,
-                        horizontalOffset
-                );
-                horizontalOffset += 10;
+                tilesFrame = tilesFrame.merge(tileFrame, Direction.EAST, 5);
             }
         } else {
             tilesFrame = new CLIFrame(new String[]{
@@ -216,28 +222,12 @@ public class AssembleCLIScreen extends CLIScreen{
             });
         }
 
-        CLIFrame tilesWithTitle = tilesTitle.merge(
-                tilesFrame,
-                AnchorPoint.BOTTOM,
-                AnchorPoint.TOP,
-                1,
-                0
-        );
+        CLIFrame tilesWithTitle = tilesTitle.merge(tilesFrame, Direction.SOUTH, 1);
 
-        CLIFrame contentFrame = shipboardWithTitle.merge(
-                tilesWithTitle,
-                AnchorPoint.BOTTOM,
-                AnchorPoint.TOP,
-                2,
-                0
-        );
+        CLIFrame contentFrame = shipboardWithTitle
+                .merge(tileInHandFrame, Direction.EAST, 5)
+                .merge(tilesWithTitle, Direction.SOUTH, 2);
 
-		return screenBorder.merge(
-                contentFrame,
-                AnchorPoint.CENTER,
-                AnchorPoint.CENTER,
-                0,
-                0
-        );
+		return screenBorder.merge(contentFrame, AnchorPoint.CENTER, AnchorPoint.CENTER);
     }
 }
