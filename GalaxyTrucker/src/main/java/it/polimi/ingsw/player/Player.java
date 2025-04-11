@@ -3,7 +3,6 @@ package it.polimi.ingsw.player;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.game.exceptions.DrawTileException;
-import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
 import it.polimi.ingsw.player.exceptions.NoTileInHandException;
 import it.polimi.ingsw.player.exceptions.TooManyReservedTilesException;
