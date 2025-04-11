@@ -1,6 +1,7 @@
 package it.polimi.ingsw.network.socket;
 
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.network.messages.SocketMessage;
@@ -118,6 +119,11 @@ public class ServerSocketHandler implements IServer {
 	public void pickTile(IClient client, Integer id) throws RemoteException {
 		SocketMessage mess = SocketMessage.pickTileMessage(id);
 		sendSocketMessage(mess);
+	}
+
+	@Override
+	public void placeTile(IClient client, Coordinates coordinates, Rotation rotation) throws RemoteException {
+		sendSocketMessage(SocketMessage.placeMessage(coordinates, rotation));
 	}
 
 	@Override
