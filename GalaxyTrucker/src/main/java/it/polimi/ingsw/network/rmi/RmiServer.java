@@ -7,6 +7,7 @@ import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.exceptions.DrawTileException;
 import it.polimi.ingsw.game.exceptions.GameNotFoundException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
+import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.GameServer;
@@ -172,15 +173,16 @@ public class RmiServer implements IServer {
 	public void flipHourglass(IClient client) throws RemoteException {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
-		if(game == null){
+		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
+		if(game == null | player == null){
 			client.updateClient(new ClientUpdate(connectionUUID, "You are not in a game."));
 			return;
 		}
 
 		if (game.getGameData().getCurrentGamePhaseType().equals(GamePhaseType.ASSEMBLE)){
 			try {
-				game.getGameData().getCurrentGamePhase().startTimer();
-			} catch (TimerIsAlreadyRunningException e) {
+				game.getGameData().getCurrentGamePhase().startTimer(player);
+			} catch (TimerIsAlreadyRunningException | CommandNotAllowedException e) {
 				client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 				return;
 			}
@@ -243,9 +245,7 @@ public class RmiServer implements IServer {
 		try {
 			player.setReservedTiles(player.getTileInHand());
 			player.discardTile(game.getGameData());
-		}catch (NoTileInHandException e){
-			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
-		}catch (TooManyReservedTilesException e){
+		}catch (NoTileInHandException | TooManyReservedTilesException e){
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
 
@@ -261,9 +261,7 @@ public class RmiServer implements IServer {
 
 		try{
 			player.pickTile(game.getGameData(), id);
-		} catch (AlreadyHaveTileInHandException e) {
-			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
-        } catch (ThatTileIdDoesNotExistsException e) {
+		} catch (AlreadyHaveTileInHandException | ThatTileIdDoesNotExistsException e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
         }
 

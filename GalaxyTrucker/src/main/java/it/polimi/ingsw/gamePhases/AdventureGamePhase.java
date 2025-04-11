@@ -5,6 +5,7 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.enums.GameState;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.gamePhases.exceptions.NoMoreCardsException;
+import it.polimi.ingsw.player.Player;
 
 import java.util.UUID;
 
@@ -31,7 +32,7 @@ public class AdventureGamePhase extends PlayableGamePhase{
     }
 
     @Override
-    public void startTimer() {
+    public void startTimer(Player p) {
 
     }
 

@@ -74,7 +74,7 @@ class GameDataTest {
              * Used to implement starting timer logic
              */
             @Override
-            public void startTimer() throws TimerIsAlreadyRunningException {
+            public void startTimer(Player p) throws TimerIsAlreadyRunningException {
 
             }
         };

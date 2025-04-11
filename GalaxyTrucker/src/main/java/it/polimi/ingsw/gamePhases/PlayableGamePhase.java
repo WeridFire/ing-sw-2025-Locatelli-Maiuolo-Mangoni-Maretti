@@ -2,8 +2,10 @@ package it.polimi.ingsw.gamePhases;
 
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
 import it.polimi.ingsw.network.exceptions.CantFindClientException;
+import it.polimi.ingsw.player.Player;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
@@ -55,6 +57,7 @@ public abstract class PlayableGamePhase implements Serializable {
 
     /**
      * Used to implement starting timer logic
+     * @param p The player who flipped the timer.
      * */
-    public abstract void startTimer() throws TimerIsAlreadyRunningException;
+    public abstract void startTimer(Player p) throws TimerIsAlreadyRunningException, CommandNotAllowedException;
 }
