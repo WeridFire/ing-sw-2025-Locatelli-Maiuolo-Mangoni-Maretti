@@ -73,6 +73,7 @@ public class Game {
 
         //nota sta nel playloop di una phase cambiare il suo stato in "ENDED" e cambiare il gameDate.currentGamePhase
         AssembleGamePhase a = new AssembleGamePhase(id, GamePhaseType.ASSEMBLE, gameData);
+        getGameData().setCurrentGamePhase(a);
         a.playLoop();
 
         gameData.getDeck().drawNextCard();
