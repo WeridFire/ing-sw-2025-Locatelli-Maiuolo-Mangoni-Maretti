@@ -52,6 +52,22 @@ public class AssembleCLIScreen extends CLIScreen{
                 }
                 break;
             case "finish":
+                if(getLastUpdate().getCurrentGame().getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE){
+                    setScreenMessage("The game is not in assembly phase.");
+                    return;
+                }
+
+                if(getLastUpdate().getClientPlayer().getShipBoard() == null){
+                    setScreenMessage("You don't have a shipboard.");
+                    return;
+                }
+
+                if(getLastUpdate().getClientPlayer().getShipBoard().isEndedAssembly()){
+                    setScreenMessage("You already ended the assembly phase!");
+                    return;
+                }
+                getServer().finishAssembling(getClient());
+                return;
 
             default:
                 setScreenMessage("Invalid command. Use help to view available commands.");
