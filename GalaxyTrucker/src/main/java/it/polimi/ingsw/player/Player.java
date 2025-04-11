@@ -80,11 +80,10 @@ public class Player implements Serializable {
     }
 
     /**
-     *
-     * @param tileInHand tile held by the player
+     * @param tileInHand tile held by the player. Can be null to reset an empty hand
      */
     public void setTileInHand(TileSkeleton tileInHand) throws AlreadyHaveTileInHandException {
-        if(getTileInHand() != null){
+        if (getTileInHand() != null && tileInHand != null) {
             throw new AlreadyHaveTileInHandException("You already are holding a tile.");
         }
         this.tileInHand = tileInHand;
