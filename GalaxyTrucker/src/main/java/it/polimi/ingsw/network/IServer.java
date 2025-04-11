@@ -1,6 +1,7 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.util.Coordinates;
 
@@ -31,5 +32,6 @@ public interface IServer extends Remote {
 	void discardTile(IClient client) throws RemoteException;
 	void reserveTile(IClient client) throws RemoteException;
 	void pickTile(IClient client, Integer id) throws RemoteException;
+	void placeTile(IClient client, Coordinates coordinates, Rotation rotation) throws RemoteException;
 	void finishAssembling(IClient client) throws RemoteException;
 }
