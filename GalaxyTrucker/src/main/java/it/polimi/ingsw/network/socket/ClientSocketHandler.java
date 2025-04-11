@@ -1,9 +1,11 @@
 package it.polimi.ingsw.network.socket;
 
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.network.*;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.messages.SocketMessage;
+import it.polimi.ingsw.util.Coordinates;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -70,8 +72,12 @@ public class ClientSocketHandler implements IClient {
 						case DRAW_TILE -> getServer().drawTile(this);
 						case DISCARD_TILE -> getServer().discardTile(this);
 						case RESERVE_TILE -> getServer().reserveTile(this);
+						case PICK_TILE -> getServer().pickTile(this,
+								(Integer) message.getArgs().getFirst());
+						case PLACE_TILE -> getServer().placeTile(this,
+								(Coordinates) message.getArgs().getFirst(),
+								(Rotation) message.getArgs().get(1));
 						case FINISH_ASSEMBLING -> getServer().finishAssembling(this);
-						//TODO: case PICK_TILE
 					}
 				}catch(IllegalArgumentException e){
 					System.err.println("ERROR WHILE PARSING MESSAGE! Message:");
