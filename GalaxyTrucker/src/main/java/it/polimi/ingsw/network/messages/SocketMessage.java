@@ -1,6 +1,8 @@
 package it.polimi.ingsw.network.messages;
 
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.enums.Rotation;
+import it.polimi.ingsw.util.Coordinates;
 
 import java.io.*;
 import java.util.List;
@@ -18,6 +20,7 @@ public class SocketMessage implements Serializable{
 		DISCARD_TILE,
 		RESERVE_TILE,
 		PICK_TILE,
+		PLACE_TILE,
 		FINISH_ASSEMBLING
 	}
 
@@ -161,11 +164,22 @@ public class SocketMessage implements Serializable{
 	 * Creates a socket message to tell the server to pick the tile with a specific id.
 	 *
 	 * @param id : id of the tile to pick
-	 *
 	 * @return The socket message containing the desired information.
 	 */
 	public static SocketMessage pickTileMessage(Integer id){
 		return new SocketMessage(MessageType.PICK_TILE, List.of(id));
+	}
+
+	/**
+	 * Creates a socket message to tell the server to place the tile in hand onto the shipboard in the specified
+	 * coordinates
+	 *
+	 * @param coordinates destination coordinates for the tile onto the shipboard
+	 * @param rotation rotation to apply to the tile before placing it onto the shipboard
+	 * @return The socket message containing the desired information.
+	 */
+	public static SocketMessage placeMessage(Coordinates coordinates, Rotation rotation){
+		return new SocketMessage(MessageType.PLACE_TILE, List.of(coordinates, rotation));
 	}
 
 	public static SocketMessage finishAssemblingMessage(){
