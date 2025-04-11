@@ -25,33 +25,32 @@ public class AssembleCLIScreen extends CLIScreen{
         command = command.toLowerCase();
         switch(command){
             case "timerflip":
+                //TODO: client side checks
                 getServer().flipHourglass(getClient());
-                setScreenMessage("Done");
                 break;
 
             case "draw":
+                //TODO: client side checks
                 getServer().drawTile(getClient());
-                setScreenMessage("Done");
                 break;
 
             case "discard":
+                //TODO: client side checks
                 getServer().discardTile(getClient());
-                setScreenMessage("Done");
                 break;
 
             case "reserve":
+                //TODO: client side checks
                 getServer().reserveTile(getClient());
-                setScreenMessage("Done");
                 break;
 
             case "pick":
+                //TODO: client side checks
                 if (args.length == 1) {
                     int id = Integer.parseInt(args[0]);
                     getServer().pickTile(getClient(), id);
                 }
-                setScreenMessage("Done");
                 break;
-
             default:
                 setScreenMessage("Invalid command. Use help to view available commands.");
                 break;
