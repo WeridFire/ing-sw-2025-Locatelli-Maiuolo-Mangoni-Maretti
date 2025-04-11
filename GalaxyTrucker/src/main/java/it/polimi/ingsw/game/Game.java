@@ -6,7 +6,8 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.AdventureGamePhase;
 import it.polimi.ingsw.gamePhases.AssembleGamePhase;
-import it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTypeException;
+import it.polimi.ingsw.gamePhases.LobbyGamePhase;
+import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
@@ -71,16 +72,31 @@ public class Game {
      */
     public void gameLoop() throws InterruptedException, RemoteException {
 
-        AssembleGamePhase a = new AssembleGamePhase(id, GamePhaseType.ASSEMBLE, gameData);
+        LobbyGamePhase l = new LobbyGamePhase(id, gameData);
+        getGameData().setCurrentGamePhase(l);
+        l.playLoop();
+
+        //Call function to initialize all players stuff.
+        initGame();
+
+        AssembleGamePhase a = new AssembleGamePhase(id, gameData);
         getGameData().setCurrentGamePhase(a);
+
+        //We notify all players about the new game state
+        GameServer.getInstance().broadcastUpdate(this);
+
         a.playLoop();
 
         gameData.getDeck().drawNextCard();
         AdventureGamePhase adventureGamePhase = null;
         while(gameData.getDeck().getTopCard() != null) {
             //create adventure
-            adventureGamePhase = new AdventureGamePhase(id, GamePhaseType.ADVENTURE, gameData, gameData.getDeck().getTopCard());
+            adventureGamePhase = new AdventureGamePhase(id, gameData, gameData.getDeck().getTopCard());
             getGameData().setCurrentGamePhase(adventureGamePhase);
+
+            //We notify all players about the new game state
+            GameServer.getInstance().broadcastUpdate(this);
+
             adventureGamePhase.playLoop();
 
             gameData.getDeck().drawNextCard();
@@ -107,15 +123,14 @@ public class Game {
     public void addPlayer(Player player) throws PlayerAlreadyInGameException {
         if(gameData.getCurrentGamePhaseType() == GamePhaseType.LOBBY){
             gameData.addPlayer(player);
-            if(gameData.getPlayers().size() >= gameData.getRequiredPlayers()){
-                startGame();
-            }
         }
         //IN here we should handle when a player reconnects. That's why it is handled on the Game level, and not
         //GameData.
     }
 
-    private void startGame(){
+    private void initGame(){
+        //After the lobby phase has ended, we initialize the game.
+
         switch(gameData.getLevel()){
             case TESTFLIGHT, ONE -> gameData.setLapSize(18);
             case TWO -> gameData.setLapSize(24);
@@ -136,14 +151,6 @@ public class Game {
         for (Player player : gameData.getPlayers()) {
             player.setShipBoard(new ShipBoard(gameData.getLevel()));
         }
-
-        if(gameData.getCurrentGamePhaseType() == GamePhaseType.LOBBY){
-			try {
-				gameLoop();
-			} catch ( InterruptedException | RemoteException e) {
-				throw new RuntimeException(e);
-			}
-		}
     }
 
 

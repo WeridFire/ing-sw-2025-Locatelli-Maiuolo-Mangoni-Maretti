@@ -5,6 +5,7 @@ import it.polimi.ingsw.game.exceptions.GameNotFoundException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.player.Player;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -56,6 +57,15 @@ public class GamesHandler {
     public Game newGame() {
         Game game = new Game();
         games.add(game);
+        //Instantiate a thread that handles that specific game.
+        new Thread(() -> {
+			try {
+				game.gameLoop();
+                //TODO: Once the game has ended, remove it from the games list!
+			} catch (InterruptedException | RemoteException e) {
+				throw new RuntimeException(e);
+			}
+		}).start();
         return game;
     }
 

@@ -141,6 +141,14 @@ public class GameData implements Serializable {
     }
 
     /**
+     *
+     * @return The unordered, original reference to the players object. Useful for locks.
+     */
+    public Set<Player> getUnorderedPlayers(){
+        return players;
+    }
+
+    /**
      * Gets the player whose turn it is.
      *
      * @return The current turn player.
@@ -233,10 +241,18 @@ public class GameData implements Serializable {
                 .contains(player.getUsername())) {
             throw new PlayerAlreadyInGameException("Player with this username is already present.");
         }
-        players.add(player);
-        if (players.size() == 1) {
-            this.gameLeader = player.getUsername();
+        synchronized (players){
+            players.add(player);
+            if (players.size() == 1) {
+                this.gameLeader = player.getUsername();
+            }
+
+            if(players.size() >= requiredPlayers){
+                //Awake main thread for starting game.
+                players.notifyAll();
+            }
         }
+
     }
 
     /**
@@ -322,6 +338,12 @@ public class GameData implements Serializable {
             return;
         }
         this.requiredPlayers = requiredPlayers;
+        synchronized (players){
+            if(players.size() >= requiredPlayers){
+                //Awake main thread for starting game.
+                players.notifyAll();
+            }
+        }
     }
 
     /**
