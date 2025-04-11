@@ -28,8 +28,8 @@ public class AssembleGamePhase extends PlayableGamePhase {
      * @param gamePhaseType The type of the game phase.
      * @param gameData      The game data.
      */
-    public AssembleGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameData gameData) {
-        super(gameId, gamePhaseType, gameData);
+    public AssembleGamePhase(UUID gameId, GameData gameData) {
+        super(gameId, GamePhaseType.ASSEMBLE, gameData);
 
         this.timerRunning = false;
 
