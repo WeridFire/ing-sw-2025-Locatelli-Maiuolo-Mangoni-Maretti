@@ -3,10 +3,12 @@ package it.polimi.ingsw.cards.planets;
 import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.cards.exceptions.PlanetsCardException;
+import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
 import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
+import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static it.polimi.ingsw.view.cli.CLIScreen.getScreenFrame;
 
 public class PlanetsCard extends Card {
 
@@ -31,6 +35,8 @@ public class PlanetsCard extends Card {
 	 */
 	public PlanetsCard(Planet[] planets, int lostDays, String textureName, int level) {
 		super(textureName, level);
+		this.planets = planets;
+		this.lostDays = lostDays;
 	}
 
 	/**
@@ -98,7 +104,64 @@ public class PlanetsCard extends Card {
 	 */
 	@Override
 	public CLIFrame getCLIRepresentation() {
-		// TODO
-		return null;
+		/**
+		 * sembrano in obliquo i bordi ma è
+		 * perche è un commento
+		 *
+		 * +--------------+
+		 * |   PIRATES    |
+		 * | lost days: x |
+		 * | firepower: x |
+		 * | bounty: x    |
+		 * |              |
+		 * | hits:        |
+		 * | ............ |
+		 * | ............ |
+		 * +--------------+
+		 * */
+
+		CLIFrame cardBorder = getScreenFrame(11, 20, ANSI.BACKGROUND_CYAN);
+
+		// frame title
+		CLIFrame title = new CLIFrame(new String[]{
+				ANSI.WHITE + "PLANETS" + ANSI.RESET
+		});
+		cardBorder = cardBorder.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 0, 0);
+
+		List<String> cardInfoLines = new ArrayList<>();
+
+		cardInfoLines.add(
+				ANSI.BLACK + "Lost days: " + lostDays + ANSI.RESET
+		);
+		cardInfoLines.add(
+				""
+		);
+
+		int p = 1;
+		for (Planet planet : planets) {
+			cardInfoLines.add(ANSI.BLACK + "Planet "+ p + ": "  + ANSI.RESET);
+			p++;
+
+			StringBuilder line = new StringBuilder();
+			for (int i = 0; i < planet.getAvailableGoods().size(); i++) {
+				if (i % 4 == 0 && i != 0) {
+					cardInfoLines.add(line.toString());
+					line = new StringBuilder();
+				}
+				line.append(planet.getAvailableGoods().get(i).getUnicodeColoredString());
+			}
+
+			cardInfoLines.add(
+					line.toString()
+			);
+
+
+		}
+
+		CLIFrame infoFrame = new CLIFrame(cardInfoLines.toArray(new String[0]));
+
+		cardBorder = cardBorder.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
+
+		return cardBorder;
 	}
 }
