@@ -48,7 +48,7 @@ public enum SideType {
             case DOUBLE -> Direction.sortedArray("╞", "╨─", "╡", "╥─");
             case SINGLE -> Direction.sortedArray("├", "─┴", "┤", "─┬");
             case SMOOTH -> Direction.sortedArray("│", "──", "│", "──");
-            case CANNON, ENGINE -> Direction.sortedArray("⯈", "/\\", "⯇", "\\/");
+            case CANNON, ENGINE -> Direction.sortedArray(">", "/\\", "<", "\\/");
         };
         return reps.get(pointing.getValue());
     }
