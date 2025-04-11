@@ -194,9 +194,9 @@ public class BoardCoordinates {
                 line3.append(tileRep[2]);
             }
 
-            line1.append("─");
+            line1.append("──");
             line2.append(row);
-            line3.append("─");
+            line3.append("──");
 
             result.add(line1.toString());
             result.add(line2.toString());
