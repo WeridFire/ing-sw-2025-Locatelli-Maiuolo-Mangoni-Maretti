@@ -13,6 +13,15 @@ public enum Rotation {
 
     private static final Rotation[] VALUES = values();
 
+    public static Rotation fromString(String rotation) {
+        return switch (rotation.toUpperCase()) {
+            case "LEFT", "L", "COUNTERCLOCKWISE", "CC", "-90", "-PI/2" -> COUNTERCLOCKWISE;
+            case "RIGHT", "R", "CLOCKWISE", "C", "90", "PI/2" -> CLOCKWISE;
+            case "OPPOSITE", "O", "180", "PI" -> OPPOSITE;
+            default -> NONE;
+        };
+    }
+
     private final int value;
 
     Rotation(int value) {
