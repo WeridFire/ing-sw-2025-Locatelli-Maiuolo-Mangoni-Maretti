@@ -93,11 +93,14 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
 
     /**
      * Reset the tile rotation to its instantiation state.
-     * Subclasses should not override this.
      * @throws FixedTileException If the tile has been already fixed.
      */
-    public void resetRotation() throws FixedTileException {
+    public final void resetRotation() throws FixedTileException {
         rotateTile(appliedRotation.reversed());
+    }
+
+    public Rotation getAppliedRotation() {
+        return appliedRotation;
     }
 
     /**
@@ -157,6 +160,11 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
             sb.append("; ").append(directions[i]).append(" -> ").append(sides[directions[i].getValue()]);
         }
         return sb.append("]").toString();
+    }
+
+    public boolean equals(TileSkeleton other) {
+        if (other == null) return false;
+        return id == other.id;
     }
 
     @Override
