@@ -1,14 +1,21 @@
 package it.polimi.ingsw.cards.enemy;
 
+import it.polimi.ingsw.cards.planets.Planet;
+import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
 import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
+import static it.polimi.ingsw.view.cli.CLIScreen.getScreenFrame;
 
 public class SmugglersCard extends EnemyCard {
 
@@ -57,7 +64,67 @@ public class SmugglersCard extends EnemyCard {
 	 */
 	@Override
 	public CLIFrame getCLIRepresentation() {
-		// TODO
-		return null;
+		/**
+		 * sembrano in obliquo i bordi ma è
+		 * perche è un commento
+		 *
+		 * +--------------+
+		 * |   PIRATES    |
+		 * | lost days: x |
+		 * | firepower: x |
+		 * | bounty: x    |
+		 * |              |
+		 * | hits:        |
+		 * | ............ |
+		 * | ............ |
+		 * +--------------+
+		 * */
+
+		CLIFrame cardBorder = getScreenFrame(11, 20, ANSI.BACKGROUND_CYAN);
+
+		// frame title
+		CLIFrame title = new CLIFrame(new String[]{
+				ANSI.WHITE + "SMUGGLERS" + ANSI.RESET
+		});
+		cardBorder = cardBorder.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 0, 0);
+
+		List<String> cardInfoLines = new ArrayList<>();
+
+		cardInfoLines.add(
+				ANSI.BLACK + "Punish cargo: " + punishCargo + ANSI.RESET
+		);
+		cardInfoLines.add(
+				ANSI.BLACK + "Fire power: " + getFirePower() + ANSI.RESET
+		);
+		cardInfoLines.add(
+				ANSI.BLACK + "Lost days: " + getLostDays() + ANSI.RESET
+		);
+
+		cardInfoLines.add(
+				""
+		);
+
+		cardInfoLines.add(
+				ANSI.BLACK + "Prizes: " + ANSI.RESET
+		);
+		StringBuilder line = new StringBuilder();
+		for (int i = 0; i < prizeGoods.length; i++) {
+			if (i % 4 == 0 && i != 0) {
+				cardInfoLines.add(line.toString());
+				line = new StringBuilder();
+			}
+			line.append(prizeGoods[i].getUnicodeColoredString());
+		}
+
+		cardInfoLines.add(
+				line.toString()
+		);
+
+
+		CLIFrame infoFrame = new CLIFrame(cardInfoLines.toArray(new String[0]));
+
+		cardBorder = cardBorder.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
+
+		return cardBorder;
 	}
 }
