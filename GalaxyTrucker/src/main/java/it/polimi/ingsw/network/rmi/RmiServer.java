@@ -21,6 +21,8 @@ import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.ShipBoard;
+import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
@@ -226,6 +228,7 @@ public class RmiServer implements IServer {
 			player.discardTile(game.getGameData());
 		} catch (NoTileInHandException e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
+			return;
 		}
 
 		GameServer.getInstance().broadcastUpdate(game);
@@ -247,6 +250,7 @@ public class RmiServer implements IServer {
 			player.discardTile(game.getGameData());
 		}catch (NoTileInHandException | TooManyReservedTilesException e){
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
+			return;
 		}
 
 		GameServer.getInstance().broadcastUpdate(game);
@@ -259,12 +263,43 @@ public class RmiServer implements IServer {
 		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
 		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
 
+		if (player == null || game == null) {
+			client.updateClient(new ClientUpdate(connectionUUID, "You are not in a game."));
+			return;
+		}
+
 		try{
 			player.pickTile(game.getGameData(), id);
 		} catch (AlreadyHaveTileInHandException | ThatTileIdDoesNotExistsException e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
+			return;
         }
 
 		GameServer.getInstance().broadcastUpdate(game);
     }
+
+	@Override
+	public void finishAssembling(IClient client) throws RemoteException {
+		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
+		Player player = gamesHandler.getPlayerByConnection(connectionUUID);
+		Game game = gamesHandler.findGameByClientUUID(connectionUUID);
+		if (player == null || game == null) {
+			client.updateClient(new ClientUpdate(connectionUUID, "You are not in a game."));
+			return;
+		}
+
+		ShipBoard shipBoard = player.getShipBoard();
+
+		if(shipBoard == null){
+			client.updateClient(new ClientUpdate(connectionUUID, "You don't have a shipboard."));
+			//This means that something went wrong or the player is in pre-assembly or lobby phase.
+			return;
+		}
+
+		try {
+			shipBoard.endAssembly(game.getGameData());
+		} catch (AlreadyEndedAssemblyException | CommandNotAllowedException e) {
+			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
+		}
+	}
 }
