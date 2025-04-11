@@ -283,6 +283,14 @@ public class ShipBoard implements ICLIPrintable, Serializable {
         return false;
     }
 
+	/**
+	 *
+	 * @return if the shipboard assembly process is finished.
+	 */
+	public boolean isEndedAssembly() {
+		return endedAssembly;
+	}
+
     /**
      * Determines the level of protection from cannons in a given direction, coordinate and range.
      * <p>
