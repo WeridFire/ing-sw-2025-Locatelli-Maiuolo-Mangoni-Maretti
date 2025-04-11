@@ -159,8 +159,8 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		if (board.containsKey(coordinates)) {
 			throw new TileAlreadyPresentException(coordinates, board.get(coordinates));
 		}
-		board.put(coordinates, tile);
 		tile.place(coordinates);
+		board.put(coordinates, tile);
 	}
 
 
