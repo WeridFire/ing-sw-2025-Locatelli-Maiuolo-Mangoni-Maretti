@@ -69,9 +69,8 @@ public class Game {
      * This method is currently a placeholder and needs to be implemented.
      * </p>
      */
-    public void gameLoop() throws IncorrectGamePhaseTypeException, InterruptedException, RemoteException {
+    public void gameLoop() throws InterruptedException, RemoteException {
 
-        //nota sta nel playloop di una phase cambiare il suo stato in "ENDED" e cambiare il gameDate.currentGamePhase
         AssembleGamePhase a = new AssembleGamePhase(id, GamePhaseType.ASSEMBLE, gameData);
         getGameData().setCurrentGamePhase(a);
         a.playLoop();
@@ -81,7 +80,7 @@ public class Game {
         while(gameData.getDeck().getTopCard() != null) {
             //create adventure
             adventureGamePhase = new AdventureGamePhase(id, GamePhaseType.ADVENTURE, gameData, gameData.getDeck().getTopCard());
-
+            getGameData().setCurrentGamePhase(adventureGamePhase);
             adventureGamePhase.playLoop();
 
             gameData.getDeck().drawNextCard();
@@ -141,7 +140,7 @@ public class Game {
         if(gameData.getCurrentGamePhaseType() == GamePhaseType.LOBBY){
 			try {
 				gameLoop();
-			} catch (IncorrectGamePhaseTypeException | InterruptedException | RemoteException e) {
+			} catch ( InterruptedException | RemoteException e) {
 				throw new RuntimeException(e);
 			}
 		}

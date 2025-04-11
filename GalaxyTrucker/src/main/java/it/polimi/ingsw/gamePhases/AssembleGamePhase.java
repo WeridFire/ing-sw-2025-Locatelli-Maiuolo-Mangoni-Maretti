@@ -26,12 +26,8 @@ public class AssembleGamePhase extends PlayableGamePhase {
      * @param gamePhaseType The type of the game phase.
      * @param gameData      The game data.
      */
-    public AssembleGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameData gameData) throws IncorrectGamePhaseTypeException{
+    public AssembleGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameData gameData) {
         super(gameId, gamePhaseType, gameData);
-
-        if (!gamePhaseType.equals(GamePhaseType.ASSEMBLE)){
-            throw new IncorrectGamePhaseTypeException("Assemble gamePhase type is not coherent");
-        }
 
         if (gameData.getLevel().equals(GameLevel.TESTFLIGHT)){
             this.howManyTimerRotationsLeft = -1;
