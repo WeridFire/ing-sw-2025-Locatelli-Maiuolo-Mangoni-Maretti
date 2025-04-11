@@ -92,31 +92,37 @@ public class ServerSocketHandler implements IServer {
 
 	@Override
 	public void flipHourglass(IClient client) {
-		SocketMessage mess = SocketMessage.flipHourglass();
+		SocketMessage mess = SocketMessage.flipHourglassMessage();
 		sendSocketMessage(mess);
 	}
 
 	@Override
 	public void drawTile(IClient client) {
-		SocketMessage mess = SocketMessage.drawTile();
+		SocketMessage mess = SocketMessage.drawTileMessage();
 		sendSocketMessage(mess);
 	}
 
 	@Override
 	public void discardTile(IClient client) throws RemoteException {
-		SocketMessage mess = SocketMessage.discardTile();
+		SocketMessage mess = SocketMessage.discardTileMessage();
 		sendSocketMessage(mess);
 	}
 
 	@Override
 	public void reserveTile(IClient client) throws RemoteException {
-		SocketMessage mess = SocketMessage.reserveTile();
+		SocketMessage mess = SocketMessage.reserveTileMessage();
 		sendSocketMessage(mess);
 	}
 
 	@Override
 	public void pickTile(IClient client, Integer id) throws RemoteException {
-		SocketMessage mess = SocketMessage.pickTile(id);
+		SocketMessage mess = SocketMessage.pickTileMessage(id);
+		sendSocketMessage(mess);
+	}
+
+	@Override
+	public void finishAssembling(IClient client) throws RemoteException {
+		SocketMessage mess = SocketMessage.finishAssemblingMessage();
 		sendSocketMessage(mess);
 	}
 }
