@@ -72,6 +72,15 @@ public abstract class CLIScreen implements ICLIPrintable {
 	protected final void refresh(){
 		clear();
 		printScreen();
+
+		if(CLIScreenHandler.getInstance().isShowingHelpScreen){
+			printAvailableCommands();
+		}
+
+		if(CLIScreenHandler.getInstance().isShowingAvailableScreens){
+			CLIScreenHandler.getInstance().printAvailableScreens();
+		}
+
 		if(getLastUpdate().getError() != null){
 			displayError();
 		}
