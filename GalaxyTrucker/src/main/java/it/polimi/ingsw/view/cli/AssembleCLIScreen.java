@@ -51,6 +51,8 @@ public class AssembleCLIScreen extends CLIScreen{
                     getServer().pickTile(getClient(), id);
                 }
                 break;
+            case "finish":
+
             default:
                 setScreenMessage("Invalid command. Use help to view available commands.");
                 break;
