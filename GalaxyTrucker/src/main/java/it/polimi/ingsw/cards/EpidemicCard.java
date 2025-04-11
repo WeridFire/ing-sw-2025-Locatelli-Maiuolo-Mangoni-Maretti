@@ -1,6 +1,7 @@
 package it.polimi.ingsw.cards;
 
 import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.tiles.Tile;
@@ -8,13 +9,13 @@ import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.shipboard.visitors.VisitorEpidemic;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static it.polimi.ingsw.view.cli.CLIScreen.getScreenFrame;
 
 public class EpidemicCard extends Card{
 	/**
@@ -45,7 +46,41 @@ public class EpidemicCard extends Card{
 	 */
 	@Override
 	public CLIFrame getCLIRepresentation() {
-		// TODO
-		return null;
+		/**
+		 * sembrano in obliquo i bordi ma è
+		 * perche è un commento
+		 *
+		 * +--------------+
+		 * |   PIRATES    |
+		 * | lost days: x |
+		 * | firepower: x |
+		 * | bounty: x    |
+		 * |              |
+		 * | hits:        |
+		 * | ............ |
+		 * | ............ |
+		 * +--------------+
+		 * */
+
+		CLIFrame cardBorder = getScreenFrame(11, 20, ANSI.BACKGROUND_CYAN);
+
+		// frame title
+		CLIFrame title = new CLIFrame(new String[]{
+				ANSI.WHITE + "EPIDEMIC" + ANSI.RESET
+		});
+		cardBorder = cardBorder.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 0, 0);
+
+		List<String> cardInfoLines = new ArrayList<>();
+		cardInfoLines.add(
+				ANSI.BLACK + "Some crewmember" + ANSI.RESET
+		);
+		cardInfoLines.add(
+				ANSI.BLACK + "died from covid!" + ANSI.RESET
+		);
+		CLIFrame infoFrame = new CLIFrame(cardInfoLines.toArray(new String[0]));
+
+		cardBorder = cardBorder.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
+
+		return cardBorder;
 	}
 }
