@@ -4,6 +4,7 @@ import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -394,6 +395,39 @@ public class CLIFrame implements Serializable {
             case WEST -> merge(add, AnchorPoint.LEFT, AnchorPoint.RIGHT, 0, -space);
             case SOUTH -> merge(add, AnchorPoint.BOTTOM, AnchorPoint.TOP, space, 0);
         };
+    }
+
+    /**
+     * Virtually applies a colored background to this frame and return the result.
+     * <p>
+     * Any part with an already colored background is not changed;
+     * for all the parts with a transparent background: it changes in the specified color.
+     *
+     * @param backgroundFill The color to fill the background with.
+     * @return A new {@link CLIFrame} representing the painted result.
+     */
+    public CLIFrame paintBackground(String backgroundFill) {
+        String emptyLine = backgroundFill + " ".repeat(columns);
+        String[] frame = Collections.nCopies(rows, emptyLine).toArray(String[]::new);
+        return new CLIFrame(frame).merge(this);
+    }
+
+    /**
+     * Virtually applies a colored foreground to this frame and return the result.
+     * <p>
+     * Any part with an already colored foreground is not changed;
+     * for all the parts with a non-set foreground: it changes in the specified color.
+     *
+     * @param foregroundFill The color to fill the foreground with.
+     * @return A new {@link CLIFrame} representing the painted result.
+     */
+    public CLIFrame paintForeground(String foregroundFill) {
+        String[] frame = new String[rows];
+        for (int i = 0; i < rows; i++) {
+            frame[i] = contentAsLines[i].replace(ANSI.RESET, ANSI.RESET + foregroundFill);
+            frame[i] = foregroundFill + frame[i] + ANSI.RESET;
+        }
+        return new CLIFrame(frame);
     }
 
     @Override
