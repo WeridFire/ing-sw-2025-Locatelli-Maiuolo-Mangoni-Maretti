@@ -33,7 +33,7 @@ class CabinTileTest {
                 SideType.SINGLE, SideType.DOUBLE, SideType.UNIVERSAL, SideType.UNIVERSAL).toArray(SideType[]::new));
 
         //Creates the main cabin
-        mainCabin = TilesFactory.createMainCabinTile();
+        mainCabin = TilesFactory.createMainCabinTile(MainCabinTile.Color.RED);
 
         cabinBrown = new CabinTile(Direction.sortedArray(
                 SideType.SINGLE, SideType.DOUBLE, SideType.SMOOTH, SideType.SMOOTH).toArray(SideType[]::new));

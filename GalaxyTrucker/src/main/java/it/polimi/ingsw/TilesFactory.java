@@ -25,14 +25,14 @@ public class TilesFactory {
      *
      * @return A {@code Tile} instance representing the main cabin.
      */
-    public static MainCabinTile createMainCabinTile() {
+    public static MainCabinTile createMainCabinTile(MainCabinTile.Color color) {
         /*
         Blue -> "GT-new_tiles_16_for web33.jpg"
         Green -> "GT-new_tiles_16_for web34.jpg"
         Red -> "GT-new_tiles_16_for web52.jpg"
         Yellow -> "GT-new_tiles_16_for web61.jpg"
          */
-        return new MainCabinTile();
+        return new MainCabinTile(color);
     }
 
     /**
