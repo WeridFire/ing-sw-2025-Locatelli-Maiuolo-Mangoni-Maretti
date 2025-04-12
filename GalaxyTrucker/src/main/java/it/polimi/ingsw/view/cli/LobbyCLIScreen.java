@@ -177,7 +177,6 @@ public class LobbyCLIScreen extends CLIScreen{
 
 		CLIFrame gameInfoBG = getScreenFrame(8, 60, ANSI.BACKGROUND_WHITE);
 		CLIFrame gameInfoBlock = new CLIFrame(lobbyInfoLines.toArray(new String[0]));
-		System.out.println(gameInfoBlock);
 		gameInfoBlock = gameInfoBG.merge(gameInfoBlock, AnchorPoint.CENTER, AnchorPoint.CENTER);
 		// Merge the game info block into the lobby info frame (with some vertical offset)
 		lobbyInfoFrame = lobbyInfoFrame.merge(gameInfoBlock, AnchorPoint.TOP, AnchorPoint.CENTER, 8, 0);
