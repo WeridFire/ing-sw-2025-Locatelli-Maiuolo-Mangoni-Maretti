@@ -148,8 +148,10 @@ public class Game {
 
         gameData.setDeck(new Deck(gameData.getLevel()));
 
+        int playerIndex = 0;
         for (Player player : gameData.getPlayers()) {
-            player.setShipBoard(new ShipBoard(gameData.getLevel()));
+            player.setShipBoard(ShipBoard.create(gameData.getLevel(), playerIndex));
+            playerIndex++;
         }
     }
 

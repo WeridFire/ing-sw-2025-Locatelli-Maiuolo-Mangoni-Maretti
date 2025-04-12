@@ -134,6 +134,16 @@ public class BoardCoordinates {
     }
 
     /**
+     * Returns the coordinates where to put the main cabin on the board.
+     * It does NOT depend on {@link GameLevel}
+     *
+     * @return The main cabin coordinates.
+     */
+    public static Coordinates getMainCabinCoordinates() {
+        return new Coordinates(7, 7);
+    }
+
+    /**
      * Generates a CLI representation of the game board for the specified game level.
      * <p>
      * The representation includes a grid structure with row and column numbers for easy identification.

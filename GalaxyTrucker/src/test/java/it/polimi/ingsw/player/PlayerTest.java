@@ -53,7 +53,7 @@ class PlayerTest {
     @BeforeEach
     void setUp() {
         player1 = new Player("SpaceTruckKing", UUID.randomUUID());
-        shipBoard1 = new ShipBoard(GameLevel.TWO);
+        shipBoard1 = ShipBoard.create(GameLevel.TWO, 0);
         gameId = UUID.randomUUID();
         gameData = new GameData(gameId);
     }

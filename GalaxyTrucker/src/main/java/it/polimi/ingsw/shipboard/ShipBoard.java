@@ -1,5 +1,6 @@
 package it.polimi.ingsw.shipboard;
 
+import it.polimi.ingsw.TilesFactory;
 import it.polimi.ingsw.enums.*;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
@@ -32,12 +33,30 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	private VisitorCalculateShieldedSides visitorCalculateShieldedSides;
 	private VisitorCheckIntegrity visitorCheckIntegrity;
 
-	public ShipBoard(GameLevel level) {
+	protected ShipBoard(GameLevel level) {
 		board = new HashMap<>();
 		this.level = level;
 		emptyRepresentation = BoardCoordinates.getCLIRepresentation(level);
 		endedAssembly = false;
 	}
+
+	/**
+	 * Creates a ShipBoard for the player with specified index, already managing the main cabin placement.
+	 * @param level The game level to play (for the shipboard form)
+	 * @param playerIndex The player index (for the main-cabin color)
+	 * @return The created ShipBoard
+	 * @throws IllegalArgumentException if {@code playerIndex} is not coherent with players number
+	 */
+	public static ShipBoard create(GameLevel level, int playerIndex) {
+		ShipBoard sb = new ShipBoard(level);
+		MainCabinTile mainCabin = TilesFactory.createMainCabinTile(MainCabinTile.Color.fromPlayerIndex(playerIndex));
+        try {
+            sb.setTile(mainCabin, BoardCoordinates.getMainCabinCoordinates());
+        } catch (OutOfBuildingAreaException | TileAlreadyPresentException | FixedTileException e) {
+            throw new RuntimeException(e);  // should never happen -> runtime error
+        }
+		return sb;
+    }
 
 	private void resetVisitors() {
 		visitorCalculateCargoInfo = new VisitorCalculateCargoInfo();
