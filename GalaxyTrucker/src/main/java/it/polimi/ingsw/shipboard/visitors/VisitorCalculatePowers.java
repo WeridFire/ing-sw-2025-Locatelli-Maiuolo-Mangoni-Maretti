@@ -6,6 +6,7 @@ import it.polimi.ingsw.shipboard.tiles.*;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
 import it.polimi.ingsw.util.Coordinates;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,7 @@ public class VisitorCalculatePowers implements TileVisitor {
     /**
      * Stores information about a power calculation, including base power, activation locations, and bonus.
      */
-    public static class CalculatorPowerInfo {
+    public static class CalculatorPowerInfo implements Serializable {
         private boolean bonus;  // Indicates whether an alien bonus applies (e.g. purple/brown alien)
         private float basePower;  // The base power before any modifications: simple tiles (e.g. single cannons/engines)
         private final Map<Coordinates, Float> locationsToActivate;  // Map of tiles that can be activated mapped to their power values

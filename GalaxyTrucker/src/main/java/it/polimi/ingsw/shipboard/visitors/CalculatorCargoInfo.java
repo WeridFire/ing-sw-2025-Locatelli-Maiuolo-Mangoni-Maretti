@@ -5,13 +5,14 @@ import it.polimi.ingsw.shipboard.tiles.*;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
 import it.polimi.ingsw.util.Coordinates;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * This class is responsible for gathering and analyzing cargo-related information from container tiles in a shipboard.
  * It tracks the remaining capacity, the types of items loaded, and the locations of cargo containers.
  */
-public class CalculatorCargoInfo<ContainerType extends ContainerTile> {
+public class CalculatorCargoInfo<ContainerType extends ContainerTile> implements Serializable {
 
     /** A map of coordinates and container tiles in these coordinates. Also empty containers are saved. */
     private final Map<Coordinates, ContainerType> containerLocations;

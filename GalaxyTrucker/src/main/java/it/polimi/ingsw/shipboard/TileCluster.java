@@ -4,6 +4,7 @@ import it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
 import it.polimi.ingsw.shipboard.tiles.Tile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,7 +12,7 @@ import java.util.Set;
  * Represents a cluster of connected tiles, with an optional main tile.
  * A tile cluster groups tiles that are considered part of the same unit (e.g. all and only those welded together).
  */
-public class TileCluster {
+public class TileCluster implements Serializable {
     private final Set<TileSkeleton> tiles;
     private TileSkeleton mainTile;
 
