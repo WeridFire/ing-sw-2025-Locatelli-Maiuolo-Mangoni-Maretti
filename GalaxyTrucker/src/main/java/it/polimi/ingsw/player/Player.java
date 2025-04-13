@@ -1,14 +1,14 @@
 package it.polimi.ingsw.player;
 
-import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.game.exceptions.DrawTileException;
-import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
-import it.polimi.ingsw.player.exceptions.NoTileInHandException;
-import it.polimi.ingsw.player.exceptions.TooManyReservedTilesException;
+import it.polimi.ingsw.player.exceptions.*;
 import it.polimi.ingsw.shipboard.ShipBoard;
-import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
+import it.polimi.ingsw.shipboard.exceptions.*;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
+import it.polimi.ingsw.util.Coordinates;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.UUID;
 public class Player implements Serializable {
 
     private final String username;
-    private UUID connectionUUID;
+    private final UUID connectionUUID;
 
     /**
      * Tile currently held by the player
@@ -31,9 +31,15 @@ public class Player implements Serializable {
     private final List<TileSkeleton> reservedTiles;
 
     /**
+     * true <==> tile in hand has been picked from reserved tiles
+     * (can not discard and count as lost if not placed before end of assembly)
+     */  // TODO: implement check at the end of assembly to count it as reserved tile
+    private boolean isTileInHandFromReserved = false;
+
+    /**
      * Number of tiles that the player will have to pay for at the end of the game (destroyed tiles or reserved and not used tiles)
      */
-    private final List<TileSkeleton> discardedTiles;
+    private final List<TileSkeleton> lostTiles;
 
     /**
      * The player's shipboard
@@ -52,9 +58,9 @@ public class Player implements Serializable {
 
     public Player(String username, UUID connectionUUID) {
         this.username = username;
-        this.reservedTiles = new ArrayList<>(2);
-        this.discardedTiles = new ArrayList<>();
         this.connectionUUID = connectionUUID;
+        reservedTiles = new ArrayList<>(2);
+        lostTiles = new ArrayList<>();
         credits = 0;
     }
 
@@ -74,18 +80,32 @@ public class Player implements Serializable {
      *
      * @return tile held by the player
      */
-        public TileSkeleton getTileInHand() {
+    public TileSkeleton getTileInHand() {
         return tileInHand;
     }
 
     /**
-     * @param tileInHand tile held by the player. Can be null to reset an empty hand
+     * @param tileInHand tile to be held by the player
+     * @throws AlreadyHaveTileInHandException if already have tile in hand
+     * @throws TileCanNotDisappearException if {@code tileInHand == null}: it would make the tile disappear from
+     * player's hand
      */
-    public void setTileInHand(TileSkeleton tileInHand) throws AlreadyHaveTileInHandException {
-        if (getTileInHand() != null && tileInHand != null) {
-            throw new AlreadyHaveTileInHandException("You already are holding a tile.");
+    public void setTileInHand(TileSkeleton tileInHand) throws AlreadyHaveTileInHandException, TileCanNotDisappearException {
+        if (tileInHand == null) {
+            throw new TileCanNotDisappearException("You have a tile in hand: it can not disappear.");
+        }
+        if (getTileInHand() != null) {
+            throw new AlreadyHaveTileInHandException();
         }
         this.tileInHand = tileInHand;
+    }
+
+    /**
+     * Clear the hand. Requires to have put the tile in hand somewhere else before.
+     */
+    private void removeTileFromHand() {
+        tileInHand = null;
+        isTileInHandFromReserved = false;
     }
 
     /**
@@ -97,31 +117,28 @@ public class Player implements Serializable {
     }
 
     /**
-     * Assigns the tile to the first slot of reservedTiles
-     * @param reservedTile tile to save in the array
-     * @throws TooManyReservedTilesException called if the array is already full
+     * Assigns the tile in hand to the first available slot of reservedTiles. Then already removes tile from hand.
+     * @throws NoTileInHandException if there is no tile in hand
+     * @throws TooManyReservedTilesException if there is no more space to reserve any tile
      */
-    public void setReservedTiles(TileSkeleton reservedTile) throws TooManyReservedTilesException, NoTileInHandException {
+    public void reserveTile() throws NoTileInHandException, TooManyReservedTilesException {
+        if (getTileInHand() == null) {
+            throw new NoTileInHandException();
+        }
         if (reservedTiles.size() == 2) {
             throw new TooManyReservedTilesException();
         }
-        reservedTiles.add(reservedTile);
+
+        reservedTiles.add(getTileInHand());
+        removeTileFromHand();
     }
 
     /**
      *
      * @return the list of discarded tiles
      */
-    public List<TileSkeleton> getDiscardedTiles() {
-        return discardedTiles;
-    }
-
-    /**
-     *
-     * @param tile tile to add to the list
-     */
-    public void addDiscardedTiles(TileSkeleton tile) {
-        discardedTiles.add(tile);
+    public List<TileSkeleton> getLostTiles() {
+        return lostTiles;
     }
 
     /**
@@ -182,35 +199,87 @@ public class Player implements Serializable {
      * @throws DrawTileException
      */
     public void drawTile(GameData gameData) throws DrawTileException, AlreadyHaveTileInHandException {
-        if(gameData.getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE){
-            throw new DrawTileException("You can only do this during Assembly.");
-        }
         if (gameData.getCoveredTiles().isEmpty()) {
             throw new DrawTileException("There are no covered tiles available.");
         }
         TileSkeleton t = gameData.getCoveredTiles().removeFirst();
         try{
             setTileInHand(t);
-        }catch(Exception e){
+        } catch (TileCanNotDisappearException e) {
+            throw new RuntimeException(e);  // should never happen -> runtime exception
+        } catch (Exception e){
             //put tile back in place and transmit the error
             gameData.getCoveredTiles().add(t);
             throw e;
         }
     }
 
-    public void discardTile(GameData gameData) throws NoTileInHandException {
-
-        if (getTileInHand() == null){
+    public void discardTile(GameData gameData) throws NoTileInHandException, ReservedTileException {
+        TileSkeleton tileInHand = getTileInHand();
+        if (tileInHand == null){
             throw new NoTileInHandException();
         }
+        if (isTileInHandFromReserved) {
+            throw new ReservedTileException("It's not possible to discard a reserved tile.");
+        }
 
-        TileSkeleton t = getTileInHand();
-        gameData.getDrawnTiles().add(t);
-        this.tileInHand = null;
+        gameData.getUncoveredTiles().add(tileInHand);
+        removeTileFromHand();
+    }
+
+    public void placeTile(Coordinates coordinates, Rotation rotation) throws NoTileInHandException, NoShipboardException,
+            FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, OutOfBuildingAreaException {
+        TileSkeleton tileInHand = getTileInHand();
+        ShipBoard shipBoard = getShipBoard();
+        if (tileInHand == null) {
+            throw new NoTileInHandException();
+        }
+        if (shipBoard == null) {
+            throw new NoShipboardException();
+        }
+
+        tileInHand.resetRotation();  // ensure there is no unhandled previous rotation
+        tileInHand.rotateTile(rotation);  // apply the desired rotation
+        shipBoard.setTile(tileInHand, coordinates);  // place the tile
+        // if here, the tile has been correctly placed: remove it from hand
+        removeTileFromHand();
     }
 
     public void pickTile(GameData gameData, Integer id) throws AlreadyHaveTileInHandException, ThatTileIdDoesNotExistsException {
-        TileSkeleton tile = gameData.getTileWithId(id);
-        setTileInHand(tile);
+        if (getTileInHand() != null) {
+            throw new AlreadyHaveTileInHandException();
+        }
+        TileSkeleton tile;
+        try {  // first search in the discarded tiles
+            tile = gameData.getTileWithId(id);
+        } catch (ThatTileIdDoesNotExistsException e) {
+            // if not found: search in the reserved tiles
+            tile = null;
+            for (int i = 0; i < reservedTiles.size(); i++) {  // first search in the reserved tiles
+                if (reservedTiles.get(i).getTileId() == id) {
+                    tile = reservedTiles.remove(i);
+                    isTileInHandFromReserved = true;
+                    break;
+                }
+            }
+            if (tile == null) {  // if still not found: can't search in other places
+                throw e;
+            }
+        }
+        // if here: tile found and no other tiles in hand
+        try {
+            setTileInHand(tile);
+        } catch (AlreadyHaveTileInHandException | TileCanNotDisappearException e) {
+            throw new RuntimeException(e);  // should never happen -> runtime error
+        }
+    }
+
+    public void endAssembly() throws NoShipboardException, AlreadyEndedAssemblyException {
+        ShipBoard shipBoard = getShipBoard();
+        if (shipBoard == null) {
+            throw new NoShipboardException();
+        }
+
+        shipBoard.endAssembly();
     }
 }
