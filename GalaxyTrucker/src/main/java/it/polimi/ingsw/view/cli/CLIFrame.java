@@ -4,8 +4,10 @@ import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Represents a character-based frame used in a Command Line Interface.
@@ -115,6 +117,13 @@ public class CLIFrame implements Serializable {
      */
     public CLIFrame(String line) {
         this(new String[] {line});
+    }
+
+    /**
+     * @return {@code true} if this frame has no content, {@code false} otherwise.
+     */
+    public boolean isEmpty() {
+        return contentAsLines.length == 0;
     }
 
     /**
@@ -429,6 +438,76 @@ public class CLIFrame implements Serializable {
         }
         return new CLIFrame(frame);
     }
+
+    /**
+     * Adds a {@link CLIFrame} to a grid of CLIFrames, organizing them in rows such that each row does not
+     * exceed the specified maximum width.
+     * <p>
+     * If the new frame cannot fit in the last row due to width constraints, a new row is added to the grid.
+     *
+     * @param grid The current grid of CLIFrames, represented as a list of rows (each a list of CLIFrames).
+     *             Can be {@code null}, in which case a new grid is created.
+     * @param newFrame The new {@link CLIFrame} to be added.
+     * @param horizontalSpacing The number of spaces to insert between frames in the same row.
+     * @param maxWidth The maximum allowed width of a row before wrapping to a new row.
+     * @return The updated grid with the new frame added, either to an existing row or a new one.
+     */
+    public static List<List<CLIFrame>> addInFramesGrid(List<List<CLIFrame>> grid, CLIFrame newFrame,
+                                               int horizontalSpacing, int maxWidth) {
+        if (grid == null) {
+            grid = new ArrayList<>();
+        }
+        List<CLIFrame> lastRow;
+        try {
+            lastRow = grid.getLast();
+        } catch (NoSuchElementException e) {
+            lastRow = new ArrayList<>();
+            grid.add(lastRow);
+        }
+
+        if (!lastRow.isEmpty()) {
+            // calculate if new frame would fit in the last row
+            int totalWidth = lastRow.getFirst().getColumns();
+            for (int i = 1; i < lastRow.size(); i++) {
+                totalWidth += horizontalSpacing + lastRow.get(i).getColumns();
+            }
+            totalWidth += horizontalSpacing + newFrame.getColumns();
+            if (totalWidth > maxWidth) {
+                // does not fit -> new row
+                lastRow = new ArrayList<>();
+                grid.add(lastRow);
+            }
+        }
+
+        lastRow.add(newFrame);
+        grid.removeLast();
+        grid.add(lastRow);
+        return grid;
+    }
+
+
+    public static CLIFrame fromFramesGrid(List<List<CLIFrame>> grid, int horizontalSpacing, int verticalSpacing) {
+        if (grid == null) {
+            return new CLIFrame();
+        }
+        int currentRow = 0;
+        CLIFrame totalFrame = new CLIFrame();
+        for (List<CLIFrame> row : grid) {
+            int maxHeight = 0;
+            int currentCol = 0;
+            for (CLIFrame cell : row) {
+                if (cell.getRows() > maxHeight) {
+                    maxHeight = cell.getRows();
+                }
+
+                totalFrame = totalFrame.merge(cell, AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT, currentRow, currentCol);
+                currentCol += cell.getColumns() + horizontalSpacing;
+            }
+            currentRow += maxHeight + verticalSpacing;
+        }
+        return totalFrame;
+    }
+
 
     @Override
     public String toString() {

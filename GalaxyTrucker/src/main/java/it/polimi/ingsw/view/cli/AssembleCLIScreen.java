@@ -4,6 +4,7 @@ import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.enums.Rotation;
+import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.util.Coordinates;
@@ -148,19 +149,26 @@ public class AssembleCLIScreen extends CLIScreen{
         printCommands(screenName, availableCommands.toArray(String[]::new));
     }
 
+    private CLIFrame getTileRepresentationWithID(TileSkeleton tile) {
+        CLIFrame idLabel = new CLIFrame(ANSI.BACKGROUND_YELLOW + ANSI.BLACK + " ID: " +
+                tile.getTileId() + " " + ANSI.RESET);
+        return tile.getCLIRepresentation().merge(idLabel, Direction.SOUTH)
+                .paintBackground(ANSI.BACKGROUND_BLACK);
+    }
+
     @Override
     public CLIFrame getCLIRepresentation() {
+        final int maxWidth = 100;
+        Player thisPlayer = getLastUpdate().getClientPlayer();
+
         // update tile in hand if different from previous
-        if ((tileInHand == null) || (!tileInHand.equals(getLastUpdate().getClientPlayer().getTileInHand()))) {
+        if ((tileInHand == null) || (!tileInHand.equals(thisPlayer.getTileInHand()))) {
             // note: in here also if both are null, but in that case nothing happens -> no problem
-            tileInHand = getLastUpdate().getClientPlayer().getTileInHand();
+            tileInHand = thisPlayer.getTileInHand();
         }
 
-        //white bg
-        CLIFrame screenBorder = getScreenFrame(36, 100, ANSI.BACKGROUND_WHITE);
-
-        // tile in hand frame
-        CLIFrame tileInHandFrame = new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " Tile in Hand ")
+        // frame for tile in hand
+        CLIFrame frameTileInHand = new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " Tile in Hand ")
                 .merge((tileInHand != null)
                                 ? tileInHand.getCLIRepresentation()
                                 : new CLIFrame(TileSkeleton.getForbiddenTileCLIRepresentation(0, 0)),
@@ -168,60 +176,67 @@ public class AssembleCLIScreen extends CLIScreen{
                 .merge(new CLIFrame(""), Direction.SOUTH)
                 .paintBackground(ANSI.BACKGROUND_BLACK);
 
-        //title
-        CLIFrame shipboardTitle = new CLIFrame(new String[]{
-                ANSI.BACKGROUND_BLUE + ANSI.WHITE + " YOUR SHIPBOARD " + ANSI.RESET
-        });
+        // frame for reserved tiles
+        List<TileSkeleton> reservedTiles = thisPlayer.getReservedTiles();
+        CLIFrame frameReservedTiles = (reservedTiles.isEmpty()
+                    ? new CLIFrame(ANSI.RED + "No reserved tiles" + ANSI.RESET)
+                    : reservedTiles.stream()
+                    .map(this::getTileRepresentationWithID)
+                    .reduce(new CLIFrame(), (b, t) -> b.isEmpty() ? t : b.merge(t, Direction.EAST, 3))
+                )
+                .merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " Reserved Tiles "),
+                        Direction.NORTH, 1);
 
-        //shipboard frame
-        CLIFrame shipboardFrame = getLastUpdate().getClientPlayer().getShipBoard().getCLIRepresentation()
-                .paintForeground(ANSI.BLACK);
+        // frame for shipboard
+        CLIFrame frameShipboard = thisPlayer.getShipBoard().getCLIRepresentation()
+                .paintForeground(ANSI.BLACK)
+                .merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " YOUR SHIPBOARD " + ANSI.RESET),
+                        Direction.NORTH, 1);
 
-        CLIFrame shipboardWithTitle = shipboardTitle.merge(shipboardFrame, Direction.SOUTH, 1);
+        // drawn and discarded tiles
+        List<TileSkeleton> uncoveredTiles = getLastUpdate().getCurrentGame().getUncoveredTiles();
 
-        //drawn tiles
-        List<TileSkeleton> drawnTiles = getLastUpdate().getCurrentGame().getDrawnTiles();
-
-        CLIFrame tilesTitle = new CLIFrame(new String[]{
-                ANSI.BACKGROUND_BLUE + ANSI.WHITE + " DRAWN TILES " + ANSI.RESET
-        });
-
-        //frame for drawn tiles
-        CLIFrame tilesFrame;
-        if (!drawnTiles.isEmpty()) {
-            //individual frames for each tile with its Id
+        // frame for drawn and discarded tiles as a grid
+        List<List<CLIFrame>> frameUncoveredTilesGrid = null;
+        final int uncoveredTileHorizontalSpacing = 3;
+        if (!uncoveredTiles.isEmpty()) {
+            // individual frames for each tile with its ID
             List<CLIFrame> tileFrames = new ArrayList<>();
 
-            for (TileSkeleton tile : drawnTiles) {
-                CLIFrame tileRepresentation = tile.getCLIRepresentation();
-
-                CLIFrame idLabel = new CLIFrame(new String[]{
-                        ANSI.BACKGROUND_YELLOW + ANSI.BLACK + " ID: " +
-                                tile.getTileId() + " " + ANSI.RESET
-                });
-
-                CLIFrame tileWithId = tileRepresentation.merge(idLabel, Direction.SOUTH, 1);
-
-                tileFrames.add(tileWithId);
+            for (TileSkeleton tile : uncoveredTiles) {
+                tileFrames.add(getTileRepresentationWithID(tile));
             }
 
-            //Merge all tile frames horizontally with some spacing
-            tilesFrame = new CLIFrame();
+            // merge all tile frames in a grid
             for (CLIFrame tileFrame : tileFrames) {
-                tilesFrame = tilesFrame.merge(tileFrame, Direction.EAST, 5);
+                frameUncoveredTilesGrid = CLIFrame.addInFramesGrid(frameUncoveredTilesGrid,
+                        tileFrame, uncoveredTileHorizontalSpacing, maxWidth);
             }
         } else {
-            tilesFrame = new CLIFrame(new String[]{
-                    ANSI.RED + "No tiles drawn" + ANSI.RESET
-            });
+            frameUncoveredTilesGrid = CLIFrame.addInFramesGrid(frameUncoveredTilesGrid,
+                    new CLIFrame(ANSI.RED + "No tiles drawn and discarded" + ANSI.RESET),
+                    0, maxWidth);
         }
 
-        CLIFrame tilesWithTitle = tilesTitle.merge(tilesFrame, Direction.SOUTH, 1);
+        // frame for drawn and discarded tiles
+        CLIFrame frameUncoveredTiles = CLIFrame
+                .fromFramesGrid(frameUncoveredTilesGrid, uncoveredTileHorizontalSpacing, 1)
+                // add title
+                .merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " DRAWN AND DISCARDED TILES " + ANSI.RESET),
+                        Direction.NORTH, 1);
 
-        CLIFrame contentFrame = shipboardWithTitle
-                .merge(tileInHandFrame, Direction.EAST, 5)
-                .merge(tilesWithTitle, Direction.SOUTH, 2);
+        // create content
+        CLIFrame contentFrame = frameShipboard
+                .merge(frameReservedTiles
+                        .merge(frameTileInHand, Direction.SOUTH, 2),
+                        Direction.EAST, 6)
+                .merge(frameUncoveredTiles, Direction.NORTH, 1);
 
-		return screenBorder.merge(contentFrame, AnchorPoint.CENTER, AnchorPoint.CENTER);
+        // white bg frame container
+        int containerRows = contentFrame.getRows() + 2;
+        if (containerRows < 24) containerRows = 24;
+        CLIFrame frameContainer = getScreenFrame(containerRows, maxWidth, ANSI.BACKGROUND_WHITE);
+
+		return frameContainer.merge(contentFrame, AnchorPoint.CENTER, AnchorPoint.CENTER);
     }
 }
