@@ -2,8 +2,6 @@ package it.polimi.ingsw.shipboard;
 
 import it.polimi.ingsw.TilesFactory;
 import it.polimi.ingsw.enums.*;
-import it.polimi.ingsw.game.GameData;
-import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.shipboard.tiles.*;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.shipboard.visitors.*;
@@ -216,11 +214,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 * Prepares the ship for flight.
 	 * @implNote Resets all visitors (also integrity check is called).
 	 */
-	public void endAssembly(GameData gameData) throws AlreadyEndedAssemblyException, CommandNotAllowedException {
-		if(gameData.getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE){
-			throw new CommandNotAllowedException("end assembly", "The game is not in assembly phase.");
-		}
-
+	public void endAssembly() throws AlreadyEndedAssemblyException {
 		if (endedAssembly) {
 			throw new AlreadyEndedAssemblyException();
 		}
