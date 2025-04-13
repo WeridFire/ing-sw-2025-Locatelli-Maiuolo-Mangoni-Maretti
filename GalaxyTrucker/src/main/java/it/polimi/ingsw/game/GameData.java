@@ -70,13 +70,13 @@ public class GameData implements Serializable {
     private final List<TileSkeleton> coveredTiles;
 
     /**
-     * List of drawn tiles I.E. all the tiles that:
+     * List of drawn and discarded tiles I.E. all the tiles that:
      * - are not part of a shipboard
      * - are not covered
      * - are not in hand
      * - are not reserved by anybody
      */
-    private final List<TileSkeleton> drawnTiles;
+    private final List<TileSkeleton> uncoveredTiles;
 
     private int requiredPlayers;
 
@@ -90,7 +90,7 @@ public class GameData implements Serializable {
         players = new HashSet<>();
         availableGoods = new HashMap<>();
         coveredTiles = new ArrayList<>();
-        drawnTiles = new ArrayList<>();
+        uncoveredTiles = new ArrayList<>();
         deck = null;
         pirHandler = new PIRHandler();
         level = GameLevel.TESTFLIGHT;
@@ -180,8 +180,8 @@ public class GameData implements Serializable {
      *
      * @return The list of uncovered tiles.
      */
-    public List<TileSkeleton> getDrawnTiles() {
-        return drawnTiles;
+    public List<TileSkeleton> getUncoveredTiles() {
+        return uncoveredTiles;
     }
 
 
@@ -381,9 +381,9 @@ public class GameData implements Serializable {
      * @throws ThatTileIdDoesNotExistsException if no tile with the specified ID exists in the drawn tiles
      */
     public TileSkeleton getTileWithId(Integer id) throws ThatTileIdDoesNotExistsException {
-        for (TileSkeleton t : getDrawnTiles()) {
+        for (TileSkeleton t : getUncoveredTiles()) {
             if (t.getTileId() == id) {
-                drawnTiles.remove(t);
+                uncoveredTiles.remove(t);
                 return t;
             }
         }
@@ -392,12 +392,12 @@ public class GameData implements Serializable {
 
     /**
      * Sets the drawnTiles Deck (used for testing)
-     * @param drawnTiles the deck to set
+     * @param uncoveredTiles the deck to set
      */
-    public void setDrawnTiles(List<TileSkeleton> drawnTiles) {
-        this.drawnTiles.clear();
-        if (drawnTiles != null) {
-            this.drawnTiles.addAll(drawnTiles);
+    public void setUncoveredTiles(List<TileSkeleton> uncoveredTiles) {
+        this.uncoveredTiles.clear();
+        if (uncoveredTiles != null) {
+            this.uncoveredTiles.addAll(uncoveredTiles);
         }
     }
 }

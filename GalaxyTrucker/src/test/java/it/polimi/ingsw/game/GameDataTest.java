@@ -153,9 +153,9 @@ class GameDataTest {
     }
 
     @Test
-    void testGetDrawnTiles() {
+    void testGetUncoveredTiles() {
         // TODO: trova un modo per testarlo inizializzando il game
-        List<TileSkeleton> drawnTiles = gameData.getDrawnTiles();
+        List<TileSkeleton> drawnTiles = gameData.getUncoveredTiles();
         assertNotNull(drawnTiles);
         assertTrue(drawnTiles.isEmpty());
     }

@@ -1,7 +1,6 @@
 package it.polimi.ingsw.player;
 
 import it.polimi.ingsw.TilesFactory;
-import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
@@ -9,6 +8,7 @@ import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.game.exceptions.DrawTileException;
 import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
 import it.polimi.ingsw.player.exceptions.NoTileInHandException;
+import it.polimi.ingsw.player.exceptions.ReservedTileException;
 import it.polimi.ingsw.player.exceptions.TooManyReservedTilesException;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.SideType;
@@ -20,11 +20,9 @@ import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.shipboard.visitors.TileVisitor;
 import it.polimi.ingsw.util.Coordinates;
-import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.engine.TestDescriptor;
 
 import static it.polimi.ingsw.enums.GamePhaseType.ASSEMBLE;
 import static org.junit.jupiter.api.Assertions.*;
@@ -73,7 +71,7 @@ class PlayerTest {
     }
 
     @Test
-    void testDiscardTile() throws DrawTileException, AlreadyHaveTileInHandException, NoTileInHandException {
+    void testDiscardTile() throws DrawTileException, AlreadyHaveTileInHandException, NoTileInHandException, ReservedTileException {
         List<TileSkeleton> drawnTiles = new ArrayList<>();
         List<TileSkeleton> MockTiles = new ArrayList<>();
         TileSkeleton mockTile1 = createMockTile(1);
@@ -81,7 +79,7 @@ class PlayerTest {
         MockTiles.add(mockTile1);
         MockTiles.add(mockTile2);
         gameData.setCoveredTiles(MockTiles);
-        gameData.setDrawnTiles(drawnTiles);
+        gameData.setUncoveredTiles(drawnTiles);
         gameData.setCurrentGamePhaseType(ASSEMBLE);
         player1.drawTile(gameData);
         player1.discardTile(gameData);
@@ -97,15 +95,15 @@ class PlayerTest {
         MockTiles.add(mockTile1);
         MockTiles.add(mockTile2);
         gameData.setCoveredTiles(MockTiles);
-        gameData.setDrawnTiles(drawnTiles);
+        gameData.setUncoveredTiles(drawnTiles);
         gameData.setCurrentGamePhaseType(ASSEMBLE);
         player1.drawTile(gameData);
-        player1.setReservedTiles(player1.getTileInHand());
+        player1.reserveTile();
         assertNotNull(player1.getReservedTiles().getFirst());
     }
 
     @Test
-    void testPickTile() throws DrawTileException, AlreadyHaveTileInHandException, NoTileInHandException, ThatTileIdDoesNotExistsException {
+    void testPickTile() throws DrawTileException, AlreadyHaveTileInHandException, NoTileInHandException, ThatTileIdDoesNotExistsException, ReservedTileException {
         List<TileSkeleton> drawnTiles = new ArrayList<>();
         List<TileSkeleton> MockTiles = new ArrayList<>();
         TileSkeleton mockTile1 = createMockTile(1);
@@ -113,7 +111,7 @@ class PlayerTest {
         MockTiles.add(mockTile1);
         MockTiles.add(mockTile2);
         gameData.setCoveredTiles(MockTiles);
-        gameData.setDrawnTiles(drawnTiles);
+        gameData.setUncoveredTiles(drawnTiles);
         gameData.setCurrentGamePhaseType(ASSEMBLE);
         player1.drawTile(gameData);
         player1.discardTile(gameData);
@@ -147,7 +145,7 @@ class PlayerTest {
         System.out.println("\nTest BEFORE assembly's ended\n");
         System.out.println(player1.getShipBoard().getCLIRepresentation());
 
-        assertDoesNotThrow(() -> player1.getShipBoard().endAssembly(gameData));
+        assertDoesNotThrow(() -> player1.getShipBoard().endAssembly());
         System.out.println("\nTest AFTER assembly's ended\n");
         System.out.println(player1.getShipBoard().getCLIRepresentation());
     }
