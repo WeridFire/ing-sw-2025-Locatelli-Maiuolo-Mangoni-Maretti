@@ -161,11 +161,14 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * </ul>
 	 *
 	 * @param screenName The name of the screen for which the commands are printed. This will be displayed as the header.
-	 * @param commands An array or list of commands to be printed, each formatted as <command>|<description>.
+	 * @param commands An array or list of commands to be printed, each formatted as {@code command|description}.
 	 */
 	public final void printCommands(String screenName, String... commands) {
 		CLIScreen.clear();
-		CLIFrame frame = CLIScreen.getScreenFrame(14, 60, ANSI.BACKGROUND_BLACK);
+
+		final int frameWidth = 60;
+		final int spacesOnAvoidOverload = 1;
+		CLIFrame frame = CLIScreen.getScreenFrame(14, frameWidth, ANSI.BACKGROUND_BLACK);
 
 		String header = ANSI.BACKGROUND_BLUE +
 				ANSI.RED + " " + screenName.toUpperCase() +
@@ -190,7 +193,17 @@ public abstract class CLIScreen implements ICLIPrintable {
 				String[] parts = command.split("\\|", 2);
 				if (parts.length == 2) {
 					cmdBuilder.append(ANSI.CYAN).append("> ").append(parts[0])
-							.append(ANSI.RESET).append(" | ").append(parts[1]);
+							.append(ANSI.RESET).append(" | ");
+					// add all the description without overflowing the frame width
+					int colsLeft = frameWidth - ANSI.Helper.stripAnsi(cmdBuilder.toString()).length();
+					while (parts[1].length() > colsLeft) {
+						cmdBuilder.append(parts[1], 0, colsLeft);
+						cmdList.add(cmdBuilder.toString());
+						parts[1] = parts[1].substring(colsLeft);
+						cmdBuilder = new StringBuilder(" ".repeat(spacesOnAvoidOverload));
+						colsLeft = frameWidth - spacesOnAvoidOverload;
+					}
+					cmdBuilder.append(parts[1]);
 				} else {
 					cmdBuilder.append(ANSI.CYAN).append("> ").append(command);
 				}
