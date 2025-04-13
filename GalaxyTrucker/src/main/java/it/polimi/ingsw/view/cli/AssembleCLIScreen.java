@@ -136,19 +136,18 @@ public class AssembleCLIScreen extends CLIScreen{
 
     @Override
     void printScreenSpecificCommands() {
-        // TODO (in parent): if some commands are too verbose insert new lines to not overflow popup
         List<String> availableCommands = new ArrayList<>();
         // note: last timerflip only if assemble phase ended for this player
         availableCommands.add("timerflip|Flips the hourglass of the game.");
 
         if (tileInHand == null) {
-            availableCommands.add("draw|Draws a tile from the covered tiles");
-            availableCommands.add("pick <tileId>|Pick in hand the tile with Id <tileId>");
+            availableCommands.add("draw|Draws a tile from the covered tiles.");
+            availableCommands.add("pick <id>|Pick in hand the tile with ID <id>.");
         }
         else {
-            availableCommands.add("discard|Discard the tile you have in hand");
-            availableCommands.add("rotate <direction>|Rotate the tile you have in hand");
-            availableCommands.add("place <row> <column>|Place the tile from your hand onto your shipboard");
+            availableCommands.add("discard|Discard the tile you have in hand.");
+            availableCommands.add("rotate <direction>|Rotate the tile you have in hand.");
+            availableCommands.add("place <row> <column>|Place the tile from your hand onto your shipboard.");
         }
 
         printCommands(screenName, availableCommands.toArray(String[]::new));
