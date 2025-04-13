@@ -176,6 +176,8 @@ public class CLIScreenHandler {
 					//if the command is not recognized as a global command, it lets the active screen process it.
 					if (currentScreen != null){
 						try{
+							// NOTE: currentScreen always satisfies currentScreen.switchConditions()
+							// <===> processCommand precondition is satisfied
 							currentScreen.processCommand(cmd, args);
 						}catch(IllegalArgumentException e){
 							currentScreen.setScreenMessage(e.getMessage());

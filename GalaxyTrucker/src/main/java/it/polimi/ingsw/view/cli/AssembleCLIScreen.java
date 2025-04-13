@@ -27,7 +27,7 @@ public class AssembleCLIScreen extends CLIScreen{
     }
 
     @Override
-    protected void processCommand(String command, String[] args) throws RemoteException, IllegalArgumentException {
+    protected void processCommand(String command, String[] args) throws RemoteException {
         command = command.toLowerCase();
         switch(command){
             case "timerflip":
@@ -111,11 +111,6 @@ public class AssembleCLIScreen extends CLIScreen{
                 break;
 
             case "finish":
-                if(getLastUpdate().getCurrentGame().getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE){
-                    setScreenMessage("The game is not in assembly phase.");
-                    return;
-                }
-
                 if(getLastUpdate().getClientPlayer().getShipBoard() == null){
                     setScreenMessage("You don't have a shipboard.");
                     return;

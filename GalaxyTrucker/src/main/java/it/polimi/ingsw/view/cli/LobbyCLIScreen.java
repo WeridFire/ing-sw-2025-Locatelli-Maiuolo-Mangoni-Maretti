@@ -74,7 +74,7 @@ public class LobbyCLIScreen extends CLIScreen{
 
 
 	@Override
-	protected void processCommand(String command, String[] args) throws RemoteException, IllegalArgumentException {
+	protected void processCommand(String command, String[] args) throws RemoteException {
 		switch(command){
 			case "settings":
 				if(!getLastUpdate().isGameLeader()){

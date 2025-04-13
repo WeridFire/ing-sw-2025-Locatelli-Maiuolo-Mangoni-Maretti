@@ -50,7 +50,7 @@ public class MenuCLIScreen extends CLIScreen {
 	 */
 
 	@Override
-	protected void processCommand(String command, String[] args) throws RemoteException, IllegalArgumentException {
+	protected void processCommand(String command, String[] args) throws RemoteException {
 		switch(command){
 			case "refresh":
 				getServer().ping(getClient());

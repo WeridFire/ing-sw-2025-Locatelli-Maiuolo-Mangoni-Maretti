@@ -15,16 +15,12 @@ import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
-import it.polimi.ingsw.player.exceptions.NoTileInHandException;
-import it.polimi.ingsw.player.exceptions.TooManyReservedTilesException;
+import it.polimi.ingsw.player.exceptions.*;
 import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.shipboard.LoadableType;
-import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.*;
-import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
@@ -46,7 +42,7 @@ public class RmiServer implements IServer {
 			this.game = game;
 		}
 		static PlayerGameInstance validateClient(GamesHandler gamesHandler, GameServer gameServer,
-													 IClient client) throws RemoteException {
+												 IClient client) throws RemoteException {
 			UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 			Player player = gamesHandler.getPlayerByConnection(connectionUUID);
 			Game game = gamesHandler.findGameByClientUUID(connectionUUID);
@@ -56,6 +52,18 @@ public class RmiServer implements IServer {
 				return null;
 			}
 			return new PlayerGameInstance(connectionUUID, player, game);
+		}
+		static PlayerGameInstance validateClient(GamesHandler gamesHandler, GameServer gameServer,
+												 IClient client, GamePhaseType forceCurrentGamePhase) throws RemoteException {
+			PlayerGameInstance result = validateClient(gamesHandler, gameServer, client);
+			if (result == null) return null;
+			GamePhaseType currentGamePhase = result.game.getGameData().getCurrentGamePhaseType();
+			if (currentGamePhase != forceCurrentGamePhase) {
+				client.updateClient(new ClientUpdate(result.connectionUUID, "You cannot perform this action in the "
+						+ currentGamePhase + " game phase. Required game phase: " + forceCurrentGamePhase));
+				return null;
+			}
+			return result;
 		}
 	}
 
@@ -160,9 +168,11 @@ public class RmiServer implements IServer {
 		client.updateClient(new ClientUpdate(pg.connectionUUID));
 	}
 
+	// LOBBY PHASE
+
 	@Override
 	public void updateGameSettings(IClient client, GameLevel level, int minPlayers) throws RemoteException {
-		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client, GamePhaseType.LOBBY);
 		if (pg == null) return;
 		// else: actually try to perform the action
 
@@ -180,24 +190,22 @@ public class RmiServer implements IServer {
 
 	@Override
 	public void flipHourglass(IClient client) throws RemoteException {
-		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client, GamePhaseType.ASSEMBLE);
 		if (pg == null) return;
 		// else: actually try to perform the action
 
-		if (pg.game.getGameData().getCurrentGamePhaseType().equals(GamePhaseType.ASSEMBLE)){
-			try {
-				pg.game.getGameData().getCurrentGamePhase().startTimer(pg.player);
-			} catch (TimerIsAlreadyRunningException | CommandNotAllowedException e) {
-				client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
-				return;
-			}
+		try {
+			pg.game.getGameData().getCurrentGamePhase().startTimer(pg.player);
+		} catch (TimerIsAlreadyRunningException | CommandNotAllowedException e) {
+			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
+			return;
 		}
 		GameServer.getInstance().broadcastUpdate(pg.game);
 	}
 
 	@Override
 	public void drawTile(IClient client) throws RemoteException {
-		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client, GamePhaseType.ASSEMBLE);
 		if (pg == null) return;
 		// else: actually try to perform the action
 
@@ -213,41 +221,39 @@ public class RmiServer implements IServer {
 
 	@Override
 	public void discardTile(IClient client) throws RemoteException {
-		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client, GamePhaseType.ASSEMBLE);
 		if (pg == null) return;
 		// else: actually try to perform the action
 
 		try {
 			pg.player.discardTile(pg.game.getGameData());
-		} catch (NoTileInHandException e) {
+		} catch (NoTileInHandException | ReservedTileException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 			return;
 		}
 
-		GameServer.getInstance().broadcastUpdate(pg.game);
+        GameServer.getInstance().broadcastUpdate(pg.game);
 	}
 
 	@Override
 	public void reserveTile(IClient client) throws RemoteException {
-		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client, GamePhaseType.ASSEMBLE);
 		if (pg == null) return;
 		// else: actually try to perform the action
 
 		try {
-			pg.player.setReservedTiles(pg.player.getTileInHand());
-			pg.player.discardTile(pg.game.getGameData());
-		}catch (NoTileInHandException | TooManyReservedTilesException e){
+			pg.player.reserveTile();
+        }catch (NoTileInHandException | TooManyReservedTilesException e){
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 			return;
 		}
 
 		GameServer.getInstance().broadcastUpdate(pg.game);
-
 	}
 
 	@Override
 	public void pickTile(IClient client, Integer id) throws RemoteException {
-		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client, GamePhaseType.ASSEMBLE);
 		if (pg == null) return;
 		// else: actually try to perform the action
 
@@ -263,30 +269,14 @@ public class RmiServer implements IServer {
 
 	@Override
 	public void placeTile(IClient client, Coordinates coordinates, Rotation rotation) throws RemoteException {
-		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client, GamePhaseType.ASSEMBLE);
 		if (pg == null) return;
 		// else: actually try to perform the action
 
-		TileSkeleton tileInHand = pg.player.getTileInHand();
-		if (tileInHand == null) {
-			client.updateClient(new ClientUpdate(pg.connectionUUID, "You don't have a tile in hand."));
-			return;
-		}
-
-		ShipBoard shipBoard = pg.player.getShipBoard();
-		if (shipBoard == null) {
-			client.updateClient(new ClientUpdate(pg.connectionUUID, "You don't have a shipboard."));
-			return;
-		}
-
 		try {
-			tileInHand.resetRotation();  // ensure there is no unhandled previous rotation
-			tileInHand.rotateTile(rotation);  // apply the desired rotation
-			shipBoard.setTile(tileInHand, coordinates);  // place the tile
-			// if here, the tile has been correctly placed:
-			pg.player.setTileInHand(null);  // remove tile from hand
-		} catch (FixedTileException | TileAlreadyPresentException | OutOfBuildingAreaException |
-				 TileWithoutNeighborException | AlreadyHaveTileInHandException e) {
+			pg.player.placeTile(coordinates, rotation);
+		} catch (NoTileInHandException | NoShipboardException | FixedTileException | TileAlreadyPresentException
+				 | OutOfBuildingAreaException | TileWithoutNeighborException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 			return;
         }
@@ -296,22 +286,14 @@ public class RmiServer implements IServer {
 
 	@Override
 	public void finishAssembling(IClient client) throws RemoteException {
-		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client, GamePhaseType.ASSEMBLE);
 		if (pg == null) return;
 		// else: actually try to perform the action
 
-		ShipBoard shipBoard = pg.player.getShipBoard();
-
-		if(shipBoard == null){
-			client.updateClient(new ClientUpdate(pg.connectionUUID, "You don't have a shipboard."));
-			//This means that something went wrong or the player is in pre-assembly or lobby phase.
-			return;
-		}
-
 		try {
-			shipBoard.endAssembly(pg.game.getGameData());
-		} catch (AlreadyEndedAssemblyException | CommandNotAllowedException e) {
+			pg.player.endAssembly();
+		} catch (NoShipboardException | AlreadyEndedAssemblyException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 		}
-	}
+    }
 }

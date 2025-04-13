@@ -9,7 +9,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public abstract class CLIScreen implements ICLIPrintable {
 
@@ -59,11 +58,11 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * This function basically allows the main CLI logic to delegate to the active screen the handling of a command.
 	 * Passes the command and the args, and the screen tries to execute. If it fails, the screen will display the error
 	 * and the requirements for the command to execute.
+	 * @requires this.switchConditions() == true
 	 * @param command The command to execute
 	 * @param args The args to pass
-	 * @throws RemoteException
 	 */
-	protected abstract void processCommand(String command, String[] args) throws RemoteException, IllegalArgumentException;
+	protected abstract void processCommand(String command, String[] args) throws RemoteException;
 
 	/**
 	 * Refreshes the whole screen. Causes the CLI to clear, print newly the screen using the specific screen logic,

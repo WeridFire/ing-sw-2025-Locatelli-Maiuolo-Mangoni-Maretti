@@ -19,14 +19,16 @@ public interface IServer extends Remote {
 	void joinGame(IClient client, UUID gameId, String username) throws RemoteException;
 	void quitGame(IClient client) throws RemoteException;
 	void ping(IClient client) throws RemoteException;
+
+	// ???
 	void activateTiles(IClient client, Set<Coordinates> tilesToActivate) throws RemoteException;
 	void allocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException;
 	void forceEndTurn(IClient client) throws RemoteException;
 
-	//Lobby phase
+	// Lobby phase
 	void updateGameSettings(IClient client, GameLevel level, int minPlayers) throws RemoteException;
 
-	// Assemble Phase
+	// Assemble phase
 	void flipHourglass(IClient client) throws RemoteException;
 	void drawTile(IClient client) throws RemoteException;
 	void discardTile(IClient client) throws RemoteException;
