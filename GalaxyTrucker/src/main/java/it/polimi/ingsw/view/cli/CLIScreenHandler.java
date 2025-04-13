@@ -167,6 +167,7 @@ public class CLIScreenHandler {
 				case "help":
 					isShowingHelpScreen = true;
 					currentScreen.refresh();
+					isShowingHelpScreen = false;
 					break;
 				case "debug":
 					currentScreen.setScreenMessage("The current game state was saved to update.json");
