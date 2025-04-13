@@ -51,8 +51,8 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		ShipBoard sb = new ShipBoard(level);
 		MainCabinTile mainCabin = TilesFactory.createMainCabinTile(MainCabinTile.Color.fromPlayerIndex(playerIndex));
         try {
-            sb.setTile(mainCabin, BoardCoordinates.getMainCabinCoordinates());
-        } catch (OutOfBuildingAreaException | TileAlreadyPresentException | FixedTileException e) {
+            sb.forceSetTile(mainCabin, BoardCoordinates.getMainCabinCoordinates());
+        } catch (FixedTileException e) {
             throw new RuntimeException(e);  // should never happen -> runtime error
         }
 		return sb;
@@ -157,6 +157,20 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		return result;
 	}
 
+
+	/**
+	 * Places a tile at the specified coordinates on the board, ignoring board constraints.
+	 *
+	 * @param tile The tile to place.
+	 * @param coordinates The coordinates where the tile should be placed.
+	 * @throws FixedTileException If the provided tile has already been placed.
+	 * @throws NullPointerException If the provided tile is null.
+	 */
+	private void forceSetTile(TileSkeleton tile, Coordinates coordinates) throws FixedTileException {
+		tile.place(coordinates);
+        board.put(coordinates, tile);
+	}
+
 	/**
 	 * Places a tile at the specified coordinates on the board.
 	 *
@@ -164,22 +178,37 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 * @param coordinates The coordinates where the tile should be placed.
 	 * @throws OutOfBuildingAreaException If the coordinates are outside the valid building area.
 	 * @throws TileAlreadyPresentException If there is already a tile at the specified coordinates.
-	 * @throws IllegalArgumentException If the provided tile is null.
 	 * @throws FixedTileException If the provided tile has already been placed.
+	 * @throws TileWithoutNeighborException If the provided coordinates are not adjacent to an already placed tile
+	 * coordinates.
+	 * @throws IllegalArgumentException If the provided tile is null.
 	 */
 	public void setTile(TileSkeleton tile, Coordinates coordinates) throws OutOfBuildingAreaException,
-            TileAlreadyPresentException, IllegalArgumentException, FixedTileException {
+            TileAlreadyPresentException, FixedTileException, TileWithoutNeighborException, IllegalArgumentException {
 		if (tile == null) {
 			throw new IllegalArgumentException("Tile cannot be null");
 		}
+
 		if (!BoardCoordinates.isOnBoard(level, coordinates)) {
 			throw new OutOfBuildingAreaException(level, coordinates);
 		}
+
 		if (board.containsKey(coordinates)) {
 			throw new TileAlreadyPresentException(coordinates, board.get(coordinates));
 		}
-		tile.place(coordinates);
-		board.put(coordinates, tile);
+
+		boolean hasNeighbor = false;
+		for (Coordinates neighbor : coordinates.getNeighbors()) {
+			if (board.containsKey(neighbor)) {
+				hasNeighbor = true;
+				break;
+			}
+		}
+		if (!hasNeighbor) {
+			throw new TileWithoutNeighborException(coordinates);
+		}
+
+		forceSetTile(tile, coordinates);
 	}
 
 

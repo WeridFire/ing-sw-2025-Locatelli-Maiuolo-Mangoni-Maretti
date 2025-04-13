@@ -23,10 +23,7 @@ import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.ShipBoard;
-import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
-import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
-import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
-import it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
+import it.polimi.ingsw.shipboard.exceptions.*;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
@@ -288,8 +285,8 @@ public class RmiServer implements IServer {
 			shipBoard.setTile(tileInHand, coordinates);  // place the tile
 			// if here, the tile has been correctly placed:
 			pg.player.setTileInHand(null);  // remove tile from hand
-		} catch (FixedTileException | TileAlreadyPresentException | OutOfBuildingAreaException
-				 | AlreadyHaveTileInHandException e) {
+		} catch (FixedTileException | TileAlreadyPresentException | OutOfBuildingAreaException |
+				 TileWithoutNeighborException | AlreadyHaveTileInHandException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 			return;
         }
