@@ -452,19 +452,22 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		return info;
 	}
 
-	@Override
-	public CLIFrame getCLIRepresentation() {
+	public CLIFrame getCLIRepresentation(Set<Coordinates> highlight, String fgColor) {
 		int minRow = BoardCoordinates.getFirstCoordinateFromDirection(Direction.NORTH);
 		int minCol = BoardCoordinates.getFirstCoordinateFromDirection(Direction.WEST);
+		final int tileWidth = 4;
+		final int tileHeight = 3;
 
 		CLIFrame tilesRepresentation = new CLIFrame();
 		for (Map.Entry<Coordinates, TileSkeleton> entry : board.entrySet()) {
 			Coordinates c = entry.getKey();
-			tilesRepresentation = tilesRepresentation.merge(entry.getValue().getCLIRepresentation(),
+			tilesRepresentation = tilesRepresentation.merge(entry.getValue().getCLIRepresentation()
+							.paintForeground(highlight.contains(c) ? fgColor : ANSI.RESET),
 					AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT,
-					(c.getRow() - minRow) * 3, (c.getColumn() - minCol) * 4);
+					(c.getRow() - minRow) * tileHeight, (c.getColumn() - minCol) * tileWidth);
 		}
-		tilesRepresentation.applyOffset(3 + 1, 4 + 2);  // consider the numbers offset in the empty representation
+		// consider the numbers offset in the empty representation
+		tilesRepresentation.applyOffset(tileHeight + 1, tileWidth + 2);
 
 		CLIFrame rep = emptyRepresentation.merge(tilesRepresentation);
 		if (endedAssembly) {
@@ -472,6 +475,11 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		}
 
 		return rep;
+	}
+
+	@Override
+	public CLIFrame getCLIRepresentation() {
+		return getCLIRepresentation(Collections.emptySet(), ANSI.RESET);
 	}
 
 
