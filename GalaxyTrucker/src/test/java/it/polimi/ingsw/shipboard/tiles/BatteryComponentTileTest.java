@@ -130,7 +130,7 @@ class BatteryComponentTileTest {
     }
 
     @Test
-    void doubleTileCantHoldThree() throws TooMuchLoadException, UnsupportedLoadableItemException {
+    void doubleTileCantHoldMore() throws TooMuchLoadException, UnsupportedLoadableItemException {
 
         //Should throw
         assertThrows(TooMuchLoadException.class, () -> {
@@ -140,7 +140,7 @@ class BatteryComponentTileTest {
     }
 
     @Test
-    void tripleTileCantHold4() throws TooMuchLoadException, UnsupportedLoadableItemException {
+    void tripleTileCantHoldMore() throws TooMuchLoadException, UnsupportedLoadableItemException {
 
         //Should throw
         assertThrows(TooMuchLoadException.class, () -> {
@@ -172,7 +172,45 @@ class BatteryComponentTileTest {
             tripleBatteryTile.loadItems(LoadableType.RED_GOODS, 1);
         });
 
+        //Should throw
+        assertThrows(UnsupportedLoadableItemException.class, () -> {
+            doubleBatteryTile.loadItems(LoadableType.BLUE_GOODS, 1);
+        });
+
+        //Should throw
+        assertThrows(UnsupportedLoadableItemException.class, () -> {
+            doubleBatteryTile.loadItems(LoadableType.GREEN_GOODS, 1);
+        });
+
+        //Should throw
+        assertThrows(UnsupportedLoadableItemException.class, () -> {
+            doubleBatteryTile.loadItems(LoadableType.YELLOW_GOODS, 1);
+        });
+
+        //Should throw
+        assertThrows(UnsupportedLoadableItemException.class, () -> {
+            doubleBatteryTile.loadItems(LoadableType.RED_GOODS, 1);
+        });
+
     }
 
+    @Test
+    void batteryCantHoldCrew() throws TooMuchLoadException, UnsupportedLoadableItemException {
 
+        //Should throw
+        assertThrows(UnsupportedLoadableItemException.class, () -> {
+            doubleBatteryTile.loadItems(LoadableType.HUMAN, 1);
+        });
+
+        //Should throw
+        assertThrows(UnsupportedLoadableItemException.class, () -> {
+            doubleBatteryTile.loadItems(LoadableType.BROWN_ALIEN, 1);
+        });
+
+        //Should throw
+        assertThrows(UnsupportedLoadableItemException.class, () -> {
+            doubleBatteryTile.loadItems(LoadableType.PURPLE_ALIEN, 1);
+        });
+
+    }
 }
