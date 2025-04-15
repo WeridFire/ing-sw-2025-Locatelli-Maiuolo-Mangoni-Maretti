@@ -61,10 +61,13 @@ public class GamesHandler {
         new Thread(() -> {
 			try {
 				game.gameLoop();
-                //TODO: Once the game has ended, remove it from the games list!
 			} catch (InterruptedException | RemoteException e) {
 				throw new RuntimeException(e);
 			}
+            finally {
+                // once the game has ended due to any circumstance, remove it from the games list
+                games.remove(game);
+            }
 		}).start();
         return game;
     }
