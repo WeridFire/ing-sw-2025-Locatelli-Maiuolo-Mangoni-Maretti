@@ -114,15 +114,15 @@ public class AssembleCLIScreen extends CLIScreen{
             case "finish":
                 if(getLastUpdate().getClientPlayer().getShipBoard() == null){
                     setScreenMessage("You don't have a shipboard.");
-                    return;
+                    break;
                 }
 
                 if(getLastUpdate().getClientPlayer().getShipBoard().isEndedAssembly()){
                     setScreenMessage("You already ended the assembly phase!");
-                    return;
+                    break;
                 }
                 getServer().finishAssembling(getClient());
-                return;
+                break;
 
             default:
                 setScreenMessage("Invalid command. Use help to view available commands.");
