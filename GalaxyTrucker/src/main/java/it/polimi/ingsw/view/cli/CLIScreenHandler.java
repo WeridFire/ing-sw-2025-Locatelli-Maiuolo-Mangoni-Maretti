@@ -174,6 +174,7 @@ public class CLIScreenHandler {
 						} else {
 							currentScreen.setScreenMessage("No screen found with name '" + args[0] +
 									"'. Please use one name in the provided list of available screens.");
+							// TODO: adjust double refresh
 						}
 					}
 					else if (args.length > 1) {
