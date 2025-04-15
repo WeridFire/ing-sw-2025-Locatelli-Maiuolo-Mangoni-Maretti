@@ -2,8 +2,14 @@ package it.polimi.ingsw.shipboard;
 
 import it.polimi.ingsw.TilesFactory;
 import it.polimi.ingsw.enums.*;
+import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
+import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.shipboard.tiles.*;
+import it.polimi.ingsw.shipboard.tiles.exceptions.AlreadyInitializedCabinException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
+import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
+import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.shipboard.visitors.*;
 import it.polimi.ingsw.shipboard.visitors.integrity.*;
 import it.polimi.ingsw.shipboard.exceptions.*;
@@ -404,6 +410,51 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 			tile.accept(smugglers);
 		}
 		smugglers.removeMostValuableItems(quantityToRemove);
+	}
+
+	public void fillShipboard(Player p, PIRHandler handler){
+		//Fill batteries
+		getVisitorCalculateCargoInfo()
+				.getBatteriesInfo()
+				.getLocations()
+				.values()
+				.forEach(BatteryComponentTile::fill);
+
+
+		Set<LoadableType> loadedAliens = new HashSet<>(); //this is a set to keep track of the aliens added,
+														// to prevent adding more than 1 alien of the same type.
+		getVisitorCalculateCargoInfo().getCrewInfo().getLocations().values().forEach((cabin) -> {
+			List<LoadableType> allowedTypes = new ArrayList<>(cabin.getAllowedItems().stream().toList()); //We need it ordered
+			allowedTypes.removeAll(loadedAliens); //Remove any alien that was already added, to prevent adding duplicates
+			LoadableType fillType = allowedTypes.getFirst(); //Get default choice
+			if(allowedTypes.size() > 1){
+				String[] choices = allowedTypes.stream().map((type) -> {
+					int amount = type.getRequiredCapacity() == 1 ? 2 : 1;
+					return amount + " units of " + type.name();
+				}).toArray(String[]::new); //Generate messages for each type
+				try {
+					PIRMultipleChoice choicePir = new PIRMultipleChoice(p,
+										30,
+										"What type of crew do you want to add in cabin at coordinates " + cabin.getCoordinates().toString(),
+										choices,
+							0
+					);
+					int selected = handler.setAndRunTurn(choicePir);
+					fillType = allowedTypes.get(selected);
+					if(fillType == LoadableType.PURPLE_ALIEN || fillType == LoadableType.BROWN_ALIEN){
+						loadedAliens.add(fillType);
+					}
+				} catch (NotFixedTileException e) {
+					throw new RuntimeException(e); //shouldn't happen
+				}
+			}
+
+			try {
+				cabin.fillWith(fillType);
+			} catch (AlreadyInitializedCabinException | UnsupportedLoadableItemException e) {
+				throw new RuntimeException(e); //Shouldn't happen
+			}
+		});
 	}
 
 	public GameLevel getLevel(){

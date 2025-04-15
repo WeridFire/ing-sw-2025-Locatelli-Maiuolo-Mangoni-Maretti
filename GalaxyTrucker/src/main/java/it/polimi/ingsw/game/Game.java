@@ -13,6 +13,7 @@ import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -85,6 +86,9 @@ public class Game {
         //We notify all players about the new game state
         GameServer.getInstance().broadcastUpdate(this);
 
+        //Blocking function that waits for everyone to finish set up their shipboard aliens
+        fillUpShipboards();
+
         a.playLoop();
 
         gameData.getDeck().drawNextCard();
@@ -152,6 +156,26 @@ public class Game {
         for (Player player : gameData.getPlayers()) {
             player.setShipBoard(ShipBoard.create(gameData.getLevel(), playerIndex));
             playerIndex++;
+        }
+    }
+
+    /**
+     * Blocking function that will wait for all the players to fill up their shipboard in non-obvious cases
+     * through multiple PIRs choice, in parallel on new threads. Will return once everyone has filled up their
+     * @throws InterruptedException
+     */
+    private void fillUpShipboards() throws InterruptedException {
+        List<Thread> threads = new ArrayList<>();
+        for(Player p : gameData.getPlayers()){
+            Thread th = new Thread(() -> {
+                p.getShipBoard().fillShipboard(p, gameData.getPIRHandler());
+            });
+            th.start();
+            threads.add(th);
+        }
+
+        for(Thread th : threads){
+            th.join();
         }
     }
 
