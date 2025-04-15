@@ -131,4 +131,10 @@ public class ServerSocketHandler implements IServer {
 		SocketMessage mess = SocketMessage.finishAssemblingMessage();
 		sendSocketMessage(mess);
 	}
+
+	@Override
+	public void showcardgroup(IClient client, Integer id) throws RemoteException {
+		SocketMessage mess =SocketMessage.showCardGroupMessage(id);
+		sendSocketMessage(mess);
+	}
 }

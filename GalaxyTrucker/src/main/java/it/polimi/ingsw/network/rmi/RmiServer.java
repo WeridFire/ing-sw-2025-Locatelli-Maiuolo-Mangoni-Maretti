@@ -1,6 +1,7 @@
 package it.polimi.ingsw.network.rmi;
 
 import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.cards.exceptions.CardsGroupException;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.enums.Rotation;
@@ -296,4 +297,18 @@ public class RmiServer implements IServer {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 		}
     }
+
+	@Override
+	public void showcardgroup(IClient client, Integer id) throws RemoteException {
+
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client, GamePhaseType.ASSEMBLE);
+		if (pg == null) return;
+		// else: actually try to perform the action
+
+		try {
+			pg.game.getGameData().getDeck().getGroup(id).showGroup(pg.player.getUsername());
+		} catch (CardsGroupException e) {
+			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
+		}
+	}
 }

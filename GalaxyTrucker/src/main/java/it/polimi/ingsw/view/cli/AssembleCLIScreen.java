@@ -124,6 +124,13 @@ public class AssembleCLIScreen extends CLIScreen{
                 getServer().finishAssembling(getClient());
                 return;
 
+            case "showcardgroup":
+                if (args.length == 1) {
+                    int id = Integer.parseInt(args[0]);
+                    getServer().showcardgroup(getClient(), id);
+                }
+                break;
+
             default:
                 setScreenMessage("Invalid command. Use help to view available commands.");
                 break;

@@ -21,7 +21,8 @@ public class SocketMessage implements Serializable{
 		RESERVE_TILE,
 		PICK_TILE,
 		PLACE_TILE,
-		FINISH_ASSEMBLING
+		FINISH_ASSEMBLING,
+		SHOW_CARD_GROUP
 	}
 
 	private MessageType type;
@@ -183,6 +184,12 @@ public class SocketMessage implements Serializable{
 	}
 
 	public static SocketMessage finishAssemblingMessage(){
+
 		return new SocketMessage(MessageType.FINISH_ASSEMBLING);
 	}
+
+	public static SocketMessage showCardGroupMessage(Integer id) {
+		return new SocketMessage(SocketMessage.MessageType.SHOW_CARD_GROUP, List.of(id));
+	}
+
 }
