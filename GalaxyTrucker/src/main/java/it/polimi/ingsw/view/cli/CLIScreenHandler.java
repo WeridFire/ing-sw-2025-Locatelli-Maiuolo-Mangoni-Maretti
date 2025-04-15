@@ -107,17 +107,11 @@ public class CLIScreenHandler {
 		if (screens.isEmpty()) {
 			frame = frame.merge(new CLIFrame(ANSI.BACKGROUND_RED + ANSI.WHITE + "No Screens Available"), AnchorPoint.CENTER, AnchorPoint.CENTER, -1, 0);
 		}else{
-			StringBuilder screensList = new StringBuilder();
-			screens.forEach(cli -> screensList
-									.append(ANSI.BACKGROUND_WHITE)
-									.append(ANSI.BLACK)
-									.append(" > ")
-									.append(ANSI.WHITE)
-									.append(cli.screenName).append("\n"));
-			//TODO: use ARRAY of strings to create the CLIFrame instead of a stringbuilder, which breaks the thing.
-			// See printCommands for a correct implementation of this. Once there will be more than 1 screen available
-			// at once I will get to implement it - davide
-			CLIFrame s = new CLIFrame(screensList.toString());
+			List<String> screensList = new ArrayList<>(screens.size());
+			screens.forEach(cli ->
+					screensList.add(ANSI.BACKGROUND_WHITE + ANSI.BLACK + " > " + ANSI.WHITE + cli.screenName)
+			);
+			CLIFrame s = new CLIFrame(screensList.toArray(new String[0]));
 			frame = frame.merge(s, AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT, 1, 1);
 		}
 		frame = frame.merge(new CLIFrame(ANSI.BACKGROUND_RED + ANSI.WHITE + "Enter to close"),
@@ -177,10 +171,17 @@ public class CLIScreenHandler {
 						boolean success = activateScreen(args[0]);
 						if(success){
 							break;
+						} else {
+							currentScreen.setScreenMessage("No screen found with name '" + args[0] +
+									"'. Please use one name in the provided list of available screens.");
 						}
+					}
+					else {
+						currentScreen.setScreenMessage("Usage: screen <name>");
 					}
 					isShowingAvailableScreens = true;
 					currentScreen.refresh();
+					isShowingAvailableScreens = false;
 					break;
 				case "help":
 					isShowingHelpScreen = true;
