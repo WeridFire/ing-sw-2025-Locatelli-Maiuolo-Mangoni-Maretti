@@ -35,7 +35,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 
 	/**
 	 * @param screenName The identifier of the screen.
-	 * @see #CLIScreen(String, boolean)  CLIScreen
+	 * @see #CLIScreen(String)  CLIScreen
 	 */
 	public CLIScreen(String screenName){
 		this(screenName, false, 0);
@@ -47,15 +47,6 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * @return If the screen can be activable.
 	 */
 	protected abstract boolean switchConditions();
-
-	/**
-	 * Prints the screen to the CLI. Gets called on every refresh, and prints out the actual
-	 * juice of the screen. This does not include "service" messages such as server errors, which
-	 * are handled in their own functions.
-	 */
-	protected final void printScreen(){
-		System.out.println(getCLIRepresentation());
-	}
 
 	/**
 	 * This function basically allows the main CLI logic to delegate to the active screen the handling of a command.
