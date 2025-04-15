@@ -125,12 +125,15 @@ public class LobbyCLIScreen extends CLIScreen{
 	}
 
 	@Override
-	protected void printScreenSpecificCommands() {
+	protected List<String> getScreenSpecificCommands() {
+		List<String> availableCommands = new ArrayList<>(
+				List.of("leave|Leave the current lobby.")
+		);
+
 		if(getLastUpdate().isGameLeader()){
-			printCommands(screenName, "settings|Change the game settings.", "leave|Leave the current lobby.");
-		}else{
-			printCommands(screenName, "leave|Leave the current lobby.");
+			availableCommands.add("settings|Change the game settings.");
 		}
+		return availableCommands;
 	}
 
 	@Override

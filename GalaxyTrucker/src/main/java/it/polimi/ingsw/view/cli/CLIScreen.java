@@ -93,11 +93,11 @@ public abstract class CLIScreen implements ICLIPrintable {
 	}
 
 	/**
-	 * This function should call inside of it the method printCommands, passing the commands available
-	 * in the specific screen.
-	 * Check out the examples in {@link MenuCLIScreen#printScreenSpecificCommands()}.
+	 * This function should return the commands available in the specific screen
+	 * to pass as parameter while calling the method printCommands.
+	 * Can be immutable.
 	 */
-	abstract void printScreenSpecificCommands();
+	protected abstract List<String> getScreenSpecificCommands();
 
 	/*
 	!!!BELOW THIS YOU DON'T NEED TO OVERRIDE ANYTHING!!!

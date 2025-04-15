@@ -80,10 +80,10 @@ public class MenuCLIScreen extends CLIScreen {
 	}
 
 	@Override
-	protected void printScreenSpecificCommands() {
-		printCommands(screenName, "refresh|Refresh the game list.",
-											"join|Join an existing game.",
-											"create|Create a new game.");
+	protected List<String> getScreenSpecificCommands() {
+		return List.of("refresh|Refresh the game list.",
+				"join|Join an existing game.",
+				"create|Create a new game.");
 	}
 
 	@Override

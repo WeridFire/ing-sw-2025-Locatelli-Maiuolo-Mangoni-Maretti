@@ -44,7 +44,7 @@ public class PIRCLIScreen extends CLIScreen {
 	}
 
 	@Override
-	void printScreenSpecificCommands() {
+	protected List<String> getScreenSpecificCommands() {
 		List<String> availableCommands = new ArrayList<>();
 		switch(getPIRType()){
 			case CHOICE -> availableCommands.add("choice|Choose an option with the corresponding ID.");
@@ -52,8 +52,7 @@ public class PIRCLIScreen extends CLIScreen {
 			case ADD_CARGO -> availableCommands.add("load|Choose the coordinates and the cargo to load.");
 			case REMOVE_CARGO -> availableCommands.add("remove|Choose the coordinates and the items to remove");
 		}
-
-		printCommands("turn", availableCommands.toArray(String[]::new));
+		return availableCommands;
 	}
 
 	@Override

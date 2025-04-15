@@ -131,7 +131,7 @@ public class AssembleCLIScreen extends CLIScreen{
     }
 
     @Override
-    void printScreenSpecificCommands() {
+    protected List<String> getScreenSpecificCommands() {
         List<String> availableCommands = new ArrayList<>();
         // note: last timerflip only if assemble phase ended for this player
         availableCommands.add("timerflip|Flips the hourglass of the game.");
@@ -146,7 +146,7 @@ public class AssembleCLIScreen extends CLIScreen{
             availableCommands.add("place <row> <column>|Place the tile from your hand onto your shipboard.");
         }
 
-        printCommands(screenName, availableCommands.toArray(String[]::new));
+        return availableCommands;
     }
 
     private CLIFrame getTileRepresentationWithID(TileSkeleton tile) {
