@@ -6,157 +6,123 @@ import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.util.Coordinates;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class PIRHandler {
 
-	private PIRActivateTiles activateTiles = null;
-	private PIRAddLoadables addLoadables = null;
-	private PIRMultipleChoice choice = null;
-	private PIRRemoveLoadables removeLoadables = null;
-	private PIR genericReference;
 
+	private Map<Player, PIR> activePIRs = new HashMap<>();
 	/**
 	 *
 	 * @return true if any turn in the player input request is set, or null if none is not set.
 	 */
 	private boolean isAnyTurnActive(){
-		//if first is not null, second is usually never null but check anyways
-		return genericReference != null && genericReference.getPIRType() != null;
+		return !activePIRs.isEmpty();
 	}
 
 	/**
 	 *
-	 * @return the PIR of activating tiles, or null if the current turn doesn't match this type.
+	 * @param p the player to check if they have any active turn currently
+	 * @return If the player requested has an active turn waiting to finish.
 	 */
-	public PIRActivateTiles getActivateTiles() throws InputNotSupportedException {
-		if(activateTiles == null){
-			throw new InputNotSupportedException(getType());
-		}
-		return activateTiles;
+	private boolean isPlayerTurnActive(Player p){
+		return activePIRs.get(p) != null;
 	}
 
 	/**
-	 *
-	 * @return the PIR of adding loadables, or null if the current turn doesn't match this type.
+	 * Returns the active PIR for the player. Null if not active.
+	 * @param p the player to get the current active turn
+	 * @return The active turn for the specified player.
 	 */
-	public PIRAddLoadables getAddLoadables() throws InputNotSupportedException {
-		if(addLoadables == null){
-			throw new InputNotSupportedException(getType());
-		}
-		return addLoadables;
+	public PIR getPlayerPIR(Player p){
+		return activePIRs.get(p);
 	}
 
 	/**
-	 *
-	 * @return the PIR of making a 2 ways choice, or null if the current turn doesn't match this type.
+	 * Generic function which BLOCKS A THREAD until the turn has been fullfilled.
+	 * @param pir The generic PIR to run.
 	 */
-	public PIRMultipleChoice getChoice() throws InputNotSupportedException {
-		if(choice == null){
-			throw new InputNotSupportedException(getType());
+	private void setAndRunGenericTurn(PIR pir) {
+		if(isPlayerTurnActive(pir.getCurrentPlayer())){
+			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
 		}
-		return choice;
-	}
-
-	/**
-	 *
-	 * @return the PIR of removing loadables, or null if the current turn doesn't match this type.
-	 */
-	public PIRRemoveLoadables getRemoveLoadables() throws InputNotSupportedException {
-		if(removeLoadables == null){
-			throw new InputNotSupportedException(getType());
-		}
-		return removeLoadables;
-	}
-
-	/**
-	 * This function sets and run the turn itself. After a turn is set, it will automatically run. Once the turn has
-	 * finished running (either happening due to timeout or player taking action) it will delete the generic reference pointer
-	 * @param genericPIR The PIR to run and wait for it to finish.
-	 */
-	private void setGenericReference(PIR genericPIR){
-		this.genericReference = genericPIR;
-		try {
-			genericPIR.run();
-			this.genericReference = null;
-		} catch (InterruptedException e) {
+		this.activePIRs.put(pir.getCurrentPlayer(), pir);
+		try{
+			pir.run();
+		}catch(InterruptedException e){
 			e.printStackTrace();
 		}
+		//Do not clear in here the map entry after the turn has finished. This because after it we still
+		//need to retrieve from the object the result of the turn!
 	}
 
+	/**
+	 * Blocking function that will create a new PIR for the operation of activating
+	 * specific tiles on the player's shipboard.
+	 * @param activateTiles The PIR to run
+	 * @return The activated tiles by the player.
+	 */
 	public Set<Coordinates> setAndRunTurn(PIRActivateTiles activateTiles) {
-		if(isAnyTurnActive()){
-			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
-		}
-		this.activateTiles = activateTiles;
-		setGenericReference(activateTiles);
+		setAndRunGenericTurn(activateTiles);
 		Set<Coordinates> result = activateTiles.getActivatedTiles();
-		this.activateTiles = null;
+		activePIRs.remove(activateTiles.getCurrentPlayer());
 		return result;
 	}
 
+	/**
+	 * Blocking function that will create a new PIR for the operation of
+	 * adding loadables on the player's shipboard. Doesn't return anything,
+	 * as the PIR itself affects the model.
+	 * @param addLoadables The PIR to run.
+	 */
 	public void setAndRunTurn(PIRAddLoadables addLoadables) {
-		if(isAnyTurnActive()){
-			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
-		}
-		this.addLoadables = addLoadables;
-		setGenericReference(addLoadables);
-		this.addLoadables = null;
+		setAndRunGenericTurn(addLoadables);
+		activePIRs.remove(addLoadables.getCurrentPlayer());
 	}
 
+
+	/**
+	 * Blocking function that will create a new PIR for the operation of making a
+	 * Yes or No choice. It will return the choice selected by the player.
+	 * @param choice the PIR to run.
+	 * @return True if the player chose "YES"
+	 */
 	public boolean setAndRunTurn(PIRYesNoChoice choice) {
-		if(isAnyTurnActive()){
-			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
-		}
-		this.choice = choice;
-		setGenericReference(choice);
+		setAndRunGenericTurn(choice);
 		boolean result = choice.isChoiceYes();
-		this.choice = null;
+		activePIRs.remove(choice.getCurrentPlayer());
 		return result;
 	}
 
+	/**
+	 * Blocking function that will create a new PIR for the operation of
+	 * making the player select an option out of multiple choices, with custom
+	 * messages.
+	 * @param choice the PIR to run
+	 * @return The selected choice
+	 */
 	public int setAndRunTurn(PIRMultipleChoice choice) {
-		if(isAnyTurnActive()){
-			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
-		}
-		this.choice = choice;
-		setGenericReference(choice);
+		setAndRunGenericTurn(choice);
 		int result = choice.getChoice();
-		this.choice = null;
+		activePIRs.remove(choice.getCurrentPlayer());
 		return result;
 	}
 
+	/**
+	 * Blocking function that will create a new PIR for the operation of
+	 * removing loadables from the player's shipboard. Doesn't return anything,
+	 * as the PIR itself affects the model.
+	 * @see PIRHandler#setAndRunTurn(PIRAddLoadables)
+	 * @param removeLoadables The PIR to run.
+	 */
 	public void setAndRunTurn(PIRRemoveLoadables removeLoadables) {
-		if(isAnyTurnActive()){
-			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
-		}
-		this.removeLoadables = removeLoadables;
-		setGenericReference(removeLoadables);
-		this.removeLoadables = null;
+		setAndRunGenericTurn(removeLoadables);
+		activePIRs.remove(removeLoadables.getCurrentPlayer());
 	}
 
-	/**
-	 *
-	 * @return the player the current turn is dedicated to.
-	 */
-	public Player getCurrentPlayer() {
-		if(!isAnyTurnActive()){
-			return null;
-		}
-		return genericReference.getCurrentPlayer();
-	}
 
-	/**
-	 *
-	 * @return The type of the current turn.
-	 */
-	public PIRType getType() {
-		//basically nullcheck generic reference
-		if(!isAnyTurnActive()){
-			return null;
-		}
-		return genericReference.getPIRType();
-	}
 
 
 	/**
@@ -166,13 +132,13 @@ public class PIRHandler {
 	 * @throws WrongPlayerTurnException If the player is not who the turn is for.
 	 */
 	public void endTurn(Player player) throws WrongPlayerTurnException {
-		if(!isAnyTurnActive()) {
-			return;
+		if(!isPlayerTurnActive(player)) {
+			throw new WrongPlayerTurnException(player);
 		}
-		if(!getCurrentPlayer().equals(player)){
-			throw new WrongPlayerTurnException(getCurrentPlayer(), player, getType());
+		PIR active = activePIRs.get(player);
+		if(active != null){
+			active.endTurn();
 		}
-		genericReference.endTurn();
 		/*
 		We don't need in here to nullify generic reference! In fact, check what happens when genericReference ends
 		and the caller of genericReference.run() resumes. This happens in this class PIRHandler#setGenericReference.
