@@ -18,7 +18,7 @@ public class AssembleCLIScreen extends CLIScreen{
     private TileSkeleton tileInHand = null;
 
     public AssembleCLIScreen() {
-        super("assemble", true);
+        super("assemble", true, 0);
     }
 
     @Override

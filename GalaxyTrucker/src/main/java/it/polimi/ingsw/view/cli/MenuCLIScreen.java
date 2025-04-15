@@ -15,7 +15,7 @@ public class MenuCLIScreen extends CLIScreen {
 	 * and allows commands to join and create a match.
 	 */
 	public MenuCLIScreen() {
-		super("menu", true);
+		super("menu", true, 0);
 	}
 
 	@Override

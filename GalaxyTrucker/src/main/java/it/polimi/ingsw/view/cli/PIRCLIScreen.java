@@ -9,7 +9,7 @@ import java.util.List;
 public class PIRCLIScreen extends CLIScreen {
 
 	public PIRCLIScreen() {
-		super("turn", false);
+		super("turn", false, 10);
 	}
 
 	private PIRType getPIRType(){
@@ -24,10 +24,10 @@ public class PIRCLIScreen extends CLIScreen {
 	protected boolean switchConditions() {
 		//NOTE! Until PIRHandler is fixed to not be transient (so make it serializable) this will
 		//return error inevitably
-		return getLastUpdate()
-				.getCurrentGame()
-				.getPIRHandler()
-				.getPlayerPIR(getLastUpdate().getClientPlayer()) != null;
+		return getLastUpdate().getCurrentGame() != null &&
+				getLastUpdate().getCurrentGame().getPIRHandler() != null &&
+				getLastUpdate().getCurrentGame().getPIRHandler().getPlayerPIR(getLastUpdate()
+																.getClientPlayer()) != null;
 	}
 
 	@Override

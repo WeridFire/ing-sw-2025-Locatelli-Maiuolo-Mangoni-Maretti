@@ -15,6 +15,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 	protected final String screenName;
 	private String screenMessage;
 	private final boolean forceActivate;
+	private int priority = 0;
 
 	/**
 	 * Abstract class for a CLI screen. Contains the standardized methods and fields to design a new screen.
@@ -24,10 +25,12 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * based on the current state of the game there might be different available screens.
 	 * @param screenName The identifier of the screen.
 	 * @param forceActivate if to forcefully activate this screen whenever an update satisfying it will be received.
+	 * @param priority if there are multiple screens not force-activable, priority will indicate which one to prioritize.
 	 */
-	public CLIScreen(String screenName, boolean forceActivate) {
+	public CLIScreen(String screenName, boolean forceActivate, int priority) {
 		this.screenName = screenName;
 		this.forceActivate = forceActivate;
+		this.priority = priority;
 	}
 
 	/**
@@ -35,7 +38,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * @see #CLIScreen(String, boolean)  CLIScreen
 	 */
 	public CLIScreen(String screenName){
-		this(screenName, false);
+		this(screenName, false, 0);
 	}
 
 	/**
@@ -119,6 +122,10 @@ public abstract class CLIScreen implements ICLIPrintable {
 
 	public final boolean isForceActivate() {
 		return forceActivate;
+	}
+
+	public final int getPriority() {
+		return priority;
 	}
 
 	private void displayError(){
@@ -280,5 +287,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 	public static CLIFrame getScreenFrame(int rows, int columns) {
 		return getScreenFrame(new int[] {rows}, columns);
 	}
+
+
 
 }

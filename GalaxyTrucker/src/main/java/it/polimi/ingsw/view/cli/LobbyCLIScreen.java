@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class LobbyCLIScreen extends CLIScreen{
 
 	public LobbyCLIScreen() {
-		super("lobby", true);
+		super("lobby", true, 0);
 	}
 
 	@Override

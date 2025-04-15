@@ -67,8 +67,25 @@ public class CLIScreenHandler {
 									.orElse(null);
 		if(forceActivate != null){
 			activateScreen(forceActivate.screenName);
+			return;
 		}
-		getCurrentScreen().refresh();
+
+		if(getCurrentScreen().switchConditions()){
+			getCurrentScreen().refresh(); //In case the screen conditions are still met, we just refresh the current screen
+		}else{
+			//If the previous screen is no longer activable, and there is not a forced screen to activate,
+			//Look for all the available screens, and get the one with the highest priority (usually the PIRs).
+			CLIScreen newScreen = getAvailableScreens().stream().sorted((c1, c2) -> {
+				return Integer.compare(c2.getPriority(), c1.getPriority());
+			}).findFirst().orElse(null);
+			if(newScreen != null){
+				activateScreen(newScreen.screenName);
+			}else{
+				activateScreen("Menu");
+			}
+
+		}
+
 	}
 
 	/**
