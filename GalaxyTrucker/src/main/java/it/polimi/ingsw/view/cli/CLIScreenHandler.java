@@ -176,8 +176,8 @@ public class CLIScreenHandler {
 									"'. Please use one name in the provided list of available screens.");
 						}
 					}
-					else {
-						currentScreen.setScreenMessage("Usage: screen <name>");
+					else if (args.length > 1) {
+						currentScreen.setScreenMessage("Usage: screen | screen <name>");
 					}
 					isShowingAvailableScreens = true;
 					currentScreen.refresh();
