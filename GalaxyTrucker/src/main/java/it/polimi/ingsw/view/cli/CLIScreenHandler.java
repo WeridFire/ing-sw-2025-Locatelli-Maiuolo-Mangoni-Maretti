@@ -98,9 +98,7 @@ public class CLIScreenHandler {
 	/**
 	 * Prints an informative message displaying the currently available and activable screens.
 	 */
-	protected void printAvailableScreens() {
-
-		CLIScreen.clear();
+	protected CLIFrame popupAvailableScreens() {
 		Set<CLIScreen> screens = getAvailableScreens();
 		CLIFrame frame = CLIScreen.getScreenFrame(12, 40, ANSI.BACKGROUND_BLACK);
 		frame = frame.merge(new CLIFrame(ANSI.RED + "AVAILABLE SCREENS"), AnchorPoint.TOP, AnchorPoint.CENTER, 1, 0);
@@ -116,9 +114,7 @@ public class CLIScreenHandler {
 		}
 		frame = frame.merge(new CLIFrame(ANSI.BACKGROUND_RED + ANSI.WHITE + "Enter to close"),
 										AnchorPoint.BOTTOM, AnchorPoint.CENTER, -2, 0);
-		CLIFrame currentScr = getCurrentScreen().getCLIRepresentation();
-		currentScr = currentScr.merge(frame, AnchorPoint.CENTER, AnchorPoint.CENTER);
-		System.out.println(currentScr);
+		return frame;
 	}
 
 	/**
