@@ -4,6 +4,7 @@ import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.game.exceptions.DrawTileException;
 import it.polimi.ingsw.player.exceptions.*;
+import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.*;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
@@ -282,4 +283,6 @@ public class Player implements Serializable {
 
         shipBoard.endAssembly();
     }
+
+
 }

@@ -43,6 +43,7 @@ public class CLIScreenHandler {
 		allScreens.add(new MenuCLIScreen()); //menu
 		allScreens.add(new LobbyCLIScreen()); //lobby
 		allScreens.add(new AssembleCLIScreen()); //assemble
+		allScreens.add(new PIRCLIScreen()); //input
 	}
 
 	// END OF SINGLETON LOGIC
@@ -66,8 +67,25 @@ public class CLIScreenHandler {
 									.orElse(null);
 		if(forceActivate != null){
 			activateScreen(forceActivate.screenName);
+			return;
 		}
-		getCurrentScreen().refresh();
+
+		if(getCurrentScreen().switchConditions()){
+			getCurrentScreen().refresh(); //In case the screen conditions are still met, we just refresh the current screen
+		}else{
+			//If the previous screen is no longer activable, and there is not a forced screen to activate,
+			//Look for all the available screens, and get the one with the highest priority (usually the PIRs).
+			CLIScreen newScreen = getAvailableScreens().stream().sorted((c1, c2) -> {
+				return Integer.compare(c2.getPriority(), c1.getPriority());
+			}).findFirst().orElse(null);
+			if(newScreen != null){
+				activateScreen(newScreen.screenName);
+			}else{
+				activateScreen("Menu");
+			}
+
+		}
+
 	}
 
 	/**
@@ -80,33 +98,23 @@ public class CLIScreenHandler {
 	/**
 	 * Prints an informative message displaying the currently available and activable screens.
 	 */
-	protected void printAvailableScreens() {
-
-		CLIScreen.clear();
+	protected CLIFrame popupAvailableScreens() {
 		Set<CLIScreen> screens = getAvailableScreens();
 		CLIFrame frame = CLIScreen.getScreenFrame(12, 40, ANSI.BACKGROUND_BLACK);
 		frame = frame.merge(new CLIFrame(ANSI.RED + "AVAILABLE SCREENS"), AnchorPoint.TOP, AnchorPoint.CENTER, 1, 0);
 		if (screens.isEmpty()) {
 			frame = frame.merge(new CLIFrame(ANSI.BACKGROUND_RED + ANSI.WHITE + "No Screens Available"), AnchorPoint.CENTER, AnchorPoint.CENTER, -1, 0);
 		}else{
-			StringBuilder screensList = new StringBuilder();
-			screens.forEach(cli -> screensList
-									.append(ANSI.BACKGROUND_WHITE)
-									.append(ANSI.BLACK)
-									.append(" > ")
-									.append(ANSI.WHITE)
-									.append(cli.screenName).append("\n"));
-			//TODO: use ARRAY of strings to create the CLIFrame instead of a stringbuilder, which breaks the thing.
-			// See printCommands for a correct implementation of this. Once there will be more than 1 screen available
-			// at once I will get to implement it - davide
-			CLIFrame s = new CLIFrame(screensList.toString());
+			List<String> screensList = new ArrayList<>(screens.size());
+			screens.forEach(cli ->
+					screensList.add(ANSI.BACKGROUND_WHITE + ANSI.BLACK + " > " + ANSI.WHITE + cli.screenName)
+			);
+			CLIFrame s = new CLIFrame(screensList.toArray(new String[0]));
 			frame = frame.merge(s, AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT, 1, 1);
 		}
 		frame = frame.merge(new CLIFrame(ANSI.BACKGROUND_RED + ANSI.WHITE + "Enter to close"),
 										AnchorPoint.BOTTOM, AnchorPoint.CENTER, -2, 0);
-		CLIFrame currentScr = getCurrentScreen().getCLIRepresentation();
-		currentScr = currentScr.merge(frame, AnchorPoint.CENTER, AnchorPoint.CENTER);
-		System.out.println(currentScr);
+		return frame;
 	}
 
 	/**
@@ -156,13 +164,19 @@ public class CLIScreenHandler {
 					break;
 				case "screen":
 					if(args.length == 1){
-						boolean success = activateScreen(args[0]);
-						if(success){
-							break;
+						if (!activateScreen(args[0])) {
+							currentScreen.setScreenMessage("No screen found with name '" + args[0] +
+									"'. Please use one name in the provided list of available screens.");
 						}
+						break;
+					}
+					else if (args.length > 1) {
+						currentScreen.setScreenMessage("Usage: screen | screen <name>");
+						break;
 					}
 					isShowingAvailableScreens = true;
 					currentScreen.refresh();
+					isShowingAvailableScreens = false;
 					break;
 				case "help":
 					isShowingHelpScreen = true;

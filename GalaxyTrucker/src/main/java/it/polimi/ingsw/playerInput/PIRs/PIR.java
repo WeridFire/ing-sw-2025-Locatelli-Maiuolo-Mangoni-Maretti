@@ -2,8 +2,13 @@ package it.polimi.ingsw.playerInput.PIRs;
 
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRType;
+import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
+import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
+import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
+import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.util.*;
@@ -83,5 +88,13 @@ public abstract class PIR {
 		if(player != currentPlayer){
 			throw new WrongPlayerTurnException(currentPlayer, player, PIRType);
 		}
+	}
+
+	public void activateTiles(Player player, Set<Coordinates> coordinates) throws WrongPlayerTurnException, NotEnoughItemsException, TileNotAvailableException, InputNotSupportedException {
+		throw new InputNotSupportedException(getPIRType());
+	}
+
+	public void addLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToAdd) throws WrongPlayerTurnException, TileNotAvailableException, UnsupportedLoadableItemException, TooMuchLoadException, InputNotSupportedException {
+		throw new InputNotSupportedException(getPIRType());
 	}
 }

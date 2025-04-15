@@ -15,6 +15,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 	protected final String screenName;
 	private String screenMessage;
 	private final boolean forceActivate;
+	private int priority = 0;
 
 	/**
 	 * Abstract class for a CLI screen. Contains the standardized methods and fields to design a new screen.
@@ -24,18 +25,20 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * based on the current state of the game there might be different available screens.
 	 * @param screenName The identifier of the screen.
 	 * @param forceActivate if to forcefully activate this screen whenever an update satisfying it will be received.
+	 * @param priority if there are multiple screens not force-activable, priority will indicate which one to prioritize.
 	 */
-	public CLIScreen(String screenName, boolean forceActivate) {
+	public CLIScreen(String screenName, boolean forceActivate, int priority) {
 		this.screenName = screenName;
 		this.forceActivate = forceActivate;
+		this.priority = priority;
 	}
 
 	/**
 	 * @param screenName The identifier of the screen.
-	 * @see #CLIScreen(String, boolean)  CLIScreen
+	 * @see #CLIScreen(String)  CLIScreen
 	 */
 	public CLIScreen(String screenName){
-		this(screenName, false);
+		this(screenName, false, 0);
 	}
 
 	/**
@@ -44,15 +47,6 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * @return If the screen can be activable.
 	 */
 	protected abstract boolean switchConditions();
-
-	/**
-	 * Prints the screen to the CLI. Gets called on every refresh, and prints out the actual
-	 * juice of the screen. This does not include "service" messages such as server errors, which
-	 * are handled in their own functions.
-	 */
-	protected final void printScreen(){
-		System.out.println(getCLIRepresentation());
-	}
 
 	/**
 	 * This function basically allows the main CLI logic to delegate to the active screen the handling of a command.
@@ -69,16 +63,21 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * and then prints any eventual error or message.
 	 */
 	protected final void refresh(){
-		clear();
-		printScreen();
+		CLIFrame screen = getCLIRepresentation();
 
+		CLIFrame popups = new CLIFrame();
 		if(CLIScreenHandler.getInstance().isShowingHelpScreen){
-			printAvailableCommands();
+			popups = popups.merge(popupAvailableCommands(),
+					AnchorPoint.CENTER, AnchorPoint.CENTER);
+		}
+		if(CLIScreenHandler.getInstance().isShowingAvailableScreens){
+			popups = popups.merge(CLIScreenHandler.getInstance().popupAvailableScreens(),
+					AnchorPoint.CENTER, AnchorPoint.CENTER);
 		}
 
-		if(CLIScreenHandler.getInstance().isShowingAvailableScreens){
-			CLIScreenHandler.getInstance().printAvailableScreens();
-		}
+		clear();
+		// print the screen with popups at the center
+		System.out.println(screen.merge(popups, AnchorPoint.CENTER, AnchorPoint.CENTER));
 
 		if(getLastUpdate().getError() != null){
 			displayError();
@@ -90,19 +89,18 @@ public abstract class CLIScreen implements ICLIPrintable {
 	}
 
 	/**
-	 * This function should call inside of it the method printCommands, passing the commands available
-	 * in the specific screen.
-	 * Check out the examples in {@link MenuCLIScreen#printScreenSpecificCommands()}.
+	 * This function should return the commands available in the specific screen
+	 * to pass as parameter while calling the method printCommands.
+	 * Can be immutable.
 	 */
-	abstract void printScreenSpecificCommands();
+	protected abstract List<String> getScreenSpecificCommands();
 
 	/*
 	!!!BELOW THIS YOU DON'T NEED TO OVERRIDE ANYTHING!!!
 	 */
 
-	protected final void printAvailableCommands(){
-		clear();
-		printScreenSpecificCommands();
+	protected final CLIFrame popupAvailableCommands(){
+		return popupCommands(screenName, getScreenSpecificCommands().toArray(new String[0]));
 	}
 
 	protected final IClient getClient(){
@@ -119,6 +117,10 @@ public abstract class CLIScreen implements ICLIPrintable {
 
 	public final boolean isForceActivate() {
 		return forceActivate;
+	}
+
+	public final int getPriority() {
+		return priority;
 	}
 
 	private void displayError(){
@@ -151,8 +153,8 @@ public abstract class CLIScreen implements ICLIPrintable {
 	}
 
 	/**
-	 * Prints commands for a specific screen name.
-	 * This method will display a blue header with the screen name, followed by each command on a new line.
+	 * Return the {@link CLIFrame} of commands with a specific screen name and commands.
+	 * This will be a popup which display a blue header with the screen name, followed by each command on a new line.
 	 * Each command should be formatted as <b>command</b>|<b>description</b>, where:
 	 * <ul>
 	 *     <li><b>command</b> is the name or identifier of the command.</li>
@@ -162,9 +164,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * @param screenName The name of the screen for which the commands are printed. This will be displayed as the header.
 	 * @param commands An array or list of commands to be printed, each formatted as {@code command|description}.
 	 */
-	public final void printCommands(String screenName, String... commands) {
-		CLIScreen.clear();
-
+	public final CLIFrame popupCommands(String screenName, String... commands) {
 		final int frameWidth = 60;
 		final int spacesOnAvoidOverload = 1;
 		CLIFrame frame = CLIScreen.getScreenFrame(14, frameWidth, ANSI.BACKGROUND_BLACK);
@@ -173,7 +173,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 				ANSI.RED + " " + screenName.toUpperCase() +
 				ANSI.RESET + ANSI.BACKGROUND_BLUE + " SPECIFIC COMMANDS " +
 				ANSI.RESET;
-		List<String> cmds = null;
+		List<String> cmds;
 		if(commands == null){
 			cmds = new ArrayList<>();
 		}else{
@@ -218,9 +218,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 		frame = frame.merge(new CLIFrame(ANSI.BACKGROUND_RED + ANSI.WHITE + "Enter to close"),
 				AnchorPoint.BOTTOM, AnchorPoint.CENTER, -2, 0);
 
-		CLIFrame currentScr = CLIScreenHandler.getInstance().getCurrentScreen().getCLIRepresentation();
-		currentScr = currentScr.merge(frame, AnchorPoint.CENTER, AnchorPoint.CENTER);
-		System.out.println(currentScr);
+		return frame;
 	}
 
 
@@ -280,5 +278,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 	public static CLIFrame getScreenFrame(int rows, int columns) {
 		return getScreenFrame(new int[] {rows}, columns);
 	}
+
+
 
 }

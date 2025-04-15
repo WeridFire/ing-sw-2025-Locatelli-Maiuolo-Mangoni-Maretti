@@ -18,7 +18,7 @@ public class AssembleCLIScreen extends CLIScreen{
     private TileSkeleton tileInHand = null;
 
     public AssembleCLIScreen() {
-        super("assemble", true);
+        super("assemble", true, 0);
     }
 
     @Override
@@ -114,15 +114,15 @@ public class AssembleCLIScreen extends CLIScreen{
             case "finish":
                 if(getLastUpdate().getClientPlayer().getShipBoard() == null){
                     setScreenMessage("You don't have a shipboard.");
-                    return;
+                    break;
                 }
 
                 if(getLastUpdate().getClientPlayer().getShipBoard().isEndedAssembly()){
                     setScreenMessage("You already ended the assembly phase!");
-                    return;
+                    break;
                 }
                 getServer().finishAssembling(getClient());
-                return;
+                break;
 
             case "showcardgroup":
                 if (args.length == 1) {
@@ -138,7 +138,7 @@ public class AssembleCLIScreen extends CLIScreen{
     }
 
     @Override
-    void printScreenSpecificCommands() {
+    protected List<String> getScreenSpecificCommands() {
         List<String> availableCommands = new ArrayList<>();
         // note: last timerflip only if assemble phase ended for this player
         availableCommands.add("timerflip|Flips the hourglass of the game.");
@@ -153,7 +153,7 @@ public class AssembleCLIScreen extends CLIScreen{
             availableCommands.add("place <row> <column>|Place the tile from your hand onto your shipboard.");
         }
 
-        printCommands(screenName, availableCommands.toArray(String[]::new));
+        return availableCommands;
     }
 
     private CLIFrame getTileRepresentationWithID(TileSkeleton tile) {

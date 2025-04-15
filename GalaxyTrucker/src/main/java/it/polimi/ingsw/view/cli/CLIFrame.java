@@ -4,10 +4,7 @@ import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * Represents a character-based frame used in a Command Line Interface.
@@ -413,9 +410,14 @@ public class CLIFrame implements Serializable {
      * for all the parts with a transparent background: it changes in the specified color.
      *
      * @param backgroundFill The color to fill the background with.
-     * @return A new {@link CLIFrame} representing the painted result.
+     * @return A new {@link CLIFrame} representing the painted result,
+     * or a copy of this {@link CLIFrame} if {@code backgroundFill} is not {@link ANSI} background.
+     * @implNote {@link ANSI#RESET} is not a background but does nothing -> no need to create more than a copy
      */
     public CLIFrame paintBackground(String backgroundFill) {
+        if (!ANSI.isBackground(backgroundFill)) {
+            return new CLIFrame(this);
+        }
         String emptyLine = backgroundFill + " ".repeat(columns);
         String[] frame = Collections.nCopies(rows, emptyLine).toArray(String[]::new);
         return new CLIFrame(frame).merge(this);
@@ -428,9 +430,14 @@ public class CLIFrame implements Serializable {
      * for all the parts with a non-set foreground: it changes in the specified color.
      *
      * @param foregroundFill The color to fill the foreground with.
-     * @return A new {@link CLIFrame} representing the painted result.
+     * @return A new {@link CLIFrame} representing the painted result,
+     * or a copy of this {@link CLIFrame} if {@code foregroundFill} is not {@link ANSI} foreground.
+     * @implNote {@link ANSI#RESET} is not a foreground but does nothing -> no need to create more than a copy
      */
     public CLIFrame paintForeground(String foregroundFill) {
+        if (!ANSI.isForeground(foregroundFill)) {
+            return new CLIFrame(this);
+        }
         String[] frame = new String[rows];
         for (int i = 0; i < rows; i++) {
             frame[i] = contentAsLines[i].replace(ANSI.RESET, ANSI.RESET + foregroundFill);

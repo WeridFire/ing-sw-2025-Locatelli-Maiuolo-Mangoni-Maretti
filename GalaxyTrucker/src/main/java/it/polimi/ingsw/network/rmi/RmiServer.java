@@ -17,6 +17,7 @@ import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.*;
+import it.polimi.ingsw.playerInput.PIRs.PIR;
 import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
@@ -132,7 +133,10 @@ public class RmiServer implements IServer {
 		// else: actually try to perform the action
 
 		try {
-			pg.game.getGameData().getPIRHandler().getActivateTiles().activateTiles(pg.player, tilesToActivate);
+			PIR activePIR = pg.game.getGameData().getPIRHandler().getPlayerPIR(pg.player);
+			if(activePIR != null){
+				activePIR.activateTiles(pg.player, tilesToActivate);
+			}
 			client.updateClient(new ClientUpdate(pg.connectionUUID));
 		} catch (WrongPlayerTurnException | InputNotSupportedException | NotEnoughItemsException |
 				 TileNotAvailableException e) {
@@ -147,7 +151,10 @@ public class RmiServer implements IServer {
 		// else: actually try to perform the action
 
 		try {
-			pg.game.getGameData().getPIRHandler().getAddLoadables().addLoadables(pg.player, cargoToAdd);
+			PIR activePIR = pg.game.getGameData().getPIRHandler().getPlayerPIR(pg.player);
+			if(activePIR != null){
+				activePIR.addLoadables(pg.player, cargoToAdd);
+			}
 			client.updateClient(new ClientUpdate(pg.connectionUUID));
 		} catch (InputNotSupportedException | WrongPlayerTurnException | TileNotAvailableException |
 				 UnsupportedLoadableItemException | TooMuchLoadException e) {
