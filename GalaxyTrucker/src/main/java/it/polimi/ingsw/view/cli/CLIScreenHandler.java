@@ -164,17 +164,15 @@ public class CLIScreenHandler {
 					break;
 				case "screen":
 					if(args.length == 1){
-						boolean success = activateScreen(args[0]);
-						if(success){
-							break;
-						} else {
+						if (!activateScreen(args[0])) {
 							currentScreen.setScreenMessage("No screen found with name '" + args[0] +
 									"'. Please use one name in the provided list of available screens.");
-							// TODO: adjust double refresh
 						}
+						break;
 					}
 					else if (args.length > 1) {
 						currentScreen.setScreenMessage("Usage: screen | screen <name>");
+						break;
 					}
 					isShowingAvailableScreens = true;
 					currentScreen.refresh();
