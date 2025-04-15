@@ -43,6 +43,7 @@ public class CLIScreenHandler {
 		allScreens.add(new MenuCLIScreen()); //menu
 		allScreens.add(new LobbyCLIScreen()); //lobby
 		allScreens.add(new AssembleCLIScreen()); //assemble
+		allScreens.add(new PIRCLIScreen()); //input
 	}
 
 	// END OF SINGLETON LOGIC
