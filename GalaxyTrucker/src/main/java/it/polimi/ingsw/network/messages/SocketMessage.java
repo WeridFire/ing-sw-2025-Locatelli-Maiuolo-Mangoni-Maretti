@@ -22,7 +22,8 @@ public class SocketMessage implements Serializable{
 		PICK_TILE,
 		PLACE_TILE,
 		FINISH_ASSEMBLING,
-		SHOW_CARD_GROUP
+		SHOW_CARD_GROUP,
+		HIDE_CARD_GROUP
 	}
 
 	private MessageType type;
@@ -192,4 +193,7 @@ public class SocketMessage implements Serializable{
 		return new SocketMessage(SocketMessage.MessageType.SHOW_CARD_GROUP, List.of(id));
 	}
 
+	public static SocketMessage hideCardGroupMessage() {
+		return new SocketMessage(SocketMessage.MessageType.HIDE_CARD_GROUP);
+	}
 }

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.player;
 
+import it.polimi.ingsw.cards.CardsGroup;
 import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.game.exceptions.DrawTileException;
@@ -56,6 +57,11 @@ public class Player implements Serializable {
      * The player's absolute position on the flight board
      */
     private int position;
+
+    /**
+     *  The id of the cardgroup the player is currently holding
+     */
+    private Integer cardGroupInHand;
 
     public Player(String username, UUID connectionUUID) {
         this.username = username;
@@ -192,6 +198,33 @@ public class Player implements Serializable {
      */
     public int getPosition() {
         return position;
+    }
+
+    /**
+     * Returns the id of the held cardgroup
+     *
+     * @return the id
+     */
+    public Integer getCardGroupInHand() {
+        return cardGroupInHand;
+    }
+
+    /**
+     * Sets the id of the held cardgroup
+     *
+     *
+     */
+    public void setCardGroupInHand(Integer id) {
+        this.cardGroupInHand = id;
+    }
+
+    /**
+     * Clears the id of the held cardgroup
+     *
+     *
+     */
+    public void clearCardGroupInHand() {
+        this.cardGroupInHand = null;
     }
 
     /**

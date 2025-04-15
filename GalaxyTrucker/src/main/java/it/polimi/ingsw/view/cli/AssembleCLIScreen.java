@@ -131,6 +131,10 @@ public class AssembleCLIScreen extends CLIScreen{
                 }
                 break;
 
+            case "hidecardgroup":
+                getServer().hidecardgroup(getClient());
+                break;
+
             default:
                 setScreenMessage("Invalid command. Use help to view available commands.");
                 break;

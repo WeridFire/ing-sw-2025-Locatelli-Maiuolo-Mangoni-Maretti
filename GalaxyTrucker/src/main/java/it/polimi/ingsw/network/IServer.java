@@ -37,4 +37,5 @@ public interface IServer extends Remote {
 	void placeTile(IClient client, Coordinates coordinates, Rotation rotation) throws RemoteException;
 	void finishAssembling(IClient client) throws RemoteException;
 	void showcardgroup(IClient client, Integer id) throws RemoteException;
+	void hidecardgroup(IClient client) throws RemoteException;
 }

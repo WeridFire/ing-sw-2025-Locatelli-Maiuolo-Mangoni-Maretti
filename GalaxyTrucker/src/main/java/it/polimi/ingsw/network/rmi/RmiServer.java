@@ -314,6 +314,22 @@ public class RmiServer implements IServer {
 
 		try {
 			pg.game.getGameData().getDeck().getGroup(id).showGroup(pg.player.getUsername());
+			pg.player.setCardGroupInHand(id);
+		} catch (CardsGroupException e) {
+			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
+		}
+	}
+
+	@Override
+	public void hidecardgroup(IClient client) throws RemoteException {
+
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client, GamePhaseType.ASSEMBLE);
+		if (pg == null) return;
+		// else: actually try to perform the action
+
+		try {
+			pg.game.getGameData().getDeck().getGroup(pg.player.getCardGroupInHand()).hideGroup();
+			pg.player.clearCardGroupInHand();
 		} catch (CardsGroupException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 		}

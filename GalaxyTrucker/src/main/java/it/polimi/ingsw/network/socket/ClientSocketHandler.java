@@ -79,6 +79,7 @@ public class ClientSocketHandler implements IClient {
 								(Rotation) message.getArgs().get(1));
 						case FINISH_ASSEMBLING -> getServer().finishAssembling(this);
 						case SHOW_CARD_GROUP -> getServer().showcardgroup(this, (Integer) message.getArgs().getFirst());
+						case HIDE_CARD_GROUP -> getServer().hidecardgroup(this);
 					}
 				}catch(IllegalArgumentException e){
 					System.err.println("ERROR WHILE PARSING MESSAGE! Message:");
