@@ -9,7 +9,9 @@ import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.LobbyGamePhase;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.player.exceptions.NoShipboardException;
 import it.polimi.ingsw.shipboard.ShipBoard;
+import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.rmi.RemoteException;
@@ -72,24 +74,42 @@ public class Game {
      * </p>
      */
     public void gameLoop() throws InterruptedException, RemoteException {
+        //*******//
+        // LOBBY
 
-        LobbyGamePhase l = new LobbyGamePhase(id, gameData);
-        getGameData().setCurrentGamePhase(l);
-        l.playLoop();
+        LobbyGamePhase lobby = new LobbyGamePhase(id, gameData);
+        getGameData().setCurrentGamePhase(lobby);
+        lobby.playLoop();
 
         //Call function to initialize all players stuff.
         initGame();
 
-        AssembleGamePhase a = new AssembleGamePhase(id, gameData);
-        getGameData().setCurrentGamePhase(a);
+        //**********//
+        // ASSEMBLE
+
+        AssembleGamePhase assemble = new AssembleGamePhase(id, gameData);
+        getGameData().setCurrentGamePhase(assemble);
 
         //We notify all players about the new game state
         GameServer.getInstance().broadcastUpdate(this);
 
-        //Blocking function that waits for everyone to finish set up their shipboard aliens
+        assemble.playLoop();
+        // if here can be because time ended: force all the players that haven't finished yet to end assembly
+        for (Player player : getGameData().getPlayers()) {
+            if (!player.getShipBoard().isEndedAssembly()) {
+                try {
+                    getGameData().endAssembly(player);
+                } catch (AlreadyEndedAssemblyException | NoShipboardException e) {
+                    throw new RuntimeException(e);  // should never happen -> runtime exception
+                }
+            }
+        }
+
+        // Blocking function that waits for everyone to finish set up their shipboard aliens
         fillUpShipboards();
 
-        a.playLoop();
+        //********//
+        // FLIGHT
 
         gameData.getDeck().drawNextCard();
         AdventureGamePhase adventureGamePhase = null;
@@ -106,7 +126,7 @@ public class Game {
             gameData.getDeck().drawNextCard();
         }
 
-        //TODO: vogliamo fare una fase di ending?
+        //TODO: vogliamo fare una fase di ending? Yes: show winner and points (maybe a static leaderboard)
 
     }
 
