@@ -1,11 +1,9 @@
 package it.polimi.ingsw.player;
 
-import it.polimi.ingsw.cards.CardsGroup;
 import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.game.exceptions.DrawTileException;
 import it.polimi.ingsw.player.exceptions.*;
-import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.*;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
@@ -54,9 +52,10 @@ public class Player implements Serializable {
     private int credits;
 
     /**
-     * The player's absolute position on the flight board
+     * The player's absolute position on the flight board,
+     * or null if this player has not been placed on the route-board yet.
      */
-    private int position;
+    private Integer position;
 
     /**
      *  The id of the cardgroup the player is currently holding
@@ -69,6 +68,7 @@ public class Player implements Serializable {
         reservedTiles = new ArrayList<>(2);
         lostTiles = new ArrayList<>();
         credits = 0;
+        position = null;
     }
 
     /**
@@ -183,7 +183,7 @@ public class Player implements Serializable {
     }
 
     /**
-     * Sets the current position of the player or entity.
+     * Sets the current position of the player.
      *
      * @param position the new position to set
      */
@@ -192,12 +192,24 @@ public class Player implements Serializable {
     }
 
     /**
-     * Returns the current position of the player or entity.
+     * Returns the current position of the player.
      *
-     * @return the current position
+     * @return the current position, or {@code null} if this player has never been assigned to a position.
      */
-    public int getPosition() {
+    public Integer getPosition() {
         return position;
+    }
+
+    /**
+     * Returns the current position of the player for sorting purposes:
+     * ignores if the player this player has never been assigned to a position,
+     * and in that case suppose the order privilege goes to those players who have not a position yet.
+     *
+     * @return the current position, or {@code null} if this player has never been assigned to a position.
+     */
+    public int getOrder() {
+        if (position == null) return Integer.MAX_VALUE;
+        else return position;
     }
 
     /**
@@ -308,13 +320,14 @@ public class Player implements Serializable {
         }
     }
 
-    public void endAssembly() throws NoShipboardException, AlreadyEndedAssemblyException {
+    public void endAssembly(int startingPosition) throws NoShipboardException, AlreadyEndedAssemblyException {
         ShipBoard shipBoard = getShipBoard();
         if (shipBoard == null) {
             throw new NoShipboardException();
         }
 
         shipBoard.endAssembly();
+        setPosition(startingPosition);
     }
 
 
