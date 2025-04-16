@@ -306,8 +306,7 @@ public class RmiServer implements IServer {
     }
 
 	@Override
-	public void showcardgroup(IClient client, Integer id) throws RemoteException {
-
+	public void showCardGroup(IClient client, Integer id) throws RemoteException {
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client, GamePhaseType.ASSEMBLE);
 		if (pg == null) return;
 		// else: actually try to perform the action
@@ -321,8 +320,7 @@ public class RmiServer implements IServer {
 	}
 
 	@Override
-	public void hidecardgroup(IClient client) throws RemoteException {
-
+	public void hideCardGroup(IClient client) throws RemoteException {
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client, GamePhaseType.ASSEMBLE);
 		if (pg == null) return;
 		// else: actually try to perform the action

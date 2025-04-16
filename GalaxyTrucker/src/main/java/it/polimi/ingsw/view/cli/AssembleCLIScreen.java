@@ -127,12 +127,12 @@ public class AssembleCLIScreen extends CLIScreen{
             case "showcardgroup":
                 if (args.length == 1) {
                     int id = Integer.parseInt(args[0]);
-                    getServer().showcardgroup(getClient(), id);
+                    getServer().showCardGroup(getClient(), id);
                 }
                 break;
 
             case "hidecardgroup":
-                getServer().hidecardgroup(getClient());
+                getServer().hideCardGroup(getClient());
                 break;
 
             default:
