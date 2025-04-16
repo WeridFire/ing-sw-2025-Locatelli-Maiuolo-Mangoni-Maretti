@@ -224,7 +224,7 @@ public class RmiServer implements IServer {
 			return;
 		}
 
-		GameServer.getInstance().broadcastUpdate(pg.game);
+		GameServer.getInstance().broadcastUpdateRefreshOnly(pg.game, Set.of(pg.player));
 	}
 
 	@Override
@@ -299,10 +299,13 @@ public class RmiServer implements IServer {
 		// else: actually try to perform the action
 
 		try {
-			pg.player.endAssembly();
+			pg.game.getGameData().endAssembly(pg.player);
 		} catch (NoShipboardException | AlreadyEndedAssemblyException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
+			return;
 		}
+
+        GameServer.getInstance().broadcastUpdate(pg.game);
     }
 
 	@Override
@@ -316,7 +319,10 @@ public class RmiServer implements IServer {
 			pg.player.setCardGroupInHand(id);
 		} catch (CardsGroupException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
+			return;
 		}
+
+		GameServer.getInstance().broadcastUpdate(pg.game);
 	}
 
 	@Override
@@ -330,6 +336,9 @@ public class RmiServer implements IServer {
 			pg.player.clearCardGroupInHand();
 		} catch (CardsGroupException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
+			return;
 		}
+
+		GameServer.getInstance().broadcastUpdate(pg.game);
 	}
 }
