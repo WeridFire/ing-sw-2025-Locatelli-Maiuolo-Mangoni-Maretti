@@ -413,4 +413,30 @@ public class GameData implements Serializable {
             this.uncoveredTiles.addAll(uncoveredTiles);
         }
     }
+
+    /**
+     * Process the end of the assembly phase for a specific player,
+     * handling internally the "shipboard assembled" signal to the player.
+     * It also manages to update the game assembly phase accordingly to how many players still need to finish assembly
+     * and in which level is the game being played.
+     * @param player the player which ended assembly
+     * @throws IllegalArgumentException if {@code player} does not belong to this game data.
+     * @requires to be called during {@link GamePhaseType#ASSEMBLE}
+     */
+    public void endAssembly(Player player) throws AlreadyEndedAssemblyException, NoShipboardException {
+        if (!players.contains(player)) {
+            throw new IllegalArgumentException("Player '" + player.getUsername() + "' is not in this game");
+        }
+        // handle player management
+        player.endAssembly(startingPositions.removeFirst());
+        // handle game management
+        for (Player p : players) {
+            if (p.getPosition() == null) {
+                return;
+            }
+        }
+        // if here: no player left to finish assembly (<===> all players have a position on the route-board)
+        // thanks to precondition it's possible to cast the current game phase
+        ((AssembleGamePhase) getCurrentGamePhase()).notifyAllPlayersEndedAssembly();
+    }
 }
