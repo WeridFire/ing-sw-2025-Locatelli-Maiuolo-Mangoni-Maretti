@@ -412,7 +412,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		smugglers.removeMostValuableItems(quantityToRemove);
 	}
 
-	public void fillShipboard(Player p, PIRHandler handler){
+	public void fill(Player p, PIRHandler handler){
 		//Fill batteries
 		getVisitorCalculateCargoInfo()
 				.getBatteriesInfo()
@@ -429,13 +429,14 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 			LoadableType fillType = allowedTypes.getFirst(); //Get default choice
 			if(allowedTypes.size() > 1){
 				String[] choices = allowedTypes.stream().map((type) -> {
-					int amount = type.getRequiredCapacity() == 1 ? 2 : 1;
+					int amount = cabin.getCapacityLeft() / type.getRequiredCapacity();
 					return amount + " units of " + type.name();
 				}).toArray(String[]::new); //Generate messages for each type
 				try {
 					PIRMultipleChoice choicePir = new PIRMultipleChoice(p,
 										30,
-										"What type of crew do you want to add in cabin at coordinates " + cabin.getCoordinates().toString(),
+										"What type of crew do you want to add in cabin at coordinates "
+												+ cabin.getCoordinates().toString() + "?",
 										choices,
 							0
 					);
