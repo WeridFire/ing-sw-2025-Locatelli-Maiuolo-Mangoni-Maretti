@@ -70,7 +70,7 @@ public class CLIScreenHandler {
 			return;
 		}
 
-		if(getCurrentScreen().switchConditions()){
+        if(getCurrentScreen().switchConditions() && newUpdate.isRefreshRequired()){
 			getCurrentScreen().refresh(); //In case the screen conditions are still met, we just refresh the current screen
 		}else{
 			//If the previous screen is no longer activable, and there is not a forced screen to activate,

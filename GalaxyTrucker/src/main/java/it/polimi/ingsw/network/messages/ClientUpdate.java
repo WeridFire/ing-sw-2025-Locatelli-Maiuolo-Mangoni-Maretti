@@ -17,6 +17,7 @@ public class ClientUpdate implements Serializable {
 	private final UUID clientUUID;
 	private final GameData currentGame;
 	private final List<GameData> availableGames;
+	private final boolean requireRefresh;
 	private String error;
 
 	/**
@@ -25,19 +26,34 @@ public class ClientUpdate implements Serializable {
 	 * Based on the client the server needs to update, this class will automatically build the correct message for the
 	 * client.
 	 * @param clientUUID The UUID of the client the message is directed to.
+	 * @param requireRefresh If this client should refresh their view after receiving this update.
+	 *                      Usually this is wanted to be {@code true}.
 	 */
-	public ClientUpdate(UUID clientUUID){
+	public ClientUpdate(UUID clientUUID, boolean requireRefresh){
 		this.clientUUID = clientUUID;
 		GamesHandler gamesHandler = GamesHandler.getInstance();
 		Game game = gamesHandler.findGameByClientUUID(clientUUID);
 		if(game != null){
 			Player player = gamesHandler.getPlayerByConnection(clientUUID);
-			this.currentGame = obfuscateGame(game.getGameData(), player);
+			currentGame = obfuscateGame(game.getGameData(), player);
 		}else{
 			currentGame = null;
 		}
-		this.availableGames = GamesHandler.getInstance().getGames().stream().map(Game::getGameData
-		).collect(Collectors.toList());
+		availableGames = GamesHandler.getInstance().getGames().stream()
+				.map(Game::getGameData).collect(Collectors.toList());
+		this.requireRefresh = requireRefresh;
+	}
+
+	/**
+	 * A ClientUpdate is the type of message the server sends to the client. It sends the client all the information about
+	 * the client is currently in (which may be null), and also the information about available games, in lobby phase.
+	 * Based on the client the server needs to update, this class will automatically build the correct message for the
+	 * client.
+	 * An additional info for the client is to refresh their view by default.
+	 * @param clientUUID The UUID of the client the message is directed to.
+	 */
+	public ClientUpdate(UUID clientUUID){
+		this(clientUUID, true);
 	}
 
 	/**
@@ -166,4 +182,8 @@ public class ClientUpdate implements Serializable {
 		}
 		return Objects.equals(getClientPlayer().getUsername(), getCurrentGame().getGameLeader());
 	}
+
+    public boolean isRefreshRequired() {
+        return requireRefresh;
+    }
 }

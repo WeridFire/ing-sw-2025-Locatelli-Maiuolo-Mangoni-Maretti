@@ -17,6 +17,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -113,6 +114,18 @@ public class GameServer{
 			IClient client = clients.get(player.getConnectionUUID());
 			if (client != null){
 				client.updateClient(new ClientUpdate(player.getConnectionUUID()));
+			}
+		}
+	}
+
+	/**
+	 * like broadcastUpdate but it specifies which clients should and which should NOT refresh their view
+	 */
+	public void broadcastUpdateRefreshOnly(Game game, Set<Player> playersToRefreshView) throws RemoteException {
+		for (Player player: game.getGameData().getPlayers()){
+			IClient client = clients.get(player.getConnectionUUID());
+			if (client != null){
+				client.updateClient(new ClientUpdate(player.getConnectionUUID(), playersToRefreshView.contains(player)));
 			}
 		}
 	}

@@ -256,7 +256,7 @@ public class RmiServer implements IServer {
 			return;
 		}
 
-		GameServer.getInstance().broadcastUpdate(pg.game);
+		GameServer.getInstance().broadcastUpdateRefreshOnly(pg.game, Set.of(pg.player));
 	}
 
 	@Override
@@ -289,7 +289,7 @@ public class RmiServer implements IServer {
 			return;
         }
 
-        GameServer.getInstance().broadcastUpdate(pg.game);
+		GameServer.getInstance().broadcastUpdateRefreshOnly(pg.game, Set.of(pg.player));
     }
 
 	@Override
