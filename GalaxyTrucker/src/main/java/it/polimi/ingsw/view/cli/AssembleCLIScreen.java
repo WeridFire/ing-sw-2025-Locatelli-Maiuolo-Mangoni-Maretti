@@ -16,6 +16,7 @@ import java.util.List;
 public class AssembleCLIScreen extends CLIScreen{
 
     private TileSkeleton tileInHand = null;
+    private boolean hasEndedAssembly = false;
 
     public AssembleCLIScreen() {
         super("assemble", true, 0);
@@ -29,7 +30,15 @@ public class AssembleCLIScreen extends CLIScreen{
 
     @Override
     protected void processCommand(String command, String[] args) throws RemoteException {
+
+        if (hasEndedAssembly) {
+            setScreenMessage("You've already finished assembling your majestic ship!\n" +
+                    "Wait for the other players to complete their surely more mediocre work.");
+            return;
+        }
+
         command = command.toLowerCase();
+
         switch(command){
             case "timerflip":
                 //TODO: client side checks
@@ -66,7 +75,6 @@ public class AssembleCLIScreen extends CLIScreen{
                     }
                     try {
                         tileInHand.rotateTile(rotation);
-
                         refresh();  // only because it's client side command
                     } catch (FixedTileException e) {
                         setScreenMessage("The tile in your hand has already been placed.");  // should never happen
@@ -117,11 +125,8 @@ public class AssembleCLIScreen extends CLIScreen{
                     break;
                 }
 
-                if(getLastUpdate().getClientPlayer().getShipBoard().isEndedAssembly()){
-                    setScreenMessage("You already ended the assembly phase!");
-                    break;
-                }
                 getServer().finishAssembling(getClient());
+                hasEndedAssembly = true;
                 break;
 
             case "showcardgroup":
@@ -144,17 +149,21 @@ public class AssembleCLIScreen extends CLIScreen{
     @Override
     protected List<String> getScreenSpecificCommands() {
         List<String> availableCommands = new ArrayList<>();
-        // note: last timerflip only if assemble phase ended for this player
-        availableCommands.add("timerflip|Flips the hourglass of the game.");
 
-        if (tileInHand == null) {
-            availableCommands.add("draw|Draws a tile from the covered tiles.");
-            availableCommands.add("pick <id>|Pick in hand the tile with ID <id>.");
-        }
-        else {
-            availableCommands.add("discard|Discard the tile you have in hand.");
-            availableCommands.add("rotate <direction>|Rotate the tile you have in hand.");
-            availableCommands.add("place <row> <column>|Place the tile from your hand onto your shipboard.");
+        if (!hasEndedAssembly) {
+
+            // note: last timerflip only if assemble phase ended for this player
+            availableCommands.add("timerflip|Flips the hourglass of the game.");
+            if (tileInHand == null) {
+                availableCommands.add("draw|Draws a tile from the covered tiles.");
+                availableCommands.add("pick <id>|Pick in hand the tile with ID <id>.");
+            }
+            else {
+                availableCommands.add("discard|Discard the tile you have in hand.");
+                availableCommands.add("rotate <direction>|Rotate the tile you have in hand.");
+                availableCommands.add("place <row> <column>|Place the tile from your hand onto your shipboard.");
+            }
+
         }
 
         return availableCommands;
