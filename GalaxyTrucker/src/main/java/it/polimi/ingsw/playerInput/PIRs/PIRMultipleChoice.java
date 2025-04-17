@@ -1,9 +1,13 @@
 package it.polimi.ingsw.playerInput.PIRs;
 
+import it.polimi.ingsw.enums.AnchorPoint;
+import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
+import it.polimi.ingsw.view.cli.CLIScreen;
 
 import java.util.Set;
 
@@ -69,6 +73,54 @@ public class PIRMultipleChoice extends PIR {
 
 	@Override
 	public CLIFrame getCLIRepresentation() {
-		return null;
+		// Header frame
+		CLIFrame frame = new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " PLAYER INPUT REQUEST " + ANSI.RESET)
+				.merge(new CLIFrame(""), Direction.SOUTH);
+
+		// Message section
+		frame = frame.merge(
+				new CLIFrame(ANSI.YELLOW + choiceMessage + ANSI.RESET),
+				Direction.SOUTH, 1
+		);
+
+		// Options section
+		if (possibleOptions != null && possibleOptions.length > 0) {
+			CLIFrame optionsFrame = new CLIFrame(ANSI.CYAN + "Available Options:" + ANSI.RESET);
+
+			for (int i = 0; i < possibleOptions.length; i++) {
+				optionsFrame = optionsFrame.merge(
+						new CLIFrame(ANSI.GREEN + "[" + i + "] " + ANSI.RESET + possibleOptions[i]),
+						Direction.SOUTH, 1
+				);
+			}
+			frame = frame.merge(optionsFrame, Direction.SOUTH, 1);
+		} else {
+			frame = frame.merge(
+					new CLIFrame(ANSI.RED + "No available options!" + ANSI.RESET),
+					Direction.SOUTH, 1
+			);
+		}
+
+		// Command hint
+		frame = frame.merge(
+				new CLIFrame(ANSI.WHITE + "Command: " + ANSI.GREEN + ">choose [NUMBER]" + ANSI.RESET),
+				Direction.SOUTH, 2
+		);
+
+		// Timeout information
+		frame = frame.merge(
+				new CLIFrame(ANSI.WHITE + "You have " + ANSI.YELLOW + getCooldown() + " seconds" + ANSI.RESET + " to respond."),
+				Direction.SOUTH, 1
+		);
+
+		// Create a container screen with a fixed size, background, and border
+		int containerRows = Math.max(frame.getRows() + 2, 24);
+		int containerColumns = 100;
+		CLIFrame screenFrame = CLIScreen.getScreenFrame(containerRows, containerColumns, ANSI.BACKGROUND_BLACK, ANSI.BLACK);
+
+		// Merge the content into the screen, centered
+		return screenFrame.merge(frame, AnchorPoint.CENTER, AnchorPoint.CENTER);
 	}
+
+
 }

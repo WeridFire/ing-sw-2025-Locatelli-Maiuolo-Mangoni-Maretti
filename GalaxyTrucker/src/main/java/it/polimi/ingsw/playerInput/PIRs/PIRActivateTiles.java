@@ -1,5 +1,7 @@
 package it.polimi.ingsw.playerInput.PIRs;
 
+import it.polimi.ingsw.enums.AnchorPoint;
+import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.PowerType;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
@@ -7,7 +9,9 @@ import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
+import it.polimi.ingsw.view.cli.CLIScreen;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -85,6 +89,62 @@ public class PIRActivateTiles extends PIR {
 
 	@Override
 	public CLIFrame getCLIRepresentation() {
-		return null;
+		// Header frame
+		CLIFrame frame = new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " PLAYER INPUT REQUEST " + ANSI.RESET)
+				.merge(new CLIFrame(""), Direction.SOUTH);
+
+		// Power type info
+		frame = frame.merge(
+				new CLIFrame(ANSI.YELLOW + "Select tiles to activate for power: " + ANSI.CYAN + powerType + ANSI.RESET),
+				Direction.SOUTH, 1
+		);
+
+		// Batteries available
+		frame = frame.merge(
+				new CLIFrame(ANSI.GREEN + "Available Batteries: " + ANSI.WHITE + getAvailableBatteriesAmount() + ANSI.RESET),
+				Direction.SOUTH, 2
+		);
+
+		// List available coordinates
+		Set<Coordinates> coordinates = getHighlightMask();
+
+		if (coordinates.isEmpty()) {
+			frame = frame.merge(
+					new CLIFrame(ANSI.RED + "No tiles available for activation." + ANSI.RESET),
+					Direction.SOUTH, 1
+			);
+		} else {
+			CLIFrame coordsFrame = new CLIFrame(ANSI.CYAN + "Available Tiles to Activate:" + ANSI.RESET);
+
+			for (Coordinates c : coordinates) {
+				coordsFrame = coordsFrame.merge(
+						new CLIFrame(ANSI.WHITE + "- " + c.toString() + ANSI.RESET),
+						Direction.SOUTH, 1
+				);
+			}
+			frame = frame.merge(coordsFrame, Direction.SOUTH, 1);
+		}
+
+		// Command hint
+		frame = frame.merge(
+				new CLIFrame(ANSI.WHITE + "Command: " + ANSI.GREEN + ">activate (x,y), (x,y), ..." + ANSI.RESET),
+				Direction.SOUTH, 2
+		);
+
+		// Timeout info
+		frame = frame.merge(
+				new CLIFrame(ANSI.WHITE + "You have " + ANSI.YELLOW + getCooldown() + " seconds" + ANSI.RESET + " to respond."),
+				Direction.SOUTH, 1
+		);
+
+		// Build a nice background screen container
+		int containerRows = Math.max(frame.getRows() + 2, 24);
+		int containerColumns = 100;
+
+		CLIFrame screenFrame = CLIScreen.getScreenFrame(containerRows, containerColumns, ANSI.BACKGROUND_BLACK, ANSI.WHITE);
+
+		// Merge the content into the screen centered
+		return screenFrame.merge(frame, AnchorPoint.CENTER, AnchorPoint.CENTER);
 	}
+
 }
