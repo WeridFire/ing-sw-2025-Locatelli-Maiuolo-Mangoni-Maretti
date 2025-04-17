@@ -103,6 +103,19 @@ public class AdventureCLIScreen extends CLIScreen{
         }
     }
 
+    /**
+     * Generates or retrieves the list of coordinates defining the game path for a specific level.
+     * The coordinates are generated once per instance and then cached in the `coords` field.
+     * They are ordered anti-clockwise from the first board place.
+     *
+     * Note: The caching mechanism is instance-based and does not differentiate between levels after the first call.
+     * If this method is called subsequently with a different level on the same instance, it will return the
+     * previously cached coordinates without recalculating. This implies the instance is expected to be used for a single level's board generation.
+     *
+     * @param level The {@link GameLevel} for which to get the coordinates.
+     * @return A {@link List} of {@link Coord} objects representing the ordered path for the level.
+     *         Returns the cached list if already populated, otherwise returns the newly generated and cached list.
+     */
     private List<Coord> getCoords(GameLevel level){
         if (!coords.isEmpty()) return coords;
 
@@ -234,6 +247,17 @@ public class AdventureCLIScreen extends CLIScreen{
      * */
     private record PlayerPosAndColor(Coord pos, MainCabinTile.Color color) {}
 
+    /**
+     * Generates a {@link CLIFrame} representing the visual state of the game board for a given level.
+     * It determines the board layout, dimensions, and background color based on the specified {@code level}.
+     * The method retrieves the ordered path coordinates using {@link #getCoords(GameLevel)} and fetches
+     * the current player positions and colors from the latest game update (via {@code getLastUpdate()}).
+     * The resulting frame includes appropriate ANSI color codes for background and player pawns.
+     *
+     * @param level The {@link GameLevel} to render the board for.
+     * @return A {@link CLIFrame} object containing the string representation of the board,
+     *         ready for display in a command-line interface, with appropriate background color set.
+     */
     private CLIFrame getBoardFrame(GameLevel level) {
         //color related to level
         String bg = null;
