@@ -330,5 +330,8 @@ public class Player implements Serializable {
         setPosition(startingPosition);
     }
 
-
+    @Override
+    public String toString() {
+        return getUsername();
+    }
 }
