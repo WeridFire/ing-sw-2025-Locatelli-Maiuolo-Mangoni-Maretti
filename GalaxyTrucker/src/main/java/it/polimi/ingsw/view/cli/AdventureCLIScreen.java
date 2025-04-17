@@ -1,17 +1,25 @@
 package it.polimi.ingsw.view.cli;
 
+import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.shipboard.ShipBoard;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AdevntureCLIScreen extends CLIScreen{
+public class AdventureCLIScreen extends CLIScreen{
+
+    private final ArrayList<Coord> coords = new ArrayList<Coord>();
+
     /**
      * @param screenName The identifier of the screen.
      */
-    public AdevntureCLIScreen(String screenName) {
+    public AdventureCLIScreen(String screenName) {
         super(screenName);
     }
 
@@ -26,7 +34,7 @@ public class AdevntureCLIScreen extends CLIScreen{
      * @param forceActivate if to forcefully activate this screen whenever an update satisfying it will be received.
      * @param priority      if there are multiple screens not force-activable, priority will indicate which one to prioritize.
      */
-    public AdevntureCLIScreen(String screenName, boolean forceActivate, int priority) {
+    public AdventureCLIScreen(String screenName, boolean forceActivate, int priority) {
         super(screenName, forceActivate, priority);
     }
 
@@ -73,15 +81,47 @@ public class AdevntureCLIScreen extends CLIScreen{
      */
     @Override
     public CLIFrame getCLIRepresentation() {
-        return null;
+
+        GameData gameData = getLastUpdate().getCurrentGame();
+
+        Player thisPlayer = getLastUpdate().getClientPlayer();
+        CLIFrame shipboardFrame = thisPlayer.getShipBoard().getCLIRepresentation();
+
+        CLIFrame boardFrame = getBoardFrame(gameData.getLevel());
+
+        shipboardFrame = shipboardFrame.merge(boardFrame, Direction.NORTH, 2);
+
+        return shipboardFrame;
     }
 
-    private record Coord(int row, int col){}
+    /**
+     * Utility Record.
+     * */
+    private record Coord(int row, int col){
+        public boolean equals(Coord c) {
+            return row == c.row && col == c.col;
+        }
+    }
+
+    /**
+     * Generates or retrieves the list of coordinates defining the game path for a specific level.
+     * The coordinates are generated once per instance and then cached in the `coords` field.
+     * They are ordered anti-clockwise from the first board place.
+     *
+     * Note: The caching mechanism is instance-based and does not differentiate between levels after the first call.
+     * If this method is called subsequently with a different level on the same instance, it will return the
+     * previously cached coordinates without recalculating. This implies the instance is expected to be used for a single level's board generation.
+     *
+     * @param level The {@link GameLevel} for which to get the coordinates.
+     * @return A {@link List} of {@link Coord} objects representing the ordered path for the level.
+     *         Returns the cached list if already populated, otherwise returns the newly generated and cached list.
+     */
     private List<Coord> getCoords(GameLevel level){
+        if (!coords.isEmpty()) return coords;
+
         int max_row = 0;
         int max_col = 0;
         int magicShift = 0;
-        List<Coord> coords = new ArrayList<>();
         switch(level){
             case TESTFLIGHT:
                 coords.add(new Coord(0, 10));
@@ -169,9 +209,9 @@ public class AdevntureCLIScreen extends CLIScreen{
                 coords.add(new Coord(14, 24));
                 coords.add(new Coord(4, 25));
                 coords.add(new Coord(12, 25));
-                coords.add(new Coord(6, 27));
-                coords.add(new Coord(8, 27));
-                coords.add(new Coord(10, 27));
+                coords.add(new Coord(6, 26));
+                coords.add(new Coord(8, 26));
+                coords.add(new Coord(10, 26));
                 max_row = 17;
                 max_col = 28;
                 magicShift = 15;
@@ -194,22 +234,36 @@ public class AdevntureCLIScreen extends CLIScreen{
             return Double.compare(angleB, angleA);
         });
 
-        System.out.println("Punti ordinati in senso orario:");
-        for (Coord p : coords) {
-            System.out.println("(" + p.row() + ", " + p.col() + ")");
+        for (int i=0; i<magicShift; i++) {
+            coords.add(coords.getFirst());
+            coords.remove(coords.getFirst());
         }
-
 
         return coords;
     }
 
-    public CLIFrame getBoardFrame(GameLevel level) {
+    /**
+     * Utility Record.
+     * */
+    private record PlayerPosAndColor(Coord pos, MainCabinTile.Color color) {}
 
+    /**
+     * Generates a {@link CLIFrame} representing the visual state of the game board for a given level.
+     * It determines the board layout, dimensions, and background color based on the specified {@code level}.
+     * The method retrieves the ordered path coordinates using {@link #getCoords(GameLevel)} and fetches
+     * the current player positions and colors from the latest game update (via {@code getLastUpdate()}).
+     * The resulting frame includes appropriate ANSI color codes for background and player pawns.
+     *
+     * @param level The {@link GameLevel} to render the board for.
+     * @return A {@link CLIFrame} object containing the string representation of the board,
+     *         ready for display in a command-line interface, with appropriate background color set.
+     */
+    private CLIFrame getBoardFrame(GameLevel level) {
         //color related to level
         String bg = null;
         int[][] board = switch (level) {
             case TESTFLIGHT -> {
-                bg = ANSI.BACKGROUND_BLUE;
+                bg = ANSI.BACKGROUND_CYAN;
                 yield new int[9][17];
             }
             case ONE -> {
@@ -218,25 +272,56 @@ public class AdevntureCLIScreen extends CLIScreen{
             }
             case TWO -> {
                 bg = ANSI.BACKGROUND_RED;
-                yield new int[17][28];
+                yield new int[17][27];
             }
         };
+        ArrayList<Coord> buff_coords = new ArrayList<>(getCoords(level));
+
+        GameData currentGame = getLastUpdate().getCurrentGame();
+        List<Player> players = currentGame.getPlayers();
+        List<PlayerPosAndColor> playersPosAndColor = new ArrayList<>();
+        for (int i=0; i< players.size(); i++) {
+            Coord player_p = buff_coords.get(players.get(i).getPosition());
+            MainCabinTile.Color color = MainCabinTile.Color.fromPlayerIndex(i);
+            playersPosAndColor.add(new PlayerPosAndColor(player_p, color));
+        }
 
         for (Coord coord : getCoords(level)) {
-            board[coord.row()][coord.col()] = 1;
+            board[coord.row()][coord.col()] = -1;
         }
 
-        for (int[] ints : board) {
-            for (int j = 0; j < ints.length; j++) {
-                System.out.print(ints[j] + " ");
+        boolean found = false;
+        ArrayList<String> res = new ArrayList<String>();
+        for (int i = 0; i < board.length; i++) {
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0; j < board[i].length; j++) {
+                found = false;
+                if (board[i][j] == -1) {
+                    Coord new_c = new Coord(i,j);
+
+                    for(PlayerPosAndColor pc : playersPosAndColor ) {
+                        if (new_c.equals(pc.pos())) {
+                            sb.append(pc.color()).append("▲").append(ANSI.RESET);
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        sb.append(ANSI.WHITE + "△" +ANSI.RESET);
+                    }
+
+                } else {
+                    sb.append(" ");
+                }
+
+                if (j < board[i].length - 1) {
+                    sb.append("   ");
+                }
             }
-            System.out.println();
+            res.add(sb.toString());
         }
 
-        CLIFrame boardFrame = new CLIFrame(bg + ANSI.WHITE + " BOARD ");
-
-
-
+        CLIFrame boardFrame = new CLIFrame(res.toArray(new String[0]));
+        boardFrame = boardFrame.paintBackground(bg);
 
         return boardFrame;
     }
