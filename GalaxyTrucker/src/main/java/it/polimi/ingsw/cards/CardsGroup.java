@@ -45,7 +45,7 @@ public class CardsGroup implements Serializable {
             throw new CardsGroupException("The group cannot be shown to another player.");
         }
         heldBy = playerName;
-        //controller logic to send group to player
+        //controller logic to send group to player delegated to the caller
     }
 
     /**

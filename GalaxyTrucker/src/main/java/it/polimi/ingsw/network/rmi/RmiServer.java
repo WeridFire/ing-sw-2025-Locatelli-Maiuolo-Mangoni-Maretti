@@ -284,7 +284,7 @@ public class RmiServer implements IServer {
 		try {
 			pg.player.placeTile(coordinates, rotation);
 		} catch (NoTileInHandException | NoShipboardException | FixedTileException | TileAlreadyPresentException
-				 | OutOfBuildingAreaException | TileWithoutNeighborException e) {
+				 | OutOfBuildingAreaException | TileWithoutNeighborException | AlreadyEndedAssemblyException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 			return;
         }

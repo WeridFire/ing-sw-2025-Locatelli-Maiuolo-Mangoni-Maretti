@@ -58,7 +58,8 @@ public class Player implements Serializable {
     private Integer position;
 
     /**
-     *  The id of the cardgroup the player is currently holding
+     * The id of the cardgroup the player is currently holding,
+     * or null if this player has not any cardgroup in hand at the moment.
      */
     private Integer cardGroupInHand;
 
@@ -69,6 +70,7 @@ public class Player implements Serializable {
         lostTiles = new ArrayList<>();
         credits = 0;
         position = null;
+        cardGroupInHand = null;
     }
 
     /**
@@ -215,7 +217,8 @@ public class Player implements Serializable {
     /**
      * Returns the id of the held cardgroup
      *
-     * @return the id
+     * @return the id of the cardgroup held by the player,
+     * or {@code null} if the player is not keeping any cardgroup in hand
      */
     public Integer getCardGroupInHand() {
         return cardGroupInHand;
@@ -223,17 +226,13 @@ public class Player implements Serializable {
 
     /**
      * Sets the id of the held cardgroup
-     *
-     *
      */
-    public void setCardGroupInHand(Integer id) {
+    public void setCardGroupInHand(int id) {
         this.cardGroupInHand = id;
     }
 
     /**
      * Clears the id of the held cardgroup
-     *
-     *
      */
     public void clearCardGroupInHand() {
         this.cardGroupInHand = null;
@@ -274,7 +273,8 @@ public class Player implements Serializable {
     }
 
     public void placeTile(Coordinates coordinates, Rotation rotation) throws NoTileInHandException, NoShipboardException,
-            FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, OutOfBuildingAreaException {
+            FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, OutOfBuildingAreaException,
+            AlreadyEndedAssemblyException {
         TileSkeleton tileInHand = getTileInHand();
         ShipBoard shipBoard = getShipBoard();
         if (tileInHand == null) {

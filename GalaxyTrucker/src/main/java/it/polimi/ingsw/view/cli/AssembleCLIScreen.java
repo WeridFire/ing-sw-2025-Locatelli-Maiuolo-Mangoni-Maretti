@@ -1,5 +1,8 @@
 package it.polimi.ingsw.view.cli;
 
+import it.polimi.ingsw.cards.Card;
+import it.polimi.ingsw.cards.CardsGroup;
+import it.polimi.ingsw.cards.exceptions.CardsGroupException;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GamePhaseType;
@@ -12,14 +15,38 @@ import it.polimi.ingsw.util.Coordinates;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class AssembleCLIScreen extends CLIScreen{
 
     private TileSkeleton tileInHand = null;
-    private boolean hasEndedAssembly = false;
 
     public AssembleCLIScreen() {
         super("assemble", true, 0);
+    }
+
+    private Player getPlayer() {
+        return getLastUpdate().getClientPlayer();
+    }
+    private boolean isEndedAssembly() {
+        return getPlayer().getShipBoard().isEndedAssembly();
+    }
+    private boolean isFilled() {
+        return getPlayer().getShipBoard().isFilled();
+    }
+    private Optional<CardsGroup> getCardGroupInHand() {
+        Integer cgIndex = getPlayer().getCardGroupInHand();
+        if (cgIndex == null) return Optional.empty();
+        else {
+            try {
+                return Optional.ofNullable(getLastUpdate().getCurrentGame().getDeck().getGroup(cgIndex));
+            } catch (CardsGroupException e) {
+                throw new RuntimeException(e);  // should never happen -> runtime exception
+            }
+        }
+    }
+    private List<Boolean> listOfAvailableCardGroups() {
+        return getLastUpdate().getCurrentGame().getDeck().getGroupsAvailability();
     }
 
     @Override
@@ -31,7 +58,7 @@ public class AssembleCLIScreen extends CLIScreen{
     @Override
     protected void processCommand(String command, String[] args) throws RemoteException {
 
-        if (hasEndedAssembly) {
+        if (isEndedAssembly()) {
             setScreenMessage("You've already finished assembling your majestic ship!\n" +
                     "Wait for the other players to complete their surely more mediocre work.");
             return;
@@ -126,17 +153,20 @@ public class AssembleCLIScreen extends CLIScreen{
                 }
 
                 getServer().finishAssembling(getClient());
-                hasEndedAssembly = true;
                 break;
 
-            case "showcardgroup":
+            case "showcg":
                 if (args.length == 1) {
                     int id = Integer.parseInt(args[0]);
                     getServer().showCardGroup(getClient(), id);
                 }
                 break;
 
-            case "hidecardgroup":
+            case "hidecg":
+                if (getCardGroupInHand().isEmpty()) {
+                    setScreenMessage("You have no group of cards in your hand.");
+                    break;
+                }
                 getServer().hideCardGroup(getClient());
                 break;
 
@@ -150,18 +180,32 @@ public class AssembleCLIScreen extends CLIScreen{
     protected List<String> getScreenSpecificCommands() {
         List<String> availableCommands = new ArrayList<>();
 
-        if (!hasEndedAssembly) {
+        if (!isEndedAssembly()) {
 
             // note: last timerflip only if assemble phase ended for this player
             availableCommands.add("timerflip|Flips the hourglass of the game.");
-            if (tileInHand == null) {
+
+            boolean hasCardGroupInHand = getCardGroupInHand().isPresent();
+            boolean areThereCardGroups = !listOfAvailableCardGroups().isEmpty();
+
+            if (tileInHand == null && !hasCardGroupInHand) {
+                // can take tile
                 availableCommands.add("draw|Draws a tile from the covered tiles.");
                 availableCommands.add("pick <id>|Pick in hand the tile with ID <id>.");
+                // or group of cards
+                if (areThereCardGroups) {
+                    availableCommands.add("showcg <id>|Pick and show the card group with ID <id>.");
+                }
             }
-            else {
+            else if (tileInHand != null) {
+                // can only act with the tile in hand
                 availableCommands.add("discard|Discard the tile you have in hand.");
                 availableCommands.add("rotate <direction>|Rotate the tile you have in hand.");
                 availableCommands.add("place <row> <column>|Place the tile from your hand onto your shipboard.");
+            }
+            else /* hasCardGroupInHand */ {
+                // can only act with the card group in hand
+                availableCommands.add("hidecg|Set the card group from your hand back to the shared board.");
             }
 
         }
@@ -169,50 +213,14 @@ public class AssembleCLIScreen extends CLIScreen{
         return availableCommands;
     }
 
-    private CLIFrame getTileRepresentationWithID(TileSkeleton tile) {
+    private CLIFrame getCLIRTileWithID(TileSkeleton tile) {
         CLIFrame idLabel = new CLIFrame(ANSI.BACKGROUND_YELLOW + ANSI.BLACK + " ID: " +
                 tile.getTileId() + " " + ANSI.RESET);
         return tile.getCLIRepresentation().merge(idLabel, Direction.SOUTH)
                 .paintBackground(ANSI.BACKGROUND_BLACK);
     }
 
-    @Override
-    public CLIFrame getCLIRepresentation() {
-        final int maxWidth = 100;
-        Player thisPlayer = getLastUpdate().getClientPlayer();
-
-        // update tile in hand if different from previous
-        if ((tileInHand == null) || (!tileInHand.equals(thisPlayer.getTileInHand()))) {
-            // note: in here also if both are null, but in that case nothing happens -> no problem
-            tileInHand = thisPlayer.getTileInHand();
-        }
-
-        // frame for tile in hand
-        CLIFrame frameTileInHand = new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " Tile in Hand ")
-                .merge((tileInHand != null)
-                                ? tileInHand.getCLIRepresentation()
-                                : new CLIFrame(TileSkeleton.getForbiddenTileCLIRepresentation(0, 0)),
-                        Direction.SOUTH, 1)
-                .merge(new CLIFrame(""), Direction.SOUTH)
-                .paintBackground(ANSI.BACKGROUND_BLACK);
-
-        // frame for reserved tiles
-        List<TileSkeleton> reservedTiles = thisPlayer.getReservedTiles();
-        CLIFrame frameReservedTiles = (reservedTiles.isEmpty()
-                    ? new CLIFrame(ANSI.RED + "No reserved tiles" + ANSI.RESET)
-                    : reservedTiles.stream()
-                    .map(this::getTileRepresentationWithID)
-                    .reduce(new CLIFrame(), (b, t) -> b.isEmpty() ? t : b.merge(t, Direction.EAST, 3))
-                )
-                .merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " Reserved Tiles "),
-                        Direction.NORTH, 1);
-
-        // frame for shipboard
-        CLIFrame frameShipboard = thisPlayer.getShipBoard().getCLIRepresentation()
-                .paintForeground(ANSI.BLACK)
-                .merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " YOUR SHIPBOARD " + ANSI.RESET),
-                        Direction.NORTH, 1);
-
+    private CLIFrame getCLIRUncoveredTiles(int maxWidth) {
         // drawn and discarded tiles
         List<TileSkeleton> uncoveredTiles = getLastUpdate().getCurrentGame().getUncoveredTiles();
 
@@ -224,7 +232,7 @@ public class AssembleCLIScreen extends CLIScreen{
             List<CLIFrame> tileFrames = new ArrayList<>();
 
             for (TileSkeleton tile : uncoveredTiles) {
-                tileFrames.add(getTileRepresentationWithID(tile));
+                tileFrames.add(getCLIRTileWithID(tile));
             }
 
             // merge all tile frames in a grid
@@ -239,18 +247,88 @@ public class AssembleCLIScreen extends CLIScreen{
         }
 
         // frame for drawn and discarded tiles
-        CLIFrame frameUncoveredTiles = CLIFrame
+        return CLIFrame
                 .fromFramesGrid(frameUncoveredTilesGrid, uncoveredTileHorizontalSpacing, 1)
                 // add title
                 .merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " DRAWN AND DISCARDED TILES " + ANSI.RESET),
                         Direction.NORTH, 1);
+    }
+
+    private CLIFrame getCLIRTileInHand() {
+        // frame for tile in hand
+        return new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " Tile in Hand ")
+                .merge((tileInHand != null)
+                                ? tileInHand.getCLIRepresentation()
+                                : new CLIFrame(TileSkeleton.getForbiddenTileCLIRepresentation(0, 0)),
+                        Direction.SOUTH, 1)
+                .merge(new CLIFrame(""), Direction.SOUTH)
+                .paintBackground(ANSI.BACKGROUND_BLACK);
+    }
+
+    private CLIFrame getCLIRReservedTiles() {
+        // frame for reserved tiles
+        List<TileSkeleton> reservedTiles = getPlayer().getReservedTiles();
+        return (reservedTiles.isEmpty()
+                ? new CLIFrame(ANSI.RED + "No reserved tiles" + ANSI.RESET)
+                : reservedTiles.stream()
+                .map(this::getCLIRTileWithID)
+                .reduce(new CLIFrame(), (b, t) -> b.isEmpty() ? t : b.merge(t, Direction.EAST, 3))
+        )
+                .merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " Reserved Tiles "),
+                        Direction.NORTH, 1);
+    }
+
+    private CLIFrame getCLIRShipboardInfo() {
+        if (isFilled()) {
+            // no need to show info: this phase ended
+            return new CLIFrame();
+        }
+
+        if (isEndedAssembly()) {
+            // do not show hand nor reserved tiles. reserved -> lost
+            return new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " Ship assembled! ")
+                    .merge(new CLIFrame(ANSI.BLACK + "Wait for other players to finish"), Direction.SOUTH)
+                    .merge(new CLIFrame(ANSI.BLACK + "before filling it up"), Direction.SOUTH);
+        } else {
+            return getCLIRReservedTiles()
+                    .merge(getCLIRTileInHand(), Direction.SOUTH, 2);
+        }
+    }
+
+    private CLIFrame popupCardGroup(int maxWidth) {
+        List<Card> cards = getCardGroupInHand().map(CardsGroup::getGroupCards).orElse(new ArrayList<>());
+        List<List<CLIFrame>> cardsAsGrid = null;
+        int hSpace = 5;
+        int vSpace = 3;
+        for (Card card : cards) {
+            cardsAsGrid = CLIFrame.addInFramesGrid(cardsAsGrid,
+                    card.getCLIRepresentation(), hSpace, maxWidth);
+        }
+        return CLIFrame.fromFramesGrid(cardsAsGrid, hSpace, vSpace);
+    }
+
+    @Override
+    public CLIFrame getCLIRepresentation() {
+        final int maxWidth = 100;
+
+        // update tile in hand if different from previous
+        if ((tileInHand == null) || (!tileInHand.equals(getPlayer().getTileInHand()))) {
+            // note: in here also if both are null, but in that case nothing happens -> no problem
+            tileInHand = getPlayer().getTileInHand();
+        }
+
+        // frame for shipboard
+        CLIFrame frameShipboard = getPlayer().getShipBoard().getCLIRepresentation()
+                .paintForeground(ANSI.BLACK)
+                .merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " YOUR SHIPBOARD " + ANSI.RESET),
+                        Direction.NORTH, 1);
 
         // create content
         CLIFrame contentFrame = frameShipboard
-                .merge(frameReservedTiles
-                        .merge(frameTileInHand, Direction.SOUTH, 2),
-                        Direction.EAST, 6)
-                .merge(frameUncoveredTiles, Direction.NORTH, 1);
+                .merge(getCLIRShipboardInfo(), Direction.EAST, 6)
+                .merge(getCLIRUncoveredTiles(maxWidth), Direction.NORTH, 1)
+                // append popup of cards in hand
+                .merge(popupCardGroup(maxWidth), AnchorPoint.CENTER, AnchorPoint.CENTER);
 
         // white bg frame container
         int containerRows = contentFrame.getRows() + 2;
