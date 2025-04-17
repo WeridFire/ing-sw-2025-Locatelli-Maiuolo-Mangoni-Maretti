@@ -126,8 +126,10 @@ public class RmiServer implements IServer {
 		client.updateClient(new ClientUpdate(gameServer.getUUIDbyConnection(client)));
 	}
 
+	//PIR related COMMANDS
+
 	@Override
-	public void activateTiles(IClient client, Set<Coordinates> tilesToActivate) throws RemoteException {
+	public void pirActivateTiles(IClient client, Set<Coordinates> tilesToActivate) throws RemoteException {
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
 		if (pg == null) return;
 		// else: actually try to perform the action
@@ -145,7 +147,7 @@ public class RmiServer implements IServer {
 	}
 
 	@Override
-	public void allocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException {
+	public void pirAllocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException {
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
 		if (pg == null) return;
 		// else: actually try to perform the action
@@ -163,7 +165,7 @@ public class RmiServer implements IServer {
 	}
 
 	@Override
-	public void forceEndTurn(IClient client) throws RemoteException {
+	public void pirForceEndTurn(IClient client) throws RemoteException {
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
 		if (pg == null) return;
 		// else: actually try to perform the action
@@ -174,6 +176,41 @@ public class RmiServer implements IServer {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 		}
 		client.updateClient(new ClientUpdate(pg.connectionUUID));
+	}
+
+	@Override
+	public void pirRemoveLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException {
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
+		if (pg == null) return;
+
+		try {
+			PIR activePIR = pg.game.getGameData().getPIRHandler().getPlayerPIR(pg.player);
+			if(activePIR != null){
+				activePIR.removeLoadables(pg.player, cargoToAdd);
+			}
+			client.updateClient(new ClientUpdate(pg.connectionUUID));
+		} catch (InputNotSupportedException | WrongPlayerTurnException | TileNotAvailableException |
+				 UnsupportedLoadableItemException | NotEnoughItemsException e) {
+			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
+		}
+	}
+
+	@Override
+	public void pirSelectMultipleChoice(IClient client, int selection) throws RemoteException {
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
+		if (pg == null) return;
+
+		PIR activePIR = pg.game.getGameData().getPIRHandler().getPlayerPIR(pg.player);
+		if(activePIR != null){
+			try {
+				activePIR.makeChoice(pg.player, selection);
+			} catch (WrongPlayerTurnException | InputNotSupportedException e) {
+				client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
+				return;
+			}
+		}
+		client.updateClient(new ClientUpdate(pg.connectionUUID));
+
 	}
 
 	// LOBBY PHASE
@@ -284,7 +321,7 @@ public class RmiServer implements IServer {
 		try {
 			pg.player.placeTile(coordinates, rotation);
 		} catch (NoTileInHandException | NoShipboardException | FixedTileException | TileAlreadyPresentException
-				 | OutOfBuildingAreaException | TileWithoutNeighborException e) {
+				 | OutOfBuildingAreaException | TileWithoutNeighborException | AlreadyEndedAssemblyException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 			return;
         }

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.cards;
 
+import it.polimi.ingsw.cards.exceptions.CardsGroupException;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.player.Player;
 
@@ -100,9 +101,27 @@ public class Deck implements Serializable {
      * Access a specific card group, during ship-building phase.
      * @param index The card group index.
      * @return The correspondent card group.
+     * @throws CardsGroupException if the provided index is not associated to any card group
      */
-    public CardsGroup getGroup(int index) {
-        return cardsGroups.get(index);
+    public CardsGroup getGroup(int index) throws CardsGroupException {
+        try {
+            return cardsGroups.get(index);
+        } catch(IndexOutOfBoundsException e) {
+            throw new CardsGroupException("Card group with index '" + index + "' not found");
+        }
+    }
+
+    /**
+     * Access all the card groups in order and construct a list of booleans,
+     * where for all the indices i, \result(i) is true <===> getGroup(i) is available to be taken by a player
+     * @return The created list of booleans
+     */
+    public List<Boolean> getGroupsAvailability() {
+        List<Boolean> availability = new ArrayList<>();
+        for (CardsGroup c : cardsGroups) {
+            availability.add(!c.isSecret() && c.getHeldBy() == null);
+        }
+        return availability;
     }
 
     public Card getTopCard() {

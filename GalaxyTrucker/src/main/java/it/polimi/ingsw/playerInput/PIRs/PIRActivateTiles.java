@@ -7,6 +7,7 @@ import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -80,5 +81,10 @@ public class PIRActivateTiles extends PIR {
 
 	 Set<Coordinates> getActivatedTiles() {
 		return activatedTiles;
+	}
+
+	@Override
+	public CLIFrame getCLIRepresentation() {
+		return null;
 	}
 }

@@ -10,10 +10,11 @@ import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.ICLIPrintable;
 
 import java.util.*;
 
-public abstract class PIR {
+public abstract class PIR implements ICLIPrintable {
 
 	protected Player currentPlayer;
 	private final int cooldown;
@@ -97,4 +98,13 @@ public abstract class PIR {
 	public void addLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToAdd) throws WrongPlayerTurnException, TileNotAvailableException, UnsupportedLoadableItemException, TooMuchLoadException, InputNotSupportedException {
 		throw new InputNotSupportedException(getPIRType());
 	}
+
+	public void removeLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToRemove) throws InputNotSupportedException, WrongPlayerTurnException, TileNotAvailableException, NotEnoughItemsException, UnsupportedLoadableItemException {
+		throw new InputNotSupportedException(getPIRType());
+	}
+
+	public void makeChoice(Player player, int choice) throws WrongPlayerTurnException, InputNotSupportedException {
+		throw new InputNotSupportedException(getPIRType());
+	}
+
 }

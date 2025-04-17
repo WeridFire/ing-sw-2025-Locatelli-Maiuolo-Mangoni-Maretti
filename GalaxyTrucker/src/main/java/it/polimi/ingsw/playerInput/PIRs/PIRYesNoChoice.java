@@ -19,4 +19,6 @@ public class PIRYesNoChoice extends PIRMultipleChoice{
 	boolean isChoiceYes(){
 		return getChoice() == 0;
 	}
+
+
 }
