@@ -8,6 +8,7 @@ import it.polimi.ingsw.shipboard.tiles.ContainerTile;
 import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.*;
 
@@ -124,5 +125,10 @@ public class PIRAddLoadables extends PIR {
 	 */
 	public List<LoadableType> getFloatingLoadables() {
 		return floatingLoadables;
+	}
+
+	@Override
+	public CLIFrame getCLIRepresentation() {
+		return null;
 	}
 }
