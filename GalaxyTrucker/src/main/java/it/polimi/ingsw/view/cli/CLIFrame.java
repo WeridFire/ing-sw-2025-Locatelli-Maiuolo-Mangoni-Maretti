@@ -461,6 +461,10 @@ public class CLIFrame implements Serializable {
      */
     public static List<List<CLIFrame>> addInFramesGrid(List<List<CLIFrame>> grid, CLIFrame newFrame,
                                                int horizontalSpacing, int maxWidth) {
+        if (newFrame == null || newFrame.isEmpty()) {
+            return grid;
+        }
+
         if (grid == null) {
             grid = new ArrayList<>();
         }
