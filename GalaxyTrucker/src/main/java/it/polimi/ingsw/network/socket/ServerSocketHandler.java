@@ -68,19 +68,34 @@ public class ServerSocketHandler implements IServer {
 	}
 
 	@Override
-	public void activateTiles(IClient client, Set<Coordinates> tilesToActivate) {
-		//TODO activate tiles socket function
+	public void pirActivateTiles(IClient client, Set<Coordinates> tilesToActivate) {
+		SocketMessage mess = SocketMessage.pirActivateTilesMessage(tilesToActivate);
+		sendSocketMessage(mess);
 	}
 
 	@Override
-	public void allocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException {
-		//TODO allocate loadables socket function
+	public void pirAllocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException {
+		SocketMessage mess = SocketMessage.pirAllocateRemoveLoadables(cargoToAdd, true);
+		sendSocketMessage(mess);
+	}
+
+	@Override
+	public void pirRemoveLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToRemove) throws RemoteException {
+		SocketMessage mess = SocketMessage.pirAllocateRemoveLoadables(cargoToRemove, false);
+		sendSocketMessage(mess);
 	}
 
 
 	@Override
-	public void forceEndTurn(IClient client) {
-		//TODO force end turn socket function
+	public void pirForceEndTurn(IClient client) {
+		SocketMessage mess = SocketMessage.pirForceEndTurn();
+		sendSocketMessage(mess);
+	}
+
+	@Override
+	public void pirSelectMultipleChoice(IClient client, int selection) throws RemoteException {
+		SocketMessage mess = SocketMessage.pirSelectMultipleChoice(selection);
+		sendSocketMessage(mess);
 	}
 
 	@Override
