@@ -352,6 +352,9 @@ public class RmiServer implements IServer {
 		// else: actually try to perform the action
 
 		try {
+			if (pg.player.getCardGroupInHand() != null) {
+				throw new CardsGroupException("This player is already holding a group of cards.");  // caught below
+			}
 			pg.game.getGameData().getDeck().getGroup(id).showGroup(pg.player.getUsername());
 			pg.player.setCardGroupInHand(id);
 		} catch (CardsGroupException e) {
