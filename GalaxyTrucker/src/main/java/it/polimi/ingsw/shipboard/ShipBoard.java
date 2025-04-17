@@ -31,6 +31,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	private final CLIFrame emptyRepresentation;
 
 	private boolean endedAssembly;
+	private boolean filled;
 
 	private VisitorCalculateCargoInfo visitorCalculateCargoInfo;
 	private VisitorCalculatePowers visitorCalculatePowers;
@@ -42,6 +43,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		this.level = level;
 		emptyRepresentation = BoardCoordinates.getCLIRepresentation(level);
 		endedAssembly = false;
+		filled = false;
 	}
 
 	/**
@@ -187,8 +189,13 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 * coordinates.
 	 * @throws IllegalArgumentException If the provided tile is null.
 	 */
-	public void setTile(TileSkeleton tile, Coordinates coordinates) throws OutOfBuildingAreaException,
-            TileAlreadyPresentException, FixedTileException, TileWithoutNeighborException, IllegalArgumentException {
+	public void setTile(TileSkeleton tile, Coordinates coordinates) throws AlreadyEndedAssemblyException,
+			OutOfBuildingAreaException, TileAlreadyPresentException, FixedTileException, TileWithoutNeighborException,
+			IllegalArgumentException {
+		if (endedAssembly) {
+			throw new AlreadyEndedAssemblyException();
+		}
+
 		if (tile == null) {
 			throw new IllegalArgumentException("Tile cannot be null");
 		}
@@ -456,6 +463,17 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 				throw new RuntimeException(e); //Shouldn't happen
 			}
 		});
+
+		// here this shipboard is completely filled
+		filled = true;
+	}
+
+	/**
+	 *
+	 * @return if the ship has been already filled with the starting content (batteries etc...)
+	 */
+	public boolean isFilled() {
+		return filled;
 	}
 
 	public GameLevel getLevel(){
@@ -522,7 +540,8 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		tilesRepresentation.applyOffset(tileHeight + 1, tileWidth + 2);
 
 		CLIFrame rep = emptyRepresentation.merge(tilesRepresentation);
-		if (endedAssembly) {
+		if (filled) {
+			// already filled for the first time -> show content
 			rep = rep.merge(getInfoCliRepresentation(), Direction.EAST, 5);
 		}
 

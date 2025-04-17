@@ -7,8 +7,7 @@ public class AdventureCLIScreenTest {
 
     @Test
     public void testBoard() {
-        AdevntureCLIScreen c = new AdevntureCLIScreen("Piedi");
-        CLIFrame frame = c.getBoardFrame(GameLevel.TWO);
-
+        AdventureCLIScreen c = new AdventureCLIScreen("Piedi");
+        System.out.println(c.getCLIRepresentation().toString());
     }
 }
