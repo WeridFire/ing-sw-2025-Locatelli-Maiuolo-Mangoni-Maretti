@@ -60,24 +60,18 @@ public class CLIScreenHandler {
 		if(getCurrentScreen() == null){
 			activateScreen("Menu");
 		}
-		CLIScreen forceActivate = getAvailableScreens()
-									.stream()
-									.filter(CLIScreen::isForceActivate)
-									.findFirst()
-									.orElse(null);
-		if(forceActivate != null){
-			activateScreen(forceActivate.screenName);
-			return;
-		}
+        getAvailableScreens()
+                .stream()
+                .filter(CLIScreen::isForceActivate)
+                .findFirst().ifPresent(forceActivate -> activateScreen(forceActivate.screenName));
 
-		if(getCurrentScreen().switchConditions()){
+        if(getCurrentScreen().switchConditions() && newUpdate.isRefreshRequired()){
 			getCurrentScreen().refresh(); //In case the screen conditions are still met, we just refresh the current screen
 		}else{
 			//If the previous screen is no longer activable, and there is not a forced screen to activate,
 			//Look for all the available screens, and get the one with the highest priority (usually the PIRs).
-			CLIScreen newScreen = getAvailableScreens().stream().sorted((c1, c2) -> {
-				return Integer.compare(c2.getPriority(), c1.getPriority());
-			}).findFirst().orElse(null);
+			CLIScreen newScreen = getAvailableScreens().stream().min((c1, c2) ->
+					Integer.compare(c2.getPriority(), c1.getPriority())).orElse(null);
 			if(newScreen != null){
 				activateScreen(newScreen.screenName);
 			}else{
@@ -196,9 +190,7 @@ public class CLIScreenHandler {
 							currentScreen.processCommand(cmd, args);
 						}catch(IllegalArgumentException e){
 							currentScreen.setScreenMessage(e.getMessage());
-							break;
 						}
-
 					}
 			}
 		}

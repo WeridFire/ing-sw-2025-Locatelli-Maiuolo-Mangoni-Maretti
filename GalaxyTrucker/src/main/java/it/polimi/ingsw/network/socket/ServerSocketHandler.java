@@ -133,13 +133,13 @@ public class ServerSocketHandler implements IServer {
 	}
 
 	@Override
-	public void showcardgroup(IClient client, Integer id) throws RemoteException {
+	public void showCardGroup(IClient client, Integer id) throws RemoteException {
 		SocketMessage mess =SocketMessage.showCardGroupMessage(id);
 		sendSocketMessage(mess);
 	}
 
 	@Override
-	public void hidecardgroup(IClient client) throws RemoteException {
+	public void hideCardGroup(IClient client) throws RemoteException {
 		SocketMessage mess = SocketMessage.hideCardGroupMessage();
 		sendSocketMessage(mess);
 	}

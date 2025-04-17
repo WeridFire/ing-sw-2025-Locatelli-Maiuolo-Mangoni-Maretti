@@ -9,14 +9,13 @@ import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.LobbyGamePhase;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.player.exceptions.NoShipboardException;
 import it.polimi.ingsw.shipboard.ShipBoard;
+import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Represents a game instance with a unique identifier, game data, and a timer.
@@ -72,24 +71,50 @@ public class Game {
      * </p>
      */
     public void gameLoop() throws InterruptedException, RemoteException {
+        //*******//
+        // LOBBY
+        System.out.println(this + " In lobby");
 
-        LobbyGamePhase l = new LobbyGamePhase(id, gameData);
-        getGameData().setCurrentGamePhase(l);
-        l.playLoop();
+        LobbyGamePhase lobby = new LobbyGamePhase(id, gameData);
+        getGameData().setCurrentGamePhase(lobby);
+        lobby.playLoop();
 
         //Call function to initialize all players stuff.
+        System.out.println(this + " Initialization");
         initGame();
 
-        AssembleGamePhase a = new AssembleGamePhase(id, gameData);
-        getGameData().setCurrentGamePhase(a);
+        //**********//
+        // ASSEMBLE
+        System.out.println(this + " Started assemble phase");
+
+        AssembleGamePhase assemble = new AssembleGamePhase(id, gameData);
+        getGameData().setCurrentGamePhase(assemble);
 
         //We notify all players about the new game state
         GameServer.getInstance().broadcastUpdate(this);
 
-        //Blocking function that waits for everyone to finish set up their shipboard aliens
-        fillUpShipboards();
+        assemble.playLoop();
+        System.out.println(this + " Ended assemble phase");
+        // if here can be because time ended: force all the players that haven't finished yet to end assembly
+        for (Player player : getGameData().getPlayers()) {
+            if (!player.getShipBoard().isEndedAssembly()) {
+                try {
+                    getGameData().endAssembly(player);
+                    System.out.println(this + " Forced end assemble for player '" + player.getUsername() + "'");
+                } catch (AlreadyEndedAssemblyException | NoShipboardException e) {
+                    throw new RuntimeException(e);  // should never happen -> runtime exception
+                }
+            }
+        }
 
-        a.playLoop();
+        // Blocking function that waits for everyone to finish set up their shipboard aliens
+        System.out.println(this + " Started filling the shipboards");
+        fillUpShipboards();
+        System.out.println(this + " Filled all the shipboards");
+
+        //********//
+        // FLIGHT
+        System.out.println(this + " Started flight phase");
 
         gameData.getDeck().drawNextCard();
         AdventureGamePhase adventureGamePhase = null;
@@ -106,7 +131,7 @@ public class Game {
             gameData.getDeck().drawNextCard();
         }
 
-        //TODO: vogliamo fare una fase di ending?
+        //TODO: vogliamo fare una fase di ending? Yes: show winner and points (maybe a static leaderboard)
 
     }
 
@@ -168,7 +193,13 @@ public class Game {
         List<Thread> threads = new ArrayList<>();
         for(Player p : gameData.getPlayers()){
             Thread th = new Thread(() -> {
-                p.getShipBoard().fillShipboard(p, gameData.getPIRHandler());
+                p.getShipBoard().fill(p, gameData.getPIRHandler());
+                try {
+                    GameServer.getInstance().broadcastUpdateRefreshOnly(this, Set.of(p));
+                    // TODO: issue on refresh of the shipboard to empty crew when just main cabin
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);  // TODO: manage RemoteException at this level
+                }
             });
             th.start();
             threads.add(th);
@@ -180,4 +211,8 @@ public class Game {
     }
 
 
+    @Override
+    public String toString() {
+        return "[Game " + id + "]";
+    }
 }

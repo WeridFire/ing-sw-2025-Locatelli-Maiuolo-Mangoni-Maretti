@@ -18,7 +18,7 @@ public class WarCriteriaPower implements WarCriteria {
         float delta = p2.getShipBoard().getVisitorCalculatePowers().getInfoPower(powerType).getBasePower() -
                 p1.getShipBoard().getVisitorCalculatePowers().getInfoPower(powerType).getBasePower();
         if (delta == 0) {
-            return Integer.compare(p2.getPosition(), p1.getPosition());
+            return Integer.compare(p2.getOrder(), p1.getOrder());
             // inverted because when a player has a better position it's like it has worse power (for equal powers)
         }
         return (delta > 0) ? 1 : -1;

@@ -26,7 +26,7 @@ public class BoardCoordinates {
      *
      * @return A set of all and only the valid coordinate IDs for the game level {@link GameLevel#TESTFLIGHT}.
      */
-    private static Set<Integer> calculateValidCoordinatesTestFlight() {
+    private static Set<Integer> calculateValidCoordinatesSmall() {
         /*      4   5   6   7   8   9   10
             5   .   .   .   #   .   .   .
             6   .   .   #   #   #   .   .
@@ -52,7 +52,7 @@ public class BoardCoordinates {
      *
      * @return A set of all and only the valid coordinate IDs for the game level {@link GameLevel#TWO}.
      */
-    private static Set<Integer> calculateValidCoordinatesLevelTwo() {
+    private static Set<Integer> calculateValidCoordinatesMedium() {
         /*      4   5   6   7   8   9   10
             5   .   .   #   .   #   .   .
             6   .   #   #   #   #   #   .
@@ -85,13 +85,11 @@ public class BoardCoordinates {
      * @return A set of all and only the valid coordinate IDs for the specified level, or {@code null} if unsupported.
      */
     private static Set<Integer> calculateValidCoordinates(GameLevel level) {
-        if (level == GameLevel.TESTFLIGHT) {
-            return calculateValidCoordinatesTestFlight();
-        }
-        else if (level == GameLevel.TWO) {
-            return calculateValidCoordinatesLevelTwo();
-        }
-        return null;
+        return switch (level) {
+            case TESTFLIGHT, ONE -> calculateValidCoordinatesSmall();
+            case TWO -> calculateValidCoordinatesMedium();
+            default -> null;
+        };
     }
 
     /**

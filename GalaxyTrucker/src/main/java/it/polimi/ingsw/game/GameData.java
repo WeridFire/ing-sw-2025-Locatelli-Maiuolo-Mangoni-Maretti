@@ -4,10 +4,13 @@ import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
+import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.player.exceptions.NoShipboardException;
 import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
@@ -39,6 +42,11 @@ public class GameData implements Serializable {
      * List of players in the game.
      */
     private final Set<Player> players;
+
+    /**
+     * The list of starting position for players on the route board
+     */
+    private List<Integer> startingPositions;
 
     /**
      * Number of positions in 1 lap
@@ -93,7 +101,7 @@ public class GameData implements Serializable {
         uncoveredTiles = new ArrayList<>();
         deck = null;
         pirHandler = new PIRHandler();
-        level = GameLevel.TESTFLIGHT;
+        setLevel(GameLevel.TESTFLIGHT);
         setCurrentGamePhaseType(GamePhaseType.LOBBY);
         setRequiredPlayers(2);
     }
@@ -109,6 +117,11 @@ public class GameData implements Serializable {
 
     public void setLevel(GameLevel level) {
         this.level = level;
+
+        startingPositions = new ArrayList<>(switch (level) {
+            case TESTFLIGHT, ONE -> List.of(4, 2, 1, 0);
+            case TWO -> List.of(6, 3, 1, 0);
+        });
     }
 
     /**
@@ -136,7 +149,7 @@ public class GameData implements Serializable {
      */
     public List<Player> getPlayers() {
         return players.stream()
-                .sorted(Comparator.comparingInt(Player::getPosition))
+                .sorted(Comparator.comparingInt(Player::getOrder))
                 .toList();
     }
 
@@ -399,5 +412,31 @@ public class GameData implements Serializable {
         if (uncoveredTiles != null) {
             this.uncoveredTiles.addAll(uncoveredTiles);
         }
+    }
+
+    /**
+     * Process the end of the assembly phase for a specific player,
+     * handling internally the "shipboard assembled" signal to the player.
+     * It also manages to update the game assembly phase accordingly to how many players still need to finish assembly
+     * and in which level is the game being played.
+     * @param player the player which ended assembly
+     * @throws IllegalArgumentException if {@code player} does not belong to this game data.
+     * @requires to be called during {@link GamePhaseType#ASSEMBLE}
+     */
+    public void endAssembly(Player player) throws AlreadyEndedAssemblyException, NoShipboardException {
+        if (!players.contains(player)) {
+            throw new IllegalArgumentException("Player '" + player.getUsername() + "' is not in this game");
+        }
+        // handle player management
+        player.endAssembly(startingPositions.removeFirst());
+        // handle game management
+        for (Player p : players) {
+            if (p.getPosition() == null) {
+                return;
+            }
+        }
+        // if here: no player left to finish assembly (<===> all players have a position on the route-board)
+        // thanks to precondition it's possible to cast the current game phase
+        ((AssembleGamePhase) getCurrentGamePhase()).notifyAllPlayersEndedAssembly();
     }
 }
