@@ -144,6 +144,9 @@ public class AssembleCLIScreen extends CLIScreen{
                     int id = Integer.parseInt(args[0]);
                     getServer().pickTile(getClient(), id);
                 }
+                else {
+                    setScreenMessage("Usage: pick <id>");
+                }
                 break;
 
             case "finish":
@@ -156,9 +159,16 @@ public class AssembleCLIScreen extends CLIScreen{
                 break;
 
             case "showcg":
+                if (getCardGroupInHand().isPresent()) {
+                    setScreenMessage("You can't take another group of cards while having already one.");
+                    break;
+                }
                 if (args.length == 1) {
                     int id = Integer.parseInt(args[0]);
                     getServer().showCardGroup(getClient(), id);
+                }
+                else {
+                    setScreenMessage("Usage: showcg <id>");
                 }
                 break;
 
@@ -295,6 +305,45 @@ public class AssembleCLIScreen extends CLIScreen{
         }
     }
 
+    private CLIFrame getCLIRCardGroupAvailability(int cgIndex, Boolean available) {
+        return new CLIFrame(ANSI.BACKGROUND_YELLOW + ANSI.BLACK + " card group " + cgIndex + " ")
+                .merge(new CLIFrame((available == null
+                        ? " secret " : (available
+                        ? ANSI.GREEN + " available "
+                        : ANSI.RED + " unavailable "
+                ))), Direction.SOUTH)
+                .paintBackground(ANSI.BACKGROUND_BLACK);
+    }
+
+    private CLIFrame getCLIRAvailableCardGroups() {
+        if (isEndedAssembly()) {
+            // no need to show cards groups: player can not interact with them anymore
+            return new CLIFrame();
+        }
+
+        // frame for available card groups
+        List<Boolean> availableCardGroups = listOfAvailableCardGroups();
+        CLIFrame result = new CLIFrame();
+
+        for (int i = 0; i < availableCardGroups.size(); i++) {
+            if (availableCardGroups.get(i) != null) {
+                CLIFrame currentCardGroupInfo = getCLIRCardGroupAvailability(i, availableCardGroups.get(i));
+                result = result.isEmpty() ? currentCardGroupInfo : result
+                        .merge(currentCardGroupInfo, Direction.SOUTH, 2);
+            }
+        }
+
+        if (availableCardGroups.isEmpty()) {
+            result = result.merge(
+                    new CLIFrame(ANSI.RED + "No available")
+                            .merge(new CLIFrame(ANSI.RED + "card groups"), Direction.SOUTH),
+                    Direction.SOUTH);
+        }
+
+        return result.merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " Card Groups "),
+                Direction.NORTH, 1);
+    }
+
     private CLIFrame popupCardGroup(int maxWidth) {
         List<Card> cards = getCardGroupInHand().map(CardsGroup::getGroupCards).orElse(new ArrayList<>());
         List<List<CLIFrame>> cardsAsGrid = null;
@@ -325,6 +374,7 @@ public class AssembleCLIScreen extends CLIScreen{
 
         // create content
         CLIFrame contentFrame = frameShipboard
+                .merge(getCLIRAvailableCardGroups(), Direction.WEST, 6)
                 .merge(getCLIRShipboardInfo(), Direction.EAST, 6)
                 .merge(getCLIRUncoveredTiles(maxWidth), Direction.NORTH, 1)
                 // append popup of cards in hand

@@ -35,14 +35,23 @@ public class CardsGroup implements Serializable {
         this.secret = secret;
     }
 
+    public static CardsGroup obfuscateCardsGroup(CardsGroup original) {
+        CardsGroup obfuscated = new CardsGroup(null, original.isSecret());
+        obfuscated.heldBy = original.heldBy;
+        return obfuscated;
+    }
+
     /**
      * Shows the card group to a player.
      * @param playerName The player to show the card group to.
-     * @throws CardsGroupException when a group is secret or is already held by someone.
+     * @throws CardsGroupException when a group is secret or is already held by someone
      */
-    public void showGroup(String playerName) throws CardsGroupException{
-        if(secret || heldBy != null){
-            throw new CardsGroupException("The group cannot be shown to another player.");
+    public void showGroup(String playerName) throws CardsGroupException {
+        if (secret) {
+            throw new CardsGroupException("Players can not interact with a secret group of cards.");
+        }
+        if (heldBy != null) {
+            throw new CardsGroupException("This group of cards is already held by a player.");
         }
         heldBy = playerName;
         //controller logic to send group to player delegated to the caller
@@ -53,8 +62,11 @@ public class CardsGroup implements Serializable {
      * @throws CardsGroupException when a group is not being held by anyone or is secret.
      */
     public void hideGroup() throws CardsGroupException {
-        if(heldBy == null || secret){
-            throw new CardsGroupException("The group is not being held by anyone.");
+        if (secret) {
+            throw new CardsGroupException("Players can not interact with a secret group of cards.");
+        }
+        if (heldBy == null) {
+            throw new CardsGroupException("This group is already not held by any player.");
         }
         heldBy = null;
     }

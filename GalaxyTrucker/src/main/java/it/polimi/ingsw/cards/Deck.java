@@ -33,7 +33,7 @@ public class Deck implements Serializable {
         this.currentCard = deck.getTopCard();
         for(CardsGroup c : deck.cardsGroups){
             if(!Objects.equals(c.getHeldBy(), player.getUsername())){
-                this.cardsGroups.add(new CardsGroup(null, c.isSecret()));
+                this.cardsGroups.add(CardsGroup.obfuscateCardsGroup(c));
             }else{
                 this.cardsGroups.add(c);
             }
@@ -113,13 +113,18 @@ public class Deck implements Serializable {
 
     /**
      * Access all the card groups in order and construct a list of booleans,
-     * where for all the indices i, \result(i) is true <===> getGroup(i) is available to be taken by a player
+     * where for all the indices i:
+     * <ul>
+     *  <li>\result(i) is true <===> getGroup(i) is available to be taken by a player;</li>
+     *  <li>\result(i) is false <===> getGroup(i) is already taken by some player;</li>
+     *  <li>\result(i) is null <===> getGroup(i) is secret</li>
+     * </ul>
      * @return The created list of booleans
      */
     public List<Boolean> getGroupsAvailability() {
         List<Boolean> availability = new ArrayList<>();
         for (CardsGroup c : cardsGroups) {
-            availability.add(!c.isSecret() && c.getHeldBy() == null);
+            availability.add(c.isSecret() ? null : (c.getHeldBy() == null));
         }
         return availability;
     }
