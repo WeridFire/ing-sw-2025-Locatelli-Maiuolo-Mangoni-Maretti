@@ -34,7 +34,7 @@ public class PlanetsCard extends Card {
 	 * @param lostDays amount of days lost upon landing on a planet.
 	 */
 	public PlanetsCard(Planet[] planets, int lostDays, String textureName, int level) {
-		super(textureName, level);
+		super("PLANETS", textureName, level);
 		this.planets = planets;
 		this.lostDays = lostDays;
 	}
@@ -120,14 +120,6 @@ public class PlanetsCard extends Card {
 		 * +--------------+
 		 * */
 
-		CLIFrame cardBorder = getScreenFrame(11, 20, ANSI.BACKGROUND_CYAN);
-
-		// frame title
-		CLIFrame title = new CLIFrame(new String[]{
-				ANSI.WHITE + "PLANETS" + ANSI.RESET
-		});
-		cardBorder = cardBorder.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 0, 0);
-
 		List<String> cardInfoLines = new ArrayList<>();
 
 		cardInfoLines.add(
@@ -160,8 +152,7 @@ public class PlanetsCard extends Card {
 
 		CLIFrame infoFrame = new CLIFrame(cardInfoLines.toArray(new String[0]));
 
-		cardBorder = cardBorder.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
-
-		return cardBorder;
+		return super.getCLIRepresentation()
+				.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
 	}
 }

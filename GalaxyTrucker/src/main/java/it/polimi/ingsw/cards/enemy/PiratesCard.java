@@ -29,7 +29,7 @@ public class PiratesCard extends EnemyCard{
 
     public PiratesCard(int prizeBounty, Projectile[] punishHits, int firePower,
                        int lostDays, String textureName, int level){
-		super(firePower, lostDays, textureName, level);
+		super(firePower, lostDays, "PIRATES", textureName, level);
         this.prizeBounty = prizeBounty;
         this.punishHits = punishHits;
 
@@ -93,14 +93,6 @@ public class PiratesCard extends EnemyCard{
          * +--------------+
          * */
 
-        CLIFrame cardBorder = getScreenFrame(11, 20, ANSI.BACKGROUND_CYAN);
-
-        // frame title
-        CLIFrame title = new CLIFrame(new String[]{
-                ANSI.WHITE + "PIRATES" + ANSI.RESET
-        });
-        cardBorder = cardBorder.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 0, 0);
-
         List<String> cardInfoLines = new ArrayList<>();
         cardInfoLines.add(
                 ANSI.BLACK + "Lost days: " + getLostDays() + ANSI.RESET
@@ -130,9 +122,8 @@ public class PiratesCard extends EnemyCard{
 
         CLIFrame infoFrame = new CLIFrame(cardInfoLines.toArray(new String[0]));
 
-        cardBorder = cardBorder.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
-
-        return cardBorder;
+        return super.getCLIRepresentation()
+                .merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
     }
 
 }

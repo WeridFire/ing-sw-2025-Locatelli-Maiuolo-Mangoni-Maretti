@@ -28,7 +28,7 @@ public class MeteorSwarmCard extends Card {
 	 * @param level       The level of this card.
 	 */
 	public MeteorSwarmCard(Projectile[] meteors, String textureName, int level) {
-		super(textureName, level);
+		super("METEOR SWARM", textureName, level);
 		this.meteors = meteors;
 	}
 
@@ -71,14 +71,6 @@ public class MeteorSwarmCard extends Card {
 		 * +--------------+
 		 * */
 
-		CLIFrame cardBorder = getScreenFrame(11, 20, ANSI.BACKGROUND_CYAN);
-
-		// frame title
-		CLIFrame title = new CLIFrame(new String[]{
-				ANSI.WHITE + "METEOR SWARM" + ANSI.RESET
-		});
-		cardBorder = cardBorder.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 0, 0);
-
 		List<String> cardInfoLines = new ArrayList<>();
 
 		for(Projectile p: meteors){
@@ -87,8 +79,7 @@ public class MeteorSwarmCard extends Card {
 
 		CLIFrame infoFrame = new CLIFrame(cardInfoLines.toArray(new String[0]));
 
-		cardBorder = cardBorder.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
-
-		return cardBorder;
+		return super.getCLIRepresentation()
+				.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
 	}
 }

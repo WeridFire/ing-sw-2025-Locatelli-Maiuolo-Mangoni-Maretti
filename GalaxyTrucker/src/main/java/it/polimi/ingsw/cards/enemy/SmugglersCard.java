@@ -32,7 +32,7 @@ public class SmugglersCard extends EnemyCard {
 	 * @param prizeGoods The goods earned by the player that beats this card.
 	 */
 	public SmugglersCard(int punishCargo, LoadableType[] prizeGoods, int firePower, int lostDays, String textureName, int level) {
-		super(firePower, lostDays, textureName, level);
+		super(firePower, lostDays, "SMUGGLERS", textureName, level);
 		this.punishCargo = punishCargo;
 		this.prizeGoods = prizeGoods;
 	}
@@ -80,14 +80,6 @@ public class SmugglersCard extends EnemyCard {
 		 * +--------------+
 		 * */
 
-		CLIFrame cardBorder = getScreenFrame(11, 20, ANSI.BACKGROUND_CYAN);
-
-		// frame title
-		CLIFrame title = new CLIFrame(new String[]{
-				ANSI.WHITE + "SMUGGLERS" + ANSI.RESET
-		});
-		cardBorder = cardBorder.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 0, 0);
-
 		List<String> cardInfoLines = new ArrayList<>();
 
 		cardInfoLines.add(
@@ -123,8 +115,7 @@ public class SmugglersCard extends EnemyCard {
 
 		CLIFrame infoFrame = new CLIFrame(cardInfoLines.toArray(new String[0]));
 
-		cardBorder = cardBorder.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
-
-		return cardBorder;
+		return super.getCLIRepresentation()
+				.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
 	}
 }

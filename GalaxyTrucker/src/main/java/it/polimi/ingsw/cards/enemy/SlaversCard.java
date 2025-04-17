@@ -36,7 +36,7 @@ public class SlaversCard extends EnemyCard {
 	 * @param prizeBounty The amount of money to award to the player that beats this card.
 	 */
 	public SlaversCard(int punishCrewAmount, int prizeBounty, int firePower, int lostDays, String textureName, int level) {
-		super(firePower, lostDays, textureName, level);
+		super(firePower, lostDays, "SLAVERS", textureName, level);
 		this.punishCrewAmount = punishCrewAmount;
 		this.prizeBounty = prizeBounty;
 	}
@@ -88,14 +88,6 @@ public class SlaversCard extends EnemyCard {
 		 * +--------------+
 		 * */
 
-		CLIFrame cardBorder = getScreenFrame(11, 20, ANSI.BACKGROUND_CYAN);
-
-		// frame title
-		CLIFrame title = new CLIFrame(new String[]{
-				ANSI.WHITE + "SLAVERS" + ANSI.RESET
-		});
-		cardBorder = cardBorder.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 0, 0);
-
 		List<String> cardInfoLines = new ArrayList<>();
 		cardInfoLines.add(
 				ANSI.BLACK + "Lost days: " + getLostDays() + ANSI.RESET
@@ -115,8 +107,7 @@ public class SlaversCard extends EnemyCard {
 
 		CLIFrame infoFrame = new CLIFrame(cardInfoLines.toArray(new String[0]));
 
-		cardBorder = cardBorder.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
-
-		return cardBorder;
+		return super.getCLIRepresentation()
+				.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
 	}
 }

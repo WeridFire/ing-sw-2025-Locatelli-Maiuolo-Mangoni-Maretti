@@ -39,7 +39,7 @@ public class AbandonedShipCard extends Card{
 	 * @param level       The level of this card.
 	 */
 	public AbandonedShipCard(int requiredCrew, int lostDays, int sellPrice, String textureName, int level) {
-		super(textureName, level);
+		super("ABANDONED SHIP", textureName, level);
 		this.requiredCrew = requiredCrew;
 		this.lostDays = lostDays;
 		this.sellPrice = sellPrice;
@@ -93,14 +93,6 @@ public class AbandonedShipCard extends Card{
 		 * +--------------+
 		 * */
 
-		CLIFrame cardBorder = getScreenFrame(11, 20, ANSI.BACKGROUND_CYAN);
-
-		// frame title
-		CLIFrame title = new CLIFrame(new String[]{
-				ANSI.WHITE + "ABANDONED SHIP" + ANSI.RESET
-		});
-		cardBorder = cardBorder.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 0, 0);
-
 		List<String> cardInfoLines = new ArrayList<>();
 		cardInfoLines.add(
 				ANSI.BLACK + "Required Crew: " + requiredCrew + ANSI.RESET
@@ -114,8 +106,7 @@ public class AbandonedShipCard extends Card{
 
 		CLIFrame infoFrame = new CLIFrame(cardInfoLines.toArray(new String[0]));
 
-		cardBorder = cardBorder.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
-
-		return cardBorder;
+		return super.getCLIRepresentation()
+				.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
 	}
 }

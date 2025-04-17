@@ -1,9 +1,15 @@
 package it.polimi.ingsw.cards;
 
+import it.polimi.ingsw.enums.AnchorPoint;
+import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.view.cli.ANSI;
+import it.polimi.ingsw.view.cli.CLIFrame;
 import it.polimi.ingsw.view.cli.ICLIPrintable;
 
 import java.io.Serializable;
+
+import static it.polimi.ingsw.view.cli.CLIScreen.getScreenFrame;
 
 public abstract class Card implements ICLIPrintable, Serializable {
 
@@ -15,13 +21,19 @@ public abstract class Card implements ICLIPrintable, Serializable {
      * The texture associated with this card.
      */
     private String textureName;
+    /**
+     * The name of the card, representative of the card function (e.g. "Open Space")
+     */
+    private final String title;
 
     /**
      * Instances a card.
+     * @param title The name of the card.
      * @param textureName The name of the texture of the card.
      * @param level The level of this card.
      */
-    public Card(String textureName, int level){
+    public Card(String title, String textureName, int level){
+        this.title = title;
         this.textureName = textureName;
         this.level = level;
     };
@@ -52,5 +64,17 @@ public abstract class Card implements ICLIPrintable, Serializable {
      */
     public String getTextureName(){
         return this.textureName;
+    }
+
+    @Override
+    public CLIFrame getCLIRepresentation() {
+        String backgroundColor = switch(GameLevel.fromInteger(level)) {
+            case TESTFLIGHT, ONE -> ANSI.BACKGROUND_CYAN;
+            case TWO -> ANSI.BACKGROUND_PURPLE;
+            default -> "";
+        };
+        return getScreenFrame(11, 20, backgroundColor)
+                .merge(new CLIFrame(backgroundColor + ANSI.WHITE + " " + title + " "),
+                        AnchorPoint.TOP, AnchorPoint.CENTER);
     }
 }

@@ -21,7 +21,7 @@ public class StarDustCard extends Card{
 	 * @param level       The level of this card.
 	 */
 	public StarDustCard(String textureName, int level) {
-		super(textureName, level);
+		super("STARDUST", textureName, level);
 	}
 
 	/**
@@ -59,14 +59,6 @@ public class StarDustCard extends Card{
 		 * +--------------+
 		 * */
 
-		CLIFrame cardBorder = getScreenFrame(11, 20, ANSI.BACKGROUND_CYAN);
-
-		// frame title
-		CLIFrame title = new CLIFrame(new String[]{
-				ANSI.WHITE + "STARDUST" + ANSI.RESET
-		});
-		cardBorder = cardBorder.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 0, 0);
-
 		List<String> cardInfoLines = new ArrayList<>();
 		cardInfoLines.add(
 				ANSI.BLACK + "    Count your   " + ANSI.RESET
@@ -76,8 +68,7 @@ public class StarDustCard extends Card{
 		);
 		CLIFrame infoFrame = new CLIFrame(cardInfoLines.toArray(new String[0]));
 
-		cardBorder = cardBorder.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
-
-		return cardBorder;
+		return super.getCLIRepresentation()
+				.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
 	}
 }

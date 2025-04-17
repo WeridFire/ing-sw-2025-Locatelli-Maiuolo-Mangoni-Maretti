@@ -22,11 +22,12 @@ public abstract class EnemyCard extends Card {
     /**
      * @param firePower firepower of this enemy
      * @param lostDays days required to loot this enemy
+     * @param title the name of the card
      * @param textureName the texture of the card
      * @param level the level this card is part of
      */
-    public EnemyCard(int firePower, int lostDays, String textureName, int level) {
-        super(textureName, level);
+    public EnemyCard(int firePower, int lostDays, String title, String textureName, int level) {
+        super(title, textureName, level);
         this.firePower = firePower;
         this.lostDays = lostDays;
     }

@@ -2,6 +2,7 @@ package it.polimi.ingsw.cards;
 
 import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.enums.AnchorPoint;
+import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.PowerType;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.GameData;
@@ -24,7 +25,7 @@ public class OpenSpaceCard extends Card{
 	 * @param level       The level of this card.
 	 */
 	public OpenSpaceCard(String textureName, int level) {
-		super(textureName, level);
+		super("OPEN SPACE", textureName, level);
 	}
 
 	/**
@@ -62,25 +63,10 @@ public class OpenSpaceCard extends Card{
 		 * +--------------+
 		 * */
 
-		CLIFrame cardBorder = getScreenFrame(11, 20, ANSI.BACKGROUND_CYAN);
+		CLIFrame infoFrame = new CLIFrame(ANSI.BLACK + "Let's get")
+				.merge(new CLIFrame(ANSI.BLACK + "some fly days!"), Direction.SOUTH);
 
-		// frame title
-		CLIFrame title = new CLIFrame(new String[]{
-				ANSI.WHITE + "OPEN SPACE" + ANSI.RESET
-		});
-		cardBorder = cardBorder.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 0, 0);
-
-		List<String> cardInfoLines = new ArrayList<>();
-		cardInfoLines.add(
-				ANSI.BLACK + "  Let's get   " + ANSI.RESET
-		);
-		cardInfoLines.add(
-				ANSI.BLACK + "some fly days!" + ANSI.RESET
-		);
-		CLIFrame infoFrame = new CLIFrame(cardInfoLines.toArray(new String[0]));
-
-		cardBorder = cardBorder.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
-
-		return cardBorder;
+		return super.getCLIRepresentation()
+				.merge(infoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);
 	}
 }

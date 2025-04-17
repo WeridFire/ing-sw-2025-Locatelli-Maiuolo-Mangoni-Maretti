@@ -21,7 +21,7 @@ public class WarZoneCard extends Card {
 	 * @param level       The level of this card.
 	 */
 	public WarZoneCard(WarLevel[] warLevels, String textureName, int level) {
-		super(textureName, level);
+		super("WAR ZONE", textureName, level);
 		this.warLevels = warLevels;
 	}
 
