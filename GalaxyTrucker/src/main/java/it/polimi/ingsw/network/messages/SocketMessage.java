@@ -2,10 +2,13 @@ package it.polimi.ingsw.network.messages;
 
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.Rotation;
+import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.io.*;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class SocketMessage implements Serializable{
@@ -23,7 +26,11 @@ public class SocketMessage implements Serializable{
 		PLACE_TILE,
 		FINISH_ASSEMBLING,
 		SHOW_CARD_GROUP,
-		HIDE_CARD_GROUP
+		HIDE_CARD_GROUP,
+		PIR_ACTIVATE_TILES,
+		PIR_ALLOCATE_REMOVE_LOADABLES,
+		PIR_FORCE_END_TURN,
+		PIR_SELECT_MULTIPLE_CHOICE,
 	}
 
 	private MessageType type;
@@ -195,5 +202,21 @@ public class SocketMessage implements Serializable{
 
 	public static SocketMessage hideCardGroupMessage() {
 		return new SocketMessage(SocketMessage.MessageType.HIDE_CARD_GROUP);
+	}
+
+	public static SocketMessage pirActivateTilesMessage(Set<Coordinates> coords){
+		return new SocketMessage(MessageType.PIR_ACTIVATE_TILES, List.of(coords));
+	}
+
+	public static SocketMessage pirAllocateRemoveLoadables(Map<Coordinates, List<LoadableType>> cargo, boolean adding){
+		return new SocketMessage(MessageType.PIR_ALLOCATE_REMOVE_LOADABLES, List.of(cargo, adding));
+	}
+
+	public static SocketMessage pirForceEndTurn(){
+		return new SocketMessage(MessageType.PIR_FORCE_END_TURN);
+	}
+
+	public static SocketMessage pirSelectMultipleChoice(int selection){
+		return new SocketMessage(MessageType.PIR_SELECT_MULTIPLE_CHOICE, List.of(selection));
 	}
 }

@@ -5,13 +5,13 @@ import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.network.*;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.messages.SocketMessage;
+import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Base64;
-import java.util.UUID;
+import java.util.*;
 
 public class ClientSocketHandler implements IClient {
 
@@ -39,6 +39,7 @@ public class ClientSocketHandler implements IClient {
 	 * be able to send messages using sockets by accessing it.
 	 * @throws IOException
 	 */
+	@SuppressWarnings("unchecked")
 	public void runVirtualView() throws IOException {
 		String line;
 		while ((line = input.readLine()) != null) {
@@ -80,6 +81,21 @@ public class ClientSocketHandler implements IClient {
 						case FINISH_ASSEMBLING -> getServer().finishAssembling(this);
 						case SHOW_CARD_GROUP -> getServer().showCardGroup(this, (Integer) message.getArgs().getFirst());
 						case HIDE_CARD_GROUP -> getServer().hideCardGroup(this);
+						case PIR_ACTIVATE_TILES -> getServer().pirActivateTiles(this,
+													(Set<Coordinates>) message.getArgs().getFirst());
+						case PIR_ALLOCATE_REMOVE_LOADABLES -> {
+							boolean adding = (Boolean) message.getArgs().get(1);
+							if(adding){
+								getServer().pirAllocateLoadables(this,
+										(Map<Coordinates, List<LoadableType>>) message.getArgs().getFirst());
+							}else{
+								getServer().pirRemoveLoadables(this,
+										(Map<Coordinates, List<LoadableType>>) message.getArgs().getFirst());
+							}
+						}
+						case PIR_SELECT_MULTIPLE_CHOICE -> getServer().pirSelectMultipleChoice(this,
+								(Integer) message.getArgs().getFirst());
+						case PIR_FORCE_END_TURN -> getServer().pirForceEndTurn(this);
 					}
 				}catch(IllegalArgumentException e){
 					System.err.println("ERROR WHILE PARSING MESSAGE! Message:");

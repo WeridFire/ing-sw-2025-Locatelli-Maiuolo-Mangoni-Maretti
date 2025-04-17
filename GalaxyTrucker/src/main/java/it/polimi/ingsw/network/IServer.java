@@ -20,10 +20,12 @@ public interface IServer extends Remote {
 	void quitGame(IClient client) throws RemoteException;
 	void ping(IClient client) throws RemoteException;
 
-	// ???
-	void activateTiles(IClient client, Set<Coordinates> tilesToActivate) throws RemoteException;
-	void allocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException;
-	void forceEndTurn(IClient client) throws RemoteException;
+	// PIR related commands
+	void pirActivateTiles(IClient client, Set<Coordinates> tilesToActivate) throws RemoteException;
+	void pirAllocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException;
+	void pirForceEndTurn(IClient client) throws RemoteException;
+	void pirRemoveLoadables(IClient client,  Map<Coordinates, List<LoadableType>> cargoToRemove) throws RemoteException;
+	void pirSelectMultipleChoice(IClient client, int selection) throws RemoteException;
 
 	// Lobby phase
 	void updateGameSettings(IClient client, GameLevel level, int minPlayers) throws RemoteException;

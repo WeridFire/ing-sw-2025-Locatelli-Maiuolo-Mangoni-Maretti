@@ -3,6 +3,7 @@ package it.polimi.ingsw.playerInput.PIRs;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.Set;
 
@@ -47,13 +48,14 @@ public class PIRMultipleChoice extends PIR {
 		}
 	}
 
+	@Override
 	public void makeChoice(Player player, int choice) throws WrongPlayerTurnException {
 		checkForTurn(player);
 		this.choice = choice;
 		endTurn();
 	}
 
-	 int getChoice() {
+	int getChoice() {
 		return choice;
 	}
 
@@ -65,4 +67,8 @@ public class PIRMultipleChoice extends PIR {
 		return choiceMessage;
 	}
 
+	@Override
+	public CLIFrame getCLIRepresentation() {
+		return null;
+	}
 }

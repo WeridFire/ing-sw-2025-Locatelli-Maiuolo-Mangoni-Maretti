@@ -8,6 +8,7 @@ import it.polimi.ingsw.shipboard.tiles.ContainerTile;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.HashSet;
 import java.util.List;
@@ -80,6 +81,7 @@ public class PIRRemoveLoadables extends PIR {
 	 * @throws NotEnoughItemsException The tile requested does not have enough items.
 	 * @throws UnsupportedLoadableItemException The tile requested does not support the requested loadable.
 	 */
+	@Override
 	public void removeLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToRemove) throws WrongPlayerTurnException, TileNotAvailableException, NotEnoughItemsException, UnsupportedLoadableItemException {
 		checkForTurn(player);
 		for(Coordinates c : cargoToRemove.keySet()){
@@ -111,5 +113,14 @@ public class PIRRemoveLoadables extends PIR {
 	 */
 	public int getAmountToRemove() {
 		return amountToRemove;
+	}
+
+	public Set<LoadableType> getAllowedCargo() {
+		return allowedCargo;
+	}
+
+	@Override
+	public CLIFrame getCLIRepresentation() {
+		return null;
 	}
 }
