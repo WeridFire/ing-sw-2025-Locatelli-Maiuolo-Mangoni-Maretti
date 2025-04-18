@@ -14,17 +14,23 @@ import static it.polimi.ingsw.view.cli.CLIScreen.getScreenFrame;
 public abstract class Card implements ICLIPrintable, Serializable {
 
     /**
-     * The level this card is part of.
-     */
-    private int level;
-    /**
      * The texture associated with this card.
      */
-    private String textureName;
+    private final String textureName;
     /**
      * The name of the card, representative of the card function (e.g. "Open Space")
      */
     private final String title;
+    /**
+     * The level this card is part of.
+     */
+    private GameLevel level;
+    /**
+     * The ANSI background color for this card.
+     * It depends on the {@link #level} and it's used in {@link #getCLIRepresentation()}
+     * -> calculated only once for performance optimization.
+     */
+    private String backgroundColor;
 
     /**
      * Instances a card.
@@ -32,17 +38,44 @@ public abstract class Card implements ICLIPrintable, Serializable {
      * @param textureName The name of the texture of the card.
      * @param level The level of this card.
      */
-    public Card(String title, String textureName, int level){
+    public Card(String title, String textureName, GameLevel level){
         this.title = title;
         this.textureName = textureName;
-        this.level = level;
-    };
+        setLevel(level);
+    }
 
     /**
-     * Given a player and an amount of positions, handles the movement of it on the game board.
-     * @param player The string name of the player.
-     * @param position The amount of positions (or days) to move.
+     * Instances a card.
+     * @param title The name of the card.
+     * @param textureName The name of the texture of the card.
+     * @param level The level of this card in integer format.
      */
+    public Card(String title, String textureName, int level){
+        this(title, textureName, GameLevel.fromInteger(level));
+    }
+
+    /**
+     * Sets the level for this card.
+     * Can change dynamically, but once a card has been created it should stay the same level.
+     * @param level the new level of this card
+     */
+    public void setLevel(GameLevel level) {
+        this.level = level;
+        backgroundColor = switch(level) {
+            case TESTFLIGHT, ONE -> ANSI.BACKGROUND_CYAN;
+            case TWO -> ANSI.BACKGROUND_PURPLE;
+            default -> "";
+        };
+    }
+
+    /**
+     * Sets the level for this card.
+     * Can change dynamically, but once a card has been created it should stay the same level.
+     * @param level the new level of this card in integer format
+     */
+    public void setLevel(int level) {
+        setLevel(GameLevel.fromInteger(level));
+    }
 
     /**
      * Generic function to apply the effect of the card on the game.
@@ -51,28 +84,21 @@ public abstract class Card implements ICLIPrintable, Serializable {
     public abstract void playEffect(GameData game);
 
     /**
-     * Updates the level of the card.
-     * @param level the new level of the card.
-     */
-    public void setLevel(int level){
-        this.level = level;
-    }
-
-    /**
-     *
      * @return The texture associated to this card.
      */
     public String getTextureName(){
-        return this.textureName;
+        return textureName;
+    }
+
+    /**
+     * @return The game level associated to this card.
+     */
+    public GameLevel getLevel(){
+        return level;
     }
 
     @Override
     public CLIFrame getCLIRepresentation() {
-        String backgroundColor = switch(GameLevel.fromInteger(level)) {
-            case TESTFLIGHT, ONE -> ANSI.BACKGROUND_CYAN;
-            case TWO -> ANSI.BACKGROUND_PURPLE;
-            default -> "";
-        };
         return getScreenFrame(11, 20, backgroundColor)
                 .merge(new CLIFrame(backgroundColor + ANSI.WHITE + " " + title + " "),
                         AnchorPoint.TOP, AnchorPoint.CENTER);

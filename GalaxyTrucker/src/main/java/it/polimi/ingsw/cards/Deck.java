@@ -13,15 +13,16 @@ public class Deck implements Serializable {
      */
     final List<Card> deck = new ArrayList<>();
     private Card currentCard = null;
-    /**
-     * current index of the list
-     */
-    private int currentIndex = 0;
 
     /**
      * The list of cardsgroup, for the ship assembly phase.
      */
     private final List<CardsGroup> cardsGroups = new ArrayList<>();
+
+    /**
+     * selected game level while creating this deck
+     */
+    private final GameLevel gameLevel;
 
     /**
      * Private constructor for creating an obfuscated cards group that will be sent to the player.
@@ -30,14 +31,15 @@ public class Deck implements Serializable {
      * @param player The target player
      */
     private Deck(Deck deck, Player player){
-        this.currentCard = deck.getTopCard();
+        currentCard = deck.currentCard;
         for(CardsGroup c : deck.cardsGroups){
             if(!Objects.equals(c.getHeldBy(), player.getUsername())){
-                this.cardsGroups.add(CardsGroup.obfuscateCardsGroup(c));
+                cardsGroups.add(CardsGroup.obfuscateCardsGroup(c));
             }else{
-                this.cardsGroups.add(c);
+                cardsGroups.add(c);
             }
         }
+        gameLevel = deck.gameLevel;
     }
 
     /**
@@ -45,16 +47,18 @@ public class Deck implements Serializable {
      * @param level The deck level.
      */
     public Deck(GameLevel level){
-        List<Card> tutorialPool = null;
-        List<Card> l1Pool = null;
-        List<Card> l2Pool = null;
+        gameLevel = level;
+
+        List<Card> tutorialPool;
+        List<Card> l1Pool;
+        List<Card> l2Pool;
         switch(level){
             case TESTFLIGHT:
                 //for the tutorial is simply puts 8 cards randomly into the deck. No cardsgroup here.
                 tutorialPool = DeckFactory.createTutorialDeck();
                 Collections.shuffle(tutorialPool);
-                while (this.deck.size() < 8){
-                    this.deck.add(tutorialPool.removeFirst());
+                while (deck.size() < 8){
+                    deck.add(tutorialPool.removeFirst());
                 }
                 break;
             case ONE:
@@ -64,11 +68,11 @@ public class Deck implements Serializable {
                 //flight predictions, so not secret.
                 //TODO: fact check the content and dimension of the level 1 flight groups. On board these are not
                 // displayed (atleast in the digital resources)
-                while(this.cardsGroups.size() < 4){
+                while(cardsGroups.size() < 4){
                     List<Card> groupCard = new ArrayList<>();
                     groupCard.add(l1Pool.removeFirst());
                     groupCard.add(l1Pool.removeFirst());
-                    this.cardsGroups.add(new CardsGroup(groupCard, cardsGroups.isEmpty()));
+                    cardsGroups.add(new CardsGroup(groupCard, cardsGroups.isEmpty()));
                 }
                 break;
             case TWO:
@@ -78,7 +82,7 @@ public class Deck implements Serializable {
                 Collections.shuffle(l1Pool);
                 //Create 4 cardgroups each with 2 cards from level 2 and 1 from level 1. Also makes only the first
                 //Cardgroup secret.
-                while(this.cardsGroups.size() < 4){
+                while(cardsGroups.size() < 4){
                     List<Card> groupCard = new ArrayList<>();
                     groupCard.add(l1Pool.removeFirst());
                     groupCard.add(l2Pool.removeFirst());
@@ -89,12 +93,22 @@ public class Deck implements Serializable {
         }
     }
 
-    public void convertGroupsToCards(){
+    /**
+     * Prepares the deck from the initial form of cards groups into a full deck with all the cards mixed.
+     * It also handles the rule "start with one card of the played level".
+     */
+    public void mixGroupsIntoCards() {
         for(CardsGroup c : cardsGroups){
             while(!c.getGroupCards().isEmpty()){
                 deck.add(c.getGroupCards().removeFirst());
             }
         }
+        Collections.shuffle(deck);
+        // ensure the first card is one of the selected level
+        while (deck.getFirst().getLevel() != gameLevel) {
+            deck.add(deck.removeFirst());  // set as last card
+        }
+        // this loop will end thanks to the constructor, which gives the correct number of cards
     }
 
     /**
@@ -115,8 +129,8 @@ public class Deck implements Serializable {
      * Access all the card groups in order and construct a list of booleans,
      * where for all the indices i:
      * <ul>
-     *  <li>\result(i) is true <===> getGroup(i) is available to be taken by a player;</li>
-     *  <li>\result(i) is false <===> getGroup(i) is already taken by some player;</li>
+     *  <li>\result(i) is true <===> getGroup(i) is available to be taken by any player;</li>
+     *  <li>\result(i) is false <===> getGroup(i) is already taken by a player;</li>
      *  <li>\result(i) is null <===> getGroup(i) is secret</li>
      * </ul>
      * @return The created list of booleans
@@ -129,16 +143,15 @@ public class Deck implements Serializable {
         return availability;
     }
 
-    public Card getTopCard() {
+    public Card getCurrentCard() {
         return currentCard;
     }
 
-    public void drawNextCard(){
-        if(deck.isEmpty()){
-            currentCard = null;
-            return;
-        }
-        currentCard = deck.removeFirst();
+    public Card drawNextCard(){
+        currentCard = deck.isEmpty() ? null : deck.removeFirst();
+        System.out.println("Drawn card:" + ((currentCard == null) ? " none"
+                : "\n" + currentCard.getCLIRepresentation()));
+        return currentCard;
     }
 
     /**

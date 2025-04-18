@@ -1,6 +1,7 @@
 package it.polimi.ingsw.game;
 
 import it.polimi.ingsw.TilesFactory;
+import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
@@ -116,20 +117,25 @@ public class Game {
         // FLIGHT
         System.out.println(this + " Started flight phase");
 
-        gameData.getDeck().drawNextCard();
-        AdventureGamePhase adventureGamePhase = null;
-        while(gameData.getDeck().getTopCard() != null) {
-            //create adventure
-            adventureGamePhase = new AdventureGamePhase(id, gameData, gameData.getDeck().getTopCard());
+        // prepare the deck
+        gameData.getDeck().mixGroupsIntoCards();
+        // manage adventures
+        Card currentAdventureCard = gameData.getDeck().drawNextCard();
+        AdventureGamePhase adventureGamePhase;
+        while (currentAdventureCard != null) {
+            // create adventure
+            adventureGamePhase = new AdventureGamePhase(id, gameData, currentAdventureCard);
             getGameData().setCurrentGamePhase(adventureGamePhase);
 
-            //We notify all players about the new game state
+            // notify all players about the new game state
             GameServer.getInstance().broadcastUpdate(this);
 
             adventureGamePhase.playLoop();
 
-            gameData.getDeck().drawNextCard();
+            currentAdventureCard = gameData.getDeck().drawNextCard();
         }
+
+        System.out.println(this + " Ended flight phase");
 
         //TODO: vogliamo fare una fase di ending? Yes: show winner and points (maybe a static leaderboard)
 
