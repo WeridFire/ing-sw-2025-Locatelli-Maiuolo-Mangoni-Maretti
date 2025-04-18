@@ -64,6 +64,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 */
 	protected final void refresh(){
 		CLIFrame screen = getCLIRepresentation();
+		if (screen == null) screen = new CLIFrame();
 
 		CLIFrame popups = new CLIFrame();
 		if(CLIScreenHandler.getInstance().isShowingHelpScreen){
