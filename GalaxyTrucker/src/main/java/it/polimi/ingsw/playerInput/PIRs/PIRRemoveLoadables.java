@@ -35,12 +35,17 @@ public class PIRRemoveLoadables extends PIR {
 		}
 	}
 
-	@Override
-	public Set<Coordinates> getHighlightMask() {
+	private Map<Coordinates, ContainerTile> getContainerTiles() {
 		return currentPlayer.getShipBoard()
 				.getVisitorCalculateCargoInfo()
 				.getInfoAllContainers()
-				.getLocationsWithLoadedItems(allowedCargo, 1)
+				.getLocationsWithLoadedItems(allowedCargo, 1);
+	}
+
+
+	@Override
+	public Set<Coordinates> getHighlightMask() {
+		return getContainerTiles()
 				.keySet();
 	}
 

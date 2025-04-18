@@ -55,14 +55,18 @@ public class PIRAddLoadables extends PIR {
 
 	}
 
-	@Override
-	public Set<Coordinates> getHighlightMask() {
+	private Map<Coordinates, ContainerTile> getContainerTiles() {
 		return currentPlayer.getShipBoard()
 				.getVisitorCalculateCargoInfo()
 				.getInfoAllContainers()
 				.getLocationsWithAllowedContent(
 						new HashSet<>(getFloatingLoadables())
-				)
+				);
+	}
+
+	@Override
+	public Set<Coordinates> getHighlightMask() {
+		return getContainerTiles()
 				.keySet();
 	}
 
