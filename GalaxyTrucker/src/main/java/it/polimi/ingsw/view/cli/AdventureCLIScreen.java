@@ -5,8 +5,8 @@ import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
+import it.polimi.ingsw.util.Util;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -16,26 +16,8 @@ public class AdventureCLIScreen extends CLIScreen{
 
     private final ArrayList<Coord> coords = new ArrayList<Coord>();
 
-    /**
-     * @param screenName The identifier of the screen.
-     */
-    public AdventureCLIScreen(String screenName) {
-        super(screenName);
-    }
-
-    /**
-     * Abstract class for a CLI screen. Contains the standardized methods and fields to design a new screen.
-     * A screen is an object that displays information on the CLI based on the current game state.
-     * The user, based on the screen they are on, can perform different commands.
-     * A user can swap between screens using the screen global command. Screens differ in availability, and
-     * based on the current state of the game there might be different available screens.
-     *
-     * @param screenName    The identifier of the screen.
-     * @param forceActivate if to forcefully activate this screen whenever an update satisfying it will be received.
-     * @param priority      if there are multiple screens not force-activable, priority will indicate which one to prioritize.
-     */
-    public AdventureCLIScreen(String screenName, boolean forceActivate, int priority) {
-        super(screenName, forceActivate, priority);
+    public AdventureCLIScreen() {
+        super("adventure", true, 0);
     }
 
     /**
@@ -245,7 +227,7 @@ public class AdventureCLIScreen extends CLIScreen{
     /**
      * Utility Record.
      * */
-    private record PlayerPosAndColor(Coord pos, MainCabinTile.Color color) {}
+    private record PlayerPosAndColor(Coord pos, MainCabinTile.Color color, boolean isLeader) {}
 
     /**
      * Generates a {@link CLIFrame} representing the visual state of the game board for a given level.
@@ -281,32 +263,37 @@ public class AdventureCLIScreen extends CLIScreen{
         List<Player> players = currentGame.getPlayers();
         List<PlayerPosAndColor> playersPosAndColor = new ArrayList<>();
         for (int i=0; i< players.size(); i++) {
-            Coord player_p = buff_coords.get(players.get(i).getPosition());
+            Coord player_p = Util.getModularAt(buff_coords, players.get(i).getPosition());
             MainCabinTile.Color color = MainCabinTile.Color.fromPlayerIndex(i);
-            playersPosAndColor.add(new PlayerPosAndColor(player_p, color));
+            playersPosAndColor.add(new PlayerPosAndColor(player_p, color, i == 0));
         }
 
         for (Coord coord : getCoords(level)) {
             board[coord.row()][coord.col()] = -1;
         }
 
+        // TODO: issue in display, order is clockwise and not counterclockwise and leader problem (color or player wrong)
+
         boolean found = false;
+        String padding = " ".repeat(1);
         ArrayList<String> res = new ArrayList<String>();
         for (int i = 0; i < board.length; i++) {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder(padding);
             for (int j = 0; j < board[i].length; j++) {
                 found = false;
                 if (board[i][j] == -1) {
                     Coord new_c = new Coord(i,j);
 
-                    for(PlayerPosAndColor pc : playersPosAndColor ) {
-                        if (new_c.equals(pc.pos())) {
-                            sb.append(pc.color()).append("▲").append(ANSI.RESET);
+                    for(PlayerPosAndColor pc : playersPosAndColor) {
+                        if (new_c.equals(pc.pos)) {
+                            sb.append(pc.isLeader ? "" : ANSI.BACKGROUND_BLACK)
+                                    .append(pc.color.toANSIColor(false))
+                                    .append("▲").append(ANSI.RESET);
                             found = true;
                         }
                     }
                     if (!found) {
-                        sb.append(ANSI.WHITE + "△" +ANSI.RESET);
+                        sb.append(ANSI.BACKGROUND_BLACK + ANSI.WHITE + "△" + ANSI.RESET);
                     }
 
                 } else {
@@ -317,6 +304,7 @@ public class AdventureCLIScreen extends CLIScreen{
                     sb.append("   ");
                 }
             }
+            sb.append(padding);
             res.add(sb.toString());
         }
 

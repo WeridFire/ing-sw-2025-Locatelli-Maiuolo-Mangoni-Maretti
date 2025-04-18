@@ -7,7 +7,7 @@ public class AdventureCLIScreenTest {
 
     @Test
     public void testBoard() {
-        AdventureCLIScreen c = new AdventureCLIScreen("Piedi");
+        AdventureCLIScreen c = new AdventureCLIScreen();
         System.out.println(c.getCLIRepresentation().toString());
     }
 }
