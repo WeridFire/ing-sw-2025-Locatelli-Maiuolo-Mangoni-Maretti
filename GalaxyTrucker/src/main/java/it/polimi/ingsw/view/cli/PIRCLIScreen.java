@@ -42,8 +42,6 @@ public class PIRCLIScreen extends CLIScreen {
 
 	@Override
 	protected boolean switchConditions() {
-		//NOTE! Until PIRHandler is fixed to not be transient (so make it serializable) this will
-		//return error inevitably
 		return getLastUpdate().getCurrentGame() != null &&
 				getLastUpdate().getCurrentGame().getPIRHandler() != null &&
 				getLastUpdate().getCurrentGame().getPIRHandler().getPlayerPIR(getLastUpdate()
@@ -411,6 +409,7 @@ public class PIRCLIScreen extends CLIScreen {
 
 	@Override
 	public CLIFrame getCLIRepresentation() {
-		return null;
+		PIR activePIR = getActivePIR();
+		return (activePIR == null) ? new CLIFrame() : activePIR.getCLIRepresentation();
 	}
 }
