@@ -18,7 +18,7 @@ public class MainCabinTile extends CabinTile {
 
         public String toANSIColor(boolean background) {
             return switch (this) {
-                case BLUE -> background ? ANSI.BACKGROUND_BLUE : ANSI.RED;
+                case BLUE -> background ? ANSI.BACKGROUND_BLUE : ANSI.BLUE;
                 case RED -> background ? ANSI.BACKGROUND_RED : ANSI.RED;
                 case GREEN -> background ? ANSI.BACKGROUND_GREEN : ANSI.GREEN;
                 case YELLOW -> background ? ANSI.BACKGROUND_YELLOW : ANSI.YELLOW;
