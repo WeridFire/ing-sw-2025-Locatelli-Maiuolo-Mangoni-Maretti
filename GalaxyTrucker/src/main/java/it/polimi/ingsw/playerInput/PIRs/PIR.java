@@ -18,7 +18,7 @@ public abstract class PIR implements ICLIPrintable {
 
 	protected Player currentPlayer;
 	private final int cooldown;
-	protected final Object lock = new Object();
+	transient protected final Object lock = new Object();
 	private final it.polimi.ingsw.playerInput.PIRType PIRType;
 
 	/**
