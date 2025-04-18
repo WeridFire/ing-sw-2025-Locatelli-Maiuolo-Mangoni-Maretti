@@ -108,4 +108,8 @@ public abstract class PIR implements ICLIPrintable, Serializable {
 		throw new InputNotSupportedException(getPIRType());
 	}
 
+	@Override
+	public String toString() {
+		return getPIRType().toString();
+	}
 }
