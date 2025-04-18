@@ -60,7 +60,7 @@ public class GameData implements Serializable {
      * private Player currentPlayerTurn;
      */
 
-    transient private PIRHandler pirHandler;
+    private PIRHandler pirHandler;
 
     /**
      * Mapping of available cargo goods and their quantities.
