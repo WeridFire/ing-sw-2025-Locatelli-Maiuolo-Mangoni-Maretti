@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.messages;
 
+import com.fasterxml.jackson.core.Versioned;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Deck;

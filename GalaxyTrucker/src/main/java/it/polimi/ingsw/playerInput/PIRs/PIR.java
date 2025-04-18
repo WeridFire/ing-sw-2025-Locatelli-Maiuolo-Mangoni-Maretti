@@ -12,14 +12,15 @@ import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemExcepti
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.ICLIPrintable;
 
+import java.io.Serializable;
 import java.util.*;
 
-public abstract class PIR implements ICLIPrintable {
+public abstract class PIR implements ICLIPrintable, Serializable {
 
 	protected Player currentPlayer;
 	private final int cooldown;
 	transient protected final Object lock = new Object();
-	private final it.polimi.ingsw.playerInput.PIRType PIRType;
+	private final PIRType pirType;
 
 	/**
 	 * Abstract object for a PlayerInput request. The server will instance a new thread and wait for the player to
@@ -31,7 +32,7 @@ public abstract class PIR implements ICLIPrintable {
 	public PIR(Player currentPlayer, int cooldown, PIRType PIRType){
 		this.currentPlayer = currentPlayer;
 		this.cooldown = cooldown;
-		this.PIRType = PIRType;
+		this.pirType = PIRType;
 	}
 
 	/**
@@ -76,18 +77,18 @@ public abstract class PIR implements ICLIPrintable {
 	 * @return
 	 */
 	public PIRType getPIRType() {
-		return PIRType;
+		return pirType;
 	}
 
 	protected void checkForTileMask(Coordinates coordinate) throws TileNotAvailableException {
 		if(!getHighlightMask().contains(coordinate)){
-			throw new TileNotAvailableException(coordinate, PIRType);
+			throw new TileNotAvailableException(coordinate, pirType);
 		}
 	}
 
 	protected void checkForTurn(Player player) throws WrongPlayerTurnException {
 		if(player != currentPlayer){
-			throw new WrongPlayerTurnException(currentPlayer, player, PIRType);
+			throw new WrongPlayerTurnException(currentPlayer, player, pirType);
 		}
 	}
 
