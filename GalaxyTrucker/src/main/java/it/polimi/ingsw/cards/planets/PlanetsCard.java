@@ -1,6 +1,5 @@
 package it.polimi.ingsw.cards.planets;
 
-import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.cards.exceptions.PlanetsCardException;
 import it.polimi.ingsw.enums.AnchorPoint;
@@ -11,14 +10,7 @@ import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static it.polimi.ingsw.view.cli.CLIScreen.getScreenFrame;
+import java.util.*;
 
 public class PlanetsCard extends Card {
 
@@ -86,7 +78,7 @@ public class PlanetsCard extends Card {
 		}
 		for(Player p : game.getPlayers().reversed()){
 			Planet landedPlanet = Arrays.stream(planets)
-					.filter(pl -> pl.getCurrentPlayer().equals(p))
+					.filter(pl -> Objects.equals(pl.getCurrentPlayer(), p))
 					.findFirst()
 					.orElse(null);
 
