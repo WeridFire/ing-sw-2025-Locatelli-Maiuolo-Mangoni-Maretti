@@ -1,12 +1,13 @@
 package it.polimi.ingsw.playerInput.PIRs;
 
+import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PIRType;
-import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +16,7 @@ public class PIRHandler implements Serializable {
 
 
 	private Map<Player, PIR> activePIRs = new HashMap<>();
+
 	/**
 	 *
 	 * @return true if any turn in the player input request is set, or null if none is not set.
@@ -50,7 +52,15 @@ public class PIRHandler implements Serializable {
 			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
 		}
 		this.activePIRs.put(pir.getCurrentPlayer(), pir);
-		try{
+		// notify players about the newly set pir
+        try {
+            GameServer.getInstance().broadcastUpdate(GamesHandler.getInstance()
+					.findGameByClientUUID(pir.getCurrentPlayer().getConnectionUUID()));
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+
+        try{
 			pir.run();
 		}catch(InterruptedException e){
 			e.printStackTrace();
