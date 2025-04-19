@@ -3,9 +3,11 @@ package it.polimi.ingsw.view.cli;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
+import it.polimi.ingsw.util.GameLevelStandards;
 import it.polimi.ingsw.util.Util;
 
 import java.rmi.RemoteException;
@@ -14,7 +16,17 @@ import java.util.List;
 
 public class AdventureCLIScreen extends CLIScreen{
 
-    private final ArrayList<Coord> coords = new ArrayList<Coord>();
+    /**
+     * Utility Record.
+     * */
+    private record Coord(int row, int col){
+        public boolean equals(Coord c) {
+            return row == c.row && col == c.col;
+        }
+    }
+
+    private final ArrayList<Coord> coords = new ArrayList<>();
+
 
     public AdventureCLIScreen() {
         super("adventure", true, 0);
@@ -69,20 +81,11 @@ public class AdventureCLIScreen extends CLIScreen{
         Player thisPlayer = getLastUpdate().getClientPlayer();
         CLIFrame shipboardFrame = thisPlayer.getShipBoard().getCLIRepresentation();
 
-        CLIFrame boardFrame = getBoardFrame(gameData.getLevel());
+        CLIFrame boardFrame = getBoardFrame(gameData.getLevel(), getLastUpdate().getCurrentGame().getPlayers());
 
         shipboardFrame = shipboardFrame.merge(boardFrame, Direction.NORTH, 2);
 
         return shipboardFrame;
-    }
-
-    /**
-     * Utility Record.
-     * */
-    private record Coord(int row, int col){
-        public boolean equals(Coord c) {
-            return row == c.row && col == c.col;
-        }
     }
 
     /**
@@ -96,17 +99,16 @@ public class AdventureCLIScreen extends CLIScreen{
      * This implies the instance is expected to be used for a single level's board generation.
      *
      * @param level The {@link GameLevel} for which to get the coordinates.
+     * @param turnDirection To order the coordinates in {@link Rotation#CLOCKWISE} or {@link Rotation#COUNTERCLOCKWISE}.
+     *                      If {@code turnDirection} is not properly specified, the default (counterclockwise) applies.
      * @return A {@link List} of {@link Coord} objects representing the ordered path for the level.
      *         Returns the cached list if already populated, otherwise returns the newly generated and cached list.
      */
-    private List<Coord> getCoords(GameLevel level){
+    private List<Coord> getCoords(GameLevel level, Rotation turnDirection) {
         if (!coords.isEmpty()) return coords;
 
-        int max_row = 0;
-        int max_col = 0;
-        int magicShift = 0;
         switch(level){
-            case TESTFLIGHT:
+            case TESTFLIGHT, ONE:
                 coords.add(new Coord(0, 10));
                 coords.add(new Coord(0, 6));
                 coords.add(new Coord(1, 4));
@@ -125,12 +127,9 @@ public class AdventureCLIScreen extends CLIScreen{
                 coords.add(new Coord(6, 14));
                 coords.add(new Coord(3, 16));
                 coords.add(new Coord(5, 16));
-                max_row = 9;
-                max_col = 17;
-                magicShift = 9;
                 break;
 
-            case ONE:
+            case TWO:
                 coords.add(new Coord(4, 0));
                 coords.add(new Coord(6, 0));
                 coords.add(new Coord(2, 1));
@@ -155,12 +154,10 @@ public class AdventureCLIScreen extends CLIScreen{
                 coords.add(new Coord(8, 19));
                 coords.add(new Coord(4, 20));
                 coords.add(new Coord(6, 20));
-                max_row = 11;
-                max_col = 21;
-                magicShift = 5;
                 break;
 
-            case TWO:
+                /*
+            case THREE:
                 coords.add(new Coord(6, 0));
                 coords.add(new Coord(8, 0));
                 coords.add(new Coord(10, 0));
@@ -195,31 +192,34 @@ public class AdventureCLIScreen extends CLIScreen{
                 coords.add(new Coord(6, 26));
                 coords.add(new Coord(8, 26));
                 coords.add(new Coord(10, 26));
-                max_row = 17;
-                max_col = 28;
-                magicShift = 15;
                 break;
+
+                 */
         }
 
+        // calculate correct centroid
         double cx = 0, cy = 0;
         for (Coord p : coords) {
             cx += p.row();
             cy += p.col();
         }
-        cx /= max_row;
-        cy /= max_col;
+        cx /= coords.size();
+        cy /= coords.size();
 
+        // sort by angle
         double finalCx = cx;
         double finalCy = cy;
+        boolean clockwise = turnDirection == Rotation.CLOCKWISE;
         coords.sort((a, b) -> {
-            double angleA = Math.atan2(a.row() - finalCx, a.col() - finalCy);
-            double angleB = Math.atan2(b.row()- finalCx, b.col() - finalCy);
-            return Double.compare(angleB, angleA);
+            // note: y inverted because rows increase "going down"
+            double angleA = Math.atan2(-(a.row() - finalCx), a.col() - finalCy);
+            double angleB = Math.atan2(-(b.row() - finalCx), b.col() - finalCy);
+            return clockwise ? Double.compare(angleB, angleA) : Double.compare(angleA, angleB);
         });
 
-        for (int i=0; i<magicShift; i++) {
-            coords.add(coords.getFirst());
-            coords.remove(coords.getFirst());
+        // magic shift 2 places
+        for (int i = 0; i < 2; i++) {
+            coords.add(coords.removeFirst());
         }
 
         return coords;
@@ -233,7 +233,7 @@ public class AdventureCLIScreen extends CLIScreen{
     /**
      * Generates a {@link CLIFrame} representing the visual state of the game board for a given level.
      * It determines the board layout, dimensions, and background color based on the specified {@code level}.
-     * The method retrieves the ordered path coordinates using {@link #getCoords(GameLevel)} and fetches
+     * The method retrieves the ordered path coordinates using {@link #getCoords(GameLevel, Rotation)} and fetches
      * the current player positions and colors from the latest game update (via {@code getLastUpdate()}).
      * The resulting frame includes appropriate ANSI color codes for background and player pawns.
      *
@@ -241,24 +241,16 @@ public class AdventureCLIScreen extends CLIScreen{
      * @return A {@link CLIFrame} object containing the string representation of the board,
      *         ready for display in a command-line interface, with appropriate background color set.
      */
-    private CLIFrame getBoardFrame(GameLevel level) {
+    public CLIFrame getBoardFrame(GameLevel level, List<Player> players) {
         //color related to level
-        int[][] board = switch (level) {
-            case TESTFLIGHT -> {
-                yield new int[9][17];
-            }
-            case ONE -> {
-                yield new int[11][21];
-            }
-            case TWO -> {
-                yield new int[17][27];
-            }
         String bg = GameLevelStandards.getColorANSI(level, true);
+        boolean[][] board = switch (level) {
+            case TESTFLIGHT, ONE -> new boolean[9][17];
+            case TWO -> new boolean[11][21];
+            // case THREE -> new int[17][27];
         };
-        ArrayList<Coord> buff_coords = new ArrayList<>(getCoords(level));
+        ArrayList<Coord> buff_coords = new ArrayList<>(getCoords(level, Rotation.CLOCKWISE));
 
-        GameData currentGame = getLastUpdate().getCurrentGame();
-        List<Player> players = currentGame.getPlayers();
         List<PlayerPosAndColor> playersPosAndColor = new ArrayList<>();
         for (int i = 0; i < players.size(); i++) {
             playersPosAndColor.add(new PlayerPosAndColor(
@@ -267,25 +259,23 @@ public class AdventureCLIScreen extends CLIScreen{
                     i == 0));
         }
 
-        for (Coord coord : getCoords(level)) {
-            board[coord.row()][coord.col()] = -1;
+        for (Coord coord : buff_coords) {
+            board[coord.row()][coord.col()] = true;
         }
 
-        // TODO: issue in display, order is clockwise and not counterclockwise and leader problem (color or player wrong)
-
-        boolean found = false;
+        boolean found;
         String padding = " ".repeat(1);
         ArrayList<String> res = new ArrayList<String>();
         for (int i = 0; i < board.length; i++) {
             StringBuilder sb = new StringBuilder(padding);
             for (int j = 0; j < board[i].length; j++) {
                 found = false;
-                if (board[i][j] == -1) {
+                if (board[i][j]) {
                     Coord new_c = new Coord(i,j);
 
                     for(PlayerPosAndColor pc : playersPosAndColor) {
                         if (new_c.equals(pc.pos)) {
-                            sb.append(pc.isLeader ? ANSI.BACKGROUND_BLACK : "")
+                            sb.append(pc.isLeader ? ANSI.BACKGROUND_WHITE : ANSI.BACKGROUND_BLACK)  // no racism
                                     .append(pc.color.toANSIColor(false))
                                     .append("▲").append(ANSI.RESET);
                             found = true;
