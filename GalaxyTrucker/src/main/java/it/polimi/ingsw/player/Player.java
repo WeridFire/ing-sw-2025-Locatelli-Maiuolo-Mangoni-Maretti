@@ -33,7 +33,7 @@ public class Player implements Serializable {
     /**
      * true <==> tile in hand has been picked from reserved tiles
      * (can not discard and count as lost if not placed before end of assembly)
-     */  // TODO: implement check at the end of assembly to count it as reserved tile
+     */  // TODO: implement check at the end of assembly to count it as lost tile
     private boolean isTileInHandFromReserved = false;
 
     /**
@@ -63,6 +63,7 @@ public class Player implements Serializable {
      */
     private Integer cardGroupInHand;
 
+
     public Player(String username, UUID connectionUUID) {
         this.username = username;
         this.connectionUUID = connectionUUID;
@@ -74,7 +75,6 @@ public class Player implements Serializable {
     }
 
     /**
-     *
      * @return player's username
      */
     public String getUsername() {
@@ -86,7 +86,6 @@ public class Player implements Serializable {
     }
 
     /**
-     *
      * @return tile held by the player
      */
     public TileSkeleton getTileInHand() {
@@ -115,6 +114,17 @@ public class Player implements Serializable {
     private void removeTileFromHand() {
         tileInHand = null;
         isTileInHandFromReserved = false;
+    }
+
+    /**
+     * Set the specified tile object as a tile lost during the flight.
+     * It counts at the end as negative points in the leaderboard.
+     * @implNote This method does not modify {@code lostTile} in any way.
+     * e.g. the caller may want to remove the coordinates associated internally to the tile.
+     * @param lostTile the tile lost during flight.
+     */
+    public void setLostTile(TileSkeleton lostTile) {
+        lostTiles.add(lostTile);
     }
 
     /**
@@ -226,27 +236,38 @@ public class Player implements Serializable {
 
     /**
      * Sets the id of the held cardgroup
+     * @throws TooManyItemsInHandException if the player it is already holding a cardgroup or a tile in hand
      */
-    public void setCardGroupInHand(int id) {
-        this.cardGroupInHand = id;
+    public void setCardGroupInHand(int id) throws TooManyItemsInHandException {
+        if (getTileInHand() != null) {
+            throw new AlreadyHaveTileInHandException();
+        }
+        if (getCardGroupInHand() != null) {
+            throw new TooManyItemsInHandException("You are already holding a group of cards.");
+        }
+        cardGroupInHand = id;
     }
 
     /**
      * Clears the id of the held cardgroup
      */
     public void clearCardGroupInHand() {
-        this.cardGroupInHand = null;
+        cardGroupInHand = null;
     }
 
     /**
      * Randomly picks a tile from the covered tiles pile. Removes it from the pile and assigns it to the player.
-     * @return
-     * @throws DrawTileException
+     * @throws DrawTileException if there are no tiles from the pile
+     * @throws TooManyItemsInHandException if this player already have a tile or group of cards in hand
      */
-    public void drawTile(GameData gameData) throws DrawTileException, AlreadyHaveTileInHandException {
+    public void drawTile(GameData gameData) throws DrawTileException, TooManyItemsInHandException {
         if (gameData.getCoveredTiles().isEmpty()) {
             throw new DrawTileException("There are no covered tiles available.");
         }
+        if (getCardGroupInHand() != null) {
+            throw new TooManyItemsInHandException("You are already holding a group of cards.");
+        }
+
         TileSkeleton t = gameData.getCoveredTiles().removeFirst();
         try{
             setTileInHand(t);
@@ -291,10 +312,14 @@ public class Player implements Serializable {
         removeTileFromHand();
     }
 
-    public void pickTile(GameData gameData, Integer id) throws AlreadyHaveTileInHandException, ThatTileIdDoesNotExistsException {
+    public void pickTile(GameData gameData, Integer id) throws TooManyItemsInHandException, ThatTileIdDoesNotExistsException {
         if (getTileInHand() != null) {
             throw new AlreadyHaveTileInHandException();
         }
+        if (getCardGroupInHand() != null) {
+            throw new TooManyItemsInHandException("You are already holding a group of cards.");
+        }
+
         TileSkeleton tile;
         try {  // first search in the discarded tiles
             tile = gameData.getTileWithId(id);
@@ -320,12 +345,46 @@ public class Player implements Serializable {
         }
     }
 
-    public void endAssembly(int startingPosition) throws NoShipboardException, AlreadyEndedAssemblyException {
+    /**
+     * End shipboard assembly and setup player at {@code startingPosition} route place.
+     * Handles reserved tile in hand.
+     * @param startingPosition the position from which the player starts the flight
+     * @throws NoShipboardException if the player has no shipboard
+     * @throws AlreadyEndedAssemblyException if the assembly phase has already been called for this player
+     * @throws TooManyItemsInHandException if the player has something in hand (non-reserved tile or cards group)
+     */
+    public void endAssembly(int startingPosition) throws TooManyItemsInHandException, NoShipboardException,
+            AlreadyEndedAssemblyException {
+        if (cardGroupInHand != null || tileInHand != null) {
+            throw new TooManyItemsInHandException("You can not end assembly with items in hand.");
+        }
+        forceEndAssembly(startingPosition);
+    }
+
+    /**
+     * Force end assembly (e.g. no more time), without {@link TooManyItemsInHandException}
+     * @see #endAssembly(int)
+     */
+    public void forceEndAssembly(int startingPosition) throws NoShipboardException, AlreadyEndedAssemblyException {
         ShipBoard shipBoard = getShipBoard();
         if (shipBoard == null) {
             throw new NoShipboardException();
         }
 
+        // if tile in hand is reserved: add to the list of lost tiles
+        if ((tileInHand != null) && isTileInHandFromReserved) {
+            setLostTile(tileInHand);
+        }
+        removeTileFromHand();
+        // all the reserved tiles in lost tiles
+        for (TileSkeleton reservedTile : reservedTiles) {
+            setLostTile(reservedTile);
+        }
+        reservedTiles.clear();
+        // clears card group in hand reference
+        clearCardGroupInHand();
+
+        // actually call the end of ship assembly
         shipBoard.endAssembly();
         setPosition(startingPosition);
     }

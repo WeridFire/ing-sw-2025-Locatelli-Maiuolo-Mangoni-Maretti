@@ -22,6 +22,7 @@ import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.*;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
@@ -256,7 +257,7 @@ public class RmiServer implements IServer {
 
 		try {
 			pg.player.drawTile(pg.game.getGameData());
-		} catch (DrawTileException | AlreadyHaveTileInHandException e) {
+		} catch (DrawTileException | TooManyItemsInHandException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 			return;
 		}
@@ -304,7 +305,7 @@ public class RmiServer implements IServer {
 
 		try{
 			pg.player.pickTile(pg.game.getGameData(), id);
-		} catch (AlreadyHaveTileInHandException | ThatTileIdDoesNotExistsException e) {
+		} catch (TooManyItemsInHandException | ThatTileIdDoesNotExistsException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 			return;
         }
@@ -336,8 +337,8 @@ public class RmiServer implements IServer {
 		// else: actually try to perform the action
 
 		try {
-			pg.game.getGameData().endAssembly(pg.player);
-		} catch (NoShipboardException | AlreadyEndedAssemblyException e) {
+			pg.game.getGameData().endAssembly(pg.player, false);
+		} catch (NoShipboardException | AlreadyEndedAssemblyException | TooManyItemsInHandException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 			return;
 		}
@@ -352,12 +353,31 @@ public class RmiServer implements IServer {
 		// else: actually try to perform the action
 
 		try {
-			if (pg.player.getCardGroupInHand() != null) {
-				throw new CardsGroupException("This player is already holding a group of cards.");  // caught below
+			ShipBoard shipBoard = pg.player.getShipBoard();
+			if (shipBoard == null) {
+				throw new NoShipboardException();  // caught below
 			}
-			pg.game.getGameData().getDeck().getGroup(id).showGroup(pg.player.getUsername());
+			if (shipBoard.getTiles().size() <= 1) {
+				throw new CardsGroupException("You have to place a tile before taking a group of cards.");  // caught below
+			}
+
+			// attempt assigning the group of cards in hand
+			Integer oldCardGroup = pg.player.getCardGroupInHand();
 			pg.player.setCardGroupInHand(id);
-		} catch (CardsGroupException e) {
+
+			try {
+				// attempt showing the group of cards to the player
+				pg.game.getGameData().getDeck().getGroup(id).showGroup(pg.player.getUsername());
+			} catch (Exception e) {
+				// reset the old card group in hand
+				pg.player.clearCardGroupInHand();
+				if (oldCardGroup != null) {
+					pg.player.setCardGroupInHand(oldCardGroup);
+				}
+				// then propagate the error (caught below if expected)
+				throw e;
+			}
+		} catch (CardsGroupException | NoShipboardException | TooManyItemsInHandException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 			return;
 		}

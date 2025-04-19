@@ -7,10 +7,7 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.game.exceptions.DrawTileException;
-import it.polimi.ingsw.player.exceptions.AlreadyHaveTileInHandException;
-import it.polimi.ingsw.player.exceptions.NoTileInHandException;
-import it.polimi.ingsw.player.exceptions.ReservedTileException;
-import it.polimi.ingsw.player.exceptions.TooManyReservedTilesException;
+import it.polimi.ingsw.player.exceptions.*;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
@@ -57,7 +54,7 @@ class PlayerTest {
     }
 
     @Test
-    void testDrawTile() throws DrawTileException, AlreadyHaveTileInHandException {
+    void testDrawTile() throws DrawTileException, TooManyItemsInHandException {
 
         List<TileSkeleton> MockTiles = new ArrayList<>();
         TileSkeleton mockTile1 = createMockTile(1);
@@ -71,7 +68,7 @@ class PlayerTest {
     }
 
     @Test
-    void testDiscardTile() throws DrawTileException, AlreadyHaveTileInHandException, NoTileInHandException, ReservedTileException {
+    void testDiscardTile() throws DrawTileException, TooManyItemsInHandException, NoTileInHandException, ReservedTileException {
         List<TileSkeleton> drawnTiles = new ArrayList<>();
         List<TileSkeleton> MockTiles = new ArrayList<>();
         TileSkeleton mockTile1 = createMockTile(1);
@@ -87,7 +84,7 @@ class PlayerTest {
     }
 
     @Test
-    void testReserveTile() throws DrawTileException, AlreadyHaveTileInHandException, NoTileInHandException, TooManyReservedTilesException {
+    void testReserveTile() throws DrawTileException, TooManyItemsInHandException, NoTileInHandException, TooManyReservedTilesException {
         List<TileSkeleton> drawnTiles = new ArrayList<>();
         List<TileSkeleton> MockTiles = new ArrayList<>();
         TileSkeleton mockTile1 = createMockTile(1);
@@ -103,7 +100,7 @@ class PlayerTest {
     }
 
     @Test
-    void testPickTile() throws DrawTileException, AlreadyHaveTileInHandException, NoTileInHandException, ThatTileIdDoesNotExistsException, ReservedTileException {
+    void testPickTile() throws DrawTileException, TooManyItemsInHandException, NoTileInHandException, ThatTileIdDoesNotExistsException, ReservedTileException {
         List<TileSkeleton> drawnTiles = new ArrayList<>();
         List<TileSkeleton> MockTiles = new ArrayList<>();
         TileSkeleton mockTile1 = createMockTile(1);

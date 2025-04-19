@@ -8,6 +8,7 @@ import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
+import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
 import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
@@ -420,15 +421,22 @@ public class GameData implements Serializable {
      * It also manages to update the game assembly phase accordingly to how many players still need to finish assembly
      * and in which level is the game being played.
      * @param player the player which ended assembly
+     * @param force if the player is forced to end assembly (e.g. no more time)
      * @throws IllegalArgumentException if {@code player} does not belong to this game data.
+     * @throws TooManyItemsInHandException only if {@code player} is holding something in hand AND {@code force == false}.
      * @requires to be called during {@link GamePhaseType#ASSEMBLE}
      */
-    public void endAssembly(Player player) throws AlreadyEndedAssemblyException, NoShipboardException {
+    public void endAssembly(Player player, boolean force) throws AlreadyEndedAssemblyException, NoShipboardException,
+            TooManyItemsInHandException {
         if (!players.contains(player)) {
             throw new IllegalArgumentException("Player '" + player.getUsername() + "' is not in this game");
         }
         // handle player management
-        player.endAssembly(startingPositions.removeFirst());
+        if (force) {
+            player.forceEndAssembly(startingPositions.removeFirst());
+        } else {
+            player.endAssembly(startingPositions.removeFirst());
+        }
         // handle game management
         for (Player p : players) {
             if (p.getPosition() == null) {
