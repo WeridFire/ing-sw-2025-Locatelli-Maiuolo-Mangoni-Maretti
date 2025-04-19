@@ -30,5 +30,10 @@ public class StructuralTile extends TileSkeleton {
     public void accept(TileVisitor visitor) {
         visitor.visitStructural(this);
     }
+
+    @Override
+    public String getName() {
+        return "Structural Tile";
+    }
 }
 

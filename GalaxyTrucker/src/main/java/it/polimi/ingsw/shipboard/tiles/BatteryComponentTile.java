@@ -41,4 +41,9 @@ public class BatteryComponentTile extends ContainerTile {
             throw new RuntimeException(e);  // should never happen -> runtime error
         }
     }
+
+    @Override
+    public String getName() {
+        return "Battery Tile " + getLoadedItems().size() + "/" + getCapacity();
+    }
 }

@@ -50,4 +50,9 @@ public class CargoHoldTile extends ContainerTile {
     public void accept(TileVisitor visitor) {
         visitor.visitCargoHold(this);
     }
+
+    @Override
+    public String getName() {
+        return "Cargo Hold " + getLoadedItems().stream().map(LoadableType::getUnicodeColoredString) + "/" + getCapacity();
+    }
 }

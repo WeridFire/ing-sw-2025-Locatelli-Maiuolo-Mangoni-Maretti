@@ -18,7 +18,6 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
     private Coordinates fixedAt;
     private String cliSymbol = "?";
     private int id;
-
     /**
      * Construct the tile with specified parameters.
      * @param sides An array of sides, where for each Direction {@code d},
@@ -205,6 +204,12 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
         }
         return new String[]{c, c, c};
     }
+
+    /**
+     * Used to retrieve a tile name for CLI representation.
+     * @return The tile name and details.
+     */
+    public abstract String getName();
 
 
 }

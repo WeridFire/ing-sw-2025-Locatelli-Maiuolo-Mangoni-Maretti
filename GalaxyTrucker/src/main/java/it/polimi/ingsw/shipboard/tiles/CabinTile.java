@@ -35,6 +35,11 @@ public class CabinTile extends ContainerTile {
     }
 
     @Override
+    public String getName() {
+        return "Cabin " + (getCapacity() - getCapacityLeft()) + "/" + getCapacity();
+    }
+
+    @Override
     public void accept(TileVisitor visitor) {
         visitor.visitCabin(this);
     }

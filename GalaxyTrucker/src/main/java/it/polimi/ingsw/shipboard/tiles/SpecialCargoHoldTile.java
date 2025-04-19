@@ -23,4 +23,9 @@ public class SpecialCargoHoldTile extends CargoHoldTile {
         }
     }
 
+    @Override
+    public String getName() {
+        return "Special Cargo Hold " + getLoadedItems().stream().map(LoadableType::getUnicodeColoredString) + "/" + getCapacity();
+    }
+
 }

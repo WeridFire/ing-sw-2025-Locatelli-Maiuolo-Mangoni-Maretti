@@ -259,6 +259,14 @@ public abstract class ContainerTile extends TileSkeleton {
     }
 
     /**
+     *
+     * @return The total capacity of the container.
+     */
+    public int getCapacity() {
+        return capacity;
+    }
+
+    /**
      * Returns the set of allowed items onto the tile.
      * @return the set of allowed items on the tile.
      * @implNote a copy is returned to allow modifications: in the implementation is an unmodifiable set.

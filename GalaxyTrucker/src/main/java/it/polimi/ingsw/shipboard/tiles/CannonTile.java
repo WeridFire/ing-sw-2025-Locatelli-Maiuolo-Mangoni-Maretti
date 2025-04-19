@@ -57,4 +57,9 @@ public class CannonTile extends PowerableTile {
         return isBatteryNeeded();
     }
 
+
+    @Override
+    public String getName() {
+        return (isDoubleCannon() ? "Double Cannon" : "Cannon") + " with power " + calculateFirePower();
+    }
 }

@@ -53,4 +53,9 @@ public class MainCabinTile extends CabinTile {
     public void accept(TileVisitor visitor) {
         visitor.visitMainCabin(this);
     }
+
+    @Override
+    public String getName() {
+        return "Main Cabin " + (getCapacity() - getCapacityLeft()) + "/" + getCapacity();
+    }
 }

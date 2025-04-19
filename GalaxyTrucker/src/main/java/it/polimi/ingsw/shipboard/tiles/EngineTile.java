@@ -57,4 +57,8 @@ public class EngineTile extends PowerableTile {
         return isBatteryNeeded();
     }
 
+    @Override
+    public String getName() {
+        return (isDoubleEngine() ? "Double Cannon" : "Cannon") + " with power " + calculateThrustPower();
+    }
 }

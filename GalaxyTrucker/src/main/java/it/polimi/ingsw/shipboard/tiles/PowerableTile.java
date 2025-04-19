@@ -49,4 +49,5 @@ public abstract class PowerableTile extends TileSkeleton {
         super.rotateTile(rotation);
         rotation.applyTo(sidesWithPower);
     }
+
 }

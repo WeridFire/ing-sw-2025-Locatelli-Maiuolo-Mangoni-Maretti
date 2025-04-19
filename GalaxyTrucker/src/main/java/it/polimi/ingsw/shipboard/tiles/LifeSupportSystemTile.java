@@ -46,5 +46,10 @@ public class LifeSupportSystemTile extends TileSkeleton {
     public LoadableType getProvidedLifeSupport() {
         return providedLifeSupport;
     }
+
+    @Override
+    public String getName() {
+        return "Life Support " + getProvidedLifeSupport();
+    }
 }
 

@@ -34,4 +34,8 @@ public class ShieldGeneratorTile extends PowerableTile {
         visitor.visitShieldGenerator(this);
     }
 
+    @Override
+    public String getName() {
+        return "Shield " + getCLISymbol();
+    }
 }
