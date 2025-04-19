@@ -98,7 +98,7 @@ public class AbandonedStationCard extends Card{
 				ANSI.BLACK + "Lost days: " + lostDays + ANSI.RESET
 		);
 		cardInfoLines.add(
-				ANSI.BLACK + "Required Crew:  " + requiredCrew + ANSI.RESET
+				ANSI.BLACK + "Required Crew: " + requiredCrew + ANSI.RESET
 		);
 		cardInfoLines.add(
 				ANSI.BLACK + "Goods:  "  + ANSI.RESET
