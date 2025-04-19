@@ -262,10 +262,11 @@ public class AdventureCLIScreen extends CLIScreen{
         GameData currentGame = getLastUpdate().getCurrentGame();
         List<Player> players = currentGame.getPlayers();
         List<PlayerPosAndColor> playersPosAndColor = new ArrayList<>();
-        for (int i=0; i< players.size(); i++) {
-            Coord player_p = Util.getModularAt(buff_coords, players.get(i).getPosition());
-            MainCabinTile.Color color = MainCabinTile.Color.fromPlayerIndex(i);
-            playersPosAndColor.add(new PlayerPosAndColor(player_p, color, i == 0));
+        for (int i = 0; i < players.size(); i++) {
+            playersPosAndColor.add(new PlayerPosAndColor(
+                    Util.getModularAt(buff_coords, players.get(i).getPosition()),
+                    players.get(i).getColor(),
+                    i == 0));
         }
 
         for (Coord coord : getCoords(level)) {

@@ -6,6 +6,7 @@ import it.polimi.ingsw.game.exceptions.DrawTileException;
 import it.polimi.ingsw.player.exceptions.*;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.*;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.util.Coordinates;
@@ -166,6 +167,21 @@ public class Player implements Serializable {
      */
     public ShipBoard getShipBoard() {
         return shipBoard;
+    }
+
+    /**
+     * Returns the player's color. It's exactly the color of his main cabin, so this method requires to be called
+     * after setting up the shipboard (ensure {@link #setShipBoard(ShipBoard)} has been called).
+     *
+     * @return the player's color, or {@code null} if no shipboard has been assigned to the player yet
+     * or if the assigned shipboard has not been properly initialized.
+     */
+    public MainCabinTile.Color getColor() {
+        try {
+            return shipBoard.getColor();
+        } catch (NullPointerException | UninitializedShipboardException e) {
+            return null;
+        }
     }
 
     /**

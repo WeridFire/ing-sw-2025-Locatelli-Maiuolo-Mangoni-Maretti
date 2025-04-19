@@ -27,6 +27,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 
 	private final GameLevel level;
 	private final Map<Coordinates, TileSkeleton> board;
+	private MainCabinTile.Color color;
 
 	private final CLIFrame emptyRepresentation;
 
@@ -39,8 +40,9 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	private VisitorCheckIntegrity visitorCheckIntegrity;
 
 	protected ShipBoard(GameLevel level) {
-		board = new HashMap<>();
 		this.level = level;
+		board = new HashMap<>();
+		color = null;
 		emptyRepresentation = BoardCoordinates.getCLIRepresentation(level);
 		endedAssembly = false;
 		filled = false;
@@ -55,7 +57,8 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 */
 	public static ShipBoard create(GameLevel level, int playerIndex) {
 		ShipBoard sb = new ShipBoard(level);
-		MainCabinTile mainCabin = TilesFactory.createMainCabinTile(MainCabinTile.Color.fromPlayerIndex(playerIndex));
+		sb.color = MainCabinTile.Color.fromPlayerIndex(playerIndex);
+		MainCabinTile mainCabin = TilesFactory.createMainCabinTile(sb.color);
         try {
             sb.forceSetTile(mainCabin, BoardCoordinates.getMainCabinCoordinates());
         } catch (FixedTileException e) {
@@ -161,6 +164,21 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 			throw new NoTileFoundException(coordinates);
 		}
 		return result;
+	}
+
+	/**
+	 * Get the color this ship has been initialized with, even if it has no main cabin anymore.
+	 * Can not be null (see exceptions below).
+	 *
+	 * @return This ship's original main cabin color.
+	 * @throws UninitializedShipboardException If the {@link ShipBoard} has not been properly constructed,
+	 * hence the main cabin has never been assigned and no color can be retrieved.
+	 */
+	public MainCabinTile.Color getColor() throws UninitializedShipboardException {
+		if (color == null) {
+			throw new UninitializedShipboardException();
+		}
+		return color;
 	}
 
 
