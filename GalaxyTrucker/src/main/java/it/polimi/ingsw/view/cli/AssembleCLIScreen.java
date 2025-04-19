@@ -156,10 +156,6 @@ public class AssembleCLIScreen extends CLIScreen{
                 break;
 
             case "pick":
-                if (!isPlacedOneTile()) {
-                    setScreenMessage("You have to place a tile before taking a group of cards.");
-                    break;
-                }
                 if (occupiedHand != null) {
                     setScreenMessage("You can't pick a tile with a " + occupiedHand + " in hand.");
                     break;
