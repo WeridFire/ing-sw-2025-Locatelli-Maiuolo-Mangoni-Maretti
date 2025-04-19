@@ -50,7 +50,7 @@ public enum LoadableType {
             case GREEN_GOODS -> ANSI.GREEN + "■ ";
             case YELLOW_GOODS -> ANSI.YELLOW + "■ ";
             case RED_GOODS -> ANSI.RED + "■ ";
-            default -> null;
+            default -> "";
         };
     }
 }
