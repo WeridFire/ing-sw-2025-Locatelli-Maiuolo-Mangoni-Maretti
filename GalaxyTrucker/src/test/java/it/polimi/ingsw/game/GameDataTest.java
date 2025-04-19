@@ -280,6 +280,11 @@ class GameDataTest {
             {
                 setTileId(id);
             }
+
+            @Override
+            public String getName() {
+                return "";
+            }
         };
     }
 
