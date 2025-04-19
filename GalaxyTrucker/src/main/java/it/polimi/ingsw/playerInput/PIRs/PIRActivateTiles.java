@@ -44,7 +44,9 @@ public class PIRActivateTiles extends PIR {
 	@Override
 	void endTurn() {
 		//This function gets called by the player when they're done activating stuff.
-		lock.notifyAll();
+		synchronized (lock) {
+			lock.notifyAll();
+		}
 	}
 
 	/**
