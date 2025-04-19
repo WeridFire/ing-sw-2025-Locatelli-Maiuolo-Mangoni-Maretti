@@ -51,23 +51,19 @@ public class GameData implements Serializable {
     private List<Integer> startingPositions;
 
     /**
-     * Number of positions in 1 lap
+     * The related game UUID to identify it among other games
      */
-    private int lapSize;
-
-    private UUID gameId;
+    private final UUID gameId;
 
     /**
      * The player whose turn it is.
-     * private Player currentPlayerTurn;
      */
-
-    private PIRHandler pirHandler;
+    private final PIRHandler pirHandler;
 
     /**
      * Mapping of available cargo goods and their quantities.
      */
-    private Map<LoadableType, Integer> availableGoods;
+    private final Map<LoadableType, Integer> availableGoods;
 
     /**
      * List of game deck.
@@ -120,7 +116,8 @@ public class GameData implements Serializable {
     public void setLevel(GameLevel level) {
         this.level = level;
 
-        startingPositions = GameLevelStandards.getFlightBoardParkingLots(level);
+        // wrap in ArrayList constructor to let it be modifiable
+        startingPositions = new ArrayList<>(GameLevelStandards.getFlightBoardParkingLots(level));
     }
 
     /**
@@ -356,15 +353,6 @@ public class GameData implements Serializable {
                 players.notifyAll();
             }
         }
-    }
-
-    /**
-     * Sets the size of a lap in the game.
-     *
-     * @param lapSize the number of steps or tiles in a lap
-     */
-    public void setLapSize(int lapSize) {
-        this.lapSize = lapSize;
     }
 
     /**

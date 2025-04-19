@@ -168,8 +168,6 @@ public class Game {
     private void initGame(){
         //After the lobby phase has ended, we initialize the game.
 
-        gameData.setLapSize(GameLevelStandards.getLapSize(gameData.getLevel()));
-
         List<TileSkeleton> t = TilesFactory.createPileTiles();
         Collections.shuffle(t);
 

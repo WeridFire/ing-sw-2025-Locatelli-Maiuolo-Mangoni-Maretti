@@ -75,7 +75,7 @@ public class GameLevelStandards {
      * to a player finishing in that position.
      *
      * @param level the game level.
-     * @return a list of integers representing the finish order rewards.
+     * @return an unmodifiable list of integers representing the finish order rewards.
      */
     public static List<Integer> getFinishOrderRewards(GameLevel level) {
         return switch (level) {
