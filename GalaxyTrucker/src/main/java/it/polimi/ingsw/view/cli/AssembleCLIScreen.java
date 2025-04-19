@@ -31,6 +31,9 @@ public class AssembleCLIScreen extends CLIScreen{
     private boolean isEndedAssembly() {
         return getPlayer().getShipBoard().isEndedAssembly();
     }
+    private boolean isPlacedOneTile() {
+        return getPlayer().getShipBoard().getTiles().size() > 1;  // 1 is the main cabin so needs to be > not >=
+    }
     private boolean isFilled() {
         return getPlayer().getShipBoard().isFilled();
     }
@@ -47,6 +50,15 @@ public class AssembleCLIScreen extends CLIScreen{
     }
     private List<Boolean> listOfAvailableCardGroups() {
         return getLastUpdate().getCurrentGame().getDeck().getGroupsAvailability();
+    }
+    private String getOccupiedHandMessage() {
+        if (tileInHand != null) {
+            return "tile";
+        }
+        if (getCardGroupInHand().isPresent()) {
+            return "group of cards";
+        }
+        return null;
     }
 
     @Override
@@ -65,14 +77,19 @@ public class AssembleCLIScreen extends CLIScreen{
         }
 
         command = command.toLowerCase();
+        String occupiedHand = getOccupiedHandMessage();
 
-        switch(command){
+        switch (command) {
             case "timerflip":
                 //TODO: client side checks
                 getServer().flipHourglass(getClient());
                 break;
 
             case "draw":
+                if (occupiedHand != null) {
+                    setScreenMessage("You can't draw a tile with a " + occupiedHand + " in hand.");
+                    break;
+                }
                 //TODO: client side checks
                 getServer().drawTile(getClient());
                 break;
@@ -139,6 +156,14 @@ public class AssembleCLIScreen extends CLIScreen{
                 break;
 
             case "pick":
+                if (!isPlacedOneTile()) {
+                    setScreenMessage("You have to place a tile before taking a group of cards.");
+                    break;
+                }
+                if (occupiedHand != null) {
+                    setScreenMessage("You can't pick a tile with a " + occupiedHand + " in hand.");
+                    break;
+                }
                 //TODO: client side checks
                 if (args.length == 1) {
                     int id = Integer.parseInt(args[0]);
@@ -150,8 +175,14 @@ public class AssembleCLIScreen extends CLIScreen{
                 break;
 
             case "finish":
-                if(getLastUpdate().getClientPlayer().getShipBoard() == null){
+                if (getLastUpdate().getClientPlayer().getShipBoard() == null) {
                     setScreenMessage("You don't have a shipboard.");
+                    break;
+                }
+                // this finish is done by the player, not forced by the end of time
+                // -> check for no tiles / cards groups in hand
+                if (occupiedHand != null) {
+                    setScreenMessage("You can't finish with a " + occupiedHand + " in hand.");
                     break;
                 }
 
@@ -159,8 +190,8 @@ public class AssembleCLIScreen extends CLIScreen{
                 break;
 
             case "showcg":
-                if (getCardGroupInHand().isPresent()) {
-                    setScreenMessage("You can't take another group of cards while having already one.");
+                if (occupiedHand != null) {
+                    setScreenMessage("You can't take a group of cards with a " + occupiedHand + " in hand.");
                     break;
                 }
                 if (args.length == 1) {
@@ -203,9 +234,12 @@ public class AssembleCLIScreen extends CLIScreen{
                 availableCommands.add("draw|Draws a tile from the covered tiles.");
                 availableCommands.add("pick <id>|Pick in hand the tile with ID <id>.");
                 // or group of cards
-                if (areThereCardGroups) {
+                if (areThereCardGroups && isPlacedOneTile()) {
                     availableCommands.add("showcg <id>|Pick and show the card group with ID <id>.");
                 }
+                // or finish assembly
+                // TODO: only after all hourglass flips - 1
+                availableCommands.add("finish|Force end of assembly.");
             }
             else if (tileInHand != null) {
                 // can only act with the tile in hand
