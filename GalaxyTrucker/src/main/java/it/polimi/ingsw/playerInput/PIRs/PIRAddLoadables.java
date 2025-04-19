@@ -12,6 +12,7 @@ import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemExcepti
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
+import it.polimi.ingsw.view.cli.CLIScreen;
 
 import java.util.*;
 
@@ -146,7 +147,7 @@ public class PIRAddLoadables extends PIR {
 		if (targetCoords.isEmpty()) {
 			frame = frame.merge(
 					new CLIFrame(ANSI.RED + "No available containers for cargo allocation!" + ANSI.RESET),
-					Direction.SOUTH, 1
+					Direction.SOUTH, 0
 			);
 		} else {
 			CLIFrame containersFrame = new CLIFrame(ANSI.CYAN + "Available Containers:" + ANSI.RESET);
@@ -158,40 +159,44 @@ public class PIRAddLoadables extends PIR {
 				if (container != null) {
 					String info = ANSI.GREEN + "(" + coord.getColumn() + ", " + coord.getRow() + "): " + ANSI.RESET
 							+ container.getName();
-					containersFrame = containersFrame.merge(new CLIFrame(info), Direction.SOUTH, 1);
+					containersFrame = containersFrame.merge(new CLIFrame(info), Direction.SOUTH, 0);
 				}
 			}
-			frame = frame.merge(containersFrame, Direction.SOUTH, 1);
+			frame = frame.merge(containersFrame, Direction.SOUTH, 0);
 		}
 
 		// Command section
-		frame = frame.merge(new CLIFrame(""), Direction.SOUTH, 1);
+		frame = frame.merge(new CLIFrame(""), Direction.SOUTH, 0);
 		frame = frame.merge(
 				new CLIFrame(ANSI.YELLOW + "Commands:" + ANSI.RESET),
-				Direction.SOUTH, 1
+				Direction.SOUTH, 0
 		);
 		frame = frame.merge(
 				new CLIFrame(ANSI.WHITE + ">allocate (x, y) <LoadableType> <amount>" + ANSI.RESET),
-				Direction.SOUTH, 1
+				Direction.SOUTH, 0
 		);
 		frame = frame.merge(
 				new CLIFrame(ANSI.WHITE + ">confirm" + ANSI.RESET),
-				Direction.SOUTH, 1
+				Direction.SOUTH, 0
 		);
 
 		// Timeout / remaining time info
-		frame = frame.merge(new CLIFrame(""), Direction.SOUTH, 1);
+		frame = frame.merge(new CLIFrame(""), Direction.SOUTH, 0);
 		frame = frame.merge(
 				new CLIFrame(ANSI.WHITE + "You have " + ANSI.YELLOW + getCooldown() + " seconds" + ANSI.RESET + " to allocate your cargo."),
-				Direction.SOUTH, 1
+				Direction.SOUTH, 0
 		);
 
-		// Wrap in a styled container for better contrast
-		CLIFrame container = new CLIFrame("").paintBackground(ANSI.BACKGROUND_BLACK);
-		container = container.merge(frame, AnchorPoint.CENTER, AnchorPoint.CENTER);
+		// Wrap into a full screen background
+		int containerRows = Math.max(frame.getRows() + 2, 24);
+		int containerColumns = 100;
 
-		return container;
+		CLIFrame screenFrame = CLIScreen.getScreenFrame(containerRows, containerColumns, ANSI.BACKGROUND_BLACK, ANSI.WHITE);
+
+		// Merge the content centered
+		return screenFrame.merge(frame, AnchorPoint.CENTER, AnchorPoint.CENTER);
 	}
+
 
 
 }
