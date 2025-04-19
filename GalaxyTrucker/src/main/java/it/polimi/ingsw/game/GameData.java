@@ -14,6 +14,7 @@ import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.util.GameLevelStandards;
 
 import java.io.Serializable;
 import java.util.*;
@@ -119,10 +120,7 @@ public class GameData implements Serializable {
     public void setLevel(GameLevel level) {
         this.level = level;
 
-        startingPositions = new ArrayList<>(switch (level) {
-            case TESTFLIGHT, ONE -> List.of(4, 2, 1, 0);
-            case TWO -> List.of(6, 3, 1, 0);
-        });
+        startingPositions = GameLevelStandards.getFlightBoardParkingLots(level);
     }
 
     /**

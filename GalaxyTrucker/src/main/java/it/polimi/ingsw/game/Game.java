@@ -15,6 +15,7 @@ import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.util.GameLevelStandards;
 
 import java.rmi.RemoteException;
 import java.util.*;
@@ -167,10 +168,7 @@ public class Game {
     private void initGame(){
         //After the lobby phase has ended, we initialize the game.
 
-        switch(gameData.getLevel()){
-            case TESTFLIGHT, ONE -> gameData.setLapSize(18);
-            case TWO -> gameData.setLapSize(24);
-        }
+        gameData.setLapSize(GameLevelStandards.getLapSize(gameData.getLevel()));
 
         List<TileSkeleton> t = TilesFactory.createPileTiles();
         Collections.shuffle(t);

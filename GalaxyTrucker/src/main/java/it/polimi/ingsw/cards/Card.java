@@ -3,6 +3,7 @@ package it.polimi.ingsw.cards;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.util.GameLevelStandards;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import it.polimi.ingsw.view.cli.ICLIPrintable;
@@ -61,11 +62,7 @@ public abstract class Card implements ICLIPrintable, Serializable {
      */
     public void setLevel(GameLevel level) {
         this.level = level;
-        backgroundColor = switch(level) {
-            case TESTFLIGHT, ONE -> ANSI.BACKGROUND_CYAN;
-            case TWO -> ANSI.BACKGROUND_PURPLE;
-            default -> "";
-        };
+        backgroundColor = GameLevelStandards.getColorANSI(level, true);
     }
 
     /**

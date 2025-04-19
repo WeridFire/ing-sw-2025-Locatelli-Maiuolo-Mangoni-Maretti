@@ -7,6 +7,7 @@ import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.util.GameLevelStandards;
 
 
 import java.rmi.RemoteException;
@@ -30,12 +31,7 @@ public class AssembleGamePhase extends PlayableGamePhase {
         super(gameId, GamePhaseType.ASSEMBLE, gameData);
 
         timerRunning = false;
-        howManyTimerRotationsLeft = switch(gameData.getLevel()) {
-            // Note: for a testflight we need to wait for everyone to finish. There is no time limit.
-            case TESTFLIGHT -> 0;
-            case ONE -> 2;
-            case TWO -> 3;
-        };
+        howManyTimerRotationsLeft = GameLevelStandards.getTimerSpacesCount(gameData.getLevel());
     }
 
     public void playLoop() throws RemoteException, InterruptedException {

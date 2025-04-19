@@ -243,20 +243,17 @@ public class AdventureCLIScreen extends CLIScreen{
      */
     private CLIFrame getBoardFrame(GameLevel level) {
         //color related to level
-        String bg = null;
         int[][] board = switch (level) {
             case TESTFLIGHT -> {
-                bg = ANSI.BACKGROUND_CYAN;
                 yield new int[9][17];
             }
             case ONE -> {
-                bg = ANSI.BACKGROUND_PURPLE;
                 yield new int[11][21];
             }
             case TWO -> {
-                bg = ANSI.BACKGROUND_RED;
                 yield new int[17][27];
             }
+        String bg = GameLevelStandards.getColorANSI(level, true);
         };
         ArrayList<Coord> buff_coords = new ArrayList<>(getCoords(level));
 
