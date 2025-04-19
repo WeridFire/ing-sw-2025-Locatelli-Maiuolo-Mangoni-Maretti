@@ -5,8 +5,6 @@ import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
-import java.util.UUID;
-
 public class WarZoneCard extends Card {
 
 	/**
@@ -46,6 +44,6 @@ public class WarZoneCard extends Card {
 	@Override
 	public CLIFrame getCLIRepresentation() {
 		// TODO
-		return null;
+		return super.getCLIRepresentation();
 	}
 }

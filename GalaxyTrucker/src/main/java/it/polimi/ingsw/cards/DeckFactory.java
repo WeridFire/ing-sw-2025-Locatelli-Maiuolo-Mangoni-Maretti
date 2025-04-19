@@ -24,8 +24,8 @@ public class DeckFactory {
 				new WarLevel(WarFactory.createThrustCriteria(), WarFactory.createCrewDeathPunishment(2)),
 				new WarLevel(WarFactory.createFireCriteria(), WarFactory.createProjectilePunishment(
 						new Projectile[] {
-								Projectile.createLightCannonFire(Direction.NORTH),
-								Projectile.createLightCannonFire(Direction.NORTH)
+								Projectile.createLightCannonFire(Direction.SOUTH),
+								Projectile.createLightCannonFire(Direction.SOUTH)
 						}
 				))
 		}, "GT-cards_I_IT_0116", 0));
@@ -54,9 +54,9 @@ public class DeckFactory {
 				LoadableType.BLUE_GOODS},
 				4, 1, "GT-cards_I_IT_012.jpg", 0));
 		deckPool.add(new MeteorSwarmCard(new Projectile[]{
-				Projectile.createLargeMeteor(Direction.SOUTH),
-				Projectile.createSmallMeteor(Direction.EAST),
-				Projectile.createSmallMeteor(Direction.WEST)
+				Projectile.createLargeMeteor(Direction.NORTH),
+				Projectile.createSmallMeteor(Direction.WEST),
+				Projectile.createSmallMeteor(Direction.EAST)
 		}, "GT-cards_I_IT_019.jpg", 0));
 		return deckPool;
 	}
@@ -64,10 +64,10 @@ public class DeckFactory {
 
 	public static ArrayList<Card> createLevelOneDeck(){
 		ArrayList<Card> deckPool = createTutorialDeck();
-		deckPool.stream().forEach((c) -> {c.setLevel(1);});
+		deckPool.forEach(c -> c.setLevel(1));
 		deckPool.add(new OpenSpaceCard("GT-cards_I_IT_016.jpg", 1));
-		deckPool.add(new OpenSpaceCard("GT-cards_I_IT_016.jpg", 1));
-		deckPool.add(new OpenSpaceCard("GT-cards_I_IT_016.jpg", 1));
+		deckPool.add(new OpenSpaceCard("GT-cards_I_IT_017.jpg", 1));
+		deckPool.add(new OpenSpaceCard("GT-cards_I_IT_018.jpg", 1));
 
 		deckPool.add(new PlanetsCard(new Planet[]{
 				new Planet(List.of(new LoadableType[]{
@@ -80,7 +80,7 @@ public class DeckFactory {
 						LoadableType.YELLOW_GOODS,
 						LoadableType.YELLOW_GOODS}))
 		},
-				3, "GT-cards_I_IT_0114.jpg", 1));
+				2, "GT-cards_I_IT_0114.jpg", 1));
 
 		deckPool.add(new PlanetsCard(new Planet[]{
 				new Planet(List.of(new LoadableType[]{
@@ -125,24 +125,24 @@ public class DeckFactory {
 				"GT-cards_I_IT_01.jpg", 1));
 
 		deckPool.add(new PiratesCard(4, new Projectile[]{
-				Projectile.createLightCannonFire(Direction.SOUTH),
-				Projectile.createHeavyCannonFire(Direction.SOUTH),
-				Projectile.createLightCannonFire(Direction.SOUTH),
+				Projectile.createLightCannonFire(Direction.NORTH),
+				Projectile.createHeavyCannonFire(Direction.NORTH),
+				Projectile.createLightCannonFire(Direction.NORTH),
 		}, 5, 1, "GT-cards_I_IT_013.jpg", 1));
 
 		deckPool.add(new MeteorSwarmCard(new Projectile[]{
-				Projectile.createLargeMeteor(Direction.SOUTH),
-				Projectile.createSmallMeteor(Direction.SOUTH),
-				Projectile.createLargeMeteor(Direction.SOUTH)
+				Projectile.createLargeMeteor(Direction.NORTH),
+				Projectile.createSmallMeteor(Direction.NORTH),
+				Projectile.createLargeMeteor(Direction.NORTH)
 		}, "GT-cards_I_IT_0111.jpg", 1));
 
 		deckPool.add(new MeteorSwarmCard(new Projectile[]{
-				Projectile.createSmallMeteor(Direction.SOUTH),
-				Projectile.createSmallMeteor(Direction.SOUTH),
-				Projectile.createSmallMeteor(Direction.EAST),
-				Projectile.createSmallMeteor(Direction.WEST),
 				Projectile.createSmallMeteor(Direction.NORTH),
-		}, "GT-cards_I_IT_0111.jpg", 1));
+				Projectile.createSmallMeteor(Direction.NORTH),
+				Projectile.createSmallMeteor(Direction.WEST),
+				Projectile.createSmallMeteor(Direction.EAST),
+				Projectile.createSmallMeteor(Direction.SOUTH),
+		}, "GT-cards_I_IT_0110.jpg", 1));
 
 		deckPool.add(new AbandonedShipCard(2, 1, 3,
 				"GT-cards_I_IT_0117.jpg", 1));
@@ -156,7 +156,6 @@ public class DeckFactory {
 
 	public static ArrayList<Card> createLevelTwoDeck(){
 		ArrayList<Card> deckPool = new ArrayList<>();
-		deckPool.stream();
 		deckPool.add(new WarZoneCard(new WarLevel[]{
 				new WarLevel(WarFactory.createFireCriteria(), WarFactory.createLostDaysPunishment(4)),
 				new WarLevel(WarFactory.createThrustCriteria(), WarFactory.createLostGoodsPunishment(3)),

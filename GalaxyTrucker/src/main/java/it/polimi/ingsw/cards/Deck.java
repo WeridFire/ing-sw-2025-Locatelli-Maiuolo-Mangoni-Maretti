@@ -103,6 +103,9 @@ public class Deck implements Serializable {
                 deck.add(c.getGroupCards().removeFirst());
             }
         }
+        // forget about groups of cards
+        cardsGroups.clear();
+        // now shuffle deck
         Collections.shuffle(deck);
         // ensure the first card is one of the selected level
         while (deck.getFirst().getLevel() != gameLevel) {
