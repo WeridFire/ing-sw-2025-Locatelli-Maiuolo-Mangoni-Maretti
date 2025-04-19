@@ -193,23 +193,14 @@ public abstract class CLIScreen implements ICLIPrintable {
 				String[] parts = command.split("\\|", 2);
 				if (parts.length == 2) {
 					cmdBuilder.append(ANSI.CYAN).append("> ").append(parts[0])
-							.append(ANSI.RESET).append(" | ");
-					// add all the description without overflowing the frame width
-					int colsLeft = frameWidth - ANSI.Helper.stripAnsi(cmdBuilder.toString()).length();
-					while (parts[1].length() > colsLeft) {
-						cmdBuilder.append(parts[1], 0, colsLeft);
-						cmdList.add(cmdBuilder.toString());
-						parts[1] = parts[1].substring(colsLeft);
-						cmdBuilder = new StringBuilder(" ".repeat(spacesOnAvoidOverload));
-						colsLeft = frameWidth - spacesOnAvoidOverload;
-					}
-					cmdBuilder.append(parts[1]);
+							.append(ANSI.RESET).append(" | ").append(parts[1]);
 				} else {
 					cmdBuilder.append(ANSI.CYAN).append("> ").append(command);
 				}
 				cmdList.add(cmdBuilder.toString());
 			}
-			CLIFrame cmdFrame = new CLIFrame(cmdList.toArray(new String[0]));
+			CLIFrame cmdFrame = new CLIFrame(cmdList.toArray(new String[0]))
+					.wrap(frameWidth, spacesOnAvoidOverload, AnchorPoint.LEFT);
 			frame = frame.merge(cmdFrame, AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT, 3, 1);
 		} else {
 			frame = frame.merge(new CLIFrame(ANSI.BACKGROUND_RED + ANSI.WHITE + "No Commands Available"),

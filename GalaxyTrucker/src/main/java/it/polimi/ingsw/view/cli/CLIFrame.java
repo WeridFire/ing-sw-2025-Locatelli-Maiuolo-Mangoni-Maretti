@@ -520,6 +520,72 @@ public class CLIFrame implements Serializable {
     }
 
 
+    /**
+     * Copy this frame creating a new one, which will have all its content fit the specified width, creating new lines
+     * (with the specified indentation quantity) while the content of a line would overflow the dimension.
+     * @param maxWidth The maximum width for the content. Must be at least 1.
+     * @param indentation The number of invisible characters to append at the beginning of each new line created due
+     *                    to overflow problems. Must be less than {@code maxWidth}.
+     *                    Should be at least 0, except fot exotic results
+     *                    (new line starts before the original one if less than 0).
+     * @param align An anchor point representing where to align the text in the provided width.
+     *              Can be {@link AnchorPoint#LEFT}, {@link AnchorPoint#CENTER} or {@link AnchorPoint#RIGHT}.
+     * @return A new {@link CLIFrame} that fits within {@code maxWidth} number of columns.
+     * @throws IllegalArgumentException if {@code maxWidth < 1} or if {@code maxWidth < indentation}
+     */
+    public CLIFrame wrap(int maxWidth, int indentation, AnchorPoint align) {
+        // checks on illegal arguments
+        if (maxWidth < 1) {
+            throw new IllegalArgumentException("maxWidth must be at least 1 column wide.");
+        }
+        if (indentation >= maxWidth) {
+            throw new IllegalArgumentException("indentation must be less than maxWidth.");
+        }
+        // adjust alignment
+        final float alignDisplacementMultiplier = switch (align) {
+            case LEFT, TOP_LEFT, BOTTOM_LEFT -> 0;
+            case CENTER, TOP, BOTTOM -> 0.5f;
+            case RIGHT, TOP_RIGHT, BOTTOM_RIGHT -> 1f;
+        };
+        // variables
+        List<String> contentLines = new ArrayList<>(contentAsLines.length);  // minimum: all the previous lines
+        String indentationString = String.valueOf(INVISIBLE).repeat(indentation);
+        // process all the lines in this frame
+        for (String line : contentAsLines) {
+            StringBuilder lineBuilder = new StringBuilder();
+            StringBuilder ansiModifiers = new StringBuilder();  // to keep track of the colors when breaking line
+            int colsLeft = maxWidth;
+            // process each code point in the line as a character
+            for (String lineChar : ANSI.Helper.splitAnsiAndUnicode(line)) {
+                if (ANSI.Helper.ansiToCode(lineChar) == null) {  // it's not ANSI
+                    // -> it's actually visible -> count as column(s)
+                    int charLen = lineChar.length();
+                    colsLeft -= charLen;  // try to fit the character in this line
+                    if (colsLeft < 0) {  // this character does NOT fit in the width
+                        // create a new line
+                        contentLines.add(lineBuilder.toString());
+                        lineBuilder = new StringBuilder(ansiModifiers).append(indentationString);
+                        colsLeft = maxWidth - indentation - charLen;
+                    }
+                } else {
+                    ansiModifiers.append(lineChar);
+                }
+                // append this character to the line
+                lineBuilder.append(lineChar);
+            }
+            // at the end: append the processed line as a new line
+            int lineOccupiedSpace = ANSI.Helper.stripAnsi(lineBuilder.toString()).length();
+            int alignDisplacement = (int) ((maxWidth - lineOccupiedSpace) * alignDisplacementMultiplier);
+            contentLines.add(
+                    String.valueOf(INVISIBLE).repeat(alignDisplacement)
+                    + lineBuilder
+                    + String.valueOf(INVISIBLE).repeat(maxWidth - lineOccupiedSpace - alignDisplacement)
+            );
+        }
+        return new CLIFrame(contentLines.toArray(new String[0]));
+    }
+
+
     @Override
     public String toString() {
         return String.join("\n", contentAsLines);

@@ -73,13 +73,17 @@ public class PIRMultipleChoice extends PIR {
 
 	@Override
 	public CLIFrame getCLIRepresentation() {
+		// containerRows below
+		int containerColumns = 100;
+
 		// Header frame
 		CLIFrame frame = new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " PLAYER INPUT REQUEST " + ANSI.RESET)
 				.merge(new CLIFrame(""), Direction.SOUTH);
 
 		// Message section
 		frame = frame.merge(
-				new CLIFrame(ANSI.YELLOW + choiceMessage + ANSI.RESET),
+				new CLIFrame(ANSI.YELLOW + choiceMessage + ANSI.RESET)
+						.wrap(containerColumns, 1, AnchorPoint.CENTER),
 				Direction.SOUTH, 1
 		);
 
@@ -115,7 +119,6 @@ public class PIRMultipleChoice extends PIR {
 
 		// Create a container screen with a fixed size, background, and border
 		int containerRows = Math.max(frame.getRows() + 2, 24);
-		int containerColumns = 100;
 		CLIFrame screenFrame = CLIScreen.getScreenFrame(containerRows, containerColumns, ANSI.BACKGROUND_BLACK, ANSI.BLACK);
 
 		// Merge the content into the screen, centered
