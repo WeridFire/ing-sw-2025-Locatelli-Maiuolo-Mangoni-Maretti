@@ -209,6 +209,11 @@ class PlayerTest {
                 return null;
             }
 
+            @Override
+            public String getName() {
+                return "";
+            }
+
             {
                 setTileId(id);
             }
