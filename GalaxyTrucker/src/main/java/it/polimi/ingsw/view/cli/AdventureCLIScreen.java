@@ -286,14 +286,14 @@ public class AdventureCLIScreen extends CLIScreen{
 
                     for(PlayerPosAndColor pc : playersPosAndColor) {
                         if (new_c.equals(pc.pos)) {
-                            sb.append(pc.isLeader ? "" : ANSI.BACKGROUND_BLACK)
+                            sb.append(pc.isLeader ? ANSI.BACKGROUND_BLACK : "")
                                     .append(pc.color.toANSIColor(false))
                                     .append("▲").append(ANSI.RESET);
                             found = true;
                         }
                     }
                     if (!found) {
-                        sb.append(ANSI.BACKGROUND_BLACK + ANSI.WHITE + "△" + ANSI.RESET);
+                        sb.append(ANSI.WHITE + "△" + ANSI.RESET);
                     }
 
                 } else {
