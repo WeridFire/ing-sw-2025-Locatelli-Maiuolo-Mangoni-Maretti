@@ -65,11 +65,21 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
         if (coordinates == null) {
             throw new NullPointerException("coordinates cannot be null");
         }
-
         if (fixedAt != null) {
             throw new FixedTileException("Attempt to place an already fixed tile.");
         }
         fixedAt = coordinates;
+    }
+
+    /**
+     * Remove {@code this} tile from its place
+     * @throws NotFixedTileException If the tile does not have a place already.
+     */
+    public void unplace() throws NotFixedTileException {
+        if (fixedAt == null) {
+            throw new NotFixedTileException("Attempt to unplace an unplaced tile.");
+        }
+        fixedAt = null;
     }
 
     /**
