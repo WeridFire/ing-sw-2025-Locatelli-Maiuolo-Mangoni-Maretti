@@ -1,5 +1,7 @@
 package it.polimi.ingsw.playerInput.PIRs;
 
+import it.polimi.ingsw.enums.AnchorPoint;
+import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
@@ -8,6 +10,7 @@ import it.polimi.ingsw.shipboard.tiles.ContainerTile;
 import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.*;
@@ -133,6 +136,62 @@ public class PIRAddLoadables extends PIR {
 
 	@Override
 	public CLIFrame getCLIRepresentation() {
-		return null;
+		// Main header
+		CLIFrame frame = new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " PLAYER INPUT REQUEST — ALLOCATE CARGO " + ANSI.RESET)
+				.merge(new CLIFrame(""), Direction.SOUTH);
+
+		// Fetch valid container tiles from highlight mask
+		Set<Coordinates> targetCoords = getHighlightMask();
+
+		if (targetCoords.isEmpty()) {
+			frame = frame.merge(
+					new CLIFrame(ANSI.RED + "No available containers for cargo allocation!" + ANSI.RESET),
+					Direction.SOUTH, 1
+			);
+		} else {
+			CLIFrame containersFrame = new CLIFrame(ANSI.CYAN + "Available Containers:" + ANSI.RESET);
+
+			Map<Coordinates, ContainerTile> containerTiles = getContainerTiles();
+
+			for (Coordinates coord : targetCoords) {
+				ContainerTile container = containerTiles.get(coord);
+				if (container != null) {
+					String info = ANSI.GREEN + "(" + coord.getColumn() + ", " + coord.getRow() + "): " + ANSI.RESET
+							+ container.getName();
+					containersFrame = containersFrame.merge(new CLIFrame(info), Direction.SOUTH, 1);
+				}
+			}
+			frame = frame.merge(containersFrame, Direction.SOUTH, 1);
+		}
+
+		// Command section
+		frame = frame.merge(new CLIFrame(""), Direction.SOUTH, 1);
+		frame = frame.merge(
+				new CLIFrame(ANSI.YELLOW + "Commands:" + ANSI.RESET),
+				Direction.SOUTH, 1
+		);
+		frame = frame.merge(
+				new CLIFrame(ANSI.WHITE + ">allocate (x, y) <LoadableType> <amount>" + ANSI.RESET),
+				Direction.SOUTH, 1
+		);
+		frame = frame.merge(
+				new CLIFrame(ANSI.WHITE + ">confirm" + ANSI.RESET),
+				Direction.SOUTH, 1
+		);
+
+		// Timeout / remaining time info
+		frame = frame.merge(new CLIFrame(""), Direction.SOUTH, 1);
+		frame = frame.merge(
+				new CLIFrame(ANSI.WHITE + "You have " + ANSI.YELLOW + getCooldown() + " seconds" + ANSI.RESET + " to allocate your cargo."),
+				Direction.SOUTH, 1
+		);
+
+		// Wrap in a styled container for better contrast
+		CLIFrame container = new CLIFrame("").paintBackground(ANSI.BACKGROUND_BLACK);
+		container = container.merge(frame, AnchorPoint.CENTER, AnchorPoint.CENTER);
+
+		return container;
 	}
+
+
 }

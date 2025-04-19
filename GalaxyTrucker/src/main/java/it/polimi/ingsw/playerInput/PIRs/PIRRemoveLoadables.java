@@ -1,5 +1,6 @@
 package it.polimi.ingsw.playerInput.PIRs;
 
+import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
@@ -8,6 +9,7 @@ import it.polimi.ingsw.shipboard.tiles.ContainerTile;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.HashSet;
@@ -50,7 +52,7 @@ public class PIRRemoveLoadables extends PIR {
 	}
 
 
-	private int getCargoAmount(){
+	public int getCargoAmount(){
 		return currentPlayer.getShipBoard()
 				.getVisitorCalculateCargoInfo()
 				.getInfoAllContainers()
@@ -70,9 +72,7 @@ public class PIRRemoveLoadables extends PIR {
 	@Override
 	void endTurn() {
 		synchronized (lock){
-			if(getCargoAmount() <= targetAmount){
-				lock.notifyAll();
-			}
+			lock.notifyAll();
 		}
 	}
 
@@ -126,6 +126,67 @@ public class PIRRemoveLoadables extends PIR {
 
 	@Override
 	public CLIFrame getCLIRepresentation() {
-		return null;
+
+		// Frame Header: Purpose of the PIR
+		CLIFrame root = new CLIFrame(ANSI.BACKGROUND_RED + ANSI.WHITE + " REMOVE CARGO FROM CONTAINERS " + ANSI.RESET)
+				.merge(new CLIFrame(""), Direction.SOUTH);
+
+		// Display allowed cargo types
+		root = root.merge(
+				new CLIFrame(" Remove any of these Cargo Types: "),
+				Direction.SOUTH, 1
+		);
+
+		for (LoadableType type : getAllowedCargo()) {
+			root = root.merge(
+					new CLIFrame("  - " + type.getRequiredCapacity()),
+					Direction.SOUTH, 1
+			);
+		}
+
+		// Display available container tiles for removal
+		root = root.merge(new CLIFrame(""), Direction.SOUTH, 1);
+		root = root.merge(
+				new CLIFrame(ANSI.CYAN + " Containers with Removable Cargo: " + ANSI.RESET),
+				Direction.SOUTH, 1
+		);
+
+		Map<Coordinates, ContainerTile> containers = getContainerTiles();
+
+		if (containers.isEmpty()) {
+			root = root.merge(
+					new CLIFrame(ANSI.RED + " No containers currently match the allowed cargo for removal." + ANSI.RESET),
+					Direction.SOUTH, 1
+			);
+		} else {
+			for (Map.Entry<Coordinates, ContainerTile> entry : containers.entrySet()) {
+				Coordinates coords = entry.getKey();
+				ContainerTile tile = entry.getValue();
+
+				String containerInfo = String.format(" (%d, %d): ", coords.getColumn(), coords.getRow()) + tile.getName();
+				root = root.merge(
+						new CLIFrame(containerInfo),
+						Direction.SOUTH, 1
+				);
+			}
+		}
+
+		// Display commands footer
+		root = root.merge(new CLIFrame(""), Direction.SOUTH, 2);
+		root = root.merge(
+				new CLIFrame(ANSI.GREEN + " Commands:" + ANSI.RESET),
+				Direction.SOUTH, 1
+		);
+		root = root.merge(
+				new CLIFrame(" >remove (x, y) <LoadableType> <amount>"),
+				Direction.SOUTH, 1
+		);
+		root = root.merge(
+				new CLIFrame(" >confirm"),
+				Direction.SOUTH, 1
+		);
+
+		return root;
 	}
+
 }
