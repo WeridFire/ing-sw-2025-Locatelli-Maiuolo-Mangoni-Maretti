@@ -419,6 +419,13 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		smugglers.removeMostValuableItems(quantityToRemove);
 	}
 
+	/**
+	 * This function auto-fills itself with elements that initialize the game, for example batteries and humans.
+	 * Also for non-obvious fills, such as cabins in which there can be multiple type of loadables filled (eg aliens / humans)
+	 * It uses the PIRHandler to request the player's preference.
+	 * @param p The player to send any eventual request to
+	 * @param handler A reference to the PIRHandler, to handle these requests.
+	 */
 	public void fill(Player p, PIRHandler handler){
 		//Fill batteries
 		getVisitorCalculateCargoInfo()
