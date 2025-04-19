@@ -14,6 +14,8 @@ import static it.polimi.ingsw.view.cli.CLIScreen.getScreenFrame;
 
 public abstract class Card implements ICLIPrintable, Serializable {
 
+    // TODO general for cards: ensure the card has no immediate effect and gives the player time to understand what happened - how?
+
     /**
      * The texture associated with this card.
      */
