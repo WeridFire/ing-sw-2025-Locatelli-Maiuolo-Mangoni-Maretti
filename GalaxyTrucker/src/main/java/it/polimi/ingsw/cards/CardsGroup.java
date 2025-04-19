@@ -45,6 +45,7 @@ public class CardsGroup implements Serializable {
      * Shows the card group to a player.
      * @param playerName The player to show the card group to.
      * @throws CardsGroupException when a group is secret or is already held by someone
+     * @implNote controller logic to send group to the player is delegated to the caller
      */
     public void showGroup(String playerName) throws CardsGroupException {
         if (secret) {
