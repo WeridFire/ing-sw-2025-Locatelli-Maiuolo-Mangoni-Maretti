@@ -144,7 +144,7 @@ public class GameData implements Serializable {
     }
 
     /**
-     * Gets the list of players in the game, sorted by route order.
+     * Gets the list of players in the game, sorted by route order (first is the leader).
      *
      * @return The list of players.
      */

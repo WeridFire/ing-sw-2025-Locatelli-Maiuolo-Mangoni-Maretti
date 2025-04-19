@@ -142,7 +142,7 @@ public class BoardCoordinates {
     }
 
     /**
-     * Generates a CLI representation of the game board for the specified game level.
+     * Generates a CLI representation of the ship board for the specified game level.
      * <p>
      * The representation includes a grid structure with row and column numbers for easy identification.
      * It distinguishes between playable board tiles and forbidden tiles.

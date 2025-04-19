@@ -88,11 +88,12 @@ public class AdventureCLIScreen extends CLIScreen{
     /**
      * Generates or retrieves the list of coordinates defining the game path for a specific level.
      * The coordinates are generated once per instance and then cached in the `coords` field.
-     * They are ordered anti-clockwise from the first board place.
+     * They are ordered with the specified rotation from the first board place.
      *
-     * Note: The caching mechanism is instance-based and does not differentiate between levels after the first call.
+     * @implNote The caching mechanism is instance-based and does not differentiate between levels after the first call.
      * If this method is called subsequently with a different level on the same instance, it will return the
-     * previously cached coordinates without recalculating. This implies the instance is expected to be used for a single level's board generation.
+     * previously cached coordinates without recalculating.
+     * This implies the instance is expected to be used for a single level's board generation.
      *
      * @param level The {@link GameLevel} for which to get the coordinates.
      * @return A {@link List} of {@link Coord} objects representing the ordered path for the level.
