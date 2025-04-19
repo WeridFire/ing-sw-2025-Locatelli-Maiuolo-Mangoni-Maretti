@@ -229,15 +229,17 @@ public class Player implements Serializable {
     }
 
     /**
-     * Returns the current position of the player for sorting purposes:
-     * ignores if the player this player has never been assigned to a position,
+     * Returns the <i>opposite</i> of the current position of the player for sorting purposes:
+     * ignores if the player has never been assigned to a position,
      * and in that case suppose the order privilege goes to those players who have not a position yet.
+     * <p>
+     * <b>NOTE</b>: this is the opposite of the position, to get first the one with the most advanced position.
      *
-     * @return the current position, or {@code null} if this player has never been assigned to a position.
+     * @return the current order of the player, or {@code null} if this player has never been assigned to a position.
      */
     public int getOrder() {
         if (position == null) return Integer.MAX_VALUE;
-        else return position;
+        else return -position;
     }
 
     /**
