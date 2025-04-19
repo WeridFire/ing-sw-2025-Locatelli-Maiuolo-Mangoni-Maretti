@@ -4,6 +4,7 @@ import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.SideType;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SpecialCargoHoldTile extends CargoHoldTile {
 
@@ -25,7 +26,12 @@ public class SpecialCargoHoldTile extends CargoHoldTile {
 
     @Override
     public String getName() {
-        return "Special Cargo Hold " + getLoadedItems().stream().map(LoadableType::getUnicodeColoredString) + "/" + getCapacity();
+        return "Special Cargo Hold ["
+                + getLoadedItems().stream()
+                .map(LoadableType::getUnicodeColoredString)
+                .collect(Collectors.joining(" "))
+                + "] / " + getCapacity();
     }
+
 
 }

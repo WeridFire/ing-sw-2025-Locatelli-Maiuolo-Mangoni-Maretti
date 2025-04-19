@@ -5,6 +5,7 @@ import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.visitors.TileVisitor;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Represents a cargo hold tile, a specific type of container tile that can store goods.
@@ -53,6 +54,11 @@ public class CargoHoldTile extends ContainerTile {
 
     @Override
     public String getName() {
-        return "Cargo Hold " + getLoadedItems().stream().map(LoadableType::getUnicodeColoredString) + "/" + getCapacity();
+        return "Cargo Hold ["
+                + getLoadedItems().stream()
+                .map(LoadableType::getUnicodeColoredString)
+                .collect(Collectors.joining(" "))
+                + "] / " + getCapacity();
     }
+
 }
