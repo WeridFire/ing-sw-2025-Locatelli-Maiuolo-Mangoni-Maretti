@@ -12,6 +12,7 @@ import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
 import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
+import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
@@ -128,12 +129,11 @@ public class Game {
             // create adventure
             adventureGamePhase = new AdventureGamePhase(id, gameData, currentAdventureCard);
             getGameData().setCurrentGamePhase(adventureGamePhase);
-
-            // notify all players about the new game state
-            GameServer.getInstance().broadcastUpdate(this);
-
+            // notify all the players about the new adventure card
+            notifyAdventureToPlayers(gameData.getPlayers().getFirst(), currentAdventureCard);
+            // play the adventure
             adventureGamePhase.playLoop();
-
+            // prepare next adventure
             currentAdventureCard = gameData.getDeck().drawNextCard();
         }
 
@@ -211,6 +211,20 @@ public class Game {
         for(Thread th : threads){
             th.join();
         }
+    }
+
+    /**
+     * Blocking function that will wait for all the players to get notified about a new adventure card drawn
+     * by the leader. Will return once everyone has pressed [Enter] or the cooldown ended for all.
+     */
+    private void notifyAdventureToPlayers(Player leader, Card card) throws InterruptedException {
+        String leaderName = leader.toColoredString("[", "]");
+        gameData.getPIRHandler().broadcastPIR(this, (player, pirHandler) -> {
+            PIRDelay pirDelay = new PIRDelay(player, 6,
+                    "The leader " + leaderName + " has drawn a new Adventure Card:",
+                    card);
+            pirHandler.setAndRunTurn(pirDelay);
+        });
     }
 
 

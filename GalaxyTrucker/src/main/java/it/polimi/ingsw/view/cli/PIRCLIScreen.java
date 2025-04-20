@@ -51,18 +51,24 @@ public class PIRCLIScreen extends CLIScreen {
 
 	@Override
 	protected void processCommand(String command, String[] args) throws RemoteException {
-		if(getActivePIR() == null){
+		PIR pir = getActivePIR();
+		if (pir == null) {
 			return; //to ignore intellij complaining about null
 		}
 
-		switch(command){
-			case "choose" -> handleChooseCommand(args);
-			case "activate" -> handleActivateCommand(args);
-			case "allocate" -> handleAllocateCommand(args);
-			case "confirm" -> handleConfirmCommand();
-			case "remove" -> handleRemoveCommand(args);
-			case "endTurn" -> handleEndTurnCommand();
-			default -> setScreenMessage("Invalid command. Use help to view available commands.");
+		if (pir.getPIRType() == PIRType.DELAY) {
+			handleEndTurnCommand();  // any input closes a delay
+		}
+		else if (!Objects.equals(command, "")) {
+			switch(command){
+				case "choose" -> handleChooseCommand(args);
+				case "activate" -> handleActivateCommand(args);
+				case "allocate" -> handleAllocateCommand(args);
+				case "confirm" -> handleConfirmCommand();
+				case "remove" -> handleRemoveCommand(args);
+				case "endTurn" -> handleEndTurnCommand();
+				default -> setScreenMessage("Invalid command. Use help to view available commands.");
+			}
 		}
 	}
 

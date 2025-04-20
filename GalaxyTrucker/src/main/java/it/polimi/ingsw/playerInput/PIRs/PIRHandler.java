@@ -133,7 +133,17 @@ public class PIRHandler implements Serializable {
 		activePIRs.remove(removeLoadables.getCurrentPlayer());
 	}
 
-
+	/**
+	 * Blocking function that will create a new PIR for the operation of
+	 * showing an info to the player, waiting any input and doing nothing else. Doesn't return anything,
+	 * as the PIR itself does not need to affect the model.
+	 * @see PIRHandler#setAndRunTurn(PIRAddLoadables)
+	 * @param delay The PIR to run.
+	 */
+	public void setAndRunTurn(PIRDelay delay) {
+		setAndRunGenericTurn(delay);
+		activePIRs.remove(delay.getCurrentPlayer());
+	}
 
 
 	/**
