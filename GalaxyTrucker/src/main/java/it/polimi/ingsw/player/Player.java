@@ -10,6 +10,7 @@ import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.ANSI;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class Player implements Serializable {
     /**
      * true <==> tile in hand has been picked from reserved tiles
      * (can not discard and count as lost if not placed before end of assembly)
-     */  // TODO: implement check at the end of assembly to count it as lost tile
+     */
     private boolean isTileInHandFromReserved = false;
 
     /**
@@ -410,5 +411,26 @@ public class Player implements Serializable {
     @Override
     public String toString() {
         return getUsername();
+    }
+
+    /**
+     * Get an ANSI-friendly colored username of this player.
+     * Colors include both prefix and suffix.
+     * Color is this player's color, if present. If this player has no color, the color is default.
+     * @param prefix A string to show before the name, but with the same color
+     * @param suffix A string to show after the name, but with the same color
+     * @return The colored username.
+     */
+    public String toColoredString(String prefix, String suffix) {
+        MainCabinTile.Color color = getColor();
+        StringBuilder name = new StringBuilder();
+        if (color != null) {
+            name.append(color.toANSIColor(false));
+        }
+        name.append(prefix).append(getUsername()).append(suffix);
+        if (color != null) {
+            name.append(ANSI.RESET);
+        }
+        return name.toString();
     }
 }
