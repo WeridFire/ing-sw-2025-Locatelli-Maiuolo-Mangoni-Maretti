@@ -16,7 +16,6 @@ import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
-import it.polimi.ingsw.util.GameLevelStandards;
 
 import java.rmi.RemoteException;
 import java.util.*;
@@ -190,27 +189,10 @@ public class Game {
     /**
      * Blocking function that will wait for all the players to fill up their shipboard in non-obvious cases
      * through multiple PIRs choice, in parallel on new threads. Will return once everyone has filled up their
-     * @throws InterruptedException
      */
     private void fillUpShipboards() throws InterruptedException {
-        List<Thread> threads = new ArrayList<>();
-        for(Player p : gameData.getPlayers()){
-            Thread th = new Thread(() -> {
-                p.getShipBoard().fill(p, gameData.getPIRHandler());
-                try {
-                    GameServer.getInstance().broadcastUpdateRefreshOnly(this, Set.of(p));
-                    // TODO: issue on refresh of the shipboard to empty crew when just main cabin
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);  // TODO: manage RemoteException at this level
-                }
-            });
-            th.start();
-            threads.add(th);
-        }
-
-        for(Thread th : threads){
-            th.join();
-        }
+        gameData.getPIRHandler().broadcastPIR(this, (player, pirHandler) ->
+                player.getShipBoard().fill(player, pirHandler));
     }
 
     /**

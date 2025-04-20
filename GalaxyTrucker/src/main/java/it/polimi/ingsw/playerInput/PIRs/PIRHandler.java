@@ -1,6 +1,7 @@
 package it.polimi.ingsw.playerInput.PIRs;
 
 import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
@@ -8,14 +9,15 @@ import it.polimi.ingsw.util.Coordinates;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.BiConsumer;
 
 public class PIRHandler implements Serializable {
 
 
 	private Map<Player, PIR> activePIRs = new HashMap<>();
+
+	private boolean standardRunRefreshAll = true;
 
 	/**
 	 *
@@ -46,27 +48,43 @@ public class PIRHandler implements Serializable {
 	/**
 	 * Generic function which BLOCKS A THREAD until the turn has been fullfilled.
 	 * @param pir The generic PIR to run.
+	 * @param refreshAllPlayers Set to {@code true} if the newly set PIR will have to update the view of all the players,
+	 *                          otherwise {@code false} to update just the PIR current player's view.
 	 */
-	private void setAndRunGenericTurn(PIR pir) {
+	private void setAndRunGenericTurn(PIR pir, boolean refreshAllPlayers) {
 		if(isPlayerTurnActive(pir.getCurrentPlayer())){
 			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
 		}
 		this.activePIRs.put(pir.getCurrentPlayer(), pir);
 		// notify players about the newly set pir
-        try {
-            GameServer.getInstance().broadcastUpdate(GamesHandler.getInstance()
-					.findGameByClientUUID(pir.getCurrentPlayer().getConnectionUUID()));
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+		try {
+			Game game = GamesHandler.getInstance().findGameByClientUUID(pir.getCurrentPlayer().getConnectionUUID());
+			if (refreshAllPlayers) {
+				GameServer.getInstance().broadcastUpdate(game);
+			} else {
+				GameServer.getInstance().broadcastUpdateRefreshOnly(game, Set.of(pir.getCurrentPlayer()));
+			}
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 
-        try{
+		try {
 			pir.run();
-		}catch(InterruptedException e){
+		} catch(InterruptedException e) {
 			e.printStackTrace();
 		}
 		//Do not clear in here the map entry after the turn has finished. This because after it we still
 		//need to retrieve from the object the result of the turn!
+	}
+
+	/**
+	 * Generic function which BLOCKS A THREAD until the turn has been fullfilled.
+	 * It asks all the players to refresh their view.
+	 * If this behavior is not desired, check out {@link #setAndRunGenericTurn(PIR, boolean)}
+	 * @param pir The generic PIR to run.
+	 */
+	private void setAndRunGenericTurn(PIR pir) {
+		setAndRunGenericTurn(pir, standardRunRefreshAll);
 	}
 
 	/**
@@ -165,5 +183,31 @@ public class PIRHandler implements Serializable {
 		and the caller of genericReference.run() resumes. This happens in this class PIRHandler#setGenericReference.
 		As you can see in there the nullification of the reference is already handled.
 		 */
+	}
+
+	/**
+	 * Blocking function that
+	 * applies the specified {@code pirCascadeFunction} to each player concurrently,
+	 * wait for all the players to produce the input
+	 * then return
+	 * @param game The game from which this method will get the players and will apply the broadcast.
+	 * @param pirCascadeFunction a consumer with a {@link Player} (the "each player" in the broadcast)
+	 *                           and a {@link PIRHandler} to set and run all the desired PIRs.
+	 *                           Note that this function can handle a sequence of PIRs, that's why it needs to call the
+	 *                           {@link PIRHandler#setAndRunGenericTurn(PIR)} internally.
+	 * @throws InterruptedException if one of the instantiated threads throws an {@link InterruptedException}
+	 */
+	public void broadcastPIR(Game game, BiConsumer<Player, PIRHandler> pirCascadeFunction) throws InterruptedException {
+		List<Thread> threads = new ArrayList<>();
+		standardRunRefreshAll = false;  // avoid updating view every time another player interacts with the broadcasted pir
+		for(Player p : game.getGameData().getPlayers()){
+			Thread th = new Thread(() -> pirCascadeFunction.accept(p, this));
+			th.start();
+			threads.add(th);
+		}
+		for (Thread th : threads) {
+			th.join();
+		}
+		standardRunRefreshAll = true;  // reset standard view update to refresh all the players view
 	}
 }
