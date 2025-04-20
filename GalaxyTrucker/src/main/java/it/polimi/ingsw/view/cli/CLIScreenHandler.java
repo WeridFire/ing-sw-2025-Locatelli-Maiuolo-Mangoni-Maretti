@@ -51,59 +51,52 @@ public class CLIScreenHandler {
 
 	/**
 	 * Sets the last update received by the server, and refreshes the active screen.
-	 * @param newUpdate
+	 * @param newUpdate the new update to manage
 	 */
 	public void setLastUpdate(ClientUpdate newUpdate){
-		if(newUpdate == null){
+		if (newUpdate == null) {
 			throw new RuntimeException("Newly received update cannot be null.");
 		}
 
-		Set<CLIScreen> oldAvailableScreens = (lastUpdate == null) ? Collections.emptySet() : getAvailableScreens();
-
 		lastUpdate = newUpdate;
 
-		if (getCurrentScreen() == null) {
-			activateScreen("Menu");
-		}
+		// now forget about the current screen
+		currentScreen = null;
 
-		Set<CLIScreen> currentlyAvailableScreens = getAvailableScreens();
-		currentlyAvailableScreens
-                .stream()
-                .filter(s -> !oldAvailableScreens.contains(s))  // new available screens
+		// force activate screens which require it
+		getAvailableScreens().stream()
+				.filter(CLIScreen::isForceActivate)
 				.max(Comparator.comparingInt(CLIScreen::getPriority))
-				.ifPresentOrElse(forceActivate -> activateScreen(forceActivate.screenName),
-						// if no new available screen with high priority: default force activate screens which requires it
-						() -> currentlyAvailableScreens
-								.stream()
-								.filter(CLIScreen::isForceActivate)
-								.max(Comparator.comparingInt(CLIScreen::getPriority))
-								.ifPresent(forceActivate -> activateScreen(forceActivate.screenName)));
+				.ifPresent(forceActivate -> activateScreen(forceActivate.screenName));
 
-        if (getCurrentScreen().switchConditions()) {
-			// in case the screen conditions are still met, we just refresh the current screen
-			if (newUpdate.isRefreshRequired()) {
-                getCurrentScreen().refresh();
-            }
-		} else {
-			//If the previous screen is no longer activable, and there is not a forced screen to activate,
-			//Look for all the available screens, and get the one with the highest priority (usually the PIRs).
-			CLIScreen newScreen = getAvailableScreens().stream().min((c1, c2) ->
-					Integer.compare(c2.getPriority(), c1.getPriority())).orElse(null);
-			if(newScreen != null){
+		// If no screen is active: there is not a forcefully activated screen,
+		// so look for all the available screens and get the one with the highest priority.
+		// If no screen has been found, activate the default "Menu"
+		if (getCurrentScreen() == null) {
+			CLIScreen newScreen = getAvailableScreens().stream()
+					.max(Comparator.comparingInt(CLIScreen::getPriority))
+					.orElse(null);
+			if (newScreen != null) {
 				activateScreen(newScreen.screenName);
-			}else{
+			} else {
 				activateScreen("Menu");
 			}
-
 		}
 
+		// now just refresh the current screen (if update requires it)
+		if (newUpdate.isRefreshRequired()) {
+			getCurrentScreen().refresh();
+		}
 	}
 
 	/**
-	 * @return the list of currently available and activable screens. This list does not include the currently enabled screen.
+	 * @return the set of currently available and activable screens.
+	 * This list does not include the currently enabled screen.
 	 */
 	private Set<CLIScreen> getAvailableScreens(){
-		return allScreens.stream().filter(cli -> cli.switchConditions() && cli != currentScreen).collect(Collectors.toSet());
+		return allScreens.stream()
+				.filter(cli -> cli.switchConditions() && cli != getCurrentScreen())
+				.collect(Collectors.toSet());
 	}
 
 	/**
@@ -189,6 +182,8 @@ public class CLIScreenHandler {
 						if (!success) {
 							currentScreen.setScreenMessage("No screen found with name '" + args[0] +
 									"'.\nPlease use one name in the provided list of available screens.");
+						} else {
+							currentScreen.refresh();
 						}
 						break;
 					}

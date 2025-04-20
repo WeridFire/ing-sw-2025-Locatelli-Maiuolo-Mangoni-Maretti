@@ -143,8 +143,23 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * @param message The message to display in yellow under the screen.
 	 */
 	final void setScreenMessage(String message){
+		setScreenMessage(message, true);
+	}
+
+	/**
+	 * Sets an informative message on the client's screen, to inform about something (usually the failed
+	 * execution of the command on the client-side checks). The message is shown after a refresh.
+	 * Set {@code refresh} to {@code true} to include that refresh,
+	 * {@code false} if the caller wants to manage the refresh by itself.
+	 * @param message The message to display in yellow under the screen.
+	 * @param refresh {@code true} if a full screen refresh is desired with the setting of this message,
+	 *                           {@code false} otherwise (note that no refresh <===> no screen message visualization)
+	 */
+	final void setScreenMessage(String message, boolean refresh){
 		this.screenMessage = message;
-		this.refresh();
+		if (refresh) {
+			this.refresh();
+		}
 	}
 
 	protected static void clear(){
