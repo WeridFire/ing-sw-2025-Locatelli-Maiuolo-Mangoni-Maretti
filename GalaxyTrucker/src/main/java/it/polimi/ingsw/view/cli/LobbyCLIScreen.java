@@ -76,6 +76,8 @@ public class LobbyCLIScreen extends CLIScreen{
 	@Override
 	protected void processCommand(String command, String[] args) throws RemoteException {
 		switch(command){
+			case "": break;  // on simple enter do nothing in particular
+
 			case "settings":
 				if(!getLastUpdate().isGameLeader()){
 					setScreenMessage("You must be the game leader to perform this command.");

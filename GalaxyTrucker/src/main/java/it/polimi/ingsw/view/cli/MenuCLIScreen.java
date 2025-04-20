@@ -52,6 +52,8 @@ public class MenuCLIScreen extends CLIScreen {
 	@Override
 	protected void processCommand(String command, String[] args) throws RemoteException {
 		switch(command){
+			case "": break;  // on simple enter do nothing in particular
+
 			case "refresh":
 				getServer().ping(getClient());
 				break;

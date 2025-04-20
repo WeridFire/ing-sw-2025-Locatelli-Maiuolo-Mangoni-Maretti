@@ -93,6 +93,8 @@ public class AssembleCLIScreen extends CLIScreen{
         String occupiedHand = getOccupiedHandMessage();
 
         switch (command) {
+            case "": break;  // on simple enter do nothing in particular
+
             case "timerflip":
                 //TODO: client side checks
                 getServer().flipHourglass(getClient());

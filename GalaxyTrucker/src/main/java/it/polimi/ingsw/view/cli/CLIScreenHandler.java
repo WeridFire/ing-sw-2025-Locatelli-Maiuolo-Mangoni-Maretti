@@ -167,8 +167,18 @@ public class CLIScreenHandler {
 					//we close any "popup" window we are displaying.
 					isShowingAvailableScreens = false;
 					isShowingHelpScreen = false;
-
-					currentScreen.refresh();
+					// propagate to current screen management of empty message
+					if (currentScreen != null) {
+						try {
+							// NOTE: currentScreen always satisfies currentScreen.switchConditions()
+							// <===> processCommand precondition is satisfied
+							currentScreen.processCommand(cmd, args);
+							// manage unimplemented empty cmd as a simple refresh
+							currentScreen.setScreenMessage(null);
+						} catch (IllegalArgumentException e) {
+							currentScreen.setScreenMessage(e.getMessage());
+						}
+					}
 					break;
 				case "ping":
 					gameClient.getServer().ping(gameClient.getClient());
