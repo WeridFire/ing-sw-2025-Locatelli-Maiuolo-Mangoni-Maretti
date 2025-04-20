@@ -365,7 +365,9 @@ public class GameData implements Serializable {
     }
 
     /**
-     * Gets the username or identifier of the game leader.
+     * Gets the username or identifier of the game leader.<br>
+     * <b>NOTE</b>: the game leader is not the leader in flight board! It's the one who created the game.
+     * To get the leader in flight board use {@code getPlayers().getFirst()}
      *
      * @return the game leader's name
      */

@@ -216,7 +216,7 @@ public class CLIScreenHandler {
 							// NOTE: currentScreen always satisfies currentScreen.switchConditions()
 							// <===> processCommand precondition is satisfied
 							currentScreen.processCommand(cmd, args);
-						}catch(IllegalArgumentException e){
+						} catch(IllegalArgumentException e) {
 							currentScreen.setScreenMessage(e.getMessage());
 						}
 					}
