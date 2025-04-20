@@ -162,10 +162,10 @@ class GameDataTest {
 
     @Test
     void testSetLapSize() {
-        gameData.setLapSize(18);
+        //gameData.setLapSize(18);
         assertEquals(18, getLapSize(gameData));
 
-        gameData.setLapSize(24);
+        //gameData.setLapSize(24);
         assertEquals(24, getLapSize(gameData));
     }
 
