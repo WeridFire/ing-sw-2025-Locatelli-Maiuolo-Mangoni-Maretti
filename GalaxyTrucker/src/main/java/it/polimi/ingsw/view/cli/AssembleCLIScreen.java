@@ -12,6 +12,7 @@ import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.util.EasterEgg;
+import it.polimi.ingsw.util.GameLevelStandards;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -61,6 +62,9 @@ public class AssembleCLIScreen extends CLIScreen{
         }
         return null;
     }
+    private int getTimerTotalSlots() {
+        return GameLevelStandards.getTimerSlotsCount(getLastUpdate().getCurrentGame().getLevel());
+    }
 
     @Override
     protected boolean switchConditions() {
@@ -68,26 +72,18 @@ public class AssembleCLIScreen extends CLIScreen{
                 getLastUpdate().getCurrentGame().getCurrentGamePhaseType() == GamePhaseType.ASSEMBLE;
     }
 
+    private boolean validateIsAssemblyEnded() {
+        if (isEndedAssembly()) {
+            setScreenMessage("You've already finished assembling your majestic ship!\n" +
+                    "Wait for the other players to complete their surely more mediocre work.");
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     @Override
     protected void processCommand(String command, String[] args) throws RemoteException {
-
-        if (isEndedAssembly()) {
-            boolean validEasterEgg = false;
-            if ("easteregg".equals(command)) {
-                if (args.length >= 1) {
-                    StringBuilder name = new StringBuilder(args[0]);
-                    for (int i = 1; i < args.length; i++) name.append(' ').append(args[i]);
-                    setScreenMessage(ANSI.BACKGROUND_BLACK + ANSI.GREEN +
-                            EasterEgg.getRandomJoke(name.toString()) + ANSI.RESET);
-                    validEasterEgg = true;
-                }
-            }
-            if (!validEasterEgg) {
-                setScreenMessage("You've already finished assembling your majestic ship!\n" +
-                        "Wait for the other players to complete their surely more mediocre work.");
-            }
-            return;
-        }
 
         command = command.toLowerCase();
         String occupiedHand = getOccupiedHandMessage();
@@ -101,6 +97,7 @@ public class AssembleCLIScreen extends CLIScreen{
                 break;
 
             case "draw":
+                if (validateIsAssemblyEnded()) break;
                 if (occupiedHand != null) {
                     setScreenMessage("You can't draw a tile with a " + occupiedHand + " in hand.");
                     break;
@@ -110,16 +107,19 @@ public class AssembleCLIScreen extends CLIScreen{
                 break;
 
             case "discard":
+                if (validateIsAssemblyEnded()) break;
                 //TODO: client side checks
                 getServer().discardTile(getClient());
                 break;
 
             case "reserve":
+                if (validateIsAssemblyEnded()) break;
                 //TODO: client side checks
                 getServer().reserveTile(getClient());
                 break;
 
             case "rotate":
+                if (validateIsAssemblyEnded()) break;
                 // Note: this command overrides the private field, not needing confirmation from the server
                 if (args.length == 1) {
                     Rotation rotation = Rotation.fromString(args[0]);
@@ -146,6 +146,7 @@ public class AssembleCLIScreen extends CLIScreen{
                 break;
 
             case "place":
+                if (validateIsAssemblyEnded()) break;
                 if (args.length == 2) {
                     Coordinates coordinates;
                     try {
@@ -171,6 +172,7 @@ public class AssembleCLIScreen extends CLIScreen{
                 break;
 
             case "pick":
+                if (validateIsAssemblyEnded()) break;
                 if (occupiedHand != null) {
                     setScreenMessage("You can't pick a tile with a " + occupiedHand + " in hand.");
                     break;
@@ -186,6 +188,7 @@ public class AssembleCLIScreen extends CLIScreen{
                 break;
 
             case "finish":
+                if (validateIsAssemblyEnded()) break;
                 if (getLastUpdate().getClientPlayer().getShipBoard() == null) {
                     setScreenMessage("You don't have a shipboard.");
                     break;
@@ -201,6 +204,7 @@ public class AssembleCLIScreen extends CLIScreen{
                 break;
 
             case "showcg":
+                if (validateIsAssemblyEnded()) break;
                 if (!isPlacedOneTile()) {
                     setScreenMessage("You have to place a tile before taking a group of cards.");
                     break;
@@ -219,11 +223,24 @@ public class AssembleCLIScreen extends CLIScreen{
                 break;
 
             case "hidecg":
+                if (validateIsAssemblyEnded()) break;
                 if (getCardGroupInHand().isEmpty()) {
                     setScreenMessage("You have no group of cards in your hand.");
                     break;
                 }
                 getServer().hideCardGroup(getClient());
+                break;
+
+            case "easteregg":
+                if (isEndedAssembly() && args.length >= 1) {
+                    StringBuilder name = new StringBuilder(args[0]);
+                    for (int i = 1; i < args.length; i++) name.append(' ').append(args[i]);
+                    setScreenMessage(ANSI.BACKGROUND_BLACK + ANSI.GREEN +
+                            EasterEgg.getRandomJoke(name.toString()) + ANSI.RESET);
+                }
+                else {  // act like this command does not exist
+                    setScreenMessage("Invalid command. Use help to view available commands.");
+                }
                 break;
 
             default:
@@ -337,7 +354,7 @@ public class AssembleCLIScreen extends CLIScreen{
                         Direction.NORTH, 1);
     }
 
-    private CLIFrame getCLIRShipboardInfo() {
+    private CLIFrame getCLIRSelfInfo() {
         if (isFilled()) {
             // no need to show info: this phase ended
             return new CLIFrame();
@@ -362,6 +379,43 @@ public class AssembleCLIScreen extends CLIScreen{
                         : ANSI.RED + " unavailable "
                 ))), Direction.SOUTH)
                 .paintBackground(ANSI.BACKGROUND_BLACK);
+    }
+
+    private CLIFrame getCLIRTimerInfo() {
+        // frame for timer info
+        CLIFrame result = new CLIFrame();
+        Integer timerSlot = getLastUpdate().getCurrentGame().getAssemblyTimerSlotIndex();
+
+        if (timerSlot != null) {
+            // words info
+            boolean isTimerRunning = getLastUpdate().getCurrentGame().isAssemblyTimerRunning();
+            result = result.merge(new CLIFrame(ANSI.BLACK + "The timer is"), Direction.SOUTH);
+            if (!isTimerRunning) {
+                result = result.merge(new CLIFrame(ANSI.RED + "NOT"), Direction.SOUTH);
+            }
+            result = result.merge(new CLIFrame(ANSI.BLACK + "running"), Direction.SOUTH);
+            // create info for slot
+            StringBuilder slotsInfo = new StringBuilder();
+            int totalSlots = getTimerTotalSlots();
+            for (int i = 0; i < totalSlots; i++) {
+                if (i > 0) slotsInfo.append(' ');
+                if (i == timerSlot) {
+                    slotsInfo.append(isTimerRunning ? ANSI.GREEN : ANSI.RED).append("●").append(ANSI.RESET);
+                } else {
+                    slotsInfo.append("●");
+                }
+            }
+            result = result.merge(new CLIFrame(slotsInfo.toString()), Direction.SOUTH);
+        }
+        else {
+            result = result.merge(
+                    new CLIFrame(ANSI.RED + "No available")
+                            .merge(new CLIFrame(ANSI.RED + "timer"), Direction.SOUTH),
+                    Direction.SOUTH);
+        }
+
+        return result.merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " TIMER "),
+                Direction.NORTH, 1);
     }
 
     private CLIFrame getCLIRAvailableCardGroups() {
@@ -391,6 +445,10 @@ public class AssembleCLIScreen extends CLIScreen{
 
         return result.merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " Card Groups "),
                 Direction.NORTH, 1);
+    }
+
+    private CLIFrame getCLIRCommonInfo() {
+        return getCLIRTimerInfo().merge(getCLIRAvailableCardGroups(), Direction.SOUTH, 2);
     }
 
     private CLIFrame popupCardGroup(int maxWidth) {
@@ -423,8 +481,8 @@ public class AssembleCLIScreen extends CLIScreen{
 
         // create content
         CLIFrame contentFrame = frameShipboard
-                .merge(getCLIRAvailableCardGroups(), Direction.WEST, 6)
-                .merge(getCLIRShipboardInfo(), Direction.EAST, 6)
+                .merge(getCLIRCommonInfo(), Direction.WEST, 5)
+                .merge(getCLIRSelfInfo(), Direction.EAST, 5)
                 .merge(getCLIRUncoveredTiles(maxWidth), Direction.NORTH, 1)
                 // append popup of cards in hand
                 .merge(popupCardGroup(maxWidth), AnchorPoint.CENTER, AnchorPoint.CENTER);

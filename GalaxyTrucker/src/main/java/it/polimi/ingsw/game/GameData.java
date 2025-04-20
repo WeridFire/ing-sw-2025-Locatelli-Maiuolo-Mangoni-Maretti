@@ -435,4 +435,20 @@ public class GameData implements Serializable {
         // thanks to precondition it's possible to cast the current game phase
         ((AssembleGamePhase) getCurrentGamePhase()).notifyAllPlayersEndedAssembly();
     }
+
+    public boolean isAssemblyTimerRunning() {
+        if (getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE) {
+            return false;
+        }
+        // else: in assemble can cast current game phase
+        return ((AssembleGamePhase) getCurrentGamePhase()).isTimerRunning();
+    }
+
+    public Integer getAssemblyTimerSlotIndex() {
+        if (getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE) {
+            return null;
+        }
+        // else: in assemble can cast current game phase
+        return ((AssembleGamePhase) getCurrentGamePhase()).getAssemblyTimerSlotIndex();
+    }
 }
