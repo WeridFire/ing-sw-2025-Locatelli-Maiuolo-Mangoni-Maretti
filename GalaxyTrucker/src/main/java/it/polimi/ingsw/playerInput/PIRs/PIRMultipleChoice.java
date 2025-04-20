@@ -82,8 +82,8 @@ public class PIRMultipleChoice extends PIR {
 
 		// Message section
 		frame = frame.merge(
-				new CLIFrame(ANSI.YELLOW + choiceMessage + ANSI.RESET)
-						.wrap(containerColumns, 1, AnchorPoint.CENTER),
+				new CLIFrame(choiceMessage).paintForeground(ANSI.YELLOW)
+						.wrap(containerColumns - 2, 1, AnchorPoint.CENTER),
 				Direction.SOUTH, 1
 		);
 
