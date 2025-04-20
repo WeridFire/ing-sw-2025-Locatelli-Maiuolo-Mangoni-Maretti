@@ -47,7 +47,7 @@ public class GameLevelStandards {
      * @param level the game level.
      * @return the number of timer spaces <===> the number of times the timer should run
      */
-    public static int getTimerSpacesCount(GameLevel level) {
+    public static int getTimerSlotsCount(GameLevel level) {
         return switch (level) {
             case TESTFLIGHT -> 0;
             case ONE -> 2;

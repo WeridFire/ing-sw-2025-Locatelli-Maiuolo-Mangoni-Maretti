@@ -27,7 +27,7 @@ public class PIRDelay extends PIR {
     public PIRDelay(Player currentPlayer, int cooldown, String message, ICLIPrintable toShow) {
         super(currentPlayer, cooldown, it.polimi.ingsw.playerInput.PIRType.DELAY);
         this.message = message;
-        this.cliToShow = toShow.getCLIRepresentation();
+        cliToShow = toShow.getCLIRepresentation();
     }
 
     @Override

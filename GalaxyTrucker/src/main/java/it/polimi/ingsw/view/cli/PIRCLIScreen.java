@@ -45,8 +45,8 @@ public class PIRCLIScreen extends CLIScreen {
 	protected boolean switchConditions() {
 		return getLastUpdate().getCurrentGame() != null &&
 				getLastUpdate().getCurrentGame().getPIRHandler() != null &&
-				getLastUpdate().getCurrentGame().getPIRHandler().getPlayerPIR(getLastUpdate()
-						.getClientPlayer()) != null;
+				getLastUpdate().getCurrentGame().getPIRHandler().getPlayerPIR(
+						getLastUpdate().getClientPlayer()) != null;
 	}
 
 	@Override

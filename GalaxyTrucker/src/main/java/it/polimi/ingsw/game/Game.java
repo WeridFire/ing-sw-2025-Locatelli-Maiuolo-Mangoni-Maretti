@@ -93,7 +93,7 @@ public class Game {
         AssembleGamePhase assemble = new AssembleGamePhase(id, gameData);
         getGameData().setCurrentGamePhase(assemble);
 
-        //We notify all players about the new game state
+        // notify all players about the new game state
         GameServer.getInstance().broadcastUpdate(this);
 
         assemble.playLoop();
