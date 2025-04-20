@@ -11,6 +11,7 @@ import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.util.EasterEgg;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -71,8 +72,20 @@ public class AssembleCLIScreen extends CLIScreen{
     protected void processCommand(String command, String[] args) throws RemoteException {
 
         if (isEndedAssembly()) {
-            setScreenMessage("You've already finished assembling your majestic ship!\n" +
-                    "Wait for the other players to complete their surely more mediocre work.");
+            boolean validEasterEgg = false;
+            if ("easteregg".equals(command)) {
+                if (args.length >= 1) {
+                    StringBuilder name = new StringBuilder(args[0]);
+                    for (int i = 1; i < args.length; i++) name.append(' ').append(args[i]);
+                    setScreenMessage(ANSI.BACKGROUND_BLACK + ANSI.GREEN +
+                            EasterEgg.getRandomJoke(name.toString()) + ANSI.RESET);
+                    validEasterEgg = true;
+                }
+            }
+            if (!validEasterEgg) {
+                setScreenMessage("You've already finished assembling your majestic ship!\n" +
+                        "Wait for the other players to complete their surely more mediocre work.");
+            }
             return;
         }
 
