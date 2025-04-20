@@ -282,6 +282,10 @@ public class CLIFrame implements Serializable {
      */
     public CLIFrame merge(CLIFrame add, AnchorPoint selfAnchor, AnchorPoint addAnchor) {
         CLIFrame baseFrame = centerInAnchor(this, selfAnchor);
+
+        // note: stored original offset to restore it at the end to not change the argument content
+        int prevAddRowOffset = add.offset_row;
+        int prevAddColOffset = add.offset_column;
         CLIFrame addFrame = centerInAnchor(add, addAnchor);
 
         int rowStart = Math.min(baseFrame.getFirstRowInclusive(), addFrame.getFirstRowInclusive());
@@ -339,6 +343,8 @@ public class CLIFrame implements Serializable {
             lines[row - rowStart] = lineBuilder.toString();
         }
 
+        // reset offset of add
+        addFrame.resetOffset(prevAddRowOffset, prevAddColOffset);
         return new CLIFrame(lines);
     }
 
