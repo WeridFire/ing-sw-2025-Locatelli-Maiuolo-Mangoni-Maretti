@@ -18,6 +18,7 @@ import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.*;
 import it.polimi.ingsw.playerInput.PIRs.PIR;
+import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
@@ -172,11 +173,13 @@ public class RmiServer implements IServer {
 		// else: actually try to perform the action
 
 		try {
-			pg.game.getGameData().getPIRHandler().endTurn(pg.player);
+			PIRHandler handler = pg.game.getGameData().getPIRHandler();
+			handler.endTurn(pg.player);
+			handler.joinEndTurn(pg.player);
+			client.updateClient(new ClientUpdate(pg.connectionUUID));
 		} catch (WrongPlayerTurnException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 		}
-		client.updateClient(new ClientUpdate(pg.connectionUUID));
 	}
 
 	@Override

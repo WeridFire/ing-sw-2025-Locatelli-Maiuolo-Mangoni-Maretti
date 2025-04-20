@@ -15,7 +15,7 @@ import java.util.function.BiConsumer;
 public class PIRHandler implements Serializable {
 
 
-	private Map<Player, PIR> activePIRs = new HashMap<>();
+	private final Map<Player, PIR> activePIRs = new HashMap<>();
 
 	private boolean standardRunRefreshAll = true;
 
@@ -24,7 +24,9 @@ public class PIRHandler implements Serializable {
 	 * @return true if any turn in the player input request is set, or null if none is not set.
 	 */
 	private boolean isAnyTurnActive(){
-		return !activePIRs.isEmpty();
+		synchronized (activePIRs) {
+			return !activePIRs.isEmpty();
+		}
 	}
 
 	/**
@@ -33,7 +35,9 @@ public class PIRHandler implements Serializable {
 	 * @return If the player requested has an active turn waiting to finish.
 	 */
 	private boolean isPlayerTurnActive(Player p){
-		return activePIRs.get(p) != null;
+		synchronized (activePIRs) {
+			return activePIRs.get(p) != null;
+		}
 	}
 
 	/**
@@ -42,7 +46,9 @@ public class PIRHandler implements Serializable {
 	 * @return The active turn for the specified player.
 	 */
 	public PIR getPlayerPIR(Player p){
-		return activePIRs.get(p);
+		synchronized (activePIRs) {
+			return activePIRs.get(p);
+		}
 	}
 
 	/**
@@ -55,7 +61,9 @@ public class PIRHandler implements Serializable {
 		if(isPlayerTurnActive(pir.getCurrentPlayer())){
 			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
 		}
-		this.activePIRs.put(pir.getCurrentPlayer(), pir);
+		synchronized (activePIRs) {
+			activePIRs.put(pir.getCurrentPlayer(), pir);
+		}
 		// notify players about the newly set pir
 		try {
 			Game game = GamesHandler.getInstance().findGameByClientUUID(pir.getCurrentPlayer().getConnectionUUID());
@@ -96,7 +104,7 @@ public class PIRHandler implements Serializable {
 	public Set<Coordinates> setAndRunTurn(PIRActivateTiles activateTiles) {
 		setAndRunGenericTurn(activateTiles);
 		Set<Coordinates> result = activateTiles.getActivatedTiles();
-		activePIRs.remove(activateTiles.getCurrentPlayer());
+		removePIR(activateTiles.getCurrentPlayer());
 		return result;
 	}
 
@@ -108,7 +116,7 @@ public class PIRHandler implements Serializable {
 	 */
 	public void setAndRunTurn(PIRAddLoadables addLoadables) {
 		setAndRunGenericTurn(addLoadables);
-		activePIRs.remove(addLoadables.getCurrentPlayer());
+		removePIR(addLoadables.getCurrentPlayer());
 	}
 
 
@@ -121,7 +129,7 @@ public class PIRHandler implements Serializable {
 	public boolean setAndRunTurn(PIRYesNoChoice choice) {
 		setAndRunGenericTurn(choice);
 		boolean result = choice.isChoiceYes();
-		activePIRs.remove(choice.getCurrentPlayer());
+		removePIR(choice.getCurrentPlayer());
 		return result;
 	}
 
@@ -135,7 +143,7 @@ public class PIRHandler implements Serializable {
 	public int setAndRunTurn(PIRMultipleChoice choice) {
 		setAndRunGenericTurn(choice);
 		int result = choice.getChoice();
-		activePIRs.remove(choice.getCurrentPlayer());
+		removePIR(choice.getCurrentPlayer());
 		return result;
 	}
 
@@ -148,7 +156,7 @@ public class PIRHandler implements Serializable {
 	 */
 	public void setAndRunTurn(PIRRemoveLoadables removeLoadables) {
 		setAndRunGenericTurn(removeLoadables);
-		activePIRs.remove(removeLoadables.getCurrentPlayer());
+		removePIR(removeLoadables.getCurrentPlayer());
 	}
 
 	/**
@@ -160,23 +168,55 @@ public class PIRHandler implements Serializable {
 	 */
 	public void setAndRunTurn(PIRDelay delay) {
 		setAndRunGenericTurn(delay);
-		activePIRs.remove(delay.getCurrentPlayer());
+		removePIR(delay.getCurrentPlayer());
+	}
+
+	/**
+	 * This function will remove any PIR related to the specified player and notify all waiting threads on activePIRs
+	 * @param player The player to which remove the related PIR
+	 */
+	private void removePIR(Player player) {
+		synchronized (activePIRs) {
+			activePIRs.remove(player);
+			activePIRs.notifyAll();
+		}
+	}
+
+	/**
+	 * Blocking function that waits until the specified player has no PIR associated to it anymore
+	 * @param player The player to check for turn-end
+	 */
+	public void joinEndTurn(Player player) {
+		synchronized (activePIRs) {
+			while (isPlayerTurnActive(player)) {
+                try {
+                    activePIRs.wait();
+                } catch (InterruptedException e) {
+                    return;  // TODO: check if it's ok to do so
+                }
+            }
+		}
 	}
 
 
 	/**
 	 * This function will force end a turn. It can be called by any player, but it will check ofcourse that the
 	 * caller is the one the turn is dedicated to. If that is the case the function will force the turn to end.
+	 * <p>
+	 * Please call also {@link #joinEndTurn(Player)} after this on the same player if the caller wants to actually
+	 * waits until the internal data structure of players and PIRs gets updated for this instance.
 	 * @param player The player sending the command to end the turn.
 	 * @throws WrongPlayerTurnException If the player is not who the turn is for.
 	 */
 	public void endTurn(Player player) throws WrongPlayerTurnException {
-		if(!isPlayerTurnActive(player)) {
+		if (!isPlayerTurnActive(player)) {
 			throw new WrongPlayerTurnException(player);
 		}
-		PIR active = activePIRs.get(player);
-		if(active != null){
-			active.endTurn();
+		synchronized (activePIRs) {
+			PIR active = activePIRs.get(player);
+			if (active != null) {
+				active.endTurn();
+			}
 		}
 		/*
 		We don't need in here to nullify generic reference! In fact, check what happens when genericReference ends
