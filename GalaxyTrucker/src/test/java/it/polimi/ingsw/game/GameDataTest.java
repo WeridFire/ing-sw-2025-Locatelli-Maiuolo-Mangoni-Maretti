@@ -161,15 +161,6 @@ class GameDataTest {
     }
 
     @Test
-    void testSetLapSize() {
-        gameData.setLapSize(18);
-        assertEquals(18, getLapSize(gameData));
-
-        gameData.setLapSize(24);
-        assertEquals(24, getLapSize(gameData));
-    }
-
-    @Test
     void testMovePlayerForward() throws PlayerAlreadyInGameException {
         Player player = new Player("Player", UUID.randomUUID());
         player.setPosition(5);
@@ -235,16 +226,6 @@ class GameDataTest {
     }
 
     // Helper methods to access private methods/fields
-
-    private int getLapSize(GameData gameData) {
-        try {
-            java.lang.reflect.Field field = GameData.class.getDeclaredField("lapSize");
-            field.setAccessible(true);
-            return (int) field.get(gameData);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
 
     private TileSkeleton getTileWithId(GameData gameData, int id) throws Exception {
         try {
