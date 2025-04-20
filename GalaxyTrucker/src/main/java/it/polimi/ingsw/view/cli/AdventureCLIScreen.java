@@ -29,7 +29,8 @@ public class AdventureCLIScreen extends CLIScreen{
 
 
     public AdventureCLIScreen() {
-        super("adventure", true, 0);
+        // note that forceActivate is false because other screens can be activated during an adventure, like PIRs
+        super("adventure", false, 0);
     }
 
     /**
