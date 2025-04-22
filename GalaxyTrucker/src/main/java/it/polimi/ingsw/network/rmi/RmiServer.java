@@ -5,6 +5,7 @@ import it.polimi.ingsw.cards.exceptions.CardsGroupException;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.enums.Rotation;
+import it.polimi.ingsw.game.Cheats;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.exceptions.DrawTileException;
 import it.polimi.ingsw.game.exceptions.GameNotFoundException;
@@ -403,5 +404,17 @@ public class RmiServer implements IServer {
 		}
 
 		GameServer.getInstance().broadcastUpdate(pg.game);
+	}
+
+	@Override
+	public void useCheat(IClient client, String cheatName) throws RemoteException {
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
+		if(pg == null) return;
+
+		switch (cheatName){
+			case "shipboard" -> Cheats.cheatShipboard(pg.game, pg.player);
+			case "skip" -> Cheats.skipPhase(pg.game);
+			default -> client.updateClient(new ClientUpdate(pg.connectionUUID, "Cheat not found."));
+		}
 	}
 }

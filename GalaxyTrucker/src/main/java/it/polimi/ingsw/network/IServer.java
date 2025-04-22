@@ -40,4 +40,8 @@ public interface IServer extends Remote {
 	void finishAssembling(IClient client) throws RemoteException;
 	void showCardGroup(IClient client, Integer id) throws RemoteException;
 	void hideCardGroup(IClient client) throws RemoteException;
+
+
+	//Debugging and Dev mode
+	void useCheat(IClient client, String cheatName) throws RemoteException;
 }
