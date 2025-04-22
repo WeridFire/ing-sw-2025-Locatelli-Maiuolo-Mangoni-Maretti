@@ -190,7 +190,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 * @throws FixedTileException If the provided tile has already been placed.
 	 * @throws NullPointerException If the provided tile is null.
 	 */
-	private void forceSetTile(TileSkeleton tile, Coordinates coordinates) throws FixedTileException {
+	public void forceSetTile(TileSkeleton tile, Coordinates coordinates) throws FixedTileException {
 		tile.place(coordinates);
         board.put(coordinates, tile);
 	}
