@@ -200,6 +200,13 @@ public class CLIScreenHandler {
 					currentScreen.setScreenMessage("The current game state was saved to update.json");
 					ClientUpdate.saveDebugUpdate(getLastUpdate());
 					break;
+				case "cheat":
+					if(args.length != 1){
+						currentScreen.setScreenMessage("Usage: cheat <cheat name>");
+						break;
+					}
+					gameClient.getServer().useCheat(gameClient.getClient(), args[0]);
+					break;
 				default:
 					//if the command is not recognized as a global command, it lets the active screen process it.
 					if (currentScreen != null){

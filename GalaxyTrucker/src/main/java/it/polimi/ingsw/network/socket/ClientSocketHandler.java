@@ -96,6 +96,7 @@ public class ClientSocketHandler implements IClient {
 						case PIR_SELECT_MULTIPLE_CHOICE -> getServer().pirSelectMultipleChoice(this,
 								(Integer) message.getArgs().getFirst());
 						case PIR_FORCE_END_TURN -> getServer().pirForceEndTurn(this);
+						case CHEAT -> getServer().useCheat(this, (String) message.getArgs().getFirst());
 					}
 				}catch(IllegalArgumentException e){
 					System.err.println("ERROR WHILE PARSING MESSAGE! Message:");

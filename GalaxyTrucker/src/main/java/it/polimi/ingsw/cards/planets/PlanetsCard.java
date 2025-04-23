@@ -1,11 +1,13 @@
 package it.polimi.ingsw.cards.planets;
 
+import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.cards.exceptions.PlanetsCardException;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
+import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
@@ -45,11 +47,23 @@ public class PlanetsCard extends Card {
 	}
 
 	/**
+	 * Controls the addLoadable interaction with the player.
+	 * */
+	public void addLoadablesInteraction(Player p, PIRHandler pirHandler) throws InterruptedException {
+		for (Planet planet: planets){
+			if (planet.getCurrentPlayer() != null && planet.getCurrentPlayer().equals(p)){
+				PIRAddLoadables pirAddLoadables = new PIRAddLoadables(p, 30, planet.getAvailableGoods());
+				pirHandler.setAndRunTurn(pirAddLoadables);
+			}
+		}
+	}
+
+	/**
 	 * Iteratively asks each player if they want to land. Then in reverse order allows players to pickup their items
 	 * and move back in days.
 	 */
 	@Override
-	public void playEffect(GameData game) {
+	public void playEffect(GameData game) throws InterruptedException {
 		for (Player p : game.getPlayers()){
 			List<Planet> availablePlanets = Arrays.stream(planets)
 					.filter(planet -> planet.getCurrentPlayer() == null).toList();
@@ -69,13 +83,21 @@ public class PlanetsCard extends Card {
 					} catch (PlanetsCardException e) {
 						throw new RuntimeException("Somehow a player choose to land on a planet that was already");
 					}
-					//TODO: allow rearrrangement / discard of goods
-					game.getPIRHandler().setAndRunTurn(
-							new PIRAddLoadables(p, 30, planet.getAvailableGoods())
-					);
 				}
 			}
 		}
+
+		//TODO: allow rearrrangement / discard of goods
+		game.getPIRHandler().broadcastPIR(GamesHandler.getInstance().getGame(game.getGameId()),
+				(player, pirHandler) -> {
+                    try {
+                        addLoadablesInteraction(player, pirHandler);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+		);
+
 		for(Player p : game.getPlayers().reversed()){
 			Planet landedPlanet = Arrays.stream(planets)
 					.filter(pl -> Objects.equals(pl.getCurrentPlayer(), p))

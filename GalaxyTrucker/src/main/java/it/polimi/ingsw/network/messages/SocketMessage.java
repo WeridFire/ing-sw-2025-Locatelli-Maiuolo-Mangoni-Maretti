@@ -31,6 +31,7 @@ public class SocketMessage implements Serializable{
 		PIR_ALLOCATE_REMOVE_LOADABLES,
 		PIR_FORCE_END_TURN,
 		PIR_SELECT_MULTIPLE_CHOICE,
+		CHEAT
 	}
 
 	private MessageType type;
@@ -218,5 +219,9 @@ public class SocketMessage implements Serializable{
 
 	public static SocketMessage pirSelectMultipleChoice(int selection){
 		return new SocketMessage(MessageType.PIR_SELECT_MULTIPLE_CHOICE, List.of(selection));
+	}
+
+	public static SocketMessage cheatMessage(String cheat){
+		return new SocketMessage(MessageType.CHEAT, List.of(cheat));
 	}
 }

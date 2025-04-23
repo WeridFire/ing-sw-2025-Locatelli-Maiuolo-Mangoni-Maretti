@@ -158,4 +158,10 @@ public class ServerSocketHandler implements IServer {
 		SocketMessage mess = SocketMessage.hideCardGroupMessage();
 		sendSocketMessage(mess);
 	}
+
+	@Override
+	public void useCheat(IClient client, String cheatName) throws RemoteException {
+		SocketMessage mess = SocketMessage.cheatMessage(cheatName);
+		sendSocketMessage(mess);
+	}
 }
