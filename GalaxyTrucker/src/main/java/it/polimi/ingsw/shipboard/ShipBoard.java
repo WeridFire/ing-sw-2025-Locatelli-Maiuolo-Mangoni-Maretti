@@ -586,5 +586,78 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		return getCLIRepresentation(Collections.emptySet(), ANSI.RESET);
 	}
 
+	/**
+	 * Used in StarDustCard to count exposed connectors
+	 * for each tile checks the adjacent 4
+	 * increments counter for each empty adjacent one
+	 * decreases counter for each cannon or engine or flat tile
+	 * @return the number of exposed connectors
+	 */
+	public int getExposedConnectorsCount(){
+		int exposedConnectorsCount = 0;
+		for(Map.Entry<Coordinates, TileSkeleton> entry : board.entrySet())
+		{
+			Coordinates coord = entry.getKey();
+			TileSkeleton tile = entry.getValue();
+
+			// Count exposed connectors for each tile
+			exposedConnectorsCount += countTileExposedConnectors(coord);
+
+		}
+		return exposedConnectorsCount;
+	}
+
+	/**
+	 * Counts the number of adjacent empty tiles MAX 4
+	 * @param coord the coords of the tile we are currently counting exposed connectors
+	 * @return number of adjacent empty tiles MAX 4
+	 */
+	private int countTileExposedConnectors(Coordinates coord) {
+		int exposedCount = 0;
+
+		// Check all 4 adjacent positions
+
+		Coordinates east = new Coordinates(coord.getRow(), coord.getColumn() + 1); //East
+		Coordinates north =	new Coordinates(coord.getRow() - 1, coord.getColumn()); //North
+		Coordinates west =	new Coordinates(coord.getRow(), coord.getColumn() - 1); // West
+		Coordinates south =	new Coordinates(coord.getRow() + 1, coord.getColumn());  // South
+
+
+		//for each that isnt present in the board we increase the count
+		//East
+		if (!board.containsKey(east)) {
+			if(!(board.get(coord).getSide(Direction.EAST) == SideType.SMOOTH ||
+				board.get(coord).getSide(Direction.EAST) == SideType.CANNON)){
+				exposedCount += 1;
+			}
+		}
+
+		//North
+		if (!board.containsKey(north)) {
+			if(!(board.get(coord).getSide(Direction.NORTH) == SideType.SMOOTH ||
+					board.get(coord).getSide(Direction.NORTH) == SideType.CANNON)){
+				exposedCount += 1;
+			}
+		}
+
+		//West
+		if (!board.containsKey(west)) {
+			if(!(board.get(coord).getSide(Direction.WEST) == SideType.SMOOTH ||
+					board.get(coord).getSide(Direction.WEST) == SideType.CANNON)){
+				exposedCount += 1;
+			}
+		}
+
+		//South
+		if (!board.containsKey(south)) {
+			if(!(board.get(coord).getSide(Direction.SOUTH) == SideType.SMOOTH ||
+					board.get(coord).getSide(Direction.SOUTH) == SideType.CANNON||
+					board.get(coord).getSide(Direction.SOUTH) == SideType.ENGINE)){
+				exposedCount += 1;
+			}
+		}
+
+		return exposedCount;
+	}
 
 }

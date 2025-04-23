@@ -64,7 +64,7 @@ public class Deck implements Serializable {
             case ONE:
                 l1Pool = DeckFactory.createLevelOneDeck();
                 Collections.shuffle(l1Pool);
-                //Creates 4 cardsgroup of 2 level1 cards each. The first group is the "secret" one, other 3 are the
+                //Creates 4 cardgroups of 2 level1 cards each. The first group is the "secret" one, other 3 are the
                 //flight predictions, so not secret.
                 //TODO: fact check the content and dimension of the level 1 flight groups. On board these are not
                 // displayed (atleast in the digital resources)

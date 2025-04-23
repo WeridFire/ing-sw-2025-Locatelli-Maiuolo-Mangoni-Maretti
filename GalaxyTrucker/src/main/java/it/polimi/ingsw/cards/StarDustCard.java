@@ -31,9 +31,13 @@ public class StarDustCard extends Card{
 	@Override
 	public void playEffect(GameData game) {
 		for(Player p : game.getPlayers().reversed()){
-			//TODO: count how many exposed connectors there are, and move accordingly
-			game.movePlayerBackward(p, 4);
+			int exposedConnectors = countExposedConnectors(p);
+			game.movePlayerBackward(p, exposedConnectors);
 		}
+	}
+
+	public int countExposedConnectors(Player player) {
+		return player.getShipBoard().getExposedConnectorsCount();
 	}
 
 	/**
