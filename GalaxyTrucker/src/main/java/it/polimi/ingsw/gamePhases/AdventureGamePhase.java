@@ -23,7 +23,7 @@ public class AdventureGamePhase extends PlayableGamePhase{
     }
 
     @Override
-    public void playLoop() {
+    public void playLoop() throws InterruptedException {
         card.playEffect(gameData);
     }
 
