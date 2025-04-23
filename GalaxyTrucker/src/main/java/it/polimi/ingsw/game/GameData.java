@@ -84,6 +84,11 @@ public class GameData implements Serializable {
      */
     private final List<TileSkeleton> uncoveredTiles;
 
+    /**
+     * Used for synchronization of moving players
+     */
+    private final Object movementLock = new Object();
+
     private int requiredPlayers;
 
     private String gameLeader;
@@ -273,29 +278,31 @@ public class GameData implements Serializable {
      */
     private void movePlayer(Player playerToMove, int steps, boolean forward) {
 
-        // HashSet for fast position lookup
-        Set<Integer> occupiedPositions = new HashSet<>();
-        List<Player> currentOrder = getPlayers();
-        //TODO: SYNCHRONIZE! WE WANT TO MOVE ONLY 1 PLAYER AT A TIME SO SYNC ON THE OBJECT
-        for (Player player : currentOrder) {
-            if (!player.getUsername().equals(playerToMove.getUsername())) {
-                occupiedPositions.add(player.getPosition());
+        synchronized (movementLock) {
+
+            Set<Integer> occupiedPositions = new HashSet<>();
+            List<Player> currentOrder = getPlayers();
+            for (Player player : currentOrder) {
+                if (!player.getUsername().equals(playerToMove.getUsername())) {
+                    occupiedPositions.add(player.getPosition());
+                }
             }
-        }
 
-        int newPosition = playerToMove.getPosition();
-        int stepsLeft = steps;
+            int newPosition = playerToMove.getPosition();
+            int stepsLeft = steps;
 
-        while (stepsLeft > 0) {
-            newPosition += (forward ? 1 : -1); // Move forward or backward
-            stepsLeft--; // Decrease steps left
+            while (stepsLeft > 0) {
+                newPosition += (forward ? 1 : -1); // Move forward or backward
+                stepsLeft--; // Decrease steps left
 
-            // Add a step if a player is passed
-            if (occupiedPositions.contains(newPosition)) {
-                stepsLeft++;
+                // Add a step if a player is passed
+                if (occupiedPositions.contains(newPosition)) {
+                    stepsLeft++;
+                }
             }
+            playerToMove.setPosition(newPosition);
+
         }
-        playerToMove.setPosition(newPosition);
     }
 
     /**
