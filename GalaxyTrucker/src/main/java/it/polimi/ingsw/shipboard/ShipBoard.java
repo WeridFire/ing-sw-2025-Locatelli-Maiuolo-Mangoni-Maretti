@@ -608,9 +608,9 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	}
 
 	/**
-	 * Counts the number of adjacent empty tiles MAX 4
+	 * Counts the number of exposed connects for the tile MAX 4
 	 * @param coord the coords of the tile we are currently counting exposed connectors
-	 * @return number of adjacent empty tiles MAX 4
+	 * @return number of exposed connects for the tile MAX 4
 	 */
 	private int countTileExposedConnectors(Coordinates coord) {
 		int exposedCount = 0;
