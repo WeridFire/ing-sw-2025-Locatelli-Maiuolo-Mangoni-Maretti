@@ -2,6 +2,7 @@ package it.polimi.ingsw.playerInput;
 
 import it.polimi.ingsw.cards.projectile.Projectile;
 import it.polimi.ingsw.enums.PowerType;
+import it.polimi.ingsw.enums.ProtectionType;
 import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
@@ -110,26 +111,42 @@ public class PIRUtils {
 			return true;
 
 		}else if(projectile.isFireDefendable()){
-			//TODO: check that projectile is defendable by a single cannon, so no request necessary and return true
-			//TODO: check that projectile is defendable by a double cannon, if so proceed with request
-			String message = "You are being hit from direction " + projectile.getDirection().toString() + ". You can defend yourself " +
-					"with a double cannon. Do you want to activate it?";
-			PIRYesNoChoice choiceReq = new PIRYesNoChoice(player, 30, message, false);
-			boolean choice = game.getPIRHandler().setAndRunTurn(choiceReq);;
-			if(!choice){
+			ProtectionType defendingCannon = player.getShipBoard().getCannonProtection(projectile.getDirection(), projectile.getCoord());
+			if(defendingCannon == ProtectionType.SINGLE_CANNON){
+				//Player defends automatically thanks to his single cannon
+				return true;
+
+			} else if(defendingCannon == ProtectionType.DOUBLE_CANNON) {
+
+				if(player.getShipBoard()
+						.getVisitorCalculateCargoInfo()
+						.getBatteriesInfo()
+						.count(LoadableType.BATTERY) == 0){
+					//player doesn't have enough batteries.
+					return false;
+				}
+
+				//Asking player to activate double cannon
+				String message = "You are being hit from direction " + projectile.getDirection().toString() + ". You can defend yourself " +
+						"with a double cannon. Do you want to activate it?";
+				PIRYesNoChoice choiceReq = new PIRYesNoChoice(player, 30, message, false);
+				boolean choice = game.getPIRHandler().setAndRunTurn(choiceReq);;
+				if(!choice){
+					return false;
+				}
+				PIRRemoveLoadables pirRemoveLoadables = new PIRRemoveLoadables(player, 30, Set.of(LoadableType.BATTERY), 1);
+				game.getPIRHandler().setAndRunTurn(
+						pirRemoveLoadables
+				);
+
+				return true;
+
+			} else if (defendingCannon == ProtectionType.NONE) {
 				return false;
 			}
-			PIRRemoveLoadables pirRemoveLoadables = new PIRRemoveLoadables(player, 30, Set.of(LoadableType.BATTERY), 1);
-			game.getPIRHandler().setAndRunTurn(
-					pirRemoveLoadables
-			);
-
-			return true;
-
 		}else{
 			return false;
 		}
-	}
-
-
+        return false;
+    }
 }

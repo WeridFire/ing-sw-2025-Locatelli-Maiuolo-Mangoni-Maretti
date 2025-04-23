@@ -61,8 +61,7 @@ public class PiratesCard extends EnemyCard{
                     0
             ));
 
-            //TODO: use factory, roll random coords
-
+            proj.roll2D6();
             boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, game);
             if(!defended){
                 //TODO: HIT PLAYER

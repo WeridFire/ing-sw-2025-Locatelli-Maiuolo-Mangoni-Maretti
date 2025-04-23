@@ -381,7 +381,6 @@ public class ShipBoard implements ICLIPrintable, Serializable {
      *
      * @param direction The direction in which to check for cannon protection.
      * @param coordinate The coordinate along the perpendicular axis to the direction.
-     * @param range The range within which to search for cannons.
      *              This equivalently represents the number of rows (or columns) to check, centered in the
      *              {@code coordinate} row/column with the given direction.
      *              It should be an odd integer for symmetry.
@@ -390,25 +389,32 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 *
 	 * @throws IllegalArgumentException If {@code range <= 0}.
      */
-    public ProtectionType getCannonProtection(Direction direction, int coordinate, int range) {
-		if (range <= 0) {
-			throw new IllegalArgumentException("range must be greater than zero. " + range + " provided.");
-		}
+    public ProtectionType getCannonProtection(Direction direction, int coordinate) {
 
 		// create coordinates box range
         int firstCoordValue = BoardCoordinates.getFirstCoordinateFromDirection(direction);
         Coordinates coordTopLeft = null, coordBottomRight = null;
-		int halfRangeDown = (range - 1) / 2;
-		int halfRangeUp = (range - 1) - halfRangeDown;
+		int halfRangeDown;
+		int halfRangeUp;
         switch (direction) {
             case EAST, WEST:
+				halfRangeDown = 1;
+				halfRangeUp = 1;
                 coordTopLeft = new Coordinates(coordinate - halfRangeDown, firstCoordValue);
                 coordBottomRight = new Coordinates(coordinate + halfRangeUp, firstCoordValue);
                 break;
-            case NORTH, SOUTH:
+            case SOUTH:
+				halfRangeDown = 1;
+				halfRangeUp = 1;
                 coordTopLeft = new Coordinates(firstCoordValue, coordinate - halfRangeDown);
                 coordBottomRight = new Coordinates(firstCoordValue, coordinate + halfRangeUp);
                 break;
+			case NORTH:
+				halfRangeDown = 0;
+				halfRangeUp = 0;
+				coordTopLeft = new Coordinates(firstCoordValue, coordinate - halfRangeDown);
+				coordBottomRight = new Coordinates(firstCoordValue, coordinate + halfRangeUp);
+				break;
         }
 
 		// first search for single cannons: higher priority

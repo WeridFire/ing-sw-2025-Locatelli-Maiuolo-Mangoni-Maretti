@@ -1,8 +1,10 @@
 package it.polimi.ingsw.cards.projectile;
 
 import it.polimi.ingsw.enums.Direction;
+import it.polimi.ingsw.util.Coordinates;
 
 import java.io.Serializable;
+import java.util.Random;
 
 public class Projectile implements Serializable {
 
@@ -25,6 +27,11 @@ public class Projectile implements Serializable {
      * Direction from which the projectile is coming from.
      */
     private final Direction direction;
+
+    /**
+     * Coordinate from which the projectile is coming from.
+     */
+    private int coord;
 
     /**
      * Private constructor, will be called by public factory methods to create specific projectiles
@@ -121,5 +128,18 @@ public class Projectile implements Serializable {
         }
 
         return type + direction.toEmojiString(true) ;
+    }
+
+    /**
+     * Rolls two dies and assigns the value to coord variable
+     */
+    public void roll2D6 ()
+    {
+        Random rand = new Random();
+        this.coord = 2 + rand.nextInt(6) + rand.nextInt(6);
+    }
+
+    public int getCoord() {
+        return coord;
     }
 }
