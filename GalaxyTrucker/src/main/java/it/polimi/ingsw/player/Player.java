@@ -23,6 +23,11 @@ public class Player implements Serializable {
     private final UUID connectionUUID;
 
     /**
+     * true if the player is out of the race
+     */
+    private boolean dead = false;
+
+    /**
      * Tile currently held by the player
      */
     private TileSkeleton tileInHand;
@@ -432,5 +437,9 @@ public class Player implements Serializable {
             name.append(ANSI.RESET);
         }
         return name.toString();
+    }
+
+    public boolean isDead() {
+        return dead;
     }
 }

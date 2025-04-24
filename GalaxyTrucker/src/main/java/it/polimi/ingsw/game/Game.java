@@ -8,6 +8,7 @@ import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.AdventureGamePhase;
 import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.LobbyGamePhase;
+import it.polimi.ingsw.gamePhases.ScoreScreenGamePhase;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
@@ -145,7 +146,14 @@ public class Game {
 
         System.out.println(this + " Ended flight phase");
 
-        //TODO: vogliamo fare una fase di ending? Yes: show winner and points (maybe a static leaderboard)
+        //********//
+        // SCORE SCREEN
+        ScoreScreenGamePhase scoreScreenGamePhase;
+        scoreScreenGamePhase = new ScoreScreenGamePhase(id, gameData);
+        getGameData().setCurrentGamePhase(scoreScreenGamePhase);
+        System.out.println(this + " Started scoring phase");
+        scoreScreenGamePhase.playLoop();
+        //TODO: finire scoring phase
 
     }
 
