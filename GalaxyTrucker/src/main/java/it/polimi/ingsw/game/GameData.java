@@ -87,7 +87,7 @@ public class GameData implements Serializable {
     /**
      * Used for synchronization of moving players
      */
-    private final Object movementLock = new Object();
+    private final transient Object movementLock = new Object();
 
     private int requiredPlayers;
 
