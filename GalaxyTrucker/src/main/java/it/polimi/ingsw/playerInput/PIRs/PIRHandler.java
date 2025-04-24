@@ -34,7 +34,7 @@ public class PIRHandler implements Serializable {
 	 * @param p the player to check if they have any active turn currently
 	 * @return If the player requested has an active turn waiting to finish.
 	 */
-	private boolean isPlayerTurnActive(Player p){
+	public boolean isPlayerTurnActive(Player p){
 		synchronized (activePIRs) {
 			return activePIRs.get(p) != null;
 		}
