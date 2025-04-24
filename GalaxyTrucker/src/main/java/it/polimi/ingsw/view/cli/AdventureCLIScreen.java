@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.cli;
 
+import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
@@ -264,6 +265,7 @@ public class AdventureCLIScreen extends CLIScreen{
             board[coord.row()][coord.col()] = true;
         }
 
+        int maxl = 0;
         boolean found;
         String padding = " ".repeat(1);
         ArrayList<String> res = new ArrayList<String>();
@@ -295,7 +297,36 @@ public class AdventureCLIScreen extends CLIScreen{
                 }
             }
             sb.append(padding);
+            if (sb.toString().length() > maxl) maxl = sb.toString().length();
             res.add(sb.toString());
+        }
+
+        GameData gameData = getLastUpdate().getCurrentGame();
+        ArrayList<Player> playersInTurn = new ArrayList<>();
+
+        boolean someone = false;
+        for (Player p : gameData.getPlayers()) {
+            if (gameData.getPIRHandler().isPlayerTurnActive(p)){
+                playersInTurn.add(p);
+                someone = true;
+            }
+
+        }
+        if (someone) {
+            StringBuilder sb = new StringBuilder();
+
+            int padding2 = (maxl - sb.toString().length()) / 4;
+
+            sb.append(" ".repeat(Math.max(0, (int) padding2)));
+
+            for (Player p : playersInTurn) {
+                sb.append(p.getColor().toANSIColor(false)).append(p.getUsername()).append(ANSI.RESET).append(" ");
+            }
+            sb.append(ANSI.BLACK + "TURN" + ANSI.RESET);
+
+            int place = (int) res.size() / 2;
+
+            res.add(place, sb.toString());
         }
 
         CLIFrame boardFrame = new CLIFrame(res.toArray(new String[0]));
