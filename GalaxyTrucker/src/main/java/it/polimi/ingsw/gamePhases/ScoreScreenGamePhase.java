@@ -38,7 +38,12 @@ public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrint
         throw new CommandNotAllowedException("startTimer","No timer is allowed during the score screen phase.");
     }
 
+    /**
+     * Used to calculate scores at the end of a match
+     * @return sorted map (descending) of players and their scores
+     */
     public Map<Player, Float> calculateScores(){
+
         //TODO: add the scores for final positions on the board (depends on the game's level)
         float score;
         Map<Player, Float> playerScores = new HashMap<>();
@@ -61,6 +66,7 @@ public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrint
 
     //Used in testing
     public void printScores(Map<Player, Float> sortedScores) {
+
         System.out.println("Player Scores (Descending Order):");
         System.out.println("--------------------------------");
 
@@ -88,6 +94,10 @@ public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrint
         }
     }
 
+    /**
+     *
+     * @return the CLI representation of the leaderboard
+     */
     @Override
     public CLIFrame getCLIRepresentation() {
 

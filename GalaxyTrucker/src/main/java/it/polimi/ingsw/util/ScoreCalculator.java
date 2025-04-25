@@ -18,6 +18,13 @@ public class ScoreCalculator implements Serializable {
 
     public ScoreCalculator(){}
 
+    /**
+     * Counts all the goods and adds up the value
+     * then adds credits to the score
+     * then subtracts a point for each lost tile
+     * @param p player of which we are calculating the score
+     * @return the player's score
+     */
     public float calculateScore(Player p){
         float score = 0;
         int goodsCount;
