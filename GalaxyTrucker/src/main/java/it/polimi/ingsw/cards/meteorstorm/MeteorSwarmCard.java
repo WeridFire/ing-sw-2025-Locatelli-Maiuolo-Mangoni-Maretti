@@ -1,16 +1,22 @@
 package it.polimi.ingsw.cards.meteorstorm;
 
+import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.cards.projectile.Projectile;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRUtils;
+import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
+import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static it.polimi.ingsw.view.cli.CLIScreen.getScreenFrame;
 
@@ -36,9 +42,21 @@ public class MeteorSwarmCard extends Card {
 	 * Iterates through each meteor. For each meteor, hits all the victims in the same way.
 	 */
 	@Override
-	public void playEffect(GameData game) {
+	public void playEffect(GameData game) throws InterruptedException {
 		for(Projectile proj : meteors){
-			//TODO: make first player roll coordinates
+			Random random = new Random();
+			int dice1 = random.nextInt(6) + 1;
+			int dice2 = random.nextInt(6) + 1;
+
+			String[] dicesString = dicesString(dice1, dice2);
+
+			game.getPIRHandler().broadcastPIR(GamesHandler.getInstance().getGame(game.getGameId()), (player, pirHandler) -> {
+				PIRDelay pirDelay = new PIRDelay(player, 6,
+                        Arrays.toString(dicesString),
+						this);
+				pirHandler.setAndRunTurn(pirDelay);
+			});
+
 			for(Player player : game.getPlayers()){
 				boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, game);
 				if(!defended){
@@ -46,6 +64,28 @@ public class MeteorSwarmCard extends Card {
 				}
 			}
 		}
+	}
+
+	public String[] dicesString(int dice1, int dice2){
+		String[] diceLines = {
+				"The ancients have rolled the dice of fate",
+				"The will of the cosmos has been cast",
+				"The dice thunder with divine judgment",
+				"The threads of destiny have been thrown upon the table",
+				"Eternity has spoken in the language of dice",
+				"From the heavens, the roll echoes through time",
+				"The celestial hand has sealed your fate",
+				"In the great halls beyond, the dice have fallen"
+		};
+
+		int index = ThreadLocalRandom.current().nextInt(diceLines.length);
+		String randomLine = diceLines[index];
+
+		ArrayList<String> diceFrameLines = new ArrayList<>();
+		diceFrameLines.add(randomLine);
+		diceFrameLines.add("The magic numbers are: " + dice1 + " and " + dice2);
+
+		return diceFrameLines.toArray(new String[0]);
 	}
 
 	/**

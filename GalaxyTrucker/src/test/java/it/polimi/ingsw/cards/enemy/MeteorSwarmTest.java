@@ -26,4 +26,20 @@ public class MeteorSwarmTest {
 
         System.out.println(frame);
     }
+
+    @Test
+    void testDiceFrame(){
+        MeteorSwarmCard testCard = new MeteorSwarmCard(
+                new Projectile[]{
+                        Projectile.createSmallMeteor(Direction.EAST),
+                        Projectile.createLargeMeteor(Direction.SOUTH),
+                        Projectile.createLightCannonFire(Direction.WEST),
+                        Projectile.createHeavyCannonFire(Direction.NORTH)
+                },
+                "",
+                3
+        );
+
+
+    }
 }
