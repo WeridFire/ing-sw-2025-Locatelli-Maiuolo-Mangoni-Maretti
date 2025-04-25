@@ -153,7 +153,7 @@ public class Game {
         getGameData().setCurrentGamePhase(scoreScreenGamePhase);
         System.out.println(this + " Started scoring phase");
         scoreScreenGamePhase.playLoop();
-        notifyScoresToPlayers(scoreScreenGamePhase.getSortedScores());
+        notifyScoresToPlayers(scoreScreenGamePhase);
         //TODO: finire scoring phase
 
     }
@@ -225,38 +225,11 @@ public class Game {
         });
     }
 
-    private void notifyScoresToPlayers(Map<Player, Float> sortedScores) throws InterruptedException {
-
-        // Build the leaderboard message
-        StringBuilder leaderBoardMessage = new StringBuilder();
-        leaderBoardMessage.append("🏆 Leaderboard 🏆\n");
-        leaderBoardMessage.append("----------------\n");
-
-        int rank = 1;
-        Float previousScore = null;
-        int sameRankCount = 0;
-
-        for (Map.Entry<Player, Float> entry : sortedScores.entrySet()) {
-            Player player = entry.getKey();
-            float score = entry.getValue();
-
-            // Handle ties (same rank for same scores)
-            if (previousScore != null && score == previousScore) {
-                sameRankCount++;
-            } else {
-                rank += sameRankCount;
-                sameRankCount = 0;
-            }
-
-            leaderBoardMessage.append(String.format("%d. %s: %.1f points\n",
-                    rank, player.getUsername(), score));
-
-            previousScore = score;
-        }
+    private void notifyScoresToPlayers(ScoreScreenGamePhase scoreScreen) throws InterruptedException {
 
         gameData.getPIRHandler().broadcastPIR(this, (player, pirHandler) -> {
             PIRDelay pirDelay = new PIRDelay(player, 6,
-                    leaderBoardMessage.toString(), null);
+                    "GG to all, match is over\n", scoreScreen);
             pirHandler.setAndRunTurn(pirDelay);
         });
     }

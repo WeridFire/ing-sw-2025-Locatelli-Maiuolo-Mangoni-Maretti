@@ -7,18 +7,18 @@ import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
 import it.polimi.ingsw.network.exceptions.CantFindClientException;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.util.ScoreCalculator;
+import it.polimi.ingsw.view.cli.ANSI;
+import it.polimi.ingsw.view.cli.CLIFrame;
+import it.polimi.ingsw.view.cli.ICLIPrintable;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.util.LinkedHashMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class ScoreScreenGamePhase extends PlayableGamePhase{
+public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrintable, Serializable {
 
     private final ScoreCalculator scoreCalculator;
-    private Map<Player, Float> sortedScores;
 
     public ScoreScreenGamePhase(UUID gameId, GameData gameData) {
         super(gameId, GamePhaseType.ENDGAME, gameData);
@@ -27,8 +27,6 @@ public class ScoreScreenGamePhase extends PlayableGamePhase{
 
     @Override
     public void playLoop() throws RemoteException, CantFindClientException, InterruptedException {
-
-        this.sortedScores = calculateScores();
 
     }
 
@@ -61,7 +59,8 @@ public class ScoreScreenGamePhase extends PlayableGamePhase{
                 ));
     }
 
-    private void printScores(Map<Player, Float> sortedScores) {
+    //Used in testing
+    public void printScores(Map<Player, Float> sortedScores) {
         System.out.println("Player Scores (Descending Order):");
         System.out.println("--------------------------------");
 
@@ -73,11 +72,11 @@ public class ScoreScreenGamePhase extends PlayableGamePhase{
             float currentScore = entry.getValue();
 
             // If score is different from previous, update rank
-            if (prevScore == null || currentScore != prevScore) {
-                rank += sameRankCount;
-                sameRankCount = 0;
+            if (prevScore != null && currentScore == prevScore) {
+                sameRankCount++;    // Increment tie counter
             } else {
-                sameRankCount++;
+                rank += 1 + sameRankCount;  // Apply accumulated ties
+                sameRankCount = 0;      // Reset counter
             }
 
             System.out.printf("%d. %s: %.2f%n",
@@ -89,7 +88,40 @@ public class ScoreScreenGamePhase extends PlayableGamePhase{
         }
     }
 
-    public Map<Player, Float> getSortedScores() {
-        return sortedScores;
+    @Override
+    public CLIFrame getCLIRepresentation() {
+
+        Map<Player, Float> scores = calculateScores(); // Get sorted scores
+        List<String> leaderboardLines = new ArrayList<>();
+        leaderboardLines.add(ANSI.BLUE + "  LEADERBOARD  " + ANSI.RESET);
+        leaderboardLines.add(""); // Empty line for spacing
+
+        int rank = 1;
+        Float prevScore = null;
+        int sameRankCount = 0;
+
+        for (Map.Entry<Player, Float> entry : scores.entrySet()) {
+            float score = entry.getValue();
+
+            // Handle tied ranks
+            // If score is different from previous, update rank
+            if (prevScore != null && score == prevScore) {
+                sameRankCount++;    // Increment tie counter
+            } else {
+                rank += 1 + sameRankCount;  // Apply accumulated ties
+                sameRankCount = 0;      // Reset counter
+            }
+
+            prevScore = score;
+
+            leaderboardLines.add(
+                    String.format(ANSI.WHITE + "%2d. " + ANSI.GREEN + "%-10s" + ANSI.YELLOW + "%5.1f" + ANSI.RESET,
+                            rank,
+                            entry.getKey().getUsername(),
+                            score)
+            );
+        }
+
+        return new CLIFrame(leaderboardLines.toArray(new String[0]));
     }
 }

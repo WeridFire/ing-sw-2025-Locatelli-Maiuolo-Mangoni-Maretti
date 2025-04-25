@@ -7,7 +7,9 @@ import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.visitors.CalculatorCargoInfo;
 import it.polimi.ingsw.shipboard.visitors.VisitorCalculateCargoInfo;
 
-public class ScoreCalculator {
+import java.io.Serializable;
+
+public class ScoreCalculator implements Serializable {
 
     private static final int BLUE_GOODS_MULTIPLIER = 1;
     private static final int GREEN_GOODS_MULTIPLIER = 2;
