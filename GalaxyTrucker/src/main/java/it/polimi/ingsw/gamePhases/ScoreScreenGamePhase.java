@@ -9,13 +9,16 @@ import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.util.ScoreCalculator;
 
 import java.rmi.RemoteException;
+import java.util.LinkedHashMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class ScoreScreenGamePhase extends PlayableGamePhase{
 
-    private ScoreCalculator scoreCalculator;
+    private final ScoreCalculator scoreCalculator;
+    private Map<Player, Float> sortedScores;
 
     public ScoreScreenGamePhase(UUID gameId, GameData gameData) {
         super(gameId, GamePhaseType.ENDGAME, gameData);
@@ -25,8 +28,8 @@ public class ScoreScreenGamePhase extends PlayableGamePhase{
     @Override
     public void playLoop() throws RemoteException, CantFindClientException, InterruptedException {
 
-        calculateScores();
-        //TODO: finire implementazione
+        this.sortedScores = calculateScores();
+
     }
 
     /**
@@ -37,7 +40,8 @@ public class ScoreScreenGamePhase extends PlayableGamePhase{
         throw new CommandNotAllowedException("startTimer","No timer is allowed during the score screen phase.");
     }
 
-    public void calculateScores(){
+    public Map<Player, Float> calculateScores(){
+        //TODO: add the scores for final positions on the board (depends on the game's level)
         float score;
         Map<Player, Float> playerScores = new HashMap<>();
 
@@ -46,5 +50,46 @@ public class ScoreScreenGamePhase extends PlayableGamePhase{
            score = scoreCalculator.calculateScore(p);
            playerScores.put(p, score);
         }
+
+        return playerScores.entrySet().stream()
+                .sorted(Map.Entry.<Player, Float>comparingByValue().reversed())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
+    }
+
+    private void printScores(Map<Player, Float> sortedScores) {
+        System.out.println("Player Scores (Descending Order):");
+        System.out.println("--------------------------------");
+
+        int rank = 1;
+        Float prevScore = null;
+        int sameRankCount = 0;
+
+        for (Map.Entry<Player, Float> entry : sortedScores.entrySet()) {
+            float currentScore = entry.getValue();
+
+            // If score is different from previous, update rank
+            if (prevScore == null || currentScore != prevScore) {
+                rank += sameRankCount;
+                sameRankCount = 0;
+            } else {
+                sameRankCount++;
+            }
+
+            System.out.printf("%d. %s: %.2f%n",
+                    rank,
+                    entry.getKey().getUsername(),
+                    currentScore);
+
+            prevScore = currentScore;
+        }
+    }
+
+    public Map<Player, Float> getSortedScores() {
+        return sortedScores;
     }
 }
