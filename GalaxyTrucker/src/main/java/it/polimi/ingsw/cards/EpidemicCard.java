@@ -2,9 +2,12 @@ package it.polimi.ingsw.cards;
 
 import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.enums.AnchorPoint;
+import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.tiles.Tile;
+import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.shipboard.visitors.VisitorEpidemic;
@@ -30,12 +33,20 @@ public class EpidemicCard extends Card{
 
 	/**
 	 * For each player, iterates on all the tiles present in the shipboard. Then for each one it applies the check of
-	 * looking for adiacent tiles, to kill the passengers.
+	 * looking for adjacent tiles, to kill the passengers.
 	 */
 	@Override
 	public void playEffect(GameData game) {
+		VisitorEpidemic visitor = new VisitorEpidemic();
+
 		for (Player p : game.getPlayers()) {
-			// TODO I guess
+			ShipBoard shipBoard = p.getShipBoard();
+			Map<Coordinates, TileSkeleton> board = shipBoard.getTilesOnBoard();
+			board.values().forEach(tile -> {
+				tile.accept(visitor);
+			});
+
+			visitor.applyEpidemicEffect(board);
 		}
 	}
 
