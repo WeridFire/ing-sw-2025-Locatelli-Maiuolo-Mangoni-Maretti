@@ -43,8 +43,9 @@ public class MeteorSwarmCard extends Card {
 	 */
 	@Override
 	public void playEffect(GameData game) throws InterruptedException {
+		Random random = new Random();
+
 		for(Projectile proj : meteors){
-			Random random = new Random();
 			int dice1 = random.nextInt(6) + 1;
 			int dice2 = random.nextInt(6) + 1;
 
