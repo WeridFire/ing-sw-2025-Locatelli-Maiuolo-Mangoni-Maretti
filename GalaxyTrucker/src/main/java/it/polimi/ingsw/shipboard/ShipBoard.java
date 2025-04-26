@@ -128,6 +128,16 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	}
 
 	/**
+	 * Returns the map representing the shipboard.
+	 * The map is returned by reference, allowing direct modifications to the shipboard.
+	 *
+	 * @return the map representing the shipboard.
+	 */
+	public Map<Coordinates, TileSkeleton> getBoard() {
+		return board;
+	}
+
+	/**
 	 * Retrieves only the tiles placed in the provided coordinates.
 	 * If a coordinate value is not associated with a tile (no tile found) it is simply not considered.
 	 *
