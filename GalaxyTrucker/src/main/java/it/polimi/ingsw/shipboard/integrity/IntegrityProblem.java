@@ -24,22 +24,22 @@ import java.util.*;
  */
 public class IntegrityProblem {
     /** Clusters of tiles that must be completely removed. */
-    private final List<TileCluster> clustersToRemove;
+    private final Set<TileCluster> clustersToRemove;
 
     /** Clusters of tiles where exactly one needs to be kept. */
-    private final List<TileCluster> clustersToKeep;
+    private final Set<TileCluster> clustersToKeep;
 
     /*
      * POSSIBLE CASES:
      * - If clustersToKeep.isEmpty():
-     *     → The game stops for this player.
+     *     -> The game stops for this player.
      *
      * - If clustersToKeep.size() >= 1:
-     *     → If the intersection of the set of tiles to keep with any set of tiles to remove is not null,
+     *     -> If the intersection of the set of tiles to keep with any set of tiles to remove is not null,
      *       all the tiles in the intersection will be removed.
      *
      * - If clustersToKeep.size() >= 2:
-     *     → If the intersection of one set of tiles to keep with another set of tiles to keep is not null,
+     *     -> If the intersection of one set of tiles to keep with another set of tiles to keep is not null,
      *       all the tiles in the intersection will be kept.
      */
 
@@ -49,7 +49,7 @@ public class IntegrityProblem {
      * @param clustersToRemove a list of tile clusters that must be removed
      * @param clustersToKeep a list of tile clusters where exactly one needs to be kept
      */
-    public IntegrityProblem(List<TileCluster> clustersToRemove, List<TileCluster> clustersToKeep) {
+    public IntegrityProblem(Set<TileCluster> clustersToRemove, Set<TileCluster> clustersToKeep) {
         this.clustersToRemove = clustersToRemove;
         this.clustersToKeep = clustersToKeep;
     }
@@ -60,8 +60,8 @@ public class IntegrityProblem {
                             Set<TileSkeleton> intrinsicallyWrongTiles,
                             List<Map.Entry<TileSkeleton, TileSkeleton>> illegallyWeldedTiles) {
 
-        this.clustersToRemove = new ArrayList<>();
-        this.clustersToKeep = new ArrayList<>();
+        this.clustersToRemove = new HashSet<>();
+        this.clustersToKeep = new HashSet<>();
 
         // add intrinsically wrong tiles as 1-tile clusters to remove
         for (TileSkeleton intrinsicallyWrongTile : intrinsicallyWrongTiles) {
@@ -143,14 +143,14 @@ public class IntegrityProblem {
     }
 
     /**
-     * @return a copy of the list of clusters to remove
+     * @return a copy of the set of clusters to remove
      */
-    public List<TileCluster> getClustersToRemove() {
-        return new ArrayList<>(clustersToRemove);
+    public Set<TileCluster> getClustersToRemove() {
+        return new HashSet<>(clustersToRemove);
     }
 
     /**
-     * @return a copy of the list of clusters to keep
+     * @return a copy of the set of clusters to keep as a list to enumerate its elements
      */
     public List<TileCluster> getClustersToKeep() {
         return new ArrayList<>(clustersToKeep);

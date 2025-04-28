@@ -86,26 +86,25 @@ public class PIRHandler implements Serializable {
 	}
 
 	/**
-	 * Generic function which BLOCKS A THREAD until the turn has been fullfilled.
-	 * It asks all the players to refresh their view.
-	 * If this behavior is not desired, check out {@link #setAndRunGenericTurn(PIR, boolean)}
-	 * @param pir The generic PIR to run.
-	 */
-	private void setAndRunGenericTurn(PIR pir) {
-		setAndRunGenericTurn(pir, standardRunRefreshAll);
-	}
-
-	/**
 	 * Blocking function that will create a new PIR for the operation of activating
 	 * specific tiles on the player's shipboard.
 	 * @param activateTiles The PIR to run
+	 * @param refreshAllPlayers Set to {@code true} if the newly set PIR will have to update the view of
+	 *                          all the players, otherwise {@code false} to update just the PIR current player's view.
 	 * @return The activated tiles by the player.
 	 */
-	public Set<Coordinates> setAndRunTurn(PIRActivateTiles activateTiles) {
-		setAndRunGenericTurn(activateTiles);
+	public Set<Coordinates> setAndRunTurn(PIRActivateTiles activateTiles, boolean refreshAllPlayers) {
+		setAndRunGenericTurn(activateTiles, refreshAllPlayers);
 		Set<Coordinates> result = activateTiles.getActivatedTiles();
 		removePIR(activateTiles.getCurrentPlayer());
 		return result;
+	}
+	/**
+	 * Like {@link #setAndRunTurn(PIRActivateTiles, boolean)}, but uses default value for refreshing all players
+	 * ({@code true}).
+	 */
+	public Set<Coordinates> setAndRunTurn(PIRActivateTiles activateTiles) {
+		return setAndRunTurn(activateTiles, standardRunRefreshAll);
 	}
 
 	/**
@@ -113,24 +112,41 @@ public class PIRHandler implements Serializable {
 	 * adding loadables on the player's shipboard. Doesn't return anything,
 	 * as the PIR itself affects the model.
 	 * @param addLoadables The PIR to run.
+	 * @param refreshAllPlayers Set to {@code true} if the newly set PIR will have to update the view of
+	 *                          all the players, otherwise {@code false} to update just the PIR current player's view.
 	 */
-	public void setAndRunTurn(PIRAddLoadables addLoadables) {
-		setAndRunGenericTurn(addLoadables);
+	public void setAndRunTurn(PIRAddLoadables addLoadables, boolean refreshAllPlayers) {
+		setAndRunGenericTurn(addLoadables, refreshAllPlayers);
 		removePIR(addLoadables.getCurrentPlayer());
 	}
-
+	/**
+	 * Like {@link #setAndRunTurn(PIRAddLoadables, boolean)}, but uses default value for refreshing all players
+	 * ({@code true}).
+	 */
+	public void setAndRunTurn(PIRAddLoadables addLoadables) {
+		setAndRunTurn(addLoadables, standardRunRefreshAll);
+	}
 
 	/**
 	 * Blocking function that will create a new PIR for the operation of making a
 	 * Yes or No choice. It will return the choice selected by the player.
 	 * @param choice the PIR to run.
+	 * @param refreshAllPlayers Set to {@code true} if the newly set PIR will have to update the view of
+	 *                          all the players, otherwise {@code false} to update just the PIR current player's view.
 	 * @return True if the player chose "YES"
 	 */
-	public boolean setAndRunTurn(PIRYesNoChoice choice) {
-		setAndRunGenericTurn(choice);
+	public boolean setAndRunTurn(PIRYesNoChoice choice, boolean refreshAllPlayers) {
+		setAndRunGenericTurn(choice, refreshAllPlayers);
 		boolean result = choice.isChoiceYes();
 		removePIR(choice.getCurrentPlayer());
 		return result;
+	}
+	/**
+	 * Like {@link #setAndRunTurn(PIRYesNoChoice, boolean)}, but uses default value for refreshing all players
+	 * ({@code true}).
+	 */
+	public boolean setAndRunTurn(PIRYesNoChoice choice) {
+		return setAndRunTurn(choice, standardRunRefreshAll);
 	}
 
 	/**
@@ -138,13 +154,22 @@ public class PIRHandler implements Serializable {
 	 * making the player select an option out of multiple choices, with custom
 	 * messages.
 	 * @param choice the PIR to run
+	 * @param refreshAllPlayers Set to {@code true} if the newly set PIR will have to update the view of
+	 *                          all the players, otherwise {@code false} to update just the PIR current player's view.
 	 * @return The selected choice
 	 */
-	public int setAndRunTurn(PIRMultipleChoice choice) {
-		setAndRunGenericTurn(choice);
+	public int setAndRunTurn(PIRMultipleChoice choice, boolean refreshAllPlayers) {
+		setAndRunGenericTurn(choice, refreshAllPlayers);
 		int result = choice.getChoice();
 		removePIR(choice.getCurrentPlayer());
 		return result;
+	}
+	/**
+	 * Like {@link #setAndRunTurn(PIRMultipleChoice, boolean)}, but uses default value for refreshing all players
+	 * ({@code true}).
+	 */
+	public int setAndRunTurn(PIRMultipleChoice choice) {
+		return setAndRunTurn(choice, standardRunRefreshAll);
 	}
 
 	/**
@@ -153,22 +178,39 @@ public class PIRHandler implements Serializable {
 	 * as the PIR itself affects the model.
 	 * @see PIRHandler#setAndRunTurn(PIRAddLoadables)
 	 * @param removeLoadables The PIR to run.
+	 * @param refreshAllPlayers Set to {@code true} if the newly set PIR will have to update the view of
+	 *                          all the players, otherwise {@code false} to update just the PIR current player's view.
+	 */
+	public void setAndRunTurn(PIRRemoveLoadables removeLoadables, boolean refreshAllPlayers) {
+		setAndRunGenericTurn(removeLoadables, refreshAllPlayers);
+		removePIR(removeLoadables.getCurrentPlayer());
+	}
+	/**
+	 * Like {@link #setAndRunTurn(PIRRemoveLoadables, boolean)}, but uses default value for refreshing all players
+	 * ({@code true}).
 	 */
 	public void setAndRunTurn(PIRRemoveLoadables removeLoadables) {
-		setAndRunGenericTurn(removeLoadables);
-		removePIR(removeLoadables.getCurrentPlayer());
+		setAndRunTurn(removeLoadables, standardRunRefreshAll);
 	}
 
 	/**
 	 * Blocking function that will create a new PIR for the operation of
 	 * showing an info to the player, waiting any input and doing nothing else. Doesn't return anything,
 	 * as the PIR itself does not need to affect the model.
-	 * @see PIRHandler#setAndRunTurn(PIRAddLoadables)
 	 * @param delay The PIR to run.
+	 * @param refreshAllPlayers Set to {@code true} if the newly set PIR will have to update the view of
+	 *                          all the players, otherwise {@code false} to update just the PIR current player's view.
+	 */
+	public void setAndRunTurn(PIRDelay delay, boolean refreshAllPlayers) {
+		setAndRunGenericTurn(delay, refreshAllPlayers);
+		removePIR(delay.getCurrentPlayer());
+	}
+	/**
+	 * Like {@link #setAndRunTurn(PIRDelay, boolean)}, but uses default value for refreshing all players
+	 * ({@code true}).
 	 */
 	public void setAndRunTurn(PIRDelay delay) {
-		setAndRunGenericTurn(delay);
-		removePIR(delay.getCurrentPlayer());
+		setAndRunTurn(delay, standardRunRefreshAll);
 	}
 
 	/**
@@ -234,38 +276,13 @@ public class PIRHandler implements Serializable {
 	 * @param pirCascadeFunction a consumer with a {@link Player} (the "each player" in the broadcast)
 	 *                           and a {@link PIRHandler} to set and run all the desired PIRs.
 	 *                           Note that this function can handle a sequence of PIRs, that's why it needs to call the
-	 *                           {@link PIRHandler#setAndRunGenericTurn(PIR)} internally.
+	 *                           {@link PIRHandler#setAndRunGenericTurn(PIR, boolean)} internally.
 	 * @throws InterruptedException if one of the instantiated threads throws an {@link InterruptedException}
 	 */
 	public void broadcastPIR(Game game, BiConsumer<Player, PIRHandler> pirCascadeFunction) throws InterruptedException {
 		List<Thread> threads = new ArrayList<>();
 		standardRunRefreshAll = false;  // avoid updating view every time another player interacts with the broadcasted pir
 		for(Player p : game.getGameData().getPlayers()){
-			Thread th = new Thread(() -> pirCascadeFunction.accept(p, this));
-			th.start();
-			threads.add(th);
-		}
-		for (Thread th : threads) {
-			th.join();
-		}
-		standardRunRefreshAll = true;  // reset standard view update to refresh all the players view
-	}
-
-	/**
-	 * Blocking function that
-	 * applies the specified {@code pirCascadeFunction} to each specified player concurrently,
-	 * wait for all the players to produce the input
-	 * then return
-	 * @param players The list of {@link Player} to send PIR.
-	 * @param pirCascadeFunction a consumer with a {@link Player} and a {@link PIRHandler} to set and run all the desired PIRs.
-	 *                           Note that this function can handle a sequence of PIRs, that's why it needs to call the
-	 *                           {@link PIRHandler#setAndRunGenericTurn(PIR)} internally.
-	 * @throws InterruptedException if one of the instantiated threads throws an {@link InterruptedException}
-	 */
-	public void sendPIR(List<Player> players, BiConsumer<Player, PIRHandler> pirCascadeFunction) throws InterruptedException {
-		List<Thread> threads = new ArrayList<>();
-		standardRunRefreshAll = false;  // avoid updating view every time another player interacts with the broadcasted pir
-		for(Player p : players){
 			Thread th = new Thread(() -> pirCascadeFunction.accept(p, this));
 			th.start();
 			threads.add(th);

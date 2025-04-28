@@ -54,7 +54,7 @@ public class MeteorSwarmCard extends Card {
 			game.getPIRHandler().broadcastPIR(GamesHandler.getInstance().getGame(game.getGameId()), (player, pirHandler) -> {
 				PIRDelay pirDelay = new PIRDelay(player, 6,
                         Arrays.toString(dicesString),
-						this);
+						getCLIRepresentation());
 				pirHandler.setAndRunTurn(pirDelay);
 			});
 

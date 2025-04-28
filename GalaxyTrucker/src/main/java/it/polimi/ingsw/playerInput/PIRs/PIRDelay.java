@@ -19,15 +19,18 @@ public class PIRDelay extends PIR {
     /**
      * Object that makes the players aware of something and requires any input to go on.
      * After {@code cooldown} seconds, if no input was given by the player, the game continues anyway.
+     * <p>
+     * This constructor initialize the PIR ready to work with TUI.
      *
      * @param currentPlayer The player the game waits for
      * @param cooldown The cooldown duration.
-     * @param toShow The object to show.
+     * @param toShow The CLIFrame that represents the object to show.
+     *               Can be null: in that case only the message will be shown
      */
-    public PIRDelay(Player currentPlayer, int cooldown, String message, ICLIPrintable toShow) {
+    public PIRDelay(Player currentPlayer, int cooldown, String message, CLIFrame toShow) {
         super(currentPlayer, cooldown, it.polimi.ingsw.playerInput.PIRType.DELAY);
         this.message = message;
-        cliToShow = toShow.getCLIRepresentation();
+        cliToShow = (toShow != null) ? toShow : new CLIFrame();
     }
 
     @Override

@@ -37,6 +37,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	private boolean filled;
 
 	private final List<IShipIntegrityListener> integrityListeners;
+	private Integer countExposedConnectors;
 
 	private VisitorCalculateCargoInfo visitorCalculateCargoInfo;
 	private VisitorCalculatePowers visitorCalculatePowers;
@@ -51,6 +52,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		endedAssembly = false;
 		filled = false;
 		integrityListeners = new ArrayList<>();
+		countExposedConnectors = null;
 	}
 
 	/**
@@ -72,6 +74,9 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		return sb;
     }
 
+	/**
+	 * Resets and re-applies all visitor computations on the current board.
+	 */
 	private void resetVisitors() {
 		visitorCalculateCargoInfo = new VisitorCalculateCargoInfo();
 		visitorCalculatePowers = new VisitorCalculatePowers();
@@ -84,7 +89,20 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 			tile.accept(visitorCalculateShieldedSides);
 			tile.accept(visitorCheckIntegrity);
 		}
+	}
 
+	/**
+	 * Validates the current structure of the ship.
+	 * <p>
+	 * This method recomputes all cargo, powers, shielded sides, and structural integrity
+	 * by resetting and reapplying visitors to each tile.
+	 * If any integrity problem is detected, registered listeners are notified.
+	 * <p>
+	 * Typically called after initialization or after structural modifications such as removing tiles.
+	 */
+	public void validateStructure() {
+		countExposedConnectors = null;
+		resetVisitors();
 		notifyIntegrityListeners(visitorCheckIntegrity.getProblem());
 	}
 
@@ -232,9 +250,9 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		return color;
 	}
 
-
 	/**
-	 * Places a tile at the specified coordinates on the board, ignoring board constraints.
+	 * Places a tile at the specified coordinates on the board.
+	 * <b>Use with caution</b>: this method bypasses internal board validations.
 	 *
 	 * @param tile The tile to place.
 	 * @param coordinates The coordinates where the tile should be placed.
@@ -243,7 +261,19 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 */
 	public void forceSetTile(TileSkeleton tile, Coordinates coordinates) throws FixedTileException {
 		tile.place(coordinates);
-        board.put(coordinates, tile);
+		board.put(coordinates, tile);
+	}
+
+	/**
+	 * Removes the tile at the specified coordinates on the board without triggering any visitor updates
+	 * or integrity checks.
+	 * <b>Use with caution</b>: this method bypasses internal board validations.
+	 *
+	 * @param coordinates the coordinates of the tile to remove; must not be {@code null}
+	 * @return {@code true} if a tile was removed; {@code false} if no tile was present at the given coordinates
+	 */
+	public boolean forceRemoveTile(Coordinates coordinates) {
+		return board.remove(coordinates) != null;
 	}
 
 	/**
@@ -300,7 +330,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		if (endedAssembly) {
 			throw new AlreadyEndedAssemblyException();
 		}
-		resetVisitors();
+		validateStructure();
 		endedAssembly = true;
 	}
 
@@ -322,9 +352,9 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 			throw new NoTileFoundException(coordinates);
 		}
 
-		// Remove the tile and reset visitors
+		// Remove the tile and revalidate structure
 		board.remove(coordinates);
-		resetVisitors();
+		validateStructure();
 	}
 
     /**
@@ -638,26 +668,31 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	}
 
 	/**
-	 * Used in StarDustCard to count exposed connectors
-	 * for each tile checks the adjacent 4
-	 * increments counter for each empty adjacent one
-	 * decreases counter for each cannon or engine or flat tile
+	 * Used to count exposed connectors (e.g. in StarDust Adventure)
+	 * @implNote for each tile checks the neighbors and
+	 * increments counter for each empty adjacent one if its side is a connector.
+	 * If the count has already been calculated since last structural change in the ship,
+	 * the previously stored result is returned, avoiding duplicated calculations.
 	 * @return the number of exposed connectors
 	 */
-	public int getExposedConnectorsCount(){
-		int exposedConnectorsCount = 0;
+	public int getExposedConnectorsCount() {
+		if (countExposedConnectors != null) {
+			return countExposedConnectors;
+		}
+		// else: calculate and store it
+		countExposedConnectors = 0;
 		for(Coordinates coord : getOccupiedCoordinates())
 		{
 			// Count exposed connectors for each tile
-			exposedConnectorsCount += countTileExposedConnectors(coord);
+			countExposedConnectors += countTileExposedConnectors(coord);
 		}
-		return exposedConnectorsCount;
+		return countExposedConnectors;
 	}
 
 	/**
-	 * Counts the number of exposed connects for the tile MAX 4
+	 * Counts the number of exposed connects for the tile
 	 * @param coord the coords of the tile we are currently counting exposed connectors
-	 * @return number of exposed connects for the tile MAX 4
+	 * @return number of exposed connects for the tile
 	 */
 	private int countTileExposedConnectors(Coordinates coord) {
 		int exposedCount = 0;

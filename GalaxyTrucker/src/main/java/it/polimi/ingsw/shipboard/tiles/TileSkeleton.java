@@ -55,6 +55,20 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
     }
 
     /**
+     * Retrieve {@code this} tile's coordinates.
+     * @return {@code this} tile's coordinates.
+     * @throws RuntimeException If {@code this} tile has not been placed yet.
+     * @see #getCoordinates()
+     */
+    public Coordinates forceGetCoordinates() {
+        try {
+            return getCoordinates();
+        } catch (NotFixedTileException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Set {@code this} tile fixed at specified coordinates
      * @param coordinates Where the tile is placed.
      * @throws FixedTileException If the tile is already fixed.

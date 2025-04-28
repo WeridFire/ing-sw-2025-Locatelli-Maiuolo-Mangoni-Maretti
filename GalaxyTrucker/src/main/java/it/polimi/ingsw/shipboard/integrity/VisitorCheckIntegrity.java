@@ -44,6 +44,8 @@ public class VisitorCheckIntegrity implements TileVisitor {
         addToClusters(tile);
     }
 
+    // TODO: manage clusters with crew and those without -> if without crew can not keep
+
     @Override
     public void visitCabin(CabinTile tile) {
         addToClusters(tile);

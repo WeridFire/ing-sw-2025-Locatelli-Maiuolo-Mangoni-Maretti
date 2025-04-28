@@ -13,6 +13,7 @@ import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
 import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
+import it.polimi.ingsw.playerInput.PIRUtils;
 import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
@@ -197,7 +198,9 @@ public class Game {
 
         int playerIndex = 0;
         for (Player player : gameData.getPlayers()) {
-            player.setShipBoard(ShipBoard.create(gameData.getLevel(), playerIndex));
+            ShipBoard shipBoard = ShipBoard.create(gameData.getLevel(), playerIndex);
+            shipBoard.attachIntegrityListener(new PIRUtils.ShipIntegrityListener(player, gameData.getPIRHandler()));
+            player.setShipBoard(shipBoard);
             playerIndex++;
         }
     }
@@ -220,7 +223,7 @@ public class Game {
         gameData.getPIRHandler().broadcastPIR(this, (player, pirHandler) -> {
             PIRDelay pirDelay = new PIRDelay(player, 6,
                     "The leader " + leaderName + " has drawn a new Adventure Card:",
-                    card);
+                    card.getCLIRepresentation());
             pirHandler.setAndRunTurn(pirDelay);
         });
     }
@@ -229,7 +232,7 @@ public class Game {
 
         gameData.getPIRHandler().broadcastPIR(this, (player, pirHandler) -> {
             PIRDelay pirDelay = new PIRDelay(player, 6,
-                    "GG to all, match is over\n", scoreScreen);
+                    "GG to all, match is over\n", scoreScreen.getCLIRepresentation());
             pirHandler.setAndRunTurn(pirDelay);
         });
     }

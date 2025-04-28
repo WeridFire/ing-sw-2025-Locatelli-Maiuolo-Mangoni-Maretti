@@ -98,6 +98,10 @@ public class GameServer{
 				.findFirst().orElseThrow(() -> new RuntimeException("Could not find an UUID with the given connection."));
 	}
 
+	public IClient getClientByUUID(UUID uuid) {
+		return clients.get(uuid);
+	}
+
 	public static GameServer getInstance() {
 		if (instance == null) {
 			instance = new GameServer(1111, 1234);

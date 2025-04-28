@@ -420,6 +420,7 @@ public class RmiServer implements IServer {
 					client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 				}
 			}
+			case "randomship" -> Cheats.randomShipboard(pg.game, pg.player);
 			case "skip" -> Cheats.skipPhase(pg.game);
 			default -> client.updateClient(new ClientUpdate(pg.connectionUUID, "Cheat not found."));
 		}

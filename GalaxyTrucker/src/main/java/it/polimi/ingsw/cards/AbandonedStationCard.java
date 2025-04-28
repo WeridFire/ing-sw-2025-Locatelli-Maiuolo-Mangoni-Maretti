@@ -11,6 +11,7 @@ import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static it.polimi.ingsw.view.cli.CLIScreen.getScreenFrame;
@@ -55,7 +56,7 @@ public class AbandonedStationCard extends Card{
 				boolean result = game.getPIRHandler().setAndRunTurn(
 						new PIRYesNoChoice(p, 30, "Do you want to loot the station? " +
 								"You will lose " + lostDays + " travel days, but you will receive the " +
-								"following loot: " + availableCargo
+								"following loot: " + Arrays.toString(availableCargo)
 								, false)
 				);
 				if(result){ //meaning they accepted to do it

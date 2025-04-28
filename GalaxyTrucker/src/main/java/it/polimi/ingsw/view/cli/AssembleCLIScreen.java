@@ -24,7 +24,7 @@ public class AssembleCLIScreen extends CLIScreen{
     private TileSkeleton tileInHand = null;
 
     public AssembleCLIScreen() {
-        super("assemble", true, 0);
+        super("assemble", false, 0);
     }
 
     private Player getPlayer() {

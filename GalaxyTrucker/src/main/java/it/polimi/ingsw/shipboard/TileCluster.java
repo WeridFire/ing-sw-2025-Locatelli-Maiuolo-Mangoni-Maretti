@@ -106,5 +106,8 @@ public class TileCluster implements Serializable {
      */
     public void merge(TileCluster otherCluster) {
         tiles.addAll(otherCluster.getTiles());
+        if (mainTile == null) {
+            mainTile = otherCluster.mainTile;
+        }
     }
 }
