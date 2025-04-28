@@ -1,4 +1,4 @@
-package it.polimi.ingsw.shipboard.visitors.integrity;
+package it.polimi.ingsw.shipboard.integrity;
 
 
 import it.polimi.ingsw.enums.Direction;

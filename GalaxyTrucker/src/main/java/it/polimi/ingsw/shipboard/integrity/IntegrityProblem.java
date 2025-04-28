@@ -1,6 +1,5 @@
-package it.polimi.ingsw.shipboard.visitors.integrity;
+package it.polimi.ingsw.shipboard.integrity;
 
-import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.TileCluster;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
@@ -133,6 +132,28 @@ public class IntegrityProblem {
         }
 
         return cluster;
+    }
+
+    /**
+     * @return {@code true} if this integrity problem is an actual problem,
+     * otherwise {@code false} if it represents a normal state of the ship.
+     */
+    public boolean isProblem() {
+        return !clustersToRemove.isEmpty() || (clustersToKeep.size() != 1);
+    }
+
+    /**
+     * @return a copy of the list of clusters to remove
+     */
+    public List<TileCluster> getClustersToRemove() {
+        return new ArrayList<>(clustersToRemove);
+    }
+
+    /**
+     * @return a copy of the list of clusters to keep
+     */
+    public List<TileCluster> getClustersToKeep() {
+        return new ArrayList<>(clustersToKeep);
     }
 
 }
