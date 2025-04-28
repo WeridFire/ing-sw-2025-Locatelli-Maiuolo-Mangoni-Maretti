@@ -5,13 +5,15 @@ import it.polimi.ingsw.enums.*;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
+import it.polimi.ingsw.shipboard.integrity.IntegrityProblem;
+import it.polimi.ingsw.shipboard.integrity.IShipIntegrityListener;
+import it.polimi.ingsw.shipboard.integrity.VisitorCheckIntegrity;
 import it.polimi.ingsw.shipboard.tiles.*;
 import it.polimi.ingsw.shipboard.tiles.exceptions.AlreadyInitializedCabinException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.shipboard.visitors.*;
-import it.polimi.ingsw.shipboard.visitors.integrity.*;
 import it.polimi.ingsw.shipboard.exceptions.*;
 import it.polimi.ingsw.util.BoardCoordinates;
 import it.polimi.ingsw.util.Coordinates;
@@ -34,6 +36,8 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	private boolean endedAssembly;
 	private boolean filled;
 
+	private final List<IShipIntegrityListener> integrityListeners;
+
 	private VisitorCalculateCargoInfo visitorCalculateCargoInfo;
 	private VisitorCalculatePowers visitorCalculatePowers;
 	private VisitorCalculateShieldedSides visitorCalculateShieldedSides;
@@ -46,6 +50,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		emptyRepresentation = BoardCoordinates.getCLIRepresentation(level);
 		endedAssembly = false;
 		filled = false;
+		integrityListeners = new ArrayList<>();
 	}
 
 	/**
@@ -79,6 +84,8 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 			tile.accept(visitorCalculateShieldedSides);
 			tile.accept(visitorCheckIntegrity);
 		}
+
+		notifyIntegrityListeners(visitorCheckIntegrity.getProblem());
 	}
 
 	public VisitorCalculateCargoInfo getVisitorCalculateCargoInfo() {
@@ -96,6 +103,40 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	public VisitorCheckIntegrity getVisitorCheckIntegrity() {
 		return visitorCheckIntegrity;
 	}
+
+	/**
+	 * Registers a {@link IShipIntegrityListener} to receive notifications
+	 * about integrity problems.
+	 *
+	 * @param listener the listener to be attached; must not be {@code null}
+	 */
+	public void attachIntegrityListener(IShipIntegrityListener listener) {
+		integrityListeners.add(listener);
+	}
+
+	/**
+	 * Unregisters a previously attached {@link IShipIntegrityListener}.
+	 *
+	 * @param listener the listener to be detached
+	 * @return {@code true} if the listener was successfully removed;
+	 *         {@code false} if it was not registered
+	 */
+	public boolean detachIntegrityListener(IShipIntegrityListener listener) {
+		return integrityListeners.remove(listener);
+	}
+
+	/**
+	 * Notifies all registered {@link IShipIntegrityListener} instances
+	 * about a detected integrity problem.
+	 *
+	 * @param integrityProblem the integrity problem that occurred; must not be {@code null}
+	 */
+	private void notifyIntegrityListeners(IntegrityProblem integrityProblem) {
+		for (IShipIntegrityListener listener : integrityListeners) {
+			listener.update(integrityProblem);
+		}
+	}
+
 
 	/**
 	 * Retrieves a set of all tiles currently placed on the board, mapped to their coordinates.

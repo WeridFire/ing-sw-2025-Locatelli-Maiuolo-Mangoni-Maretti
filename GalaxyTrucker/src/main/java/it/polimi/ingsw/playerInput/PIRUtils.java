@@ -6,11 +6,10 @@ import it.polimi.ingsw.enums.ProtectionType;
 import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PIRs.PIRActivateTiles;
-import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
-import it.polimi.ingsw.playerInput.PIRs.PIRRemoveLoadables;
-import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
+import it.polimi.ingsw.playerInput.PIRs.*;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.integrity.IShipIntegrityListener;
+import it.polimi.ingsw.shipboard.integrity.IntegrityProblem;
 import it.polimi.ingsw.shipboard.visitors.VisitorCalculatePowers;
 import it.polimi.ingsw.util.Coordinates;
 
@@ -149,4 +148,23 @@ public class PIRUtils {
 		}
         return false;
     }
+
+
+	public class ShipIntegrityListener implements IShipIntegrityListener {
+		private final Player player;
+		private final PIRHandler pirHandler;
+
+		public ShipIntegrityListener(Player player, PIRHandler pirHandler) {
+			this.player = player;
+			this.pirHandler = pirHandler;
+		}
+
+		@Override
+		public void update(IntegrityProblem integrityProblem) {
+			if (!integrityProblem.isProblem()) {
+				return;
+			}
+			// TODO: actually perform Player Input Requests to manage correctly this integrity problem
+		}
+	}
 }
