@@ -22,6 +22,10 @@ public enum Rotation {
         };
     }
 
+    public static Rotation random() {
+        return VALUES[(int) (Math.random() * VALUES.length)];
+    }
+
     private final int value;
 
     Rotation(int value) {
