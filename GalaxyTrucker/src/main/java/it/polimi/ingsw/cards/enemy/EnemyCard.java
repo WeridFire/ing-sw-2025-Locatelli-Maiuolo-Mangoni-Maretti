@@ -44,7 +44,7 @@ public abstract class EnemyCard extends Card {
      * Method to punish the player that gets defeated by this enemy
      * @param player player on which the method is currently acting upon
      */
-    public abstract void applyPunishment(Player player, GameData game) throws NoTileFoundException, OutOfBuildingAreaException;
+    public abstract void applyPunishment(Player player, GameData game) ;
 
     /**
      *
@@ -63,7 +63,7 @@ public abstract class EnemyCard extends Card {
     }
 
     @Override
-    public void playEffect(GameData game) throws NoTileFoundException, OutOfBuildingAreaException {
+    public void playEffect(GameData game) {
         for(Player p : game.getPlayers()){
             float totalFirePower = PIRUtils.runPlayerPowerTilesActivationInteraction(p, game, PowerType.FIRE);
             if(totalFirePower > getFirePower()){

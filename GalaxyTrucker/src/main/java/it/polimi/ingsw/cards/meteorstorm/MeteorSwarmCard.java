@@ -44,7 +44,7 @@ public class MeteorSwarmCard extends Card {
 	 * Iterates through each meteor. For each meteor, hits all the victims in the same way.
 	 */
 	@Override
-	public void playEffect(GameData game) throws InterruptedException, NoTileFoundException, OutOfBuildingAreaException {
+	public void playEffect(GameData game) throws InterruptedException {
 		Random random = new Random();
 
 		for(Projectile proj : meteors){
@@ -63,8 +63,12 @@ public class MeteorSwarmCard extends Card {
 			for(Player player : game.getPlayers()){
 				boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, game);
 				if(!defended){
-					player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
-				}
+                    try {
+                        player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
+                    } catch (NoTileFoundException | OutOfBuildingAreaException e) {
+						throw new RuntimeException(e);  // should never happen -> runtime exception
+                    }
+                }
 			}
 		}
 	}

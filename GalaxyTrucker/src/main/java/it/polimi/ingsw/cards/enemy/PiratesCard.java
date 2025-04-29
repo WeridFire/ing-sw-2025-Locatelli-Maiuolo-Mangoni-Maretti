@@ -52,7 +52,7 @@ public class PiratesCard extends EnemyCard{
     }
 
     @Override
-    public void applyPunishment(Player player, GameData game) throws NoTileFoundException, OutOfBuildingAreaException {
+    public void applyPunishment(Player player, GameData game) {
         for(Projectile proj : punishHits){
 
             game.getPIRHandler().setAndRunTurn(new PIRMultipleChoice(
@@ -66,7 +66,11 @@ public class PiratesCard extends EnemyCard{
             proj.roll2D6();
             boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, game);
             if(!defended){
-                player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
+                try {
+                    player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
+                } catch (NoTileFoundException | OutOfBuildingAreaException e) {
+                    throw new RuntimeException(e);  // should never happen -> runtime exception
+                }
             }
         }
     }

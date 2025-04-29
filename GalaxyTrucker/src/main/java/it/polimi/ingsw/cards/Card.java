@@ -79,7 +79,7 @@ public abstract class Card implements ICLIPrintable, Serializable {
      * Generic function to apply the effect of the card on the game.
      * @param game The game data, to access and modify the game.
      */
-    public abstract void playEffect(GameData game) throws InterruptedException, NoTileFoundException, OutOfBuildingAreaException;
+    public abstract void playEffect(GameData game) throws InterruptedException;
 
     /**
      * @return The texture associated to this card.
