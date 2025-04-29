@@ -7,6 +7,8 @@ import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.playerInput.PIRUtils;
 import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
+import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
+import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import it.polimi.ingsw.view.cli.CLIScreen;
@@ -50,7 +52,7 @@ public class PiratesCard extends EnemyCard{
     }
 
     @Override
-    public void applyPunishment(Player player, GameData game) {
+    public void applyPunishment(Player player, GameData game) throws NoTileFoundException, OutOfBuildingAreaException {
         for(Projectile proj : punishHits){
 
             game.getPIRHandler().setAndRunTurn(new PIRMultipleChoice(
@@ -64,7 +66,7 @@ public class PiratesCard extends EnemyCard{
             proj.roll2D6();
             boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, game);
             if(!defended){
-                //TODO: HIT PLAYER
+                player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
             }
         }
     }

@@ -5,6 +5,8 @@ import it.polimi.ingsw.enums.PowerType;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRUtils;
+import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
+import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import it.polimi.ingsw.view.cli.CLIScreen;
 
@@ -42,7 +44,7 @@ public abstract class EnemyCard extends Card {
      * Method to punish the player that gets defeated by this enemy
      * @param player player on which the method is currently acting upon
      */
-    public abstract void applyPunishment(Player player, GameData game);
+    public abstract void applyPunishment(Player player, GameData game) throws NoTileFoundException, OutOfBuildingAreaException;
 
     /**
      *
