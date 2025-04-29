@@ -53,8 +53,7 @@ public class SmugglersCard extends EnemyCard {
 
 	@Override
 	public void applyPunishment(Player player, GameData game) {
-		//TODO: Remove most valuable items from shipboard,
-		//player.getShipBoard().removeMostValuableCargo(this.punishCargo);
+		player.getShipBoard().loseBestGoods(this.punishCargo);
 	}
 
 	/**
