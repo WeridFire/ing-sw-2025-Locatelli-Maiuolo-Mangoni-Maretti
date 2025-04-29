@@ -103,7 +103,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	public void validateStructure() {
 		countExposedConnectors = null;
 		resetVisitors();
-		notifyIntegrityListeners(visitorCheckIntegrity.getProblem(!endedAssembly));
+		notifyIntegrityListeners(visitorCheckIntegrity.getProblem(!filled));
 	}
 
 	public VisitorCalculateCargoInfo getVisitorCalculateCargoInfo() {
