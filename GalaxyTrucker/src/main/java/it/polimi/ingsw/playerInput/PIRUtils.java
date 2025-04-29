@@ -23,10 +23,7 @@ import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.ANSI;
 
 import java.rmi.RemoteException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class PIRUtils {
@@ -219,6 +216,26 @@ public class PIRUtils {
 			}
 			else {  // clustersToKeep.size() >= 2
 				// TODO: need interaction to choose cluster to keep
+
+				//List tilecluster -> list set Coordinates
+				List<Set<Coordinates>> coordCluster = new ArrayList<>();
+				for (TileCluster cluster : clustersToKeep) {
+					coordCluster.add(cluster.getTiles().stream().
+							map(TileSkeleton::forceGetCoordinates)
+							.collect(Collectors.toSet()));
+				}
+
+				pirHandler.setAndRunTurn(new PIRDelay(player, 5,
+								"Those are the different clusters",
+
+										playerShip.getCLIRepresentation(coordCluster,
+												ANSI.getRandomColors(clustersToKeep.size(), false,
+														List.of(ANSI.WHITE, ANSI.RED, ANSI.GREEN)))),
+
+						  false);
+
+
+
 				int choice = 0;
 				TileCluster chosenCluster = clustersToKeep.remove(choice);
 				// now clustersToKeep are clusters to remove

@@ -240,6 +240,20 @@ public class PIRHandler implements Serializable {
 		}
 	}
 
+	public void joinEndTurn(List<Player> players){
+		synchronized (activePIRs) {
+			for (Player player : players) {
+				while (isPlayerTurnActive(player)) {
+					try {
+						activePIRs.wait();
+					} catch (InterruptedException e) {
+						return;  // TODO: check if it's ok to do so
+					}
+				}
+			}
+
+		}
+	}
 
 	/**
 	 * This function will force end a turn. It can be called by any player, but it will check ofcourse that the

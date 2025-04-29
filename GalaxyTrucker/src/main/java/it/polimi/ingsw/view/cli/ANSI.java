@@ -107,4 +107,21 @@ public class ANSI {
 	public static boolean isBackground(String ch) {
 		return BACKGROUND_SET.contains(ch);
 	}
+
+	/**
+	 * Returns howMany different random colors. if background is True colors aare background colors
+	 */
+	public static List<String> getRandomColors(int howMany, boolean background, List<String> forbiddenColors) {
+		if (howMany < 1 || howMany > 6) return null;
+
+		Set<String> baseColors = background ? new HashSet<>(BACKGROUND_SET) : new HashSet<>(FOREGROUND_SET);
+		forbiddenColors.forEach(baseColors::remove);
+
+		if (baseColors.size() < howMany) return null;
+
+		List<String> availableColors = new ArrayList<>(baseColors);
+		Collections.shuffle(availableColors);
+
+		return availableColors.subList(0, howMany);
+	}
 }

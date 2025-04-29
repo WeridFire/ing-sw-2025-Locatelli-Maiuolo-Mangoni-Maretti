@@ -663,6 +663,35 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		return rep;
 	}
 
+	public CLIFrame getCLIRepresentation(List<Set<Coordinates>> highlight, List<String> fgColor) {
+		int minRow = BoardCoordinates.getFirstCoordinateFromDirection(Direction.NORTH);
+		int minCol = BoardCoordinates.getFirstCoordinateFromDirection(Direction.WEST);
+		final int tileWidth = 4;
+		final int tileHeight = 3;
+
+		CLIFrame tilesRepresentation = new CLIFrame();
+		for (int i = 0; i < highlight.size(); i++) {
+			for (Map.Entry<Coordinates, TileSkeleton> entry : board.entrySet()) {
+				Coordinates c = entry.getKey();
+				tilesRepresentation = tilesRepresentation.merge(entry.getValue().getCLIRepresentation()
+								.paintForeground(highlight.get(i).contains(c) ? fgColor.get(i) : ANSI.RESET),
+						AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT,
+						(c.getRow() - minRow) * tileHeight, (c.getColumn() - minCol) * tileWidth);
+			}
+		}
+
+		// consider the numbers offset in the empty representation
+		tilesRepresentation.applyOffset(tileHeight + 1, tileWidth + 2);
+
+		CLIFrame rep = emptyRepresentation.merge(tilesRepresentation);
+		if (filled) {
+			// already filled for the first time -> show content
+			rep = rep.merge(getInfoCliRepresentation(), Direction.EAST, 5);
+		}
+
+		return rep;
+	}
+
 	@Override
 	public CLIFrame getCLIRepresentation() {
 		return getCLIRepresentation(Collections.emptySet(), ANSI.RESET);

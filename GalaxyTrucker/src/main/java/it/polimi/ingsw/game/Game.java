@@ -124,6 +124,8 @@ public class Game {
         fillUpShipboards();
         System.out.println(this + " Filled all the shipboards");
 
+        gameData.getPIRHandler().joinEndTurn(gameData.getPlayers());
+
         //********//
         // FLIGHT
         System.out.println(this + " Started flight phase");
