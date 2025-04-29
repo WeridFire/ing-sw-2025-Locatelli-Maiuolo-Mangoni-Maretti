@@ -71,7 +71,7 @@ public class VisitorSmugglers implements TileVisitor {
         }
 
         // retrieve contraband cargo loaded onto this tile (in descending order of contraband value)
-        PriorityQueue<LoadableType> cargo = tile.getContrabandMostValuableItems(0, minimumContrabandValue);
+        PriorityQueue<LoadableType> cargo = tile.getContrabandMostValuableItems(maxRemovableItems, minimumContrabandValue);
 
         while (!cargo.isEmpty()) {
             LoadableType mostValuableCargo = cargo.poll();
