@@ -23,6 +23,7 @@ public class VisitorCheckIntegrity implements TileVisitor {
     private final Set<TileSkeleton> intrinsicallyWrongTiles;
     private final List<Map.Entry<TileSkeleton, TileSkeleton>> illegallyWeldedTiles;
     private final Set<TileSkeleton> tilesWithHumans;
+    private TileSkeleton mainCabin;
 
     public VisitorCheckIntegrity() {
         visitedTiles = new HashMap<>();
@@ -59,6 +60,7 @@ public class VisitorCheckIntegrity implements TileVisitor {
 
     @Override
     public void visitMainCabin(CabinTile tile) {
+        mainCabin = tile;
         visitCabin(tile);
     }
 
@@ -129,8 +131,9 @@ public class VisitorCheckIntegrity implements TileVisitor {
         }
     }
 
-    public IntegrityProblem getProblem() {
-        return new IntegrityProblem(visitedTiles, clusters,
-                intrinsicallyWrongTiles, illegallyWeldedTiles, tilesWithHumans);
+    public IntegrityProblem getProblem(boolean isAssemblePhase) {
+        return new IntegrityProblem(visitedTiles, clusters, intrinsicallyWrongTiles, illegallyWeldedTiles,
+                // if not assigned -> humans are not necessary to keep cluster, but main cabin is.
+                isAssemblePhase ? Set.of(mainCabin) : tilesWithHumans);
     }
 }
