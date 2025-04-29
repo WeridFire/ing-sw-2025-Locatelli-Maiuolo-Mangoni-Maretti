@@ -63,7 +63,7 @@ public abstract class EnemyCard extends Card {
     }
 
     @Override
-    public void playEffect(GameData game) {
+    public void playEffect(GameData game) throws NoTileFoundException, OutOfBuildingAreaException {
         for(Player p : game.getPlayers()){
             float totalFirePower = PIRUtils.runPlayerPowerTilesActivationInteraction(p, game, PowerType.FIRE);
             if(totalFirePower > getFirePower()){
