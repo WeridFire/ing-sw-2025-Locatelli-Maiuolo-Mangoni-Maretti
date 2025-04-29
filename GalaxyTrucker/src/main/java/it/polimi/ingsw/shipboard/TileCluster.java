@@ -3,6 +3,7 @@ package it.polimi.ingsw.shipboard;
 import it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
 import it.polimi.ingsw.shipboard.tiles.Tile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.view.cli.ANSI;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -109,5 +110,20 @@ public class TileCluster implements Serializable {
         if (mainTile == null) {
             mainTile = otherCluster.mainTile;
         }
+    }
+
+    public String toString(String fgColor) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        for (TileSkeleton tile : tiles) {
+            builder.append(fgColor)
+                    .append(tile.forceGetCoordinates())
+                    .append(ANSI.RESET);
+            builder.append(", ");
+        }
+        int len = builder.length();
+        builder.delete(len - 2, len);
+        builder.append("]");
+        return builder.toString();
     }
 }

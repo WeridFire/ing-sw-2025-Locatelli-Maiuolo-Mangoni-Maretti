@@ -53,7 +53,7 @@ public class VisitorCheckIntegrity implements TileVisitor {
     @Override
     public void visitCabin(CabinTile tile) {
         addToClusters(tile);
-        if (tile.getLoadedCrew() == LoadableType.HUMAN) {
+        if (tile.getLoadedItems().stream().anyMatch(i -> i == LoadableType.HUMAN)) {
             tilesWithHumans.add(tile);
         }
     }
