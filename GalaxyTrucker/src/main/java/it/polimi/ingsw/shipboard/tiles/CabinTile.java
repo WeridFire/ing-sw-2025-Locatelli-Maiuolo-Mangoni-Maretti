@@ -74,4 +74,8 @@ public class CabinTile extends ContainerTile {
         loadedCrew = crew;
     }
 
+    public LoadableType getLoadedCrew() {
+        return loadedCrew;
+    }
+
 }

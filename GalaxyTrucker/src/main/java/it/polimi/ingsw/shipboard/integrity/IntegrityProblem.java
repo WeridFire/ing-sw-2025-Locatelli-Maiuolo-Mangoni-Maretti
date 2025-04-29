@@ -58,7 +58,8 @@ public class IntegrityProblem {
     public IntegrityProblem(Map<Coordinates, TileSkeleton> visitedTiles,
                             List<TileCluster> clusters,
                             Set<TileSkeleton> intrinsicallyWrongTiles,
-                            List<Map.Entry<TileSkeleton, TileSkeleton>> illegallyWeldedTiles) {
+                            List<Map.Entry<TileSkeleton, TileSkeleton>> illegallyWeldedTiles,
+                            Set<TileSkeleton> tilesWithHumans) {
 
         this.clustersToRemove = new HashSet<>();
         this.clustersToKeep = new HashSet<>();
@@ -81,6 +82,23 @@ public class IntegrityProblem {
                     illegallyWeldedTile.getKey(), illegallyWeldedTile.getValue()));
             clustersToKeep.add(exploreCluster(visitedTiles,
                     illegallyWeldedTile.getValue(), illegallyWeldedTile.getKey()));
+        }
+
+        // now, some of the cluster to keep may have no humans -> in that case, those clusters need to be removed
+        Iterator<TileCluster> iterator = clustersToKeep.iterator();
+        while (iterator.hasNext()) {
+            TileCluster cluster = iterator.next();
+            boolean hasHuman = false;
+            for (TileSkeleton tile : cluster.getTiles()) {
+                if (tilesWithHumans.contains(tile)) {
+                    hasHuman = true;
+                    break;
+                }
+            }
+            if (!hasHuman) {
+                iterator.remove();  // remove from clustersToKeep set
+                clustersToRemove.add(cluster);  // add to clustersToRemove
+            }
         }
     }
 

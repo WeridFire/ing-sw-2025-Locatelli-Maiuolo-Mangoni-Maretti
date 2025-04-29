@@ -3,6 +3,7 @@ package it.polimi.ingsw.shipboard.integrity;
 
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.Rotation;
+import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.TileCluster;
 import it.polimi.ingsw.shipboard.tiles.*;
@@ -21,12 +22,14 @@ public class VisitorCheckIntegrity implements TileVisitor {
     private final List<TileCluster> clusters;
     private final Set<TileSkeleton> intrinsicallyWrongTiles;
     private final List<Map.Entry<TileSkeleton, TileSkeleton>> illegallyWeldedTiles;
+    private final Set<TileSkeleton> tilesWithHumans;
 
     public VisitorCheckIntegrity() {
         visitedTiles = new HashMap<>();
         clusters = new ArrayList<>();
         intrinsicallyWrongTiles = new HashSet<>();
         illegallyWeldedTiles = new ArrayList<>();
+        tilesWithHumans = new HashSet<>();
     }
 
     @Override
@@ -49,11 +52,14 @@ public class VisitorCheckIntegrity implements TileVisitor {
     @Override
     public void visitCabin(CabinTile tile) {
         addToClusters(tile);
+        if (tile.getLoadedCrew() == LoadableType.HUMAN) {
+            tilesWithHumans.add(tile);
+        }
     }
 
     @Override
     public void visitMainCabin(CabinTile tile) {
-        addToClusters(tile);
+        visitCabin(tile);
     }
 
     @Override
@@ -124,6 +130,7 @@ public class VisitorCheckIntegrity implements TileVisitor {
     }
 
     public IntegrityProblem getProblem() {
-        return new IntegrityProblem(visitedTiles, clusters, intrinsicallyWrongTiles, illegallyWeldedTiles);
+        return new IntegrityProblem(visitedTiles, clusters,
+                intrinsicallyWrongTiles, illegallyWeldedTiles, tilesWithHumans);
     }
 }
