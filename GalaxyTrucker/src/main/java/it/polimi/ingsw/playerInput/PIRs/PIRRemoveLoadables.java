@@ -66,7 +66,7 @@ public class PIRRemoveLoadables extends PIR {
 		synchronized (lock){
 			lock.wait(getCooldown()* 1000L);
 			if(getCargoAmount() > targetAmount){
-				//TODO: remove remaining cargo automatically, as player has not fulfilled the request.
+				currentPlayer.getShipBoard().loseBestGoods(getAmountToRemove());
 			}
 		}
 	}
