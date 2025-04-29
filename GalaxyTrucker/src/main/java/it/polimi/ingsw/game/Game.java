@@ -199,7 +199,7 @@ public class Game {
         int playerIndex = 0;
         for (Player player : gameData.getPlayers()) {
             ShipBoard shipBoard = ShipBoard.create(gameData.getLevel(), playerIndex);
-            shipBoard.attachIntegrityListener(new PIRUtils.ShipIntegrityListener(player, gameData.getPIRHandler()));
+            shipBoard.attachIntegrityListener(new PIRUtils.ShipIntegrityListener(player, this));
             player.setShipBoard(shipBoard);
             playerIndex++;
         }

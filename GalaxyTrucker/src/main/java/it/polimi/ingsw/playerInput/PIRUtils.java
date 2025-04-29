@@ -4,6 +4,7 @@ import it.polimi.ingsw.cards.projectile.Projectile;
 import it.polimi.ingsw.enums.PowerType;
 import it.polimi.ingsw.enums.ProtectionType;
 import it.polimi.ingsw.enums.Rotation;
+import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.network.IClient;
@@ -164,78 +165,105 @@ public class PIRUtils {
 
 	public static class ShipIntegrityListener implements IShipIntegrityListener {
 		private final Player player;
+		private final UUID gameID;
 		private final PIRHandler pirHandler;
+		private ShipBoard playerShip;
 
-		public ShipIntegrityListener(Player player, PIRHandler pirHandler) {
+		public ShipIntegrityListener(Player player, Game game) {
 			this.player = player;
-			this.pirHandler = pirHandler;
+			gameID = game.getId();
+			pirHandler = game.getGameData().getPIRHandler();
 		}
 
-		private void manageIntegrityProblem(IntegrityProblem integrityProblem) {
-			// TODO (to complete): actually perform Player Input Requests to manage correctly this integrity problem
-			PIRDelay delayInfo;
-			Set<Coordinates> maskTilesToRemove;
-			ShipBoard playerShip = player.getShipBoard();
+		private void setLostTile(TileSkeleton lostTile) {
+			if (lostTile == null) return;
+            try {
+                lostTile.unplace();
+            } catch (NotFixedTileException e) {
+                throw new RuntimeException(e);  // should never happen -> runtime exception
+            }
+            player.setLostTile(lostTile);
+		}
 
-			// 1. notify about problems
-			delayInfo = new PIRDelay(player, 3,
-					"Unfortunately, your Ship has now some integrity problems...", null);
-			pirHandler.setAndRunTurn(delayInfo, false);
-
-			// 2. if presents, notify about all the clusters that must be removed
-			maskTilesToRemove = integrityProblem.getClustersToRemove().stream()
+		private boolean manageIntegrityProblemClustersToRemove(Set<TileCluster> clustersToRemove) {
+			Set<Coordinates> maskTilesToRemove = clustersToRemove.stream()
 					.flatMap(cluster -> cluster.getTiles().stream())
 					.map(TileSkeleton::forceGetCoordinates)
 					.collect(Collectors.toSet());
-			if (!maskTilesToRemove.isEmpty()) {
-				delayInfo = new PIRDelay(player, 5,
-						"These tiles needs to be removed...",
-						playerShip.getCLIRepresentation(maskTilesToRemove, ANSI.RED));
-				pirHandler.setAndRunTurn(delayInfo, false);
-			}
+			if (maskTilesToRemove.isEmpty()) return false;
+			// notify
+			pirHandler.setAndRunTurn(new PIRDelay(player, 5,
+							"These tiles needs to be removed...",
+							playerShip.getCLIRepresentation(maskTilesToRemove, ANSI.RED)),
+					false);
 			// actually remove those
 			for (Coordinates placeTileToRemove : maskTilesToRemove) {
-				playerShip.forceRemoveTile(placeTileToRemove);
+				setLostTile(playerShip.forceRemoveTile(placeTileToRemove));
 			}
+			// NOTE: now some tiles have been removed
+			return true;
+		}
 
-			// TODO: problem: clusters to keep should NOT be any of the clusters to remove!
-			// 3. if presents, notify about all the clusters competing to stay in the ship
+		private boolean manageIntegrityProblemClustersToKeep(List<TileCluster> clustersToKeep) {
+			// different behavior based on clustersToKeep size
 			// if 0 -> end of flight
 			// if >= 2 -> player need to chose which one to keep
 			// else -> no problem
-			List<TileCluster> clustersToKeep = integrityProblem.getClustersToKeep();
+			if (clustersToKeep.size() == 1) return false;
 			if (clustersToKeep.isEmpty()) {
-				delayInfo = new PIRDelay(player, 6,
+				pirHandler.setAndRunTurn(new PIRDelay(player, 6,
 						"Your ship has no valid cluster of tiles.\n" +
-								"You need to end your flight...", null);
-				pirHandler.setAndRunTurn(delayInfo, false);
+								"You need to end your flight...", null),
+						false);
+				// TODO: add possibility to end flight in advance
 			}
-			else if (clustersToKeep.size() >= 2) {
+			else {  // clustersToKeep.size() >= 2
 				// TODO: need interaction to choose cluster to keep
 				int choice = 0;
 				TileCluster chosenCluster = clustersToKeep.remove(choice);
 				// now clustersToKeep are clusters to remove
-				maskTilesToRemove = clustersToKeep.stream()
+				Set<Coordinates> maskTilesToRemove = clustersToKeep.stream()
 						.flatMap(cluster -> cluster.getTiles().stream())
 						.filter(c -> !chosenCluster.getTiles().contains(c))
 						.map(TileSkeleton::forceGetCoordinates)
 						.collect(Collectors.toSet());
 				// actually remove those
 				for (Coordinates placeTileToRemove : maskTilesToRemove) {
-					playerShip.forceRemoveTile(placeTileToRemove);
+					setLostTile(playerShip.forceRemoveTile(placeTileToRemove));
 				}
 			}
+			// NOTE: now some tiles have been removed
+			return true;
+		}
 
-			// TODO: notify end of integrity problem
-			/*
-			UUID playerConnectionUUID = player.getConnectionUUID();
-			IClient client = GameServer.getInstance().getClientByUUID(playerConnectionUUID);
+		private void manageIntegrityProblem(IntegrityProblem integrityProblem) {
+			// TODO (to complete): actually perform Player Input Requests to manage correctly this integrity problem
+			boolean revalidateStructure;
+
+			// 1. notify about problems
+			pirHandler.setAndRunTurn(new PIRDelay(player, 3,
+					"Unfortunately, your Ship has some integrity problems...", null),
+					false);
+
+			// 2. notify about all the clusters that must be removed
+			revalidateStructure = manageIntegrityProblemClustersToRemove(integrityProblem.getClustersToRemove());
+			if (revalidateStructure) {
+				playerShip.validateStructure();
+			}
+
+			// TODO (problem): clusters to keep should NOT be any of the clusters to remove!
+			// 3. notify about all the clusters competing to stay in the ship
+			revalidateStructure = manageIntegrityProblemClustersToKeep(integrityProblem.getClustersToKeep());
+			if (revalidateStructure) {
+				playerShip.validateStructure();
+			}
+
+			// notify end of integrity problem
             try {
-                client.updateClient(new ClientUpdate(playerConnectionUUID));
+				GameServer.getInstance().broadcastUpdateRefreshOnly(gameID, Set.of(player));
             } catch (RemoteException e) {
-				e.printStackTrace();
+				System.err.println("RemoteException while broadcasting end of integrity problem");
             }
-            */
         }
 
 		@Override
@@ -243,13 +271,12 @@ public class PIRUtils {
 			if (!integrityProblem.isProblem()) {
 				return;
 			}
+			if (playerShip == null) {
+				playerShip = player.getShipBoard();
+			}
 			// else
 			// TOGGLE INTEGRITY CHECK
-			new Thread(() -> {
-				manageIntegrityProblem(integrityProblem);
-				// NOTE: now some tiles have been removed: revalidate ship structure
-				player.getShipBoard().validateStructure();
-			}).start();
+			new Thread(() -> manageIntegrityProblem(integrityProblem)).start();
 		}
 	}
 }

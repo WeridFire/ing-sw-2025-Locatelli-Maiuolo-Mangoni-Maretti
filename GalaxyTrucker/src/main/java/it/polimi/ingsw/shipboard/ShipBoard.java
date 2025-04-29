@@ -270,10 +270,11 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 * <b>Use with caution</b>: this method bypasses internal board validations.
 	 *
 	 * @param coordinates the coordinates of the tile to remove; must not be {@code null}
-	 * @return {@code true} if a tile was removed; {@code false} if no tile was present at the given coordinates
+	 * @return the previous value associated with {@code coordinates},
+	 * or {@code null} if there was no mapping for {@code coordinates}.
 	 */
-	public boolean forceRemoveTile(Coordinates coordinates) {
-		return board.remove(coordinates) != null;
+	public TileSkeleton forceRemoveTile(Coordinates coordinates) {
+		return board.remove(coordinates);
 	}
 
 	/**

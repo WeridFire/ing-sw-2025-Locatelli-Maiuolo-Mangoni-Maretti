@@ -138,5 +138,10 @@ public class GameServer{
 		broadcastUpdate(GamesHandler.getInstance().getGame(gameId));
 	}
 
+	public void broadcastUpdateRefreshOnly(UUID gameId, Set<Player> playersToRefreshView) throws RemoteException,
+			CantFindClientException {
+		broadcastUpdateRefreshOnly(GamesHandler.getInstance().getGame(gameId), playersToRefreshView);
+	}
+
 
 }
