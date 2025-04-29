@@ -8,6 +8,8 @@ import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRUtils;
 import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
+import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
+import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
@@ -42,7 +44,7 @@ public class MeteorSwarmCard extends Card {
 	 * Iterates through each meteor. For each meteor, hits all the victims in the same way.
 	 */
 	@Override
-	public void playEffect(GameData game) throws InterruptedException {
+	public void playEffect(GameData game) throws InterruptedException, NoTileFoundException, OutOfBuildingAreaException {
 		Random random = new Random();
 
 		for(Projectile proj : meteors){
@@ -61,7 +63,7 @@ public class MeteorSwarmCard extends Card {
 			for(Player player : game.getPlayers()){
 				boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, game);
 				if(!defended){
-					//TODO: HIT PLAYER
+					player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
 				}
 			}
 		}

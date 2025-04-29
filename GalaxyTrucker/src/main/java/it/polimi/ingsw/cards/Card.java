@@ -3,6 +3,8 @@ package it.polimi.ingsw.cards;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
+import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import it.polimi.ingsw.util.GameLevelStandards;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
@@ -77,7 +79,7 @@ public abstract class Card implements ICLIPrintable, Serializable {
      * Generic function to apply the effect of the card on the game.
      * @param game The game data, to access and modify the game.
      */
-    public abstract void playEffect(GameData game) throws InterruptedException;
+    public abstract void playEffect(GameData game) throws InterruptedException, NoTileFoundException, OutOfBuildingAreaException;
 
     /**
      * @return The texture associated to this card.
