@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public class SocketServer {
 
-	final ServerSocket listenSocket;
+	private final ServerSocket listenSocket;
 
 	/**
 	 * Creates a socket server. The socket server will occupy a thread and constantly listen for incoming connections.
@@ -20,7 +20,6 @@ public class SocketServer {
 	 */
 	public SocketServer(ServerSocket listenSocket) throws IOException {
 		this.listenSocket = listenSocket;
-		run();
 	}
 
 	/**
@@ -28,8 +27,9 @@ public class SocketServer {
 	 * allocate a new thread and an handler for it. Also each connection gets registered on the gameserver with a uuid.
 	 * @throws IOException
 	 */
-	private void run() throws IOException {
-		Socket clientSocket = null;
+	public void run() throws IOException {
+		if (listenSocket == null) return;
+		Socket clientSocket;
 		while ((clientSocket = this.listenSocket.accept()) != null) {
 			InputStreamReader socketRx = new InputStreamReader(clientSocket.getInputStream());
 			OutputStreamWriter socketTx = new OutputStreamWriter(clientSocket.getOutputStream());

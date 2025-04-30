@@ -56,9 +56,10 @@ public class GameServer{
 		executor.submit(() -> {
 			int port = socketPort;
 			try {
-				System.out.println("Socket server bound on port " + socketPort + ".");
 				ServerSocket listenSocket = new ServerSocket(port);
 				socketServer = new SocketServer(listenSocket);
+				System.out.println("Socket server bound on port " + socketPort + ".");
+				socketServer.run();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
