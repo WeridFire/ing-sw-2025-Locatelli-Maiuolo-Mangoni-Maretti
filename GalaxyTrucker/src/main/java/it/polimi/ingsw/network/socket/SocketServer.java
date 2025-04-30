@@ -18,7 +18,7 @@ public class SocketServer {
 	 * @param listenSocket The socket object.
 	 * @throws IOException
 	 */
-	public SocketServer(ServerSocket listenSocket) throws IOException {
+	public SocketServer(ServerSocket listenSocket) {
 		this.listenSocket = listenSocket;
 	}
 

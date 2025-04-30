@@ -72,16 +72,22 @@ public class RmiServer implements IServer {
 		}
 	}
 
-	final GamesHandler gamesHandler;
-	final GameServer gameServer;
+	private GamesHandler gamesHandler;
+	private GameServer gameServer;
 
 	/**
 	 * Creates a RMI server. All the methods call on this will affect the actual model. This is the junction between
 	 * normal RMI and SOCKET connections.
 	 */
-	public RmiServer() {
-		this.gamesHandler = GamesHandler.getInstance();
-		this.gameServer = GameServer.getInstance();
+	public RmiServer() { }
+
+	/**
+	 * Initialization method to call right after creating an instance of RMIServer,
+	 * to avoid GameServer circular dependence.
+	 */
+	public void init() {
+		gamesHandler = GamesHandler.getInstance();
+		gameServer = GameServer.getInstance();
 	}
 
 	@Override

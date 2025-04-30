@@ -2,6 +2,7 @@ package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.network.exceptions.AlreadyRunningServerException;
 import it.polimi.ingsw.network.exceptions.CantFindClientException;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.rmi.RmiServer;
@@ -9,11 +10,12 @@ import it.polimi.ingsw.network.socket.SocketServer;
 import it.polimi.ingsw.player.Player;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.ServerSocket;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.ExportException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,35 +38,50 @@ public class GameServer{
 	 * @param rmiPort The port for the RMI server.
 	 * @param socketPort The port for the SOCKET server.
 	 */
-	public GameServer(int rmiPort, int socketPort) {
+	private GameServer(int rmiPort, int socketPort) throws AlreadyRunningServerException {
 		final String serverName = "GalaxyTruckerServer";
-		//Start the RMI server on a separate thread.
-		executor.submit(() -> {
-			rmiServer = new RmiServer();
-			try {
-				rmiServer = new RmiServer();
-				IServer stub = (IServer) UnicastRemoteObject.exportObject(rmiServer, 0);
-				Registry registry = LocateRegistry.createRegistry(rmiPort);
-				registry.rebind(serverName, stub);
-				System.out.println("RMI server bound on port " + rmiPort + " with name " + serverName + ".");
-			} catch (Exception e) { // Catching all exceptions to see what's going wrong
-				e.printStackTrace();
-			}
-		});
 
-		//Start the ServerSocket on a separate thread,
+		// try starting servers (RMI and Socket) to know if ports are allowed
+		// RMI
+		try {
+			rmiServer = new RmiServer();
+			IServer stub = (IServer) UnicastRemoteObject.exportObject(rmiServer, 0);
+			Registry registry = LocateRegistry.createRegistry(rmiPort);
+			registry.rebind(serverName, stub);
+			System.out.println("RMI server bound on port " + rmiPort + " with name " + serverName + ".");
+		} catch (ExportException e) {
+			String errorMessage = "RMI server can't be exported: failure in binding on port "
+					+ rmiPort + " with name " + serverName +
+					".\nThat's probably because an other instance of the Server is already running.";
+			System.err.println(errorMessage);
+			throw new AlreadyRunningServerException(errorMessage);
+		} catch (Exception e) { // Catching all exceptions to see what's going wrong
+			e.printStackTrace();
+		}
+		// Socket
+		try {
+			ServerSocket listenSocket = new ServerSocket(socketPort);
+			socketServer = new SocketServer(listenSocket);
+			System.out.println("Socket server bound on port " + socketPort + ".");
+		} catch (BindException e) {
+			String errorMessage = "Socket server can't bind on port " + socketPort + ".";
+			System.err.println(errorMessage);
+			throw new AlreadyRunningServerException(errorMessage);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// NOTE: RMIServer is already "running" since the non-blocking function rebind,
+		// however it needs to be initialized
+		executor.submit(() -> rmiServer.init());
+		// run the ServerSocket on a separate thread
 		executor.submit(() -> {
-			int port = socketPort;
 			try {
-				ServerSocket listenSocket = new ServerSocket(port);
-				socketServer = new SocketServer(listenSocket);
-				System.out.println("Socket server bound on port " + socketPort + ".");
 				socketServer.run();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		});
-
 	}
 
 	/**
@@ -99,20 +116,31 @@ public class GameServer{
 				.findFirst().orElseThrow(() -> new RuntimeException("Could not find an UUID with the given connection."));
 	}
 
-	public IClient getClientByUUID(UUID uuid) {
-		return clients.get(uuid);
+	public static boolean isRunning() {
+		return instance != null;
 	}
 
 	public static GameServer getInstance() {
-		if (instance == null) {
-			instance = new GameServer(1111, 1234);
+		try {
+			start();
+		} catch (AlreadyRunningServerException e) {
+			// no problem
 		}
 		return instance;
 	}
 
-	public static void main(String[] args) throws IOException, NotBoundException {
-		getInstance();
+	public static void start() throws AlreadyRunningServerException {
+		if (isRunning()) throw new AlreadyRunningServerException("Server is already running.");
+		instance = new GameServer(1111, 1234);
 	}
+
+	public static void main(String[] args) {
+        try {
+            start();
+        } catch (AlreadyRunningServerException e) {
+            e.printStackTrace();
+        }
+    }
 
 	public void broadcastUpdate(Game game) throws RemoteException {
 		for (Player player: game.getGameData().getPlayers()){
@@ -137,11 +165,6 @@ public class GameServer{
 
 	public void broadcastUpdate(UUID gameId) throws RemoteException, CantFindClientException {
 		broadcastUpdate(GamesHandler.getInstance().getGame(gameId));
-	}
-
-	public void broadcastUpdateRefreshOnly(UUID gameId, Set<Player> playersToRefreshView) throws RemoteException,
-			CantFindClientException {
-		broadcastUpdateRefreshOnly(GamesHandler.getInstance().getGame(gameId), playersToRefreshView);
 	}
 
 
