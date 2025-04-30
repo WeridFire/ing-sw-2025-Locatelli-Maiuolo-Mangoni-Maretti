@@ -2,7 +2,6 @@ package it.polimi.ingsw;
 
 import it.polimi.ingsw.enums.DeviceState;
 import it.polimi.ingsw.network.GameServer;
-
 import it.polimi.ingsw.network.exceptions.AlreadyRunningServerException;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -13,11 +12,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-// This is the main GUI application for launching server and client
 public class MainApp extends Application {
 
     private Button startServerButton;
+    private Button startClientButton;
     private Label serverStatusLabel;
+    private VBox root;
     private DeviceState state;
 
     @Override
@@ -26,33 +26,29 @@ public class MainApp extends Application {
 
         state = null;
 
-        // Create "Start Server" button
+        // Crea pulsante "Start Server"
         startServerButton = new Button("Start Server");
         startServerButton.setOnAction(_ -> startServer());
 
-        // Create "Start Client" button
-        Button startClientButton = new Button("Start Client");
+        // Crea pulsante "Start Client"
+        startClientButton = new Button("Start Client");
         startClientButton.setOnAction(_ -> startClient());
 
-        // Label to show server status (initially hidden)
+        // Etichetta per stato server
         serverStatusLabel = new Label();
         serverStatusLabel.setVisible(false);
 
-        // Layout container with spacing and center alignment
-        VBox root = new VBox(15);
+        // Layout
+        root = new VBox(15);
         root.setAlignment(Pos.CENTER);
         root.getChildren().addAll(startServerButton, startClientButton, serverStatusLabel);
 
         Scene scene = new Scene(root, 400, 300);
         primaryStage.setScene(scene);
-
-        // Handle close request
         primaryStage.setOnCloseRequest(this::handleCloseRequest);
-
         primaryStage.show();
     }
 
-    // Starts the server in a new thread and updates the UI
     private void startServer() {
         new Thread(() -> {
             String serverStatusText;
@@ -76,14 +72,38 @@ public class MainApp extends Application {
         }).start();
     }
 
-    // Dummy client launcher method (replace with real client logic)
     private void startClient() {
-        System.out.println("Client started!");
-        state = DeviceState.add(state, DeviceState.CLIENT);
-        // Add real client startup logic here
+        //hide butt
+        startServerButton.setVisible(false);
+        startClientButton.setVisible(false);
+
+        // Username
+        Label promptLabel = new Label("Enter your username:");
+        TextField usernameField = new TextField();
+        usernameField.setPromptText("Username");
+
+        Button confirmButton = getConfirmationButton(usernameField);
+
+        //change layout
+        root.getChildren().setAll(promptLabel, usernameField, confirmButton);
     }
 
-    // Handle window close: check if server is active and confirm shutdown
+    private Button getConfirmationButton(TextField usernameField) {
+        Button confirmButton = new Button("Confirm");
+        confirmButton.setOnAction(_ -> {
+            String username = usernameField.getText().trim();
+            if (!username.isEmpty()) {
+                System.out.println("Client started with username: " + username);
+                state = DeviceState.add(state, DeviceState.CLIENT);
+
+            } else {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Please enter a valid username.");
+                alert.showAndWait();
+            }
+        });
+        return confirmButton;
+    }
+
     private void handleCloseRequest(WindowEvent event) {
         if (state == DeviceState.SERVER || state == DeviceState.HOST) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
