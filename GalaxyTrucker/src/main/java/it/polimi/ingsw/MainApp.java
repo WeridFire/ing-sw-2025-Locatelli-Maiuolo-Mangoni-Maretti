@@ -28,11 +28,11 @@ public class MainApp extends Application {
 
         // Create "Start Server" button
         startServerButton = new Button("Start Server");
-        startServerButton.setOnAction(e -> startServer());
+        startServerButton.setOnAction(_ -> startServer());
 
         // Create "Start Client" button
         Button startClientButton = new Button("Start Client");
-        startClientButton.setOnAction(e -> startClient());
+        startClientButton.setOnAction(_ -> startClient());
 
         // Label to show server status (initially hidden)
         serverStatusLabel = new Label();
