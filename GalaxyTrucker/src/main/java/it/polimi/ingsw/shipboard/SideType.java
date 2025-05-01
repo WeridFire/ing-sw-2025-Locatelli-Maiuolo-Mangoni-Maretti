@@ -35,7 +35,7 @@ public enum SideType {
             return (s2 == DOUBLE || s2 == UNIVERSAL);
         }
         else if (s1 == UNIVERSAL) {
-            return (s2 == SINGLE || s2 == DOUBLE || s2 == UNIVERSAL);
+            return s2.isConnector();
         }
         else {
             return false;
@@ -51,5 +51,9 @@ public enum SideType {
             case CANNON, ENGINE -> Direction.sortedArray(">", "/\\", "<", "\\/");
         };
         return reps.get(pointing.getValue());
+    }
+
+    public boolean isConnector() {
+        return this == SINGLE || this == DOUBLE || this == UNIVERSAL;
     }
 }

@@ -732,9 +732,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 			if (!board.containsKey(neighborCoord)) {
 				Direction sideDirectionToCheck = coord.getNeighborDirection(neighborCoord);
 				SideType sideToCheck = board.get(coord).getSide(sideDirectionToCheck);
-				if ((sideToCheck == SideType.SINGLE)
-					|| (sideToCheck == SideType.DOUBLE)
-					|| (sideToCheck == SideType.UNIVERSAL)) {
+				if (sideToCheck.isConnector()) {
 					exposedCount++;
 				}
 			}
