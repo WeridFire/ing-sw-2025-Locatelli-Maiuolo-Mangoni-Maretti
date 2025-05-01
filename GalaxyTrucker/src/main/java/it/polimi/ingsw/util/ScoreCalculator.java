@@ -3,9 +3,7 @@ package it.polimi.ingsw.util;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.tiles.CargoHoldTile;
-import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.visitors.CalculatorCargoInfo;
-import it.polimi.ingsw.shipboard.visitors.VisitorCalculateCargoInfo;
 
 import java.io.Serializable;
 
