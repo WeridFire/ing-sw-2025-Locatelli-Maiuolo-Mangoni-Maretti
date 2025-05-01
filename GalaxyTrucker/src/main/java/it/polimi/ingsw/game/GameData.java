@@ -465,7 +465,7 @@ public class GameData implements Serializable {
     public void endFlight(Player p){
         if (!players.contains(p)) return;
 
-        p.setDead(true);
+        p.endFlight();
 
         players.remove(p);
         deadPlayers.add(p);

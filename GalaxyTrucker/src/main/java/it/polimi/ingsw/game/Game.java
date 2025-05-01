@@ -126,6 +126,8 @@ public class Game {
 
         gameData.getPIRHandler().joinEndTurn(gameData.getPlayers());
 
+        // TODO: save gameData state HERE
+
         //********//
         // FLIGHT
         System.out.println(this + " Started flight phase");
@@ -143,6 +145,16 @@ public class Game {
             notifyAdventureToPlayers(gameData.getPlayers().getFirst(), currentAdventureCard);
             // play the adventure
             adventureGamePhase.playLoop();
+
+            // end flight for players that requested it
+            for (Player player : getGameData().getPlayers()) {
+                if (player.hasRequestedEndFlight()) {
+                    gameData.endFlight(player);
+                }
+            }
+
+            // TODO: save gameData state HERE
+
             // prepare next adventure
             currentAdventureCard = gameData.getDeck().drawNextCard();
         }

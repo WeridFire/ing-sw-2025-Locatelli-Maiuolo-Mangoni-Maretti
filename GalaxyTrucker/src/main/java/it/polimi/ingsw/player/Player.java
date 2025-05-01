@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 public class Player implements Serializable {
 
@@ -23,9 +24,19 @@ public class Player implements Serializable {
     private final UUID connectionUUID;
 
     /**
-     * true if the player is out of the race
+     * true if the player desire to end the flight at the end of the current adventure
      */
-    private boolean dead = false;
+    private boolean requestedEndFlight = false;
+
+    /**
+     * a predicate to execute just before ending the flight: if it's true, the player is safe and shall not end the flight
+     */
+    private Predicate<Player> saveFromEndFlight = null;
+
+    /**
+     * true if the player is out of the flight
+     */
+    private boolean endedFlight = false;
 
     /**
      * Tile currently held by the player
@@ -439,11 +450,35 @@ public class Player implements Serializable {
         return name.toString();
     }
 
-    public boolean isDead() {
-        return dead;
+    public boolean isEndedFlight() {
+        return endedFlight;
     }
 
-    public void setDead(boolean dead) {
-        this.dead = dead;
+    public void endFlight() {
+        if (saveFromEndFlight != null && saveFromEndFlight.test(this)) {
+            // player has been saved from ending the flight
+            saveFromEndFlight = null;
+            return;
+        }
+        endedFlight = true;
+        requestedEndFlight = false;
+        saveFromEndFlight = null;
+    }
+
+    public boolean hasRequestedEndFlight() {
+        return requestedEndFlight;
+    }
+
+    public void requestEndFlight() {
+        requestedEndFlight = true;
+    }
+
+    /**
+     * @param saveFromEndFlight a SERIALIZABLE predicate to execute just before ending the flight:
+     *                          if it's true, the player is safe and shall not end the flight
+     */
+    public void requestEndFlight(Predicate<Player> saveFromEndFlight) {
+        requestedEndFlight = true;
+        this.saveFromEndFlight = saveFromEndFlight;
     }
 }

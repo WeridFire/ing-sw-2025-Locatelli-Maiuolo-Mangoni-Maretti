@@ -46,7 +46,7 @@ public class ScoreCalculator implements Serializable {
         score += goodsCount * RED_GOODS_MULTIPLIER;
 
         //Each good is worth half if the player is out of the race
-        if(p.isDead()){
+        if(p.isEndedFlight()){
             score = score / 2;
         }
 
