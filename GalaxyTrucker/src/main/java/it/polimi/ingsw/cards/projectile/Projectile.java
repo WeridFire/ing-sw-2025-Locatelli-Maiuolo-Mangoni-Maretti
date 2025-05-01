@@ -1,7 +1,6 @@
 package it.polimi.ingsw.cards.projectile;
 
 import it.polimi.ingsw.enums.Direction;
-import it.polimi.ingsw.util.Coordinates;
 
 import java.io.Serializable;
 import java.util.Random;
@@ -16,12 +15,12 @@ public class Projectile implements Serializable {
     /**
      * Determines if you can defend from the projectile with a shield.
      */
-    private final boolean shieldDefendable;
+    private final boolean shieldDefensible;
 
     /**
      * Determines if you can defend from the projectile with a cannon.
      */
-    private final boolean fireDefendable;
+    private final boolean fireDefensible;
 
     /**
      * Direction from which the projectile is coming from.
@@ -36,10 +35,10 @@ public class Projectile implements Serializable {
     /**
      * Private constructor, will be called by public factory methods to create specific projectiles
      */
-    private Projectile(boolean bouncy, boolean shieldDefendable, boolean fireDefendable, Direction direction) {
+    private Projectile(boolean bouncy, boolean shieldDefensible, boolean fireDefensible, Direction direction) {
         this.bouncy = bouncy;
-        this.shieldDefendable = shieldDefendable;
-        this.fireDefendable = fireDefendable;
+        this.shieldDefensible = shieldDefensible;
+        this.fireDefensible = fireDefensible;
         this.direction = direction;
     }
 
@@ -73,12 +72,12 @@ public class Projectile implements Serializable {
         return bouncy;
     }
 
-    public boolean isShieldDefendable() {
-        return shieldDefendable;
+    public boolean isShieldDefensible() {
+        return shieldDefensible;
     }
 
-    public boolean isFireDefendable() {
-        return fireDefendable;
+    public boolean isFireDefensible() {
+        return fireDefensible;
     }
 
     public Direction getDirection() {
@@ -87,13 +86,13 @@ public class Projectile implements Serializable {
 
     public String toVerboseString() {
         String type = "";
-        if (bouncy && shieldDefendable && !fireDefendable) {
+        if (bouncy && shieldDefensible && !fireDefensible) {
             type = "Small Meteor";
-        } else if (!bouncy && !shieldDefendable && fireDefendable) {
+        } else if (!bouncy && !shieldDefensible && fireDefensible) {
             type = "Large Meteor";
-        } else if (!bouncy && shieldDefendable && !fireDefendable) {
+        } else if (!bouncy && shieldDefensible && !fireDefensible) {
             type = "Light Cannon Fire";
-        } else if (!bouncy && !shieldDefendable && !fireDefendable) {
+        } else if (!bouncy && !shieldDefensible && !fireDefensible) {
             type = "Heavy Cannon Fire";
         }
 
@@ -102,13 +101,13 @@ public class Projectile implements Serializable {
 
     public String toEmojiString() {
         String type = "";
-        if (bouncy && shieldDefendable && !fireDefendable) {
+        if (bouncy && shieldDefensible && !fireDefensible) {
             type = "☄️"; // Small Meteor
-        } else if (!bouncy && !shieldDefendable && fireDefendable) {
+        } else if (!bouncy && !shieldDefensible && fireDefensible) {
             type = "🌑"; // Large Meteor
-        } else if (!bouncy && shieldDefendable && !fireDefendable) {
+        } else if (!bouncy && shieldDefensible && !fireDefensible) {
             type = "💥"; // Light Cannon Fire
-        } else if (!bouncy && !shieldDefendable && !fireDefendable) {
+        } else if (!bouncy && !shieldDefensible && !fireDefensible) {
             type = "🔥"; // Heavy Cannon Fire
         }
 
@@ -117,13 +116,13 @@ public class Projectile implements Serializable {
 
     public String toUnicodeString() {
         String type = "";
-        if (bouncy && shieldDefendable && !fireDefendable) {
+        if (bouncy && shieldDefensible && !fireDefensible) {
             type = "●"; // ● Small Meteor
-        } else if (!bouncy && !shieldDefendable && fireDefendable) {
+        } else if (!bouncy && !shieldDefensible && fireDefensible) {
             type = "■"; // ■ Large Meteor
-        } else if (!bouncy && shieldDefendable && !fireDefendable) {
+        } else if (!bouncy && shieldDefensible && !fireDefensible) {
             type = "*"; // ✹ Light Cannon Fire
-        } else if (!bouncy && !shieldDefendable && !fireDefendable) {
+        } else if (!bouncy && !shieldDefensible && !fireDefensible) {
             type = "⚡"; // ⚡ Heavy Cannon Fire
         }
 
