@@ -1,5 +1,6 @@
 package it.polimi.ingsw.game;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
@@ -16,6 +17,9 @@ import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.GameLevelStandards;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Predicate;
@@ -492,5 +496,43 @@ public class GameData implements Serializable {
 
         players.remove(p);
         deadPlayers.add(p);
+    }
+
+    public void saveGameState() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        File directory = new File("games");
+
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        File file = new File(directory, getGameId().toString() + ".json");
+
+        try (FileWriter fileWriter = new FileWriter(file)) {
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(fileWriter, this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static GameData loadFromState(UUID gameId) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        File file = new File("games", gameId.toString() + ".json");
+
+        if (!file.exists()) {
+            return null;
+        }
+
+        try {
+            GameData game = objectMapper.readValue(file, GameData.class);
+
+            //Perform in here any processing needed. For example we make it so all the players are shown as "disconnected",
+            //so that players can rejoin using the same nickname.
+            game.players.forEach((p) -> p.setConnectionUUID(null));
+            return game;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
