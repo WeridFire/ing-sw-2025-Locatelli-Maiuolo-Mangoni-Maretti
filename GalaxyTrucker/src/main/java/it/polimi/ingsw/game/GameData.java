@@ -18,6 +18,7 @@ import it.polimi.ingsw.util.GameLevelStandards;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -155,6 +156,28 @@ public class GameData implements Serializable {
         return players.stream()
                 .sorted(Comparator.comparingInt(Player::getOrder))
                 .toList();
+    }
+
+    /**
+     * Gets the list of players in the game, sorted by route order (first is the leader) and with filter applied.
+     *
+     * @param filter a predicate to apply to each element to determine if it should be included.
+     * @return The list of players.
+     */
+    public List<Player> getPlayers(Predicate<Player> filter) {
+        return players.stream()
+                .filter(filter)
+                .sorted(Comparator.comparingInt(Player::getOrder))
+                .toList();
+    }
+
+    /**
+     * Gets the list of players in the game that have not ended flight yet.
+     *
+     * @return The list of players.
+     */
+    public List<Player> getPlayersInFlight() {
+        return getPlayers(p -> !p.isEndedFlight());
     }
 
     /**
