@@ -146,6 +146,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	/**
 	 * Notifies all registered {@link IShipIntegrityListener} instances
 	 * about a detected integrity problem.
+	 * @implNote IMPORTANT: it needs to be called also on {@code integrityProblem.isProblem() == false}
 	 *
 	 * @param integrityProblem the integrity problem that occurred; must not be {@code null}
 	 */
@@ -368,7 +369,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
      * @param coordinate The coordinate along the perpendicular axis to the direction.
      * @return The {@link Coordinates} of the first found tile, or {@code null} if no tile is found.
      */
-    private Coordinates getFirstTileLocation(Direction direction, int coordinate) {
+    public Coordinates getFirstTileLocation(Direction direction, int coordinate) {
         int firstCoordValue = BoardCoordinates.getFirstCoordinateFromDirection(direction);
         Coordinates coord = switch (direction) {
             case EAST, WEST -> new Coordinates(coordinate, firstCoordValue);
@@ -452,65 +453,51 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		return endedAssembly;
 	}
 
-    /**
-     * Determines the level of protection from cannons in a given direction, coordinate and range.
-     * <p>
-     * This method checks for the presence of single or double cannons within a certain range
-     * in the specified direction and returns the corresponding {@link ProtectionType}.
-     * <p>
-     * Single cannons have priority over double cannons: if both a single and a double cannon are found,
-     * the protection is given by the single cannon (no need for battery: low entropy -> Stevino wins).
-     *
-     * @param direction The direction in which to check for cannon protection.
-     * @param coordinate The coordinate along the perpendicular axis to the direction.
-     *              This equivalently represents the number of rows (or columns) to check, centered in the
-     *              {@code coordinate} row/column with the given direction.
-     *              It should be an odd integer for symmetry.
-     * @return The level of protection, which can be: {@link ProtectionType#SINGLE_CANNON},
-     *         {@link ProtectionType#DOUBLE_CANNON} or {@link ProtectionType#NONE}.
+	/**
+	 * Determines the level of protection from cannons in a given direction and coordinate.
+	 * <p>
+	 * This method checks for the presence of single or double cannons
+	 * in the specified direction and returns the corresponding {@link ProtectionType}.
+	 * <p>
+	 * Single cannons have priority over double cannons: if both a single and a double cannon are found,
+	 * the protection is given by the single cannon (no need for battery: low entropy -> Stevino wins).
 	 *
-	 * @throws IllegalArgumentException If {@code range <= 0}.
-     */
-    public ProtectionType getCannonProtection(Direction direction, int coordinate) {
+	 * @param direction The direction in which to check for cannon protection.
+	 * @param coordinate The coordinate along the perpendicular axis to the direction.
+	 * @return The level of protection, which can be: {@link ProtectionType#SINGLE_CANNON},
+	 *         {@link ProtectionType#DOUBLE_CANNON} or {@link ProtectionType#NONE}.
+	 */
+	public ProtectionType getCannonProtection(Direction direction, int coordinate) {
 
 		// create coordinates box range
-        int firstCoordValue = BoardCoordinates.getFirstCoordinateFromDirection(direction);
-        Coordinates coordTopLeft = null, coordBottomRight = null;
-		int halfRangeDown;
-		int halfRangeUp;
-        switch (direction) {
-            case EAST, WEST:
-				halfRangeDown = 1;
-				halfRangeUp = 1;
-                coordTopLeft = new Coordinates(coordinate - halfRangeDown, firstCoordValue);
-                coordBottomRight = new Coordinates(coordinate + halfRangeUp, firstCoordValue);
-                break;
-            case SOUTH:
-				halfRangeDown = 1;
-				halfRangeUp = 1;
-                coordTopLeft = new Coordinates(firstCoordValue, coordinate - halfRangeDown);
-                coordBottomRight = new Coordinates(firstCoordValue, coordinate + halfRangeUp);
-                break;
-			case NORTH:
-				halfRangeDown = 0;
-				halfRangeUp = 0;
-				coordTopLeft = new Coordinates(firstCoordValue, coordinate - halfRangeDown);
-				coordBottomRight = new Coordinates(firstCoordValue, coordinate + halfRangeUp);
+		int firstCoordValue = BoardCoordinates.getFirstCoordinateFromDirection(direction);
+		Coordinates coordTopLeft = null, coordBottomRight = null;
+		switch (direction) {
+			case EAST, WEST:
+				coordTopLeft = new Coordinates(coordinate - 1, firstCoordValue);
+				coordBottomRight = new Coordinates(coordinate + 1, firstCoordValue);
 				break;
-        }
+			case SOUTH:
+				coordTopLeft = new Coordinates(firstCoordValue, coordinate - 1);
+				coordBottomRight = new Coordinates(firstCoordValue, coordinate + 1);
+				break;
+			case NORTH:
+				coordTopLeft = new Coordinates(firstCoordValue, coordinate);
+				coordBottomRight = new Coordinates(firstCoordValue, coordinate);
+				break;
+		}
 
 		// first search for single cannons: higher priority
-        if (hasCannonPointing(false, direction, coordTopLeft, coordBottomRight)) {
-            return ProtectionType.SINGLE_CANNON;
-        }
+		if (hasCannonPointing(false, direction, coordTopLeft, coordBottomRight)) {
+			return ProtectionType.SINGLE_CANNON;
+		}
 		// if no single cannon is found: search for double cannons
-        if (hasCannonPointing(true, direction, coordTopLeft, coordBottomRight)) {
-            return ProtectionType.DOUBLE_CANNON;
-        }
+		if (hasCannonPointing(true, direction, coordTopLeft, coordBottomRight)) {
+			return ProtectionType.DOUBLE_CANNON;
+		}
 		// if here: no cannon found
-        return ProtectionType.NONE;
-    }
-
+		return ProtectionType.NONE;
+	}
 
 	/**
 	 * Processes the removal of contraband items.
