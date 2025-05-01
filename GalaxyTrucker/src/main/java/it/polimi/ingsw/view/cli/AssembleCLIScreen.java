@@ -7,6 +7,7 @@ import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.enums.Rotation;
+import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
@@ -83,7 +84,7 @@ public class AssembleCLIScreen extends CLIScreen{
     }
 
     @Override
-    protected void processCommand(String command, String[] args) throws RemoteException {
+    protected void processCommand(String command, String[] args) throws RemoteException, CommandNotAllowedException {
 
         command = command.toLowerCase();
         String occupiedHand = getOccupiedHandMessage();
@@ -243,9 +244,8 @@ public class AssembleCLIScreen extends CLIScreen{
                 }
                 break;
 
-            default:
-                setScreenMessage("Invalid command. Use help to view available commands.");
-                break;
+            // refuses unavailable commands
+            default: throw new CommandNotAllowedException();
         }
     }
 

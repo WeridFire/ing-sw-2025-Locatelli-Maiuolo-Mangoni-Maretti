@@ -4,6 +4,7 @@ import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.player.Player;
 
 import java.rmi.RemoteException;
@@ -74,7 +75,7 @@ public class LobbyCLIScreen extends CLIScreen{
 
 
 	@Override
-	protected void processCommand(String command, String[] args) throws RemoteException {
+	protected void processCommand(String command, String[] args) throws RemoteException, CommandNotAllowedException {
 		switch(command){
 			case "": break;  // on simple enter do nothing in particular
 
@@ -120,9 +121,9 @@ public class LobbyCLIScreen extends CLIScreen{
 			case "leave":
 				setScreenMessage("Function not implemented yet.");
 				break;
-			default:
-				setScreenMessage("Invalid command. Use help to view available commands.");
-				break;
+
+			// refuses unavailable commands
+			default: throw new CommandNotAllowedException();
 		}
 	}
 

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.cli;
 
 import it.polimi.ingsw.enums.Direction;
+import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.playerInput.PIRType;
 import it.polimi.ingsw.playerInput.PIRs.*;
 import it.polimi.ingsw.shipboard.LoadableType;
@@ -10,7 +11,6 @@ import java.rmi.RemoteException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class PIRCLIScreen extends CLIScreen {
 
@@ -50,7 +50,7 @@ public class PIRCLIScreen extends CLIScreen {
 	}
 
 	@Override
-	protected void processCommand(String command, String[] args) throws RemoteException {
+	protected void processCommand(String command, String[] args) throws RemoteException, CommandNotAllowedException {
 		PIR pir = getActivePIR();
 		if (pir == null) {
 			return; //to ignore intellij complaining about null
@@ -67,7 +67,7 @@ public class PIRCLIScreen extends CLIScreen {
 				case "confirm" -> handleConfirmCommand();
 				case "remove" -> handleRemoveCommand(args);
 				case "endTurn" -> handleEndTurnCommand();
-				default -> setScreenMessage("Invalid command. Use help to view available commands.");
+				default -> throw new CommandNotAllowedException();
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.cli;
 
 import it.polimi.ingsw.enums.AnchorPoint;
+import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.network.messages.ClientUpdate;
@@ -52,11 +53,13 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * This function basically allows the main CLI logic to delegate to the active screen the handling of a command.
 	 * Passes the command and the args, and the screen tries to execute. If it fails, the screen will display the error
 	 * and the requirements for the command to execute.
+	 *
 	 * @requires this.switchConditions() == true
 	 * @param command The command to execute
 	 * @param args The args to pass
+	 * @throws CommandNotAllowedException If the specified command can not be processed in this screen
 	 */
-	protected abstract void processCommand(String command, String[] args) throws RemoteException;
+	protected abstract void processCommand(String command, String[] args) throws RemoteException, CommandNotAllowedException;
 
 	/**
 	 * Refreshes the whole screen. Causes the CLI to clear, print newly the screen using the specific screen logic,

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.cli;
 
 import it.polimi.ingsw.enums.AnchorPoint;
+import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 
@@ -10,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class CLIScreenHandler {
 
-	private CLIScreen currentScreen;
+	private final Deque<CLIScreen> currentScreens;
 	private final Set<CLIScreen> allScreens;
 	private final GameClient gameClient;
 	private ClientUpdate lastUpdate;
@@ -39,6 +40,7 @@ public class CLIScreenHandler {
 
 	public CLIScreenHandler(GameClient gameClient){
 		this.gameClient = gameClient;
+		currentScreens = new LinkedList<>();
 		allScreens = new HashSet<>();
 		allScreens.add(new MenuCLIScreen());  // menu
 		allScreens.add(new LobbyCLIScreen());  // lobby
@@ -61,7 +63,7 @@ public class CLIScreenHandler {
 		lastUpdate = newUpdate;
 
 		// now forget about the current screen
-		currentScreen = null;
+		currentScreens.clear();
 
 		// force activate screens which require it
 		getAvailableScreens().stream()
@@ -135,7 +137,7 @@ public class CLIScreenHandler {
 				.findFirst()
 				.orElse(null);
 		if (cliScreen != null) {
-			this.currentScreen = cliScreen;
+			currentScreens.addFirst(cliScreen);
 			return true;
 		}
 		return false;
@@ -155,19 +157,17 @@ public class CLIScreenHandler {
 			List<String> commandParts = new ArrayList<>(Arrays.asList(command.split(" ")));
 			String cmd = commandParts.removeFirst();
 			String[] args = commandParts.toArray(new String[0]);
+
+			CLIScreen currentScreen = getCurrentScreen();
+			if (currentScreen == null) continue;
+
 			switch (cmd) {
 				case "":
 					//we close any "popup" window we are displaying.
 					isShowingAvailableScreens = false;
 					isShowingHelpScreen = false;
 					// propagate to current screen management of empty message
-					if (currentScreen != null) {
-						// NOTE: currentScreen always satisfies currentScreen.switchConditions()
-						// <===> processCommand precondition is satisfied
-						currentScreen.processCommand(cmd, args);
-						// manage unimplemented empty cmd as a simple refresh
-						currentScreen.setScreenMessage(null);
-					}
+					propagateProcessCommand(cmd, args);
 					break;
 				case "ping":
 					gameClient.getServer().ping(gameClient.getClient());
@@ -208,17 +208,45 @@ public class CLIScreenHandler {
 					gameClient.getServer().useCheat(gameClient.getClient(), args[0]);
 					break;
 				default:
-					//if the command is not recognized as a global command, it lets the active screen process it.
-					if (currentScreen != null){
-						try{
-							// NOTE: currentScreen always satisfies currentScreen.switchConditions()
-							// <===> processCommand precondition is satisfied
-							currentScreen.processCommand(cmd, args);
-						} catch(IllegalArgumentException e) {
-							currentScreen.setScreenMessage(e.getMessage());
-						}
-					}
+					// If the command is not recognized as a global command, it lets the active screen process it.
+					propagateProcessCommand(cmd, args);
 			}
+		}
+	}
+
+	/**
+	 * The first active screen processes the specified command.
+	 * If it throws a CommandNotAllowedException, it tries with the next active screen and so on, until
+	 * no more screens are active, or
+	 * the command is processed without raising a CommandNotAllowedException.
+	 * @param cmd The command to process
+	 * @param args Arguments of the command to process
+	 * @throws RemoteException if any screen trying to process the command throws a RemoteException.
+	 */
+	private void propagateProcessCommand(String cmd, String[] args) throws RemoteException {
+		// If more than one screen is present (case of non-forceActivated screens),
+		// it propagates until a screen accepts it.
+		String firstMessageNotAllowedException = null;
+		for (CLIScreen processScreen : currentScreens) {
+			try{
+				// NOTE: processScreen always satisfies processScreen.switchConditions()
+				// <===> processCommand precondition is satisfied
+				processScreen.processCommand(cmd, args);
+			} catch (CommandNotAllowedException e) {
+				if (firstMessageNotAllowedException == null) {
+					firstMessageNotAllowedException = e.getMessage();
+				}
+				continue;
+			} catch(IllegalArgumentException e) {
+				processScreen.setScreenMessage(e.getMessage());
+			}
+			// if here: the command has been processed
+			firstMessageNotAllowedException = null;
+			break;
+		}
+		// if the first exception message is not null, it means no screen was able to process the command
+		if (firstMessageNotAllowedException != null) {
+			getCurrentScreen().setScreenMessage(firstMessageNotAllowedException);
 		}
 	}
 
@@ -231,6 +259,6 @@ public class CLIScreenHandler {
 	}
 
 	protected CLIScreen getCurrentScreen(){
-		return currentScreen;
+		return currentScreens.peekFirst();
 	}
 }

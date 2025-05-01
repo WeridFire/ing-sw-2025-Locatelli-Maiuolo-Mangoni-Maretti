@@ -1,17 +1,16 @@
 package it.polimi.ingsw.view.cli;
 
-import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.GameLevelStandards;
 import it.polimi.ingsw.util.Util;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,18 +45,25 @@ public class AdventureCLIScreen extends CLIScreen{
                 getLastUpdate().getCurrentGame().getCurrentGamePhaseType() == GamePhaseType.ADVENTURE;
     }
 
-    /**
-     * This function basically allows the main CLI logic to delegate to the active screen the handling of a command.
-     * Passes the command and the args, and the screen tries to execute. If it fails, the screen will display the error
-     * and the requirements for the command to execute.
-     *
-     * @param command The command to execute
-     * @param args    The args to pass
-     * @requires this.switchConditions() == true
-     */
     @Override
-    protected void processCommand(String command, String[] args) throws RemoteException {
+    protected void processCommand(String command, String[] args) throws CommandNotAllowedException {
+        switch(command){
+            case "": break;  // on simple enter do nothing in particular
 
+            case "endFlight":
+                Player player = getLastUpdate().getClientPlayer();
+                if (player.isEndedFlight()) {
+                    setScreenMessage("You have already ended the flight.");
+                } else {
+                    setScreenMessage("The request to end the flight has been registered.\n" +
+                            "You will end the flight as soon as possible.");
+                    player.requestEndFlight();
+                }
+                break;
+
+            // refuses unavailable commands
+            default: throw new CommandNotAllowedException();
+        }
     }
 
     /**

@@ -2,6 +2,7 @@ package it.polimi.ingsw.view.cli;
 
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class MenuCLIScreen extends CLIScreen {
 	 */
 
 	@Override
-	protected void processCommand(String command, String[] args) throws RemoteException {
+	protected void processCommand(String command, String[] args) throws RemoteException, CommandNotAllowedException {
 		switch(command){
 			case "": break;  // on simple enter do nothing in particular
 
@@ -75,9 +76,9 @@ public class MenuCLIScreen extends CLIScreen {
 					setScreenMessage("Usage: create <username>");
 				}
 				break;
-			default:
-				setScreenMessage("Invalid command. Use help to view available commands.");
-				break;
+
+			// refuses unavailable commands
+			default: throw new CommandNotAllowedException();
 		}
 	}
 
