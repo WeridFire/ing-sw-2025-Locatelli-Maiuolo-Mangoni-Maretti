@@ -21,7 +21,7 @@ import java.util.function.Predicate;
 public class Player implements Serializable {
 
     private final String username;
-    private final UUID connectionUUID;
+    private UUID connectionUUID;
 
     /**
      * true if the player desire to end the flight at the end of the current adventure
@@ -101,6 +101,10 @@ public class Player implements Serializable {
 
     public UUID getConnectionUUID() {
         return connectionUUID;
+    }
+
+    public void setConnectionUUID(UUID conn) {
+        this.connectionUUID = conn;
     }
 
     /**
@@ -480,5 +484,9 @@ public class Player implements Serializable {
     public void requestEndFlight(Predicate<Player> saveFromEndFlight) {
         requestedEndFlight = true;
         this.saveFromEndFlight = saveFromEndFlight;
+    }
+
+    public boolean isConnected(){
+        return getConnectionUUID() != null;
     }
 }
