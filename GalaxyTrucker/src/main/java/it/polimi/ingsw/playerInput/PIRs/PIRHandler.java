@@ -15,28 +15,44 @@ import java.util.function.BiConsumer;
 public class PIRHandler implements Serializable {
 
 
-	private final Map<Player, PIR> activePIRs = new HashMap<>();
+	private final Map<Player, PIR> activePIRs = new HashMap<>(4);
+	private final List<PIRAtomicSequence> atomicSequences = new ArrayList<>(4);
 
 	private boolean standardRunRefreshAll = true;
 
 	/**
-	 *
-	 * @return true if any turn in the player input request is set, or null if none is not set.
+	 * @return the currently running PIRs atomic sequence for the specified player, or {@code null} if there is no
+	 * atomic sequence running for the player
 	 */
-	private boolean isAnyTurnActive(){
-		synchronized (activePIRs) {
-			return !activePIRs.isEmpty();
+	private PIRAtomicSequence getRunningAtomicSequence(Player player) {
+		synchronized (atomicSequences) {
+			return atomicSequences.stream().filter(piras -> piras.getPlayer() == player).findFirst().orElse(null);
 		}
 	}
 
 	/**
 	 *
-	 * @param p the player to check if they have any active turn currently
+	 * @param p the player to check if they have any active turn currently.
+	 *          Note: running atomic sequences are considered as active turns.
 	 * @return If the player requested has an active turn waiting to finish.
 	 */
 	public boolean isPlayerTurnActive(Player p){
 		synchronized (activePIRs) {
-			return activePIRs.get(p) != null;
+			if (activePIRs.get(p) != null) return true;
+			synchronized (atomicSequences) {
+				return getRunningAtomicSequence(p) != null;
+			}
+		}
+	}
+
+	/**
+	 *
+	 * @param pir the pir to check if it can be started due to absence of other player's input requests.
+	 * @return {@code true} if the pir can be set and run, {@code false} otherwise.
+	 */
+	public boolean isPlayerReadyForInputRequest(PIR pir){
+		synchronized (activePIRs) {
+			return  (activePIRs.get(pir.getCurrentPlayer()) == null);
 		}
 	}
 
@@ -52,17 +68,41 @@ public class PIRHandler implements Serializable {
 	}
 
 	/**
+	 * @return {@code true} if the specified pir is valid in the player's PIRs atomic sequence, or if there is no
+	 * atomic sequence running for the player; {@code false} otherwise.
+	 */
+	private boolean validateAtomicSequence(PIR pir) {
+		synchronized (atomicSequences) {
+			PIRAtomicSequence playerAtomicSequence = getRunningAtomicSequence(pir.getCurrentPlayer());
+			if (playerAtomicSequence == null) return true;
+			else return playerAtomicSequence.isValid(pir);
+		}
+	}
+
+	/**
 	 * Generic function which BLOCKS A THREAD until the turn has been fullfilled.
 	 * @param pir The generic PIR to run.
 	 * @param refreshAllPlayers Set to {@code true} if the newly set PIR will have to update the view of all the players,
 	 *                          otherwise {@code false} to update just the PIR current player's view.
 	 */
 	private void setAndRunGenericTurn(PIR pir, boolean refreshAllPlayers) {
-		if(isPlayerTurnActive(pir.getCurrentPlayer())){
+		// verify correctness of pir and atomic sequences
+		synchronized (atomicSequences) {
+			while (!validateAtomicSequence(pir)) {
+                try {
+                    atomicSequences.wait();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+		}
+		// setup the pir
+		if (!isPlayerReadyForInputRequest(pir)) {
 			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
 		}
 		synchronized (activePIRs) {
 			activePIRs.put(pir.getCurrentPlayer(), pir);
+			activePIRs.notifyAll();
 		}
 		// notify players about the newly set pir
 		try {
@@ -75,7 +115,7 @@ public class PIRHandler implements Serializable {
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
-
+		// run the pir
 		try {
 			pir.run();
 		} catch(InterruptedException e) {
@@ -225,6 +265,50 @@ public class PIRHandler implements Serializable {
 	}
 
 	/**
+	 * Creates a new {@link PIRAtomicSequence} for the specified player.
+	 * If another atomic sequence is already active for the same player, this method
+	 * will block until it completes. Only one atomic sequence per player is allowed at a time.
+	 *
+	 * @param player the player for whom to create the atomic sequence
+	 * @return the newly created {@link PIRAtomicSequence}
+	 */
+	public PIRAtomicSequence createAtomicSequence(Player player) {
+		synchronized (atomicSequences) {
+			// block until all the previous atomic sequences are done
+			PIRAtomicSequence piras = getRunningAtomicSequence(player);
+			while (piras != null) {
+                try {
+                    atomicSequences.wait();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                piras = getRunningAtomicSequence(player);
+			}
+			atomicSequences.add(new PIRAtomicSequence(player));
+			atomicSequences.notifyAll();
+		}
+		return getRunningAtomicSequence(player);
+	}
+
+	/**
+	 * Destroys the given {@link PIRAtomicSequence}, allowing any waiting threads
+	 * (on this or other players' sequences) to proceed.
+	 * Also notifies the {@code activePIRs} monitor, which may be used to track turn progression.
+	 *
+	 * @param pirAtomicSequence the sequence to destroy and remove
+	 */
+	public void destroyAtomicSequence(PIRAtomicSequence pirAtomicSequence) {
+		synchronized (atomicSequences) {
+			atomicSequences.remove(pirAtomicSequence);
+			atomicSequences.notifyAll();
+		}
+		// it's like ending a turn -> notify also activePIRs
+		synchronized (activePIRs) {
+			activePIRs.notifyAll();
+		}
+	}
+
+	/**
 	 * Blocking function that waits until the specified player has no PIR associated to it anymore
 	 * @param player The player to check for turn-end
 	 */
@@ -242,8 +326,16 @@ public class PIRHandler implements Serializable {
 
 	public void joinEndTurn(List<Player> players){
 		synchronized (activePIRs) {
-			for (Player player : players) {
-				while (isPlayerTurnActive(player)) {
+			boolean allEnded = false;
+			while (!allEnded) {
+				allEnded = true;
+				for (Player player : players) {
+					if (isPlayerTurnActive(player)) {
+						allEnded = false;
+						break;
+					}
+				}
+				if (!allEnded) {
 					try {
 						activePIRs.wait();
 					} catch (InterruptedException e) {
@@ -251,7 +343,6 @@ public class PIRHandler implements Serializable {
 					}
 				}
 			}
-
 		}
 	}
 

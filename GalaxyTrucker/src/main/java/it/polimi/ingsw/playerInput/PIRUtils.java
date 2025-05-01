@@ -9,13 +9,13 @@ import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.network.GameServer;
-import it.polimi.ingsw.network.IClient;
-import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.*;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.TileCluster;
+import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
+import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import it.polimi.ingsw.shipboard.integrity.IShipIntegrityListener;
 import it.polimi.ingsw.shipboard.integrity.IntegrityProblem;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
@@ -169,6 +169,7 @@ public class PIRUtils {
 		transient private Game game;
 		private final PIRHandler pirHandler;
 		private ShipBoard playerShip;
+		private PIRAtomicSequence integritySequence;
 
 		public ShipIntegrityListener(Player player, Game game) {
 			this.player = player;
@@ -193,10 +194,11 @@ public class PIRUtils {
 					.collect(Collectors.toSet());
 			if (maskTilesToRemove.isEmpty()) return false;
 			// notify
-			pirHandler.setAndRunTurn(new PIRDelay(player, 5,
-							"These tiles needs to be removed...",
-							playerShip.getCLIRepresentation(maskTilesToRemove, ANSI.RED)),
-					false);
+			PIRDelay pirInfo = new PIRDelay(player, 5,
+					"These tiles needs to be removed...",
+					playerShip.getCLIRepresentation(maskTilesToRemove, ANSI.RED));
+			integritySequence.addPlayerInputRequest(pirInfo);
+			pirHandler.setAndRunTurn(pirInfo, false);
 			// actually remove those
 			for (Coordinates placeTileToRemove : maskTilesToRemove) {
 				setLostTile(playerShip.forceRemoveTile(placeTileToRemove));
@@ -212,11 +214,12 @@ public class PIRUtils {
 			// else -> no problem
 			if (clustersToKeep.size() == 1) return false;
 			if (clustersToKeep.isEmpty()) {
-				pirHandler.setAndRunTurn(new PIRDelay(player, 6,
-						"Your ship has no valid cluster of tiles.\n" +
-								"You need to end your flight...", null),
-						false);
-				game.getGameData().endFlight(player);
+				PIRDelay pirInfo = new PIRDelay(player, 6,
+						"Your ship has no valid cluster of tiles." +
+								"You need to end your flight...", null);
+				integritySequence.addPlayerInputRequest(pirInfo);
+				pirHandler.setAndRunTurn(pirInfo, false);
+				player.requestEndFlight();
 				return false;
 			}
 			// else: clustersToKeep.size() >= 2
@@ -228,14 +231,16 @@ public class PIRUtils {
 						.collect(Collectors.toSet()));
 			}
 
-			int choice = pirHandler.setAndRunTurn(new PIRMultipleChoice(player, 30,
+			PIRMultipleChoice pirChoice = new PIRMultipleChoice(player, 30,
 					playerShip.getCLIRepresentation(coordCluster,
 									ANSI.getRandomColors(clustersToKeep.size(), false,
 											List.of(ANSI.WHITE, ANSI.RED, ANSI.GREEN)))
-					.merge(new CLIFrame("Choose one cluster to keep"), Direction.NORTH, 1)
+							.merge(new CLIFrame("Choose one cluster to keep"), Direction.NORTH, 1)
 							.toString(),
 					clustersToKeep.stream().map(TileCluster::toString).toArray(String[]::new),
-					0), false);
+					0);
+			integritySequence.addPlayerInputRequest(pirChoice);
+			int choice = pirHandler.setAndRunTurn(pirChoice, false);
 
 			TileCluster chosenCluster = clustersToKeep.remove(choice);
 			// now clustersToKeep are clusters to remove
@@ -257,9 +262,10 @@ public class PIRUtils {
 			boolean revalidateStructure;
 
 			// 1. notify about problems
-			pirHandler.setAndRunTurn(new PIRDelay(player, 3,
-					"Unfortunately, your Ship has some integrity problems...", null),
-					false);
+			PIRDelay pirInfo = new PIRDelay(player, 3,
+					"Unfortunately, your Ship has some integrity problems...", null);
+			integritySequence.addPlayerInputRequest(pirInfo);
+			pirHandler.setAndRunTurn(pirInfo, false);
 
 			// 2. notify about all the clusters that must be removed
 			revalidateStructure = manageIntegrityProblemClustersToRemove(integrityProblem.getClustersToRemove());
@@ -284,15 +290,28 @@ public class PIRUtils {
 		@Override
 		public void update(IntegrityProblem integrityProblem) {
 			if (!integrityProblem.isProblem()) {
+				if (integritySequence != null) {
+					// destroy atomic sequence to continue with other PIRs for this player
+					pirHandler.destroyAtomicSequence(integritySequence);
+					integritySequence = null;
+				}
 				return;
 			}
+
+			if (integritySequence == null) {
+				// create atomic sequence to block other PIRs for this player
+				integritySequence = pirHandler.createAtomicSequence(player);
+			} else {
+				integritySequence.clear();
+			}
+
 			if (playerShip == null) {
 				playerShip = player.getShipBoard();
 			}
 			if (game == null) {
 				game = GamesHandler.getInstance().getGame(gameID);
 			}
-			// else
+
 			// TOGGLE INTEGRITY CHECK
 			new Thread(() -> manageIntegrityProblem(integrityProblem)).start();
 		}
