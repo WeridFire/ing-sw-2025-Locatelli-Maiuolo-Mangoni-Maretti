@@ -31,7 +31,8 @@ public class SocketMessage implements Serializable{
 		PIR_ALLOCATE_REMOVE_LOADABLES,
 		PIR_FORCE_END_TURN,
 		PIR_SELECT_MULTIPLE_CHOICE,
-		CHEAT
+		CHEAT,
+		RESUME_GAME
 	}
 
 	private MessageType type;
@@ -223,5 +224,9 @@ public class SocketMessage implements Serializable{
 
 	public static SocketMessage cheatMessage(String cheat){
 		return new SocketMessage(MessageType.CHEAT, List.of(cheat));
+	}
+
+	public static SocketMessage resumeGameMessage(UUID gameId){
+		return new SocketMessage(MessageType.RESUME_GAME, List.of(gameId));
 	}
 }

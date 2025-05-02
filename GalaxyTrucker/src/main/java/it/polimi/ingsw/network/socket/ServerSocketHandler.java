@@ -164,4 +164,10 @@ public class ServerSocketHandler implements IServer {
 		SocketMessage mess = SocketMessage.cheatMessage(cheatName);
 		sendSocketMessage(mess);
 	}
+
+	@Override
+	public void resumeGame(IClient client, UUID gameId) throws RemoteException {
+		SocketMessage mess = SocketMessage.resumeGameMessage(gameId);
+		sendSocketMessage(mess);
+	}
 }
