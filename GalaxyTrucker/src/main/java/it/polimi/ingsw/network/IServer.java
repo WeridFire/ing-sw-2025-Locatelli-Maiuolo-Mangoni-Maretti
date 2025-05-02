@@ -19,6 +19,8 @@ public interface IServer extends Remote {
 	void joinGame(IClient client, UUID gameId, String username) throws RemoteException;
 	void quitGame(IClient client) throws RemoteException;
 	void ping(IClient client) throws RemoteException;
+	void resumeGame(IClient client, UUID gameId) throws RemoteException;
+
 
 	// PIR related commands
 	void pirActivateTiles(IClient client, Set<Coordinates> tilesToActivate) throws RemoteException;
@@ -29,7 +31,6 @@ public interface IServer extends Remote {
 
 	// Lobby phase
 	void updateGameSettings(IClient client, GameLevel level, int minPlayers) throws RemoteException;
-	void resumeGame(IClient client, UUID gameId) throws RemoteException;
 
 	// Assemble phase
 	void flipHourglass(IClient client) throws RemoteException;

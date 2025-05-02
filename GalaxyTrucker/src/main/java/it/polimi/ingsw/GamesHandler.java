@@ -55,9 +55,9 @@ public class GamesHandler {
      *
      * @return the newly created {@code Game} instance
      */
-    public Game newGame() {
+    public Game startGame() {
         Game game = new Game();
-       return newGame(game);
+       return startGame(game);
     }
 
 
@@ -66,7 +66,7 @@ public class GamesHandler {
      * @param game The game to start.
      * @return The game object passed.
      */
-    public Game newGame(Game game) {
+    public Game startGame(Game game) {
         //Instantiate a thread that handles that specific game.
         new Thread(() -> {
             try {
@@ -109,7 +109,7 @@ public class GamesHandler {
         if(findGameByClientUUID(connectionUUID) != null){
             throw new PlayerAlreadyInGameException("You already are in a game.");
         }
-        Game createdGame = newGame();
+        Game createdGame = startGame();
 		try {
 			addPlayerToGame(username, createdGame.getId(), connectionUUID);
 		} catch (GameNotFoundException e) {
@@ -128,7 +128,7 @@ public class GamesHandler {
      */
     public Game resumeGame(GameData savedGameState, UUID connectionUUID) throws PlayerAlreadyInGameException {
         Game createdGame = new Game(savedGameState);
-        newGame(createdGame);
+        startGame(createdGame);
         try {
             addPlayerToGame(savedGameState.getGameLeader(), createdGame.getId(), connectionUUID);
         } catch (GameNotFoundException e) {
