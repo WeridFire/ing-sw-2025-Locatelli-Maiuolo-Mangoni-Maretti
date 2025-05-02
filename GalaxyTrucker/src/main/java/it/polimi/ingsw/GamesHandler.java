@@ -1,6 +1,7 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.game.exceptions.GameNotFoundException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.player.Player;
@@ -56,19 +57,28 @@ public class GamesHandler {
      */
     public Game newGame() {
         Game game = new Game();
-        games.add(game);
+       return newGame(game);
+    }
+
+
+    /**
+     * Creates a new game, adds it to the list, starts it on a separate thread, and returns it.
+     * @param game The game to start.
+     * @return The game object passed.
+     */
+    public Game newGame(Game game) {
         //Instantiate a thread that handles that specific game.
         new Thread(() -> {
-			try {
-				game.gameLoop();
-			} catch (InterruptedException | RemoteException e) {
-				throw new RuntimeException(e);
-			}
+            try {
+                game.gameLoop();
+            } catch (InterruptedException | RemoteException e) {
+                throw new RuntimeException(e);
+            }
             finally {
                 // once the game has ended due to any circumstance, remove it from the games list
                 games.remove(game);
             }
-		}).start();
+        }).start();
         return game;
     }
 
@@ -107,6 +117,25 @@ public class GamesHandler {
 		}
         return createdGame;
 	}
+
+
+    /**
+     * Command to start a new game. Makes the gamehandler basically "forcestart" the saved gamestate, and automatically
+     * connects the player that is resuming to it, as a leader.
+     * @param savedGameState The saved game state to load.
+     * @param connectionUUID The connection fo the player that sent the command.
+     * @return The newly game object.
+     */
+    public Game resumeGame(GameData savedGameState, UUID connectionUUID) throws PlayerAlreadyInGameException {
+        Game createdGame = new Game(savedGameState);
+        newGame(createdGame);
+        try {
+            addPlayerToGame(savedGameState.getGameLeader(), createdGame.getId(), connectionUUID);
+        } catch (GameNotFoundException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        return createdGame;
+    }
 
 
     /**
