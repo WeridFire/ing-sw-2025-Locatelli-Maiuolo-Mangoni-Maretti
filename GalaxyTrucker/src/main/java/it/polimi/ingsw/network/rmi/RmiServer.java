@@ -129,8 +129,10 @@ public class RmiServer implements IServer {
 	public void quitGame(IClient client) throws RemoteException {
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
 		if(pg == null) return;
-		pg.game.getGameData().disconnectPlayer(pg.player);
+		pg.game.disconnectPlayer(pg.player);
+		//We update both the game (that may now no longer exist aswell) and the player that disconnected.
 		GameServer.getInstance().broadcastUpdate(pg.game);
+		client.updateClient(new ClientUpdate(gameServer.getUUIDbyConnection(client)));
 	}
 
 	@Override
