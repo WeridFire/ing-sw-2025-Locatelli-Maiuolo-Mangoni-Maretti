@@ -1,5 +1,6 @@
 package it.polimi.ingsw.game;
 
+import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.TilesFactory;
 import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.cards.Deck;
@@ -263,9 +264,29 @@ public class Game {
         });
     }
 
+    /**
+     * Calls an interrupts on the game thread, making it basically stop as soon as the game halts.
+     * Removes the list from the existing games list in the game handler.
+     */
     public void stopGame(){
         if(getGameThread() != null){
             getGameThread().interrupt();
+        }
+        GamesHandler.getInstance().getGames().remove(this);
+    }
+
+    public void disconnectPlayer(Player player){
+        if(gameData.getCurrentGamePhase().getGamePhaseType() == GamePhaseType.LOBBY){
+            //If we are in lobby, just remove the player.
+            gameData.getUnorderedPlayers().remove(player);
+        }else{
+            player.disconnect();
+        }
+
+        if(gameData.getUnorderedPlayers().isEmpty() ||
+            gameData.getUnorderedPlayers().stream().noneMatch(Player::isConnected)){
+            //stop the main thread.
+            stopGame();
         }
     }
 

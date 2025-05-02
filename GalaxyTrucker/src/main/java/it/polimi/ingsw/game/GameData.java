@@ -545,17 +545,4 @@ public class GameData implements Serializable {
         }
     }
 
-    public void disconnectPlayer(Player player){
-        if(getCurrentGamePhase().getGamePhaseType() == GamePhaseType.LOBBY){
-            //If we are in lobby, just remove the player.
-            players.remove(player);
-            return;
-        }
-        player.disconnect();
-        //TODO: stop game in case there are no more connected players.
-        // To resume it players will run the resume command.
-        if(getPlayers().stream().noneMatch(Player::isConnected)){
-
-        }
-    }
 }
