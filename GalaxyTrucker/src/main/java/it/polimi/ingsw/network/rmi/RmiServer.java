@@ -127,8 +127,10 @@ public class RmiServer implements IServer {
 
 	@Override
 	public void quitGame(IClient client) throws RemoteException {
-		//assume we left the game
-		client.updateClient(new ClientUpdate(gameServer.getUUIDbyConnection(client)));
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
+		if(pg == null) return;
+		pg.game.getGameData().disconnectPlayer(pg.player);
+		GameServer.getInstance().broadcastUpdate(pg.game);
 	}
 
 	@Override
