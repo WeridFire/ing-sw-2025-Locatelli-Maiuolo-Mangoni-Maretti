@@ -1,5 +1,6 @@
 package it.polimi.ingsw.gamePhases;
 
+import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
@@ -66,7 +67,7 @@ public class AssembleGamePhase extends PlayableGamePhase {
         }
 
         while (howManyTimerRotationsLeft > 1) {
-            GameServer.getInstance().broadcastUpdate(gameData.getGameId());
+            GameServer.getInstance().broadcastUpdate(GamesHandler.getInstance().getGame(gameId));
             setTimerRunning(true);
             Thread.sleep(timerMilliseconds);  // Wait for a full hourglass time
             setTimerRunning(false);
