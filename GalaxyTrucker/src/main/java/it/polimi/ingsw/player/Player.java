@@ -23,6 +23,7 @@ public class Player implements Serializable {
     private final String username;
     private UUID connectionUUID;
 
+
     /**
      * true if the player desire to end the flight at the end of the current adventure
      */
@@ -105,6 +106,10 @@ public class Player implements Serializable {
 
     public void setConnectionUUID(UUID conn) {
         this.connectionUUID = conn;
+    }
+
+    public void disconnect() {
+        this.connectionUUID = null;
     }
 
     /**
