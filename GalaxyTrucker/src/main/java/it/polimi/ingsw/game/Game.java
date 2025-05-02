@@ -27,6 +27,9 @@ import java.util.*;
  */
 public class Game {
 
+
+    private transient Thread gameThread;
+
     /**
      * Unique identifier for the game.
      */
@@ -52,6 +55,15 @@ public class Game {
     public Game(){
         this.id = UUID.randomUUID();
         loadGameData(new GameData(id));
+    }
+
+    public Thread getGameThread() {
+        return gameThread;
+    }
+
+    public void setGameThread(Thread gameThread) {
+        this.gameThread = gameThread;
+        gameThread.start();
     }
 
     /**
@@ -249,6 +261,12 @@ public class Game {
                     "GG to all, match is over\n", scoreScreen.getCLIRepresentation());
             pirHandler.setAndRunTurn(pirDelay);
         });
+    }
+
+    public void stopGame(){
+        if(getGameThread() != null){
+            getGameThread().interrupt();
+        }
     }
 
 
