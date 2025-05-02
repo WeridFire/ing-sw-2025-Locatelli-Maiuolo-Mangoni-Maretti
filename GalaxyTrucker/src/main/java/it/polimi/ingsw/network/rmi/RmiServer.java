@@ -7,6 +7,7 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.Cheats;
 import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.game.exceptions.DrawTileException;
 import it.polimi.ingsw.game.exceptions.GameNotFoundException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
@@ -430,5 +431,29 @@ public class RmiServer implements IServer {
 			case "skip" -> Cheats.skipPhase(pg.game);
 			default -> client.updateClient(new ClientUpdate(pg.connectionUUID, "Cheat not found."));
 		}
+	}
+
+	@Override
+	public void resumeGame(IClient client, UUID gameId) throws RemoteException {
+		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
+
+		if(gamesHandler.getGame(gameId) != null) {
+			client.updateClient(new ClientUpdate(connectionUUID, "The game specified is already running."));
+			return;
+		}
+
+		GameData loaded = GameData.loadFromState(gameId);
+		if(loaded == null){
+			client.updateClient(new ClientUpdate(connectionUUID, "Could not find specified game."));
+			return;
+		}
+
+		try {
+			gamesHandler.resumeGame(loaded, connectionUUID);
+		} catch (PlayerAlreadyInGameException e) {
+			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
+		}
+
+
 	}
 }
