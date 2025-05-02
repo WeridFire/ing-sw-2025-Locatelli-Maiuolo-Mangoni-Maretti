@@ -119,7 +119,7 @@ public class LobbyCLIScreen extends CLIScreen{
 				setScreenMessage("Usage: settings <level|minplayers>");
 				break;
 			case "leave":
-				setScreenMessage("Function not implemented yet.");
+				getServer().quitGame(getClient());
 				break;
 
 			// refuses unavailable commands
