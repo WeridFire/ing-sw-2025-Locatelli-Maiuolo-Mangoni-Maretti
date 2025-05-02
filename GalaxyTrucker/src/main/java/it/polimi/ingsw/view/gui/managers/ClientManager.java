@@ -4,8 +4,8 @@ import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.view.gui.elements.LoginUI;
 import javafx.application.Platform;
 import javafx.scene.Node;
-import javafx.scene.control.Label; // Example for game view
-import javafx.scene.layout.VBox;   // Example for game view
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.function.Consumer;
