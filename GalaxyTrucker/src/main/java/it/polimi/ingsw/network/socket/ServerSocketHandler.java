@@ -58,7 +58,8 @@ public class ServerSocketHandler implements IServer {
 
 	@Override
 	public void quitGame(IClient client) {
-		//TODO quit game socket function
+		SocketMessage mess = SocketMessage.quitGameMessage();
+		sendSocketMessage(mess);
 	}
 
 	@Override

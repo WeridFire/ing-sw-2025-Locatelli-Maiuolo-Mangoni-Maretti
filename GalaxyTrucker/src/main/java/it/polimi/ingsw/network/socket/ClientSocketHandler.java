@@ -98,6 +98,7 @@ public class ClientSocketHandler implements IClient {
 						case PIR_FORCE_END_TURN -> getServer().pirForceEndTurn(this);
 						case CHEAT -> getServer().useCheat(this, (String) message.getArgs().getFirst());
 						case RESUME_GAME -> getServer().resumeGame(this, (UUID) message.getArgs().getFirst());
+						case QUIT_GAME -> getServer().quitGame(this);
 					}
 				}catch(IllegalArgumentException e){
 					System.err.println("ERROR WHILE PARSING MESSAGE! Message:");

@@ -32,7 +32,8 @@ public class SocketMessage implements Serializable{
 		PIR_FORCE_END_TURN,
 		PIR_SELECT_MULTIPLE_CHOICE,
 		CHEAT,
-		RESUME_GAME
+		RESUME_GAME,
+		QUIT_GAME
 	}
 
 	private MessageType type;
@@ -228,5 +229,9 @@ public class SocketMessage implements Serializable{
 
 	public static SocketMessage resumeGameMessage(UUID gameId){
 		return new SocketMessage(MessageType.RESUME_GAME, List.of(gameId));
+	}
+
+	public static SocketMessage quitGameMessage(){
+		return new SocketMessage(MessageType.QUIT_GAME);
 	}
 }
