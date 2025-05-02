@@ -498,6 +498,9 @@ public class GameData implements Serializable {
         deadPlayers.add(p);
     }
 
+    /**
+     * Serializes and writes to file the current game state.
+     */
     public void saveGameState() {
         ObjectMapper objectMapper = new ObjectMapper();
         File directory = new File("games");
@@ -515,6 +518,11 @@ public class GameData implements Serializable {
         }
     }
 
+    /**
+     * Given a gameID, returns a GameData relative to that ID.
+     * @param gameId The gameID to resume.
+     * @return The GameData object built from the savestate. Null if the save state with the ID does not exist.
+     */
     public static GameData loadFromState(UUID gameId) {
         ObjectMapper objectMapper = new ObjectMapper();
         File file = new File("games", gameId.toString() + ".json");
