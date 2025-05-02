@@ -126,7 +126,7 @@ public class Game {
 
         gameData.getPIRHandler().joinEndTurn(gameData.getPlayers());
 
-        // TODO: save gameData state HERE
+        gameData.saveGameState();
 
         //********//
         // FLIGHT
@@ -153,7 +153,7 @@ public class Game {
                 }
             }
 
-            // TODO: save gameData state HERE
+            gameData.saveGameState();
 
             // prepare next adventure
             currentAdventureCard = gameData.getDeck().drawNextCard();
