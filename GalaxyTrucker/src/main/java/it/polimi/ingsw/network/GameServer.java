@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class GameServer{
 
@@ -143,7 +144,11 @@ public class GameServer{
     }
 
 	public void broadcastUpdate(Game game) throws RemoteException {
-		for (Player player: game.getGameData().getPlayers()){
+		for (Player player: game.getGameData()
+								.getPlayers()
+								.stream()
+								.filter(Player::isConnected).
+								collect(Collectors.toSet())){
 			IClient client = clients.get(player.getConnectionUUID());
 			if (client != null){
 				client.updateClient(new ClientUpdate(player.getConnectionUUID()));
@@ -161,10 +166,6 @@ public class GameServer{
 				client.updateClient(new ClientUpdate(player.getConnectionUUID(), playersToRefreshView.contains(player)));
 			}
 		}
-	}
-
-	public void broadcastUpdate(UUID gameId) throws RemoteException, CantFindClientException {
-		broadcastUpdate(GamesHandler.getInstance().getGame(gameId));
 	}
 
 
