@@ -68,7 +68,7 @@ public class GamesHandler {
      */
     public Game startGame(Game game) {
         //Instantiate a thread that handles that specific game.
-        new Thread(() -> {
+        Thread t = new Thread(() -> {
             try {
                 game.gameLoop();
             } catch (InterruptedException | RemoteException e) {
@@ -78,7 +78,8 @@ public class GamesHandler {
                 // once the game has ended due to any circumstance, remove it from the games list
                 games.remove(game);
             }
-        }).start();
+        });
+        game.setGameThread(t); //setting it also starts it.
         return game;
     }
 
@@ -194,4 +195,5 @@ public class GamesHandler {
     public ArrayList<Game> getGames() {
         return games;
     }
+
 }
