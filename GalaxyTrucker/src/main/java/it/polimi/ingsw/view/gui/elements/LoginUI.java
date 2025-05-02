@@ -3,25 +3,32 @@ package it.polimi.ingsw.view.gui.elements;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
-public class ClientUI {
+public class LoginUI {
     private final VBox layout;
+    private final TextField usernameField;
+    private final CheckBox rmiCheckBox;
+    private final Button loginButton;
 
-    public ClientUI(Consumer<String> onUsernameConfirmed) {
+    public LoginUI(BiConsumer<String, Boolean> onLoginAttempt) {
         Label promptLabel = new Label("Enter your username:");
-        TextField usernameField = new TextField();
+        usernameField = new TextField();
         usernameField.setPromptText("Username");
 
-        Button confirmButton = new Button("Confirm");
-        confirmButton.setOnAction(_ -> {
+        rmiCheckBox = new CheckBox("Use RMI");
+
+        loginButton = new Button("Login");
+        loginButton.setOnAction(e -> {
             String username = usernameField.getText().trim();
+            boolean useRmi = rmiCheckBox.isSelected();
             if (!username.isEmpty()) {
-                onUsernameConfirmed.accept(username);
+                onLoginAttempt.accept(username, useRmi);
             } else {
                 Alert alert = new Alert(Alert.AlertType.WARNING, "Please enter a valid username.");
                 alert.showAndWait();
@@ -30,7 +37,7 @@ public class ClientUI {
 
         layout = new VBox(15);
         layout.setAlignment(Pos.CENTER);
-        layout.getChildren().addAll(promptLabel, usernameField, confirmButton);
+        layout.getChildren().addAll(promptLabel, usernameField, rmiCheckBox, loginButton);
     }
 
     public VBox getLayout() {

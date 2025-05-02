@@ -18,4 +18,11 @@ public class AlertUtils {
 
         return alert.showAndWait().filter(response -> response == yes).isPresent();
     }
+
+    public static void showError(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
 }
