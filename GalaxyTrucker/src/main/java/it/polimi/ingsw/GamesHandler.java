@@ -57,7 +57,7 @@ public class GamesHandler {
      */
     public Game startGame() {
         Game game = new Game();
-       return startGame(game);
+        return startGame(game);
     }
 
 
@@ -71,7 +71,9 @@ public class GamesHandler {
         Thread t = new Thread(() -> {
             try {
                 game.gameLoop();
-            } catch (InterruptedException | RemoteException e) {
+            } catch (InterruptedException e) {
+                System.out.println("Interrupted game: " + game.getId());
+            }catch (RemoteException e) {
                 throw new RuntimeException(e);
             }
             finally {
@@ -111,6 +113,7 @@ public class GamesHandler {
             throw new PlayerAlreadyInGameException("You already are in a game.");
         }
         Game createdGame = startGame();
+        games.add(createdGame);
 		try {
 			addPlayerToGame(username, createdGame.getId(), connectionUUID);
 		} catch (GameNotFoundException e) {
