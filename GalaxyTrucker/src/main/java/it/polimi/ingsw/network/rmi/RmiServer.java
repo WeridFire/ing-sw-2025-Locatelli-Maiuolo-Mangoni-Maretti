@@ -106,7 +106,7 @@ public class RmiServer implements IServer {
 			Game g = gamesHandler.createGame(username, connectionUUID);
 			System.out.println("Created new game: " + g.getId());
 			client.updateClient(new ClientUpdate(connectionUUID));
-		} catch (PlayerAlreadyInGameException e) {
+		} catch (Exception e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
 
@@ -116,10 +116,14 @@ public class RmiServer implements IServer {
 	public void joinGame(IClient client, UUID gameId, String username) throws RemoteException {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		try {
-			Game result = gamesHandler.addPlayerToGame(username, gameId, connectionUUID);
-			if(result != null){
+			Game game = gamesHandler.getGame(gameId);
+			if(game == null) {
+				throw new GameNotFoundException(gameId);
+			}
+			game.addPlayer(username, connectionUUID);
+			if(game != null){
 				//notify everyone that a new player has joined -> refreshes their view
-				GameServer.getInstance().broadcastUpdate(result);
+				GameServer.getInstance().broadcastUpdate(game);
 			}
 		} catch (PlayerAlreadyInGameException | GameNotFoundException e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
