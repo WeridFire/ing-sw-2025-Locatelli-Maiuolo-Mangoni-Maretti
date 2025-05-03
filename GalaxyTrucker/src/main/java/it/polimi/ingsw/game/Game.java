@@ -152,6 +152,12 @@ public class Game {
         Card currentAdventureCard = gameData.getDeck().drawNextCard();
         AdventureGamePhase adventureGamePhase;
         while (currentAdventureCard != null) {
+
+            //skip the rest if there are no players flying
+            if(gameData.getPlayersInFlight().isEmpty()){
+                break;
+            }
+
             // create adventure
             adventureGamePhase = new AdventureGamePhase(id, gameData, currentAdventureCard);
             getGameData().setCurrentGamePhase(adventureGamePhase);
