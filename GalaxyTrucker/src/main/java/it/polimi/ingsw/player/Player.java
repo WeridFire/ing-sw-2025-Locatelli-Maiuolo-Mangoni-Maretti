@@ -23,7 +23,6 @@ public class Player implements Serializable {
     private final String username;
     private UUID connectionUUID;
 
-
     /**
      * true if the player desire to end the flight at the end of the current adventure
      */
@@ -265,6 +264,7 @@ public class Player implements Serializable {
      */
     public int getOrder() {
         if (position == null) return Integer.MAX_VALUE;
+        if (isEndedFlight()) return Integer.MAX_VALUE;
         else return -position;
     }
 
@@ -494,4 +494,5 @@ public class Player implements Serializable {
     public boolean isConnected(){
         return getConnectionUUID() != null;
     }
+
 }
