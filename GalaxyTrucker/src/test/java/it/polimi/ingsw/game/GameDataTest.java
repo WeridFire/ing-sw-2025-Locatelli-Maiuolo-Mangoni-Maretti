@@ -92,7 +92,7 @@ class GameDataTest {
     }
 
     @Test
-    void testResumeGameInAssembly() throws TooManyItemsInHandException, AlreadyEndedAssemblyException, NoShipboardException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, InterruptedException, PlayerAlreadyInGameException, OutOfBuildingAreaException {
+    void testResumeGameInAssembly() throws TooManyItemsInHandException, AlreadyEndedAssemblyException, NoShipboardException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, InterruptedException, PlayerAlreadyInGameException, OutOfBuildingAreaException, GameAlreadyRunningException {
         UUID gameId = runAndSaveGameUntilStep(0);
         Game g = GamesHandler.getInstance().getGame(gameId);
 
@@ -101,13 +101,15 @@ class GameDataTest {
         assertThrows(GameAlreadyRunningException.class,
                     () ->  GamesHandler.getInstance().resumeGame(gameData, UUID.randomUUID()));
 
-
         g.stopGame();
+        Thread.sleep(1000);
+        GamesHandler.getInstance().resumeGame(gameData, UUID.randomUUID());
     }
 
 
 
     /**
+     * Step -1: stops in lobby (shouldnt serialize a game in lobby)
      * Step 0: stops at initial assembly phase.
      * Step 1: stops with built shipboards
      * Step 2+: stops with adventure phase started
@@ -117,9 +119,15 @@ class GameDataTest {
     UUID runAndSaveGameUntilStep(int step) throws PlayerAlreadyInGameException, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException, TooManyItemsInHandException, NoShipboardException, InterruptedException {
         Game g = GamesHandler.getInstance().createGame("Pippo", UUID.randomUUID());
 
-        Player player2 = new Player("Player2", UUID.randomUUID());
         Player player1 = g.getGameData().getPlayers().stream().filter((p) -> p.getUsername().equals(g.getGameData().getGameLeader())).findFirst().get();
-        g.addPlayer(player2);
+        Player player2 = g.addPlayer("Player2", UUID.randomUUID());
+
+        if(step == -1){
+            g.getGameData().saveGameState();
+            return g.getId();
+        }
+
+        Thread.sleep(1000);
 
         if(step == 0){
             g.getGameData().saveGameState();
