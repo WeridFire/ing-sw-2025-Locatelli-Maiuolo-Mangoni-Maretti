@@ -1,5 +1,6 @@
 package it.polimi.ingsw.shipboard.tiles;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.shipboard.SideType;
@@ -46,11 +47,11 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
      * @throws NotFixedTileException If {@code this} tile has not been placed yet.
      * @see #place(Coordinates)
      */
+    @JsonIgnore
     public Coordinates getCoordinates() throws NotFixedTileException {
         if (fixedAt == null) {
             throw new NotFixedTileException("Attempt to retrieve unplaced tile's coordinates.");
         }
-
         return fixedAt;
     }
 

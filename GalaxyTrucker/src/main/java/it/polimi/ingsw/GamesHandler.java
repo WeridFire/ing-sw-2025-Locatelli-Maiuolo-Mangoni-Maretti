@@ -2,6 +2,7 @@ package it.polimi.ingsw;
 
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
 import it.polimi.ingsw.game.exceptions.GameNotFoundException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.player.Player;
@@ -130,8 +131,11 @@ public class GamesHandler {
      * @param connectionUUID The connection fo the player that sent the command.
      * @return The newly game object.
      */
-    public Game resumeGame(GameData savedGameState, UUID connectionUUID) throws PlayerAlreadyInGameException {
+    public Game resumeGame(GameData savedGameState, UUID connectionUUID) throws PlayerAlreadyInGameException, GameAlreadyRunningException {
         Game createdGame = new Game(savedGameState);
+        if(games.stream().anyMatch((g) -> g.getId().equals(savedGameState.getGameId()))){
+            throw new GameAlreadyRunningException(createdGame.getId());
+        }
         startGame(createdGame);
         try {
             addPlayerToGame(savedGameState.getGameLeader(), createdGame.getId(), connectionUUID);

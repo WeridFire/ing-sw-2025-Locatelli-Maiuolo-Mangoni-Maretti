@@ -9,6 +9,7 @@ import it.polimi.ingsw.game.Cheats;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.game.exceptions.DrawTileException;
+import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
 import it.polimi.ingsw.game.exceptions.GameNotFoundException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
@@ -454,7 +455,7 @@ public class RmiServer implements IServer {
 
 		try {
 			gamesHandler.resumeGame(loaded, connectionUUID);
-		} catch (PlayerAlreadyInGameException e) {
+		} catch (PlayerAlreadyInGameException | GameAlreadyRunningException e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
 

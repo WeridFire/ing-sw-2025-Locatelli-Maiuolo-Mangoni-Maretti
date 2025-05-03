@@ -1,20 +1,27 @@
 package it.polimi.ingsw.game;
 
+import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
+import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
+import it.polimi.ingsw.player.exceptions.NoShipboardException;
+import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
+import it.polimi.ingsw.shipboard.exceptions.*;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.shipboard.visitors.TileVisitor;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.engine.TestDescriptor;
 
+import java.rmi.RemoteException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -82,6 +89,64 @@ class GameDataTest {
         gameData.setCurrentGamePhase(mockPhase);
         assertEquals(mockPhase, gameData.getCurrentGamePhase());
         assertEquals(GamePhaseType.ADVENTURE, gameData.getCurrentGamePhaseType());
+    }
+
+    @Test
+    void testResumeGameInAssembly() throws TooManyItemsInHandException, AlreadyEndedAssemblyException, NoShipboardException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, InterruptedException, PlayerAlreadyInGameException, OutOfBuildingAreaException {
+        UUID gameId = runAndSaveGameUntilStep(0);
+        Game g = GamesHandler.getInstance().getGame(gameId);
+
+        GameData gameData = GameData.loadFromState(gameId);
+
+        assertThrows(GameAlreadyRunningException.class,
+                    () ->  GamesHandler.getInstance().resumeGame(gameData, UUID.randomUUID()));
+
+
+        g.stopGame();
+    }
+
+
+
+    /**
+     * Step 0: stops at initial assembly phase.
+     * Step 1: stops with built shipboards
+     * Step 2+: stops with adventure phase started
+     * @param step
+     * @return
+     */
+    UUID runAndSaveGameUntilStep(int step) throws PlayerAlreadyInGameException, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException, TooManyItemsInHandException, NoShipboardException, InterruptedException {
+        Game g = GamesHandler.getInstance().createGame("Pippo", UUID.randomUUID());
+
+        Player player2 = new Player("Player2", UUID.randomUUID());
+        Player player1 = g.getGameData().getPlayers().stream().filter((p) -> p.getUsername().equals(g.getGameData().getGameLeader())).findFirst().get();
+        g.addPlayer(player2);
+
+        if(step == 0){
+            g.getGameData().saveGameState();
+            return g.getId();
+        }
+
+        Thread.sleep(1000);
+
+        Cheats.cheatShipboard(g, player1);
+        Cheats.cheatShipboard(g, player2);
+        if(step == 1){
+            g.getGameData().saveGameState();
+            return g.getId();
+        }
+
+        g.getGameData().endAssembly(player1, false);
+        g.getGameData().endAssembly(player2, false);
+
+        Thread.sleep(2000);
+        if(step == 2){
+            g.getGameData().saveGameState();
+            return g.getId();
+        }
+
+
+        g.getGameData().saveGameState();
+        return g.getId();
     }
 
     @Test

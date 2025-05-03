@@ -1,7 +1,12 @@
 package it.polimi.ingsw.util;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import it.polimi.ingsw.enums.Direction;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
@@ -31,7 +36,8 @@ public class Coordinates implements Serializable {
      * @param row the row index of the coordinate
      * @param column the column index of the coordinate
      */
-    public Coordinates(int row, int column) {
+    @JsonCreator
+    public Coordinates(@JsonProperty("row") int row, @JsonProperty("column") int column) {
         this.row = row;
         this.column = column;
         id = row * MAX_COL + column;
@@ -108,6 +114,7 @@ public class Coordinates implements Serializable {
      *
      * @return a map where the keys are movement directions, and the values are the corresponding neighboring coordinates.
      */
+    @JsonIgnore
     public Set<Map.Entry<Direction, Coordinates>> neighbors() {
         Map<Direction, Coordinates> neighbors = new EnumMap<>(Direction.class);
         for (Direction direction : Direction.values()) {
@@ -122,6 +129,7 @@ public class Coordinates implements Serializable {
      *
      * @return The neighbors of this coordinates going in all the possible directions.
      */
+    @JsonIgnore
     public Set<Coordinates> getNeighbors() {
         Set<Coordinates> neighbors = new HashSet<>();
         for (Direction direction : Direction.values()) {
@@ -130,12 +138,7 @@ public class Coordinates implements Serializable {
         return neighbors;
     }
 
-    /**
-     * Get info about coordinates adjacency.
-     * @param neighbor The other coordinates to check for adjacency.
-     * @return {@code null} if this and {@code other} coordinates are not adjacent,
-     * otherwise the direction to go from this tile to the {@code other}.
-     */
+
     public Direction getNeighborDirection(Coordinates neighbor) {
         if (neighbor == null) return null;
         for (Direction direction : Direction.values()) {
@@ -172,6 +175,23 @@ public class Coordinates implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(row, column);
+    }
+
+
+    public static class KeyDeserializer extends com.fasterxml.jackson.databind.KeyDeserializer {
+
+        @Override
+        public Object deserializeKey(String s, DeserializationContext deserializationContext) throws IOException {
+            // Expected format: "(row; column)"
+            s = s.replace("(", "").replace(")", "").trim();
+            String[] parts = s.split(";");
+            if (parts.length != 2) {
+                throw new IOException("Invalid Coordinates key: " + s);
+            }
+            int row = Integer.parseInt(parts[0].trim());
+            int column = Integer.parseInt(parts[1].trim());
+            return new Coordinates(row, column);
+        }
     }
 }
 

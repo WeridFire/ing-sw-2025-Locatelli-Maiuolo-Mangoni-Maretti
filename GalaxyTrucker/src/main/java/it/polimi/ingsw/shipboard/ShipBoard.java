@@ -1,5 +1,6 @@
 package it.polimi.ingsw.shipboard;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.polimi.ingsw.TilesFactory;
 import it.polimi.ingsw.enums.*;
 import it.polimi.ingsw.player.Player;
@@ -106,18 +107,22 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		notifyIntegrityListeners(visitorCheckIntegrity.getProblem(!filled));
 	}
 
+	@JsonIgnore
 	public VisitorCalculateCargoInfo getVisitorCalculateCargoInfo() {
 		return visitorCalculateCargoInfo;
 	}
 
+	@JsonIgnore
 	public VisitorCalculatePowers getVisitorCalculatePowers() {
 		return visitorCalculatePowers;
 	}
 
+	@JsonIgnore
 	public VisitorCalculateShieldedSides getVisitorCalculateShieldedSides() {
 		return visitorCalculateShieldedSides;
 	}
 
+	@JsonIgnore
 	public VisitorCheckIntegrity getVisitorCheckIntegrity() {
 		return visitorCheckIntegrity;
 	}
@@ -183,6 +188,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 *
 	 * @return An unmodifiable set of all and only the tiles placed onto the shipboard.
 	 */
+	@JsonIgnore
 	public Set<TileSkeleton> getTiles() {
 		return Set.copyOf(board.values());
 	}
@@ -193,6 +199,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 *
 	 * @return the map representing the shipboard.
 	 */
+
 	public Map<Coordinates, TileSkeleton> getBoard() {
 		return board;
 	}

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.game;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.GameLevel;
@@ -198,6 +199,7 @@ public class GameData implements Serializable {
      *
      * @return The current turn player.
      */
+    @JsonIgnore
     public PIRHandler getPIRHandler() {
         return pirHandler;
     }
@@ -504,6 +506,7 @@ public class GameData implements Serializable {
      */
     public void saveGameState() {
         ObjectMapper objectMapper = new ObjectMapper();
+
         File directory = new File("games");
 
         if (!directory.exists()) {
