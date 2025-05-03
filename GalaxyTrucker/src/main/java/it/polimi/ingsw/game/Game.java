@@ -18,6 +18,7 @@ import it.polimi.ingsw.playerInput.PIRUtils;
 import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
+import it.polimi.ingsw.shipboard.exceptions.AlreadyPickedPosition;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.rmi.RemoteException;
@@ -124,9 +125,9 @@ public class Game {
         for (Player player : getGameData().getPlayers()) {
             if (!player.getShipBoard().isEndedAssembly()) {
                 try {
-                    getGameData().endAssembly(player, true);
+                    getGameData().endAssembly(player, true, null);
                     System.out.println(this + " Forced end assemble for player '" + player.getUsername() + "'");
-                } catch (AlreadyEndedAssemblyException | NoShipboardException | TooManyItemsInHandException e) {
+                } catch (AlreadyEndedAssemblyException | NoShipboardException | TooManyItemsInHandException | AlreadyPickedPosition e) {
                     throw new RuntimeException(e);  // should never happen -> runtime exception
                 }
             }
