@@ -62,6 +62,13 @@ public class AssembleGamePhase extends PlayableGamePhase {
 
     public void playLoop() throws RemoteException, InterruptedException {
 
+        synchronized (gameData.getUnorderedPlayers()) {
+            if(gameData.getPlayers().isEmpty()){
+                GamesHandler gamesHandler = GamesHandler.getInstance();
+                gamesHandler.getGames().remove(gamesHandler.getGame(this.gameId));
+            }
+        }
+
         if (gameData.getCurrentGamePhase() != this) {
             throw new  RuntimeException("Trying to run a game phase which is not active on the game.");
         }
@@ -81,6 +88,15 @@ public class AssembleGamePhase extends PlayableGamePhase {
 
         // if the hourglass is in its stop place (keep this 'if' to not lose the TESTFLIGHT case)
         if (howManyTimerRotationsLeft == 1) {
+
+            //check if there are any players left
+            synchronized (gameData.getUnorderedPlayers()) {
+                if(gameData.getPlayers().isEmpty()){
+                    GamesHandler gamesHandler = GamesHandler.getInstance();
+                    gamesHandler.getGames().remove(gamesHandler.getGame(this.gameId));
+                }
+            }
+
             setTimerRunning(true);  // run for the last time
             // wait at most a total hourglass time (or get notified earlier by notifyAllPlayersEndedAssembly)
             synchronized (timerLock) {

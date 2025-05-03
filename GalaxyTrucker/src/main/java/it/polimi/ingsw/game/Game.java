@@ -181,6 +181,7 @@ public class Game {
         System.out.println(this + " Started scoring phase");
         scoreScreenGamePhase.playLoop();
         notifyScoresToPlayers(scoreScreenGamePhase);
+
         //TODO: finire scoring phase
 
     }
