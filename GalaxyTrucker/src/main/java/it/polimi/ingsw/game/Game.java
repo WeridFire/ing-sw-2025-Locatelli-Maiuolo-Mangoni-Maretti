@@ -200,12 +200,24 @@ public class Game {
     }
 
 
-    public void addPlayer(Player player) throws PlayerAlreadyInGameException {
+    public Player addPlayer(String username, UUID connectionUUID) throws PlayerAlreadyInGameException {
         if(gameData.getCurrentGamePhaseType() == GamePhaseType.LOBBY){
-            gameData.addPlayer(player);
+            Player newPlayer = new Player(username, connectionUUID);
+            gameData.addPlayer(newPlayer);
+            return newPlayer;
         }
-        //IN here we should handle when a player reconnects. That's why it is handled on the Game level, and not
-        //GameData.
+
+        Player existingDisconnectedPlayer = gameData.getPlayers()
+                        .stream()
+                        .filter((p) -> p.getUsername().equals(username) && !p.isConnected())
+                        .findFirst()
+                        .orElse(null);
+        if(existingDisconnectedPlayer == null){
+            throw new PlayerAlreadyInGameException(username);
+        }else{
+            existingDisconnectedPlayer.setConnectionUUID(connectionUUID);
+            return existingDisconnectedPlayer;
+        }
     }
 
     private void initGame(){

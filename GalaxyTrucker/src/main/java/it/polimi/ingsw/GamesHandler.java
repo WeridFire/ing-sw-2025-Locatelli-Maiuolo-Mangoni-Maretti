@@ -111,15 +111,12 @@ public class GamesHandler {
      */
     public Game createGame(String username, UUID connectionUUID) throws PlayerAlreadyInGameException {
         if(findGameByClientUUID(connectionUUID) != null){
-            throw new PlayerAlreadyInGameException("You already are in a game.");
+            throw new PlayerAlreadyInGameException(username);
         }
         Game createdGame = startGame();
         games.add(createdGame);
-		try {
-			addPlayerToGame(username, createdGame.getId(), connectionUUID);
-		} catch (GameNotFoundException e) {
-			throw new RuntimeException(e.getMessage());
-		}
+
+        createdGame.addPlayer(username, connectionUUID);
         return createdGame;
 	}
 
@@ -136,43 +133,12 @@ public class GamesHandler {
         if(games.stream().anyMatch((g) -> g.getId().equals(savedGameState.getGameId()))){
             throw new GameAlreadyRunningException(createdGame.getId());
         }
+        games.add(createdGame);
         startGame(createdGame);
-        try {
-            addPlayerToGame(savedGameState.getGameLeader(), createdGame.getId(), connectionUUID);
-        } catch (GameNotFoundException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+
+        createdGame.addPlayer(savedGameState.getGameLeader(), connectionUUID);
+
         return createdGame;
-    }
-
-
-    /**
-     * Adds a player into an existing game.
-     * @param username The username the player wants to join with.
-     * @param gameId The game UUID, must exist.
-     * @param connectionUUID The connection UUID.
-     * @return The joined game
-     * @throws PlayerAlreadyInGameException The username is already present in the game.
-     * @throws GameNotFoundException The game does not exist.
-     */
-    public Game addPlayerToGame(String username, UUID gameId, UUID connectionUUID) throws PlayerAlreadyInGameException, GameNotFoundException {
-        Game target = getGame(gameId);
-        if(target == null){
-            throw new GameNotFoundException(gameId);
-        }
-        Set<String> usernames = target.getGameData().getPlayers().stream()
-                                                            .map(Player::getUsername)
-                                                            .collect(Collectors.toSet());
-        if(!usernames.contains(username)){
-            try {
-                target.addPlayer(new Player(username, connectionUUID));
-                return target;
-            } catch (PlayerAlreadyInGameException e) {
-                throw new RuntimeException(e);  // should never happen (already checked username is not in usernames) -> runtime error
-            }
-        }else{
-            throw new PlayerAlreadyInGameException("This username is already in the game.");
-        }
     }
 
     public Player getPlayerByConnection(UUID clientUUID){
