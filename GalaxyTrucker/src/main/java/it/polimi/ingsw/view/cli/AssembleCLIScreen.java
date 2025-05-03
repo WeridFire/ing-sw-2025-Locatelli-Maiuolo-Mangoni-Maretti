@@ -189,19 +189,24 @@ public class AssembleCLIScreen extends CLIScreen{
                 break;
 
             case "finish":
-                if (validateIsAssemblyEnded()) break;
-                if (getLastUpdate().getClientPlayer().getShipBoard() == null) {
-                    setScreenMessage("You don't have a shipboard.");
-                    break;
+                if (args.length == 1){
+                    if (validateIsAssemblyEnded()) break;
+                    if (getLastUpdate().getClientPlayer().getShipBoard() == null) {
+                        setScreenMessage("You don't have a shipboard.");
+                        break;
+                    }
+                    // this finish is done by the player, not forced by the end of time
+                    // -> check for no tiles / cards groups in hand
+                    if (occupiedHand != null) {
+                        setScreenMessage("You can't finish with a " + occupiedHand + " in hand.");
+                        break;
+                    }
+                    int preferredPosition = Integer.parseInt(args[0]);
+                    getServer().finishAssembling(getClient(), preferredPosition);
                 }
-                // this finish is done by the player, not forced by the end of time
-                // -> check for no tiles / cards groups in hand
-                if (occupiedHand != null) {
-                    setScreenMessage("You can't finish with a " + occupiedHand + " in hand.");
-                    break;
+                else {
+                    setScreenMessage("Usage: finish <starting position>");
                 }
-
-                getServer().finishAssembling(getClient());
                 break;
 
             case "showcg":

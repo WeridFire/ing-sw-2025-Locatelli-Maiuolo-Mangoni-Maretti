@@ -194,9 +194,9 @@ public class SocketMessage implements Serializable{
 		return new SocketMessage(MessageType.PLACE_TILE, List.of(coordinates, rotation));
 	}
 
-	public static SocketMessage finishAssemblingMessage(){
+	public static SocketMessage finishAssemblingMessage(Integer preferredPosition){
 
-		return new SocketMessage(MessageType.FINISH_ASSEMBLING);
+		return new SocketMessage(MessageType.FINISH_ASSEMBLING, List.of(preferredPosition));
 	}
 
 	public static SocketMessage showCardGroupMessage(Integer id) {
