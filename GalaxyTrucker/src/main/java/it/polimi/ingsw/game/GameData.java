@@ -8,6 +8,7 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.PlayableGamePhase;
+import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
 import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
@@ -18,10 +19,7 @@ import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.GameLevelStandards;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -286,7 +284,7 @@ public class GameData implements Serializable {
                 .map(Player::getUsername)
                 .collect(Collectors.toSet())
                 .contains(player.getUsername())) {
-            throw new PlayerAlreadyInGameException("Player with this username is already present.");
+            throw new PlayerAlreadyInGameException(player.getUsername());
         }
         synchronized (players){
             players.add(player);
@@ -294,7 +292,7 @@ public class GameData implements Serializable {
                 this.gameLeader = player.getUsername();
             }
 
-            if(players.size() >= requiredPlayers){
+            if(players.size() >= requiredPlayers && getCurrentGamePhaseType() == GamePhaseType.LOBBY){
                 //Awake main thread for starting game.
                 players.notifyAll();
             }
@@ -502,10 +500,13 @@ public class GameData implements Serializable {
     }
 
     /**
-     * Serializes and writes to file the current game state.
+     * Serializes the object instance into an UTF-8 encoded string.
+     * @return
      */
     public void saveGameState() {
-        ObjectMapper objectMapper = new ObjectMapper();
+        if(getCurrentGamePhaseType() == GamePhaseType.LOBBY){
+            return;
+        }
 
         File directory = new File("games");
 
@@ -513,14 +514,19 @@ public class GameData implements Serializable {
             directory.mkdirs();
         }
 
-        File file = new File(directory, getGameId().toString() + ".json");
+        File file = new File(directory, getGameId().toString() + ".state");
 
-        try (FileWriter fileWriter = new FileWriter(file)) {
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(fileWriter, this);
+        try (FileOutputStream fos = new FileOutputStream(file);
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+
+            oos.writeObject(this); // Assuming `this` is Serializable
+            oos.flush();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
     /**
      * Given a gameID, returns a GameData relative to that ID.
@@ -528,24 +534,27 @@ public class GameData implements Serializable {
      * @return The GameData object built from the savestate. Null if the save state with the ID does not exist.
      */
     public static GameData loadFromState(UUID gameId) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        File file = new File("games", gameId.toString() + ".json");
+        File file = new File("games", gameId.toString() + ".state");
 
         if (!file.exists()) {
             return null;
         }
 
-        try {
-            GameData game = objectMapper.readValue(file, GameData.class);
+        try (FileInputStream fis = new FileInputStream(file);
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
 
-            //Perform in here any processing needed. For example we make it so all the players are shown as "disconnected",
-            //so that players can rejoin using the same nickname.
-            game.players.forEach((p) -> p.setConnectionUUID(null));
+            GameData game = (GameData) ois.readObject();
+
+            // Reset connectionUUIDs for all players
+            game.players.forEach(p -> p.setConnectionUUID(null));
+
             return game;
-        } catch (IOException e) {
+
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             return null;
         }
     }
+
 
 }
