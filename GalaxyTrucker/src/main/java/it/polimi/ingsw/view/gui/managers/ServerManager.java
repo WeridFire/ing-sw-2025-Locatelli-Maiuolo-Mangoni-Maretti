@@ -2,8 +2,8 @@ package it.polimi.ingsw.view.gui.managers;
 
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.network.exceptions.AlreadyRunningServerException;
-import it.polimi.ingsw.view.gui.elements.AlertUtils;
-import it.polimi.ingsw.view.gui.elements.ServerUI;
+import it.polimi.ingsw.view.gui.utils.AlertUtils;
+import it.polimi.ingsw.view.gui.UIs.ServerUI;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.stage.Stage;

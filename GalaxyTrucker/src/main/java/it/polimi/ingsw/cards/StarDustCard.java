@@ -30,7 +30,7 @@ public class StarDustCard extends Card{
 	 */
 	@Override
 	public void playEffect(GameData game) {
-		for(Player p : game.getPlayers().reversed()){
+		for(Player p : game.getPlayersInFlight().reversed()){
 			int exposedConnectors = countExposedConnectors(p);
 			game.movePlayerBackward(p, exposedConnectors);
 		}

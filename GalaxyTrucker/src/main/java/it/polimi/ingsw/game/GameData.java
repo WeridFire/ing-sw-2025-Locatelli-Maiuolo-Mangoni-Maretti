@@ -154,6 +154,7 @@ public class GameData implements Serializable {
 
     /**
      * Gets the list of players in the game, sorted by route order (first is the leader).
+     * Players not in flight will be at the end of the list.
      *
      * @return The list of players.
      */
@@ -177,7 +178,7 @@ public class GameData implements Serializable {
     }
 
     /**
-     * Gets the list of players in the game that have not ended flight yet.
+     * Gets the list of players in the game that have not ended flight yet, sorted by route order (first is the leader).
      *
      * @return The list of players.
      */
@@ -313,7 +314,7 @@ public class GameData implements Serializable {
         synchronized (movementLock) {
 
             Set<Integer> occupiedPositions = new HashSet<>();
-            List<Player> currentOrder = getPlayers();
+            List<Player> currentOrder = getPlayersInFlight();
             for (Player player : currentOrder) {
                 if (!player.getUsername().equals(playerToMove.getUsername())) {
                     occupiedPositions.add(player.getPosition());
@@ -406,7 +407,7 @@ public class GameData implements Serializable {
     /**
      * Gets the username or identifier of the game leader.<br>
      * <b>NOTE</b>: the game leader is not the leader in flight board! It's the one who created the game.
-     * To get the leader in flight board use {@code getPlayers().getFirst()}
+     * To get the leader in flight board use {@code getPlayersInFlight().getFirst()}
      *
      * @return the game leader's name
      */

@@ -1,4 +1,4 @@
-package it.polimi.ingsw.view.gui.elements;
+package it.polimi.ingsw.view.gui.utils;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;

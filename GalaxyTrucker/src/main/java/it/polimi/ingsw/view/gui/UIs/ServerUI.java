@@ -1,4 +1,4 @@
-package it.polimi.ingsw.view.gui.elements;
+package it.polimi.ingsw.view.gui.UIs;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;

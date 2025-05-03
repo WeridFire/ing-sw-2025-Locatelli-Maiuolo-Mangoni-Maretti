@@ -64,7 +64,7 @@ public class PlanetsCard extends Card {
 	 */
 	@Override
 	public void playEffect(GameData game) throws InterruptedException {
-		for (Player p : game.getPlayers()){
+		for (Player p : game.getPlayersInFlight()){
 			List<Planet> availablePlanets = Arrays.stream(planets)
 					.filter(planet -> planet.getCurrentPlayer() == null).toList();
 			List<String> planetsOption = new ArrayList<String>();
@@ -88,7 +88,7 @@ public class PlanetsCard extends Card {
 		}
 
 		//TODO: allow rearrrangement / discard of goods
-		game.getPIRHandler().broadcastPIR(GamesHandler.getInstance().getGame(game.getGameId()),
+		game.getPIRHandler().broadcastPIR(game.getPlayersInFlight(),
 				(player, pirHandler) -> {
                     try {
                         addLoadablesInteraction(player, pirHandler);
@@ -98,7 +98,7 @@ public class PlanetsCard extends Card {
                 }
 		);
 
-		for(Player p : game.getPlayers().reversed()){
+		for(Player p : game.getPlayersInFlight().reversed()){
 			Planet landedPlanet = Arrays.stream(planets)
 					.filter(pl -> Objects.equals(pl.getCurrentPlayer(), p))
 					.findFirst()

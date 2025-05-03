@@ -155,15 +155,13 @@ public class Game {
             adventureGamePhase = new AdventureGamePhase(id, gameData, currentAdventureCard);
             getGameData().setCurrentGamePhase(adventureGamePhase);
             // notify all the players about the new adventure card
-            notifyAdventureToPlayers(gameData.getPlayers().getFirst(), currentAdventureCard);
+            notifyAdventureToPlayers(gameData.getPlayersInFlight().getFirst(), currentAdventureCard);
             // play the adventure
             adventureGamePhase.playLoop();
 
             // end flight for players that requested it
-            for (Player player : getGameData().getPlayers()) {
-                if (player.hasRequestedEndFlight()) {
-                    gameData.endFlight(player);
-                }
+            for (Player player : getGameData().getPlayers(Player::hasRequestedEndFlight)) {
+                gameData.endFlight(player);
             }
 
             gameData.saveGameState();
@@ -249,7 +247,7 @@ public class Game {
      * through multiple PIRs choice, in parallel on new threads. Will return once everyone has filled up their
      */
     private void fillUpShipboards() throws InterruptedException {
-        gameData.getPIRHandler().broadcastPIR(this, (player, pirHandler) ->
+        gameData.getPIRHandler().broadcastPIR(gameData.getPlayers(), (player, pirHandler) ->
                 player.getShipBoard().fill(player, pirHandler));
     }
 
@@ -259,7 +257,7 @@ public class Game {
      */
     private void notifyAdventureToPlayers(Player leader, Card card) throws InterruptedException {
         String leaderName = leader.toColoredString("[", "]");
-        gameData.getPIRHandler().broadcastPIR(this, (player, pirHandler) -> {
+        gameData.getPIRHandler().broadcastPIR(gameData.getPlayers(), (player, pirHandler) -> {
             PIRDelay pirDelay = new PIRDelay(player, 6,
                     "The leader " + leaderName + " has drawn a new Adventure Card:",
                     card.getCLIRepresentation());
@@ -268,10 +266,9 @@ public class Game {
     }
 
     private void notifyScoresToPlayers(ScoreScreenGamePhase scoreScreen) throws InterruptedException {
-
-        gameData.getPIRHandler().broadcastPIR(this, (player, pirHandler) -> {
+        gameData.getPIRHandler().broadcastPIR(gameData.getPlayers(), (player, pirHandler) -> {
             PIRDelay pirDelay = new PIRDelay(player, 6,
-                    "GG to all, match is over\n", scoreScreen.getCLIRepresentation());
+                    "GG to all, match is over", scoreScreen.getCLIRepresentation());
             pirHandler.setAndRunTurn(pirDelay);
         });
     }

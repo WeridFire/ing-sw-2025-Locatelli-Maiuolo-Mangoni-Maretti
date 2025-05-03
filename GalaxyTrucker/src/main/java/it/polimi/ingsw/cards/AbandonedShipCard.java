@@ -51,7 +51,7 @@ public class AbandonedShipCard extends Card{
 	 */
 	@Override
 	public void playEffect(GameData game) {
-		for(Player p : game.getPlayers()){
+		for(Player p : game.getPlayersInFlight()){
 			if(p.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().countAll(LoadableType.CREW_SET) >= requiredCrew){
 				boolean result = game.getPIRHandler().setAndRunTurn(
 						new PIRYesNoChoice(p, 30, "Do you want to take the ship? " +
