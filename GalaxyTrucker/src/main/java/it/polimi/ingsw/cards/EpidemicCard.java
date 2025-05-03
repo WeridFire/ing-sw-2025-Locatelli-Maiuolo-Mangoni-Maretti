@@ -39,7 +39,7 @@ public class EpidemicCard extends Card{
 	public void playEffect(GameData game) {
 		VisitorEpidemic visitor = new VisitorEpidemic();
 
-		for (Player p : game.getPlayers()) {
+		for (Player p : game.getPlayersInFlight()) {
 			ShipBoard shipBoard = p.getShipBoard();
 			Map<Coordinates, TileSkeleton> board = shipBoard.getTilesOnBoard();
 			board.values().forEach(tile -> {

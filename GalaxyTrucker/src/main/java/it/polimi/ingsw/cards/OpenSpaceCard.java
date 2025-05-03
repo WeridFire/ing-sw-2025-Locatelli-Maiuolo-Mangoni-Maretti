@@ -33,7 +33,7 @@ public class OpenSpaceCard extends Card{
 	 */
 	@Override
 	public void playEffect(GameData game) {
-		for(Player p : game.getPlayers()){
+		for(Player p : game.getPlayersInFlight()){
 			float steps = PIRUtils.runPlayerPowerTilesActivationInteraction(p, game, PowerType.THRUST);
 			//Here we just round, but know for sure that the thrusters tiles won't return numbers with decimals.
 			game.movePlayerForward(p, Math.round(steps));

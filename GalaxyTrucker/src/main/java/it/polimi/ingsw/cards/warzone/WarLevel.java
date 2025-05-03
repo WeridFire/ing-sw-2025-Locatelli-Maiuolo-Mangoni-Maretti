@@ -33,8 +33,8 @@ public class WarLevel implements Serializable {
 	 * @return
 	 */
 	public Player getWorstPlayer(GameData game) {
-		return game.getPlayers()
-				.stream().min(warCriteria).orElse(null);
+		return game.getPlayersInFlight().stream()
+				.min(warCriteria).orElse(null);
 	}
 
 	/**

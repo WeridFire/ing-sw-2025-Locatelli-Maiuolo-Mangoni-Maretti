@@ -377,17 +377,17 @@ public class PIRHandler implements Serializable {
 	 * applies the specified {@code pirCascadeFunction} to each player concurrently,
 	 * wait for all the players to produce the input
 	 * then return
-	 * @param game The game from which this method will get the players and will apply the broadcast.
+	 * @param players The list of players to which apply the broadcast.
 	 * @param pirCascadeFunction a consumer with a {@link Player} (the "each player" in the broadcast)
 	 *                           and a {@link PIRHandler} to set and run all the desired PIRs.
 	 *                           Note that this function can handle a sequence of PIRs, that's why it needs to call the
 	 *                           {@link PIRHandler#setAndRunGenericTurn(PIR, boolean)} internally.
 	 * @throws InterruptedException if one of the instantiated threads throws an {@link InterruptedException}
 	 */
-	public void broadcastPIR(Game game, BiConsumer<Player, PIRHandler> pirCascadeFunction) throws InterruptedException {
+	public void broadcastPIR(List<Player> players, BiConsumer<Player, PIRHandler> pirCascadeFunction) throws InterruptedException {
 		List<Thread> threads = new ArrayList<>();
 		standardRunRefreshAll = false;  // avoid updating view every time another player interacts with the broadcasted pir
-		for(Player p : game.getGameData().getPlayers()){
+		for(Player p : players){
 			Thread th = new Thread(() -> pirCascadeFunction.accept(p, this));
 			th.start();
 			threads.add(th);

@@ -259,6 +259,7 @@ public class AdventureCLIScreen extends CLIScreen{
         };
         ArrayList<Coord> buff_coords = new ArrayList<>(getCoords(level, Rotation.CLOCKWISE));
 
+        // TODO: implement players out of flight visualization
         List<PlayerPosAndColor> playersPosAndColor = new ArrayList<>();
         for (int i = 0; i < players.size(); i++) {
             playersPosAndColor.add(new PlayerPosAndColor(

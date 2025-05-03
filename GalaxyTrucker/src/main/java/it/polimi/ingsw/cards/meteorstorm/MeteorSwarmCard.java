@@ -53,14 +53,14 @@ public class MeteorSwarmCard extends Card {
 
 			String[] dicesString = dicesString(dice1, dice2);
 
-			game.getPIRHandler().broadcastPIR(GamesHandler.getInstance().getGame(game.getGameId()), (player, pirHandler) -> {
+			game.getPIRHandler().broadcastPIR(game.getPlayersInFlight(), (player, pirHandler) -> {
 				PIRDelay pirDelay = new PIRDelay(player, 6,
                         Arrays.toString(dicesString),
 						getCLIRepresentation());
 				pirHandler.setAndRunTurn(pirDelay);
 			});
 
-			for(Player player : game.getPlayers()){
+			for(Player player : game.getPlayersInFlight()){
 				boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, game);
 				if(!defended){
                     try {
