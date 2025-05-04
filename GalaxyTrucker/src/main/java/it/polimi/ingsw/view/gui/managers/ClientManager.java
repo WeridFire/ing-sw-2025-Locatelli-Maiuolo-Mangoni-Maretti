@@ -23,6 +23,9 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+/**
+ * Manages the client-side GUI flow, including login, game creation, and game joining.
+ */
 public class ClientManager {
 
     private final Stage primaryStage;
@@ -32,16 +35,31 @@ public class ClientManager {
     private GameClient gameClient;
     private String username;
 
+    /**
+     * Constructs a ClientManager with the specified primary stage, scene updater, and launcher callback.
+     *
+     * @param primaryStage        the JavaFX Stage to display scenes
+     * @param sceneUpdater        a Consumer to update the current scene with a new Node
+     * @param showLauncherCallback a Runnable to execute when returning to the launcher
+     */
     public ClientManager(Stage primaryStage, Consumer<Node> sceneUpdater, Runnable showLauncherCallback) {
         this.primaryStage = primaryStage;
         this.sceneUpdater = sceneUpdater;
         this.showLauncherCallback = showLauncherCallback;
     }
 
+    /**
+     * Retrieves the latest update from the CLI screen handler.
+     *
+     * @return the last ClientUpdate received
+     */
     public ClientUpdate getLastUpdate() {
         return CLIScreenHandler.getInstance().getLastUpdate();
     }
 
+    /**
+     * Displays the login UI, allowing the user to enter their username and select connection type.
+     */
     public void showLoginUI() {
         LoginUI clientLoginUI = new LoginUI((username, useRmi) -> {
             if (!username.trim().isEmpty()) {
@@ -65,6 +83,12 @@ public class ClientManager {
         });
     }
 
+    /**
+     * Attempts to connect to the server with the given username and connection type.
+     *
+     * @param username the username provided by the user
+     * @param useRmi   true to use RMI, false to use sockets
+     */
     private void attemptConnection(String username, boolean useRmi) {
         this.username = username;
         String HOST = "localhost";
@@ -93,6 +117,11 @@ public class ClientManager {
         Platform.runLater(() -> createOrJoinGame(username));
     }
 
+    /**
+     * Presents the options to either create a new game or join an existing one.
+     *
+     * @param username the username of the current client
+     */
     private void createOrJoinGame(String username) {
 
         Button createButton = new Button("Create Game");
@@ -101,7 +130,6 @@ public class ClientManager {
         Button joinButton = new Button("Join Game");
         joinButton.setOnAction(_ -> handleJoinGame(username));
 
-        // Use the scene updater to show the buttons
         VBox gameLayout = new VBox(15, createButton, joinButton);
         gameLayout.setAlignment(Pos.CENTER);
         sceneUpdater.accept(gameLayout);
@@ -118,18 +146,26 @@ public class ClientManager {
         });
     }
 
+    /**
+     * Sends a request to the server to create a new game and transitions to the lobby UI.
+     *
+     * @param username the username of the client creating the game
+     */
     public void handleCreateGame(String username) {
-        //create the actual game
         try {
-            gameClient.getClient().getServer().createGame(gameClient.getClient(),username);
+            gameClient.getClient().getServer().createGame(gameClient.getClient(), username);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
 
-        //change screen
         sceneUpdater.accept(new LobbyUI(username).getLayout());
     }
 
+    /**
+     * Retrieves the list of active games from the server and displays the join game UI.
+     *
+     * @param username the username of the client attempting to join
+     */
     public void handleJoinGame(String username) {
         try {
             gameClient.getClient().getServer().ping(gameClient.getClient());
@@ -143,15 +179,15 @@ public class ClientManager {
         System.out.println(activeGames);
 
         JoinGameUI joinGameUI = new JoinGameUI(uuid -> {
-                    System.out.println("Trying to join game with UUID: " + uuid);
-                    try {
-                        gameClient.getClient().getServer().joinGame(gameClient.getClient(), UUID.fromString(uuid), username);
-                    } catch (RemoteException e) {
-                        throw new RuntimeException(e);
-                    }
-                },
+            System.out.println("Trying to join game with UUID: " + uuid);
+            try {
+                gameClient.getClient().getServer().joinGame(gameClient.getClient(), UUID.fromString(uuid), username);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        },
                 activeGames.stream().map(
-                    UUID::toString
+                        UUID::toString
                 ).collect(Collectors.toList())
         );
 
