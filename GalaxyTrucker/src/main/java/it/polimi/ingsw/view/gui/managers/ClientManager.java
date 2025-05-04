@@ -1,5 +1,7 @@
 package it.polimi.ingsw.view.gui.managers;
 
+import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.view.cli.CLIScreenHandler;
 import it.polimi.ingsw.view.gui.UIs.LobbyUI;
@@ -12,6 +14,8 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.function.Consumer;
 
@@ -60,10 +64,18 @@ public class ClientManager {
         int RMI_PORT = 1111;
 
         try {
-            this.gameClient = new GameClient(useRmi,
+            gameClient = new GameClient(useRmi,
                     HOST,
                     useRmi ? RMI_PORT : SOCKET_PORT
             );
+
+            new Thread(() -> {
+                try {
+                    GameClient.main(gameClient);
+                } catch (IOException | NotBoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }).start();
 
         } catch (Exception e) {
             AlertUtils.showError("Connection Error", "No game server available on " + HOST + ":" + (useRmi ? RMI_PORT : SOCKET_PORT));
@@ -101,7 +113,7 @@ public class ClientManager {
     public void handleCreateGame(String username) {
         //create the actual game
         try {
-            gameClient.getServer().createGame(gameClient, username);
+            gameClient.getClient().getServer().createGame(gameClient.getClient(),username);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
