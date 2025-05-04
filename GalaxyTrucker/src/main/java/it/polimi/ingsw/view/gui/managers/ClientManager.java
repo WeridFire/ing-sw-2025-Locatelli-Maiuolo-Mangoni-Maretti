@@ -1,9 +1,10 @@
 package it.polimi.ingsw.view.gui.managers;
 
-import it.polimi.ingsw.GamesHandler;
-import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.network.GameClient;
+import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.cli.CLIScreenHandler;
+import it.polimi.ingsw.view.gui.UIs.JoinGameUI;
 import it.polimi.ingsw.view.gui.UIs.LobbyUI;
 import it.polimi.ingsw.view.gui.utils.AlertUtils;
 import it.polimi.ingsw.view.gui.UIs.LoginUI;
@@ -17,7 +18,10 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class ClientManager {
 
@@ -32,6 +36,10 @@ public class ClientManager {
         this.primaryStage = primaryStage;
         this.sceneUpdater = sceneUpdater;
         this.showLauncherCallback = showLauncherCallback;
+    }
+
+    public ClientUpdate getLastUpdate() {
+        return CLIScreenHandler.getInstance().getLastUpdate();
     }
 
     public void showLoginUI() {
@@ -91,7 +99,7 @@ public class ClientManager {
         createButton.setOnAction(_ -> handleCreateGame(username));
 
         Button joinButton = new Button("Join Game");
-        //joinButton.setOnAction(_ -> clientManager.showLoginUI());
+        joinButton.setOnAction(_ -> handleJoinGame(username));
 
         // Use the scene updater to show the buttons
         VBox gameLayout = new VBox(15, createButton, joinButton);
@@ -122,6 +130,31 @@ public class ClientManager {
         sceneUpdater.accept(new LobbyUI(username).getLayout());
     }
 
-    public void handleJoinGame() {
+    public void handleJoinGame(String username) {
+        try {
+            gameClient.getClient().getServer().ping(gameClient.getClient());
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+
+        List<UUID> activeGames =
+                getLastUpdate().getAvailableGames().stream().map(GameData::getGameId).toList();
+
+        System.out.println(activeGames);
+
+        JoinGameUI joinGameUI = new JoinGameUI(uuid -> {
+                    System.out.println("Trying to join game with UUID: " + uuid);
+                    try {
+                        gameClient.getClient().getServer().joinGame(gameClient.getClient(), UUID.fromString(uuid), username);
+                    } catch (RemoteException e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                activeGames.stream().map(
+                    UUID::toString
+                ).collect(Collectors.toList())
+        );
+
+        sceneUpdater.accept(joinGameUI.getLayout());
     }
 }
