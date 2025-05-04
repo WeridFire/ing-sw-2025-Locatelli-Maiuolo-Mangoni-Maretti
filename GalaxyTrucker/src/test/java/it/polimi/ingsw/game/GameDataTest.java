@@ -92,7 +92,7 @@ class GameDataTest {
     }
 
     @Test
-    void testResumeGameInAssembly() throws TooManyItemsInHandException, AlreadyEndedAssemblyException, NoShipboardException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, InterruptedException, PlayerAlreadyInGameException, OutOfBuildingAreaException, GameAlreadyRunningException {
+    void testResumeGameInAssembly() throws AlreadyPickedPosition, AlreadyEndedAssemblyException, NoShipboardException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, InterruptedException, PlayerAlreadyInGameException, OutOfBuildingAreaException, GameAlreadyRunningException, TooManyItemsInHandException {
         UUID gameId = runAndSaveGameUntilStep(0);
         Game g = GamesHandler.getInstance().getGame(gameId);
 
@@ -116,7 +116,7 @@ class GameDataTest {
      * @param step
      * @return
      */
-    UUID runAndSaveGameUntilStep(int step) throws PlayerAlreadyInGameException, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException, TooManyItemsInHandException, NoShipboardException, InterruptedException {
+    UUID runAndSaveGameUntilStep(int step) throws AlreadyPickedPosition, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException, TooManyItemsInHandException, NoShipboardException, InterruptedException, PlayerAlreadyInGameException {
         Game g = GamesHandler.getInstance().createGame("Pippo", UUID.randomUUID());
 
         Player player1 = g.getGameData().getPlayers().stream().filter((p) -> p.getUsername().equals(g.getGameData().getGameLeader())).findFirst().get();
@@ -143,8 +143,8 @@ class GameDataTest {
             return g.getId();
         }
 
-        g.getGameData().endAssembly(player1, false);
-        g.getGameData().endAssembly(player2, false);
+        g.getGameData().endAssembly(player1, false, null);
+        g.getGameData().endAssembly(player2, false, null);
 
         Thread.sleep(2000);
         if(step == 2){
