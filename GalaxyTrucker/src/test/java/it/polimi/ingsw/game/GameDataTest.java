@@ -143,8 +143,8 @@ class GameDataTest {
             return g.getId();
         }
 
-        g.getGameData().endAssembly(player1, false, null);
-        g.getGameData().endAssembly(player2, false, null);
+        g.getGameData().endAssembly(player1, false, 1);
+        g.getGameData().endAssembly(player2, false, 2);
 
         Thread.sleep(2000);
         if(step == 2){
