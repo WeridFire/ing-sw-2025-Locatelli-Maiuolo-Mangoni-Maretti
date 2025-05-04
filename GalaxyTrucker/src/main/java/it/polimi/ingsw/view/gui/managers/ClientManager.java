@@ -28,12 +28,22 @@ import java.util.stream.Collectors;
  */
 public class ClientManager {
 
+    private static ClientManager instance;
+
     private final Stage primaryStage;
     private final Consumer<Node> sceneUpdater;
     private final Runnable showLauncherCallback;
 
     private GameClient gameClient;
     private String username;
+
+
+    public static ClientManager getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("Client Manager not initialized");
+        }
+        return instance;
+    }
 
     /**
      * Constructs a ClientManager with the specified primary stage, scene updater, and launcher callback.
@@ -46,6 +56,8 @@ public class ClientManager {
         this.primaryStage = primaryStage;
         this.sceneUpdater = sceneUpdater;
         this.showLauncherCallback = showLauncherCallback;
+
+        instance = this;
     }
 
     /**
@@ -55,6 +67,10 @@ public class ClientManager {
      */
     public ClientUpdate getLastUpdate() {
         return CLIScreenHandler.getInstance().getLastUpdate();
+    }
+
+    public Consumer<Node> getSceneUpdater() {
+        return sceneUpdater;
     }
 
     /**
@@ -192,5 +208,10 @@ public class ClientManager {
         );
 
         sceneUpdater.accept(joinGameUI.getLayout());
+    }
+
+
+    public String getUsername() {
+        return username;
     }
 }

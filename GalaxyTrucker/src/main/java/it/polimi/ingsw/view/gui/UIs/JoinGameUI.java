@@ -1,5 +1,9 @@
 package it.polimi.ingsw.view.gui.UIs;
 
+import com.sun.tools.javac.Main;
+import it.polimi.ingsw.MainApp;
+import it.polimi.ingsw.network.GameClient;
+import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.collections.FXCollections;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -18,12 +22,10 @@ public class JoinGameUI {
         gameUUIDField = new TextField();
         gameUUIDField.setPromptText("Game UUID");
 
-        // Lista dei game attivi
         Label activeGamesLabel = new Label("Active Games:");
         activeGamesList = new ListView<>(FXCollections.observableArrayList(activeGames));
-        activeGamesList.setMaxHeight(150); // Limita altezza della lista
+        activeGamesList.setMaxHeight(150);
 
-        // Quando l’utente seleziona un gioco, precompila il campo UUID
         activeGamesList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 gameUUIDField.setText(newVal);
@@ -35,6 +37,9 @@ public class JoinGameUI {
             String uuid = gameUUIDField.getText().trim();
             if (!uuid.isEmpty()) {
                 onJoinGame.accept(uuid);
+
+                ClientManager.getInstance().getSceneUpdater().accept(new LobbyUI(ClientManager.getInstance().getUsername()).getLayout());
+
             } else {
                 Alert alert = new Alert(Alert.AlertType.WARNING, "Please enter a valid game UUID.");
                 alert.showAndWait();
