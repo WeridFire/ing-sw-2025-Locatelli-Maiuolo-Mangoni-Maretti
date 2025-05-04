@@ -12,7 +12,17 @@ import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -139,16 +149,38 @@ public class ClientManager {
      * @param username the username of the current client
      */
     private void createOrJoinGame(String username) {
-
         Button createButton = new Button("Create Game");
+        createButton.setFont(Font.font("Orbitron", FontWeight.BOLD, 14));
+        createButton.setTextFill(Color.WHITE);
+        createButton.setStyle("-fx-background-color: linear-gradient(to right, #1e3c72, #2a5298);"
+                + "-fx-background-radius: 10;"
+                + "-fx-padding: 10 20 10 20;");
+        createButton.setEffect(new DropShadow(5, Color.BLACK));
         createButton.setOnAction(_ -> handleCreateGame(username));
 
         Button joinButton = new Button("Join Game");
+        joinButton.setFont(Font.font("Orbitron", FontWeight.BOLD, 14));
+        joinButton.setTextFill(Color.WHITE);
+        joinButton.setStyle("-fx-background-color: linear-gradient(to right, #000046, #1CB5E0);"
+                + "-fx-background-radius: 10;"
+                + "-fx-padding: 10 20 10 20;");
+        joinButton.setEffect(new DropShadow(5, Color.BLACK));
         joinButton.setOnAction(_ -> handleJoinGame(username));
 
-        VBox gameLayout = new VBox(15, createButton, joinButton);
+        VBox gameLayout = new VBox(20, createButton, joinButton);
         gameLayout.setAlignment(Pos.CENTER);
+        gameLayout.setPrefSize(500, 400);
+        gameLayout.setBackground(new Background(new BackgroundFill(
+                new LinearGradient(
+                        0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
+                        new Stop(0, Color.web("#0F0C29")),
+                        new Stop(0.5, Color.web("#302B63")),
+                        new Stop(1, Color.web("#24243E"))
+                ),
+                CornerRadii.EMPTY, null)));
+
         sceneUpdater.accept(gameLayout);
+
         primaryStage.setTitle("Join or Create Game");
         primaryStage.setOnCloseRequest(event -> {
             showLauncherCallback.run();
@@ -161,6 +193,7 @@ public class ClientManager {
             event.consume();
         });
     }
+
 
     /**
      * Sends a request to the server to create a new game and transitions to the lobby UI.

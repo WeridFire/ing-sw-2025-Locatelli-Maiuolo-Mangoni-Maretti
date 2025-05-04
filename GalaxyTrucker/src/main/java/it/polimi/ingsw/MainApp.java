@@ -9,7 +9,17 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -50,7 +60,7 @@ public class MainApp extends Application {
         primaryStage.setTitle("Game Launcher");
 
         // Initialize the root container
-        root = new VBox(15);
+        root = new VBox(20);
         root.setAlignment(Pos.CENTER); // Center content
 
         // Create managers, passing the stage, the scene updater lambda, and a callback to show launcher
@@ -85,7 +95,13 @@ public class MainApp extends Application {
      */
     private void showLauncherUI() {
         Button startServerButton = new Button("Start Server");
-        // Disable button immediately if server is already running (e.g., after returning from server UI)
+        startServerButton.setFont(Font.font("Orbitron", FontWeight.BOLD, 14));
+        startServerButton.setTextFill(Color.WHITE);
+        startServerButton.setStyle("-fx-background-color: linear-gradient(to right, #2193b0, #6dd5ed);"
+                + "-fx-background-radius: 10;"
+                + "-fx-padding: 10 20 10 20;");
+        startServerButton.setEffect(new DropShadow(5, Color.BLACK));
+
         if (serverManager != null && serverManager.isServerRunning()) {
             startServerButton.setDisable(true);
             startServerButton.setText("Server Running");
@@ -94,17 +110,32 @@ public class MainApp extends Application {
         }
 
         Button startClientButton = new Button("Start Client");
+        startClientButton.setFont(Font.font("Orbitron", FontWeight.BOLD, 14));
+        startClientButton.setTextFill(Color.WHITE);
+        startClientButton.setStyle("-fx-background-color: linear-gradient(to right, #3f2b96, #a8c0ff);"
+                + "-fx-background-radius: 10;"
+                + "-fx-padding: 10 20 10 20;");
+        startClientButton.setEffect(new DropShadow(5, Color.BLACK));
         startClientButton.setOnAction(_ -> clientManager.showLoginUI());
 
-        // Use the scene updater to show the buttons
-        VBox launcherLayout = new VBox(15, startServerButton, startClientButton);
+        VBox launcherLayout = new VBox(20, startServerButton, startClientButton);
         launcherLayout.setAlignment(Pos.CENTER);
-        updateSceneRoot(launcherLayout); // Update the root VBox content
+        launcherLayout.setPrefSize(500, 400);
+        launcherLayout.setBackground(new Background(new BackgroundFill(
+                new LinearGradient(
+                        0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
+                        new Stop(0, Color.web("#0F0C29")),
+                        new Stop(0.5, Color.web("#302B63")),
+                        new Stop(1, Color.web("#24243E"))
+                ),
+                CornerRadii.EMPTY, null)));
 
-        // Reset title and close handler for the launcher view
+        updateSceneRoot(launcherLayout);
+
         primaryStage.setTitle("Game Launcher");
         primaryStage.setOnCloseRequest(this::handleLauncherCloseRequest);
     }
+
 
 
     /**
