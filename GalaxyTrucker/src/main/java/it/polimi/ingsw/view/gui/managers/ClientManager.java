@@ -73,6 +73,13 @@ public class ClientManager {
         return sceneUpdater;
     }
 
+    public GameClient getGameClient() {
+        if (gameClient == null) {
+            throw new IllegalStateException("Game client not initialized");
+        }
+        return gameClient;
+    }
+
     /**
      * Displays the login UI, allowing the user to enter their username and select connection type.
      */
