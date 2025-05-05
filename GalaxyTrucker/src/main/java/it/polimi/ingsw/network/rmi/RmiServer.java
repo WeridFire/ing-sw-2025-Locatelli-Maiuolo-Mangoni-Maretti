@@ -192,7 +192,8 @@ public class RmiServer implements IServer {
 		try {
 			PIRHandler handler = pg.game.getGameData().getPIRHandler();
 			handler.endTurn(pg.player);
-			handler.joinEndTurn(pg.player);
+			// note: join interaction and not join turn to allow the ended pir to be in an atomic sequence
+			handler.joinEndInteraction(pg.player);
 			client.updateClient(new ClientUpdate(pg.connectionUUID));
 		} catch (WrongPlayerTurnException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));

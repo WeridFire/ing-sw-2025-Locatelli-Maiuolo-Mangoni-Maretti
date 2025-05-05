@@ -46,13 +46,12 @@ public class PIRHandler implements Serializable {
 	}
 
 	/**
-	 *
-	 * @param pir the pir to check if it can be started due to absence of other player's input requests.
-	 * @return {@code true} if the pir can be set and run, {@code false} otherwise.
+	 * @param player the player to check if it has no other player's input requests running.
+	 * @return {@code true} if a new pir can be set and run for the specified player, {@code false} otherwise.
 	 */
-	public boolean isPlayerReadyForInputRequest(PIR pir){
+	public boolean isPlayerReadyForInputRequest(Player player){
 		synchronized (activePIRs) {
-			return  (activePIRs.get(pir.getCurrentPlayer()) == null);
+			return  (activePIRs.get(player) == null);
 		}
 	}
 
@@ -97,7 +96,7 @@ public class PIRHandler implements Serializable {
             }
 		}
 		// setup the pir
-		if (!isPlayerReadyForInputRequest(pir)) {
+		if (!isPlayerReadyForInputRequest(pir.getCurrentPlayer())) {
 			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
 		}
 		synchronized (activePIRs) {
@@ -309,18 +308,35 @@ public class PIRHandler implements Serializable {
 	}
 
 	/**
-	 * Blocking function that waits until the specified player has no PIR associated to it anymore
+	 * Blocking function that waits until the specified player has no PIR or atomic sequences of PIRs associated to it anymore
 	 * @param player The player to check for turn-end
 	 */
 	public void joinEndTurn(Player player) {
 		synchronized (activePIRs) {
 			while (isPlayerTurnActive(player)) {
-                try {
-                    activePIRs.wait();
-                } catch (InterruptedException e) {
-                    return;  // TODO: check if it's ok to do so
-                }
-            }
+				try {
+					activePIRs.wait();
+				} catch (InterruptedException e) {
+					return;  // TODO: check if it's ok to do so
+				}
+			}
+		}
+	}
+
+	/**
+	 * Blocking function that waits until the specified player has no PIR associated to it anymore.
+	 * Can be inside an atomic sequence: call this function to allow join during atomic sequence running.
+	 * @param player The player to check for turn-end
+	 */
+	public void joinEndInteraction(Player player) {
+		synchronized (activePIRs) {
+			while (!isPlayerReadyForInputRequest(player)) {
+				try {
+					activePIRs.wait();
+				} catch (InterruptedException e) {
+					return;  // TODO: check if it's ok to do so
+				}
+			}
 		}
 	}
 
