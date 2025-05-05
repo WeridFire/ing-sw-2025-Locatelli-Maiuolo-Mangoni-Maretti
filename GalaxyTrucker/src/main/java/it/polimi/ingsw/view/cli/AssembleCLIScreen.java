@@ -189,7 +189,7 @@ public class AssembleCLIScreen extends CLIScreen{
                 break;
 
             case "finish":
-                if (args.length == 1){
+                if (args.length <= 1) {
                     if (validateIsAssemblyEnded()) break;
                     if (getLastUpdate().getClientPlayer().getShipBoard() == null) {
                         setScreenMessage("You don't have a shipboard.");
@@ -201,11 +201,11 @@ public class AssembleCLIScreen extends CLIScreen{
                         setScreenMessage("You can't finish with a " + occupiedHand + " in hand.");
                         break;
                     }
-                    int preferredPosition = Integer.parseInt(args[0]);
+                    Integer preferredPosition = (args.length == 0) ? null : Integer.parseInt(args[0]);
                     getServer().finishAssembling(getClient(), preferredPosition);
                 }
                 else {
-                    setScreenMessage("Usage: finish <starting position>");
+                    setScreenMessage("Usage: finish [<starting position>: default->first free]");
                 }
                 break;
 
