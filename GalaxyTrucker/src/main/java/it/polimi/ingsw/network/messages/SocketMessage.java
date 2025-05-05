@@ -6,10 +6,7 @@ import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.io.*;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class SocketMessage implements Serializable{
 	// Enum to define message types
@@ -195,12 +192,11 @@ public class SocketMessage implements Serializable{
 	}
 
 	public static SocketMessage finishAssemblingMessage(Integer preferredPosition){
-
-		return new SocketMessage(MessageType.FINISH_ASSEMBLING, List.of(preferredPosition));
+		return new SocketMessage(MessageType.FINISH_ASSEMBLING, Collections.singletonList(preferredPosition));
 	}
 
 	public static SocketMessage showCardGroupMessage(Integer id) {
-		return new SocketMessage(SocketMessage.MessageType.SHOW_CARD_GROUP, List.of(id));
+		return new SocketMessage(SocketMessage.MessageType.SHOW_CARD_GROUP, Collections.singletonList(id));
 	}
 
 	public static SocketMessage hideCardGroupMessage() {

@@ -1,4 +1,4 @@
-package it.polimi.ingsw.shipboard.exceptions;
+package it.polimi.ingsw.gamePhases.exceptions;
 
 public class AlreadyPickedPosition extends Exception {
     public AlreadyPickedPosition(String message) {

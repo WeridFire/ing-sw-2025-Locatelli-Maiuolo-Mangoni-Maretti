@@ -8,11 +8,10 @@ import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.Cheats;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.GameData;
-import it.polimi.ingsw.game.exceptions.DrawTileException;
-import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
-import it.polimi.ingsw.game.exceptions.GameNotFoundException;
-import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
+import it.polimi.ingsw.game.exceptions.*;
+import it.polimi.ingsw.gamePhases.exceptions.AlreadyPickedPosition;
 import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
+import it.polimi.ingsw.gamePhases.exceptions.IllegalStartingPositionIndexException;
 import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.GameServer;
@@ -358,7 +357,8 @@ public class RmiServer implements IServer {
 
 		try {
 			pg.game.getGameData().endAssembly(pg.player, false, preferredPosition);
-		} catch (NoShipboardException | AlreadyEndedAssemblyException | TooManyItemsInHandException | AlreadyPickedPosition e) {
+		} catch (NoShipboardException | AlreadyEndedAssemblyException | TooManyItemsInHandException |
+                 AlreadyPickedPosition | IllegalStartingPositionIndexException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 			return;
 		}

@@ -10,6 +10,7 @@ import it.polimi.ingsw.gamePhases.AdventureGamePhase;
 import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.LobbyGamePhase;
 import it.polimi.ingsw.gamePhases.ScoreScreenGamePhase;
+import it.polimi.ingsw.gamePhases.exceptions.IllegalStartingPositionIndexException;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
@@ -18,7 +19,7 @@ import it.polimi.ingsw.playerInput.PIRUtils;
 import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
-import it.polimi.ingsw.shipboard.exceptions.AlreadyPickedPosition;
+import it.polimi.ingsw.gamePhases.exceptions.AlreadyPickedPosition;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.rmi.RemoteException;
@@ -127,7 +128,8 @@ public class Game {
                 try {
                     getGameData().endAssembly(player, true, null);
                     System.out.println(this + " Forced end assemble for player '" + player.getUsername() + "'");
-                } catch (AlreadyEndedAssemblyException | NoShipboardException | TooManyItemsInHandException | AlreadyPickedPosition e) {
+                } catch (AlreadyEndedAssemblyException | NoShipboardException | TooManyItemsInHandException |
+                         AlreadyPickedPosition | IllegalStartingPositionIndexException e) {
                     throw new RuntimeException(e);  // should never happen -> runtime exception
                 }
             }

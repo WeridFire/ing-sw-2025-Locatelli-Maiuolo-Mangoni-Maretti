@@ -290,6 +290,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 *
 	 * @param tile The tile to place.
 	 * @param coordinates The coordinates where the tile should be placed.
+	 * @throws AlreadyEndedAssemblyException If this shipboard has already been consolidated as assembled.
 	 * @throws OutOfBuildingAreaException If the coordinates are outside the valid building area.
 	 * @throws TileAlreadyPresentException If there is already a tile at the specified coordinates.
 	 * @throws FixedTileException If the provided tile has already been placed.

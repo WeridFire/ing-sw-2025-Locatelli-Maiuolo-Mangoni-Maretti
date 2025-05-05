@@ -327,6 +327,7 @@ public class PIRUtils {
 			}
 
 			// TOGGLE INTEGRITY CHECK
+			// TODO (issue): error on skipping the delay PIRs: not accepted but also saved and done all after the cooldown (mega error)
 			new Thread(() -> manageIntegrityProblem(integrityProblem)).start();
 		}
 	}

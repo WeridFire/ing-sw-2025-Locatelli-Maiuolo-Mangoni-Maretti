@@ -1,21 +1,20 @@
 package it.polimi.ingsw.game;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.PlayableGamePhase;
-import it.polimi.ingsw.network.messages.ClientUpdate;
+import it.polimi.ingsw.gamePhases.exceptions.IllegalStartingPositionIndexException;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
 import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
 import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
-import it.polimi.ingsw.shipboard.exceptions.AlreadyPickedPosition;
+import it.polimi.ingsw.gamePhases.exceptions.AlreadyPickedPosition;
 import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.GameLevelStandards;
@@ -129,8 +128,7 @@ public class GameData implements Serializable {
     public void setLevel(GameLevel level) {
         this.level = level;
 
-        // wrap in ArrayList constructor to let it be modifiable
-        startingPositions = new ArrayList<>(GameLevelStandards.getFlightBoardParkingLots(level));
+        startingPositions = GameLevelStandards.getFlightBoardParkingLots(level);
     }
 
 
@@ -444,45 +442,69 @@ public class GameData implements Serializable {
     }
 
     /**
-     * Process the end of the assembly phase for a specific player,
-     * handling internally the "shipboard assembled" signal to the player.
-     * It also manages to update the game assembly phase accordingly to how many players still need to finish assembly
-     * and in which level is the game being played.
-     * @param player the player which ended assembly
-     * @param force if the player is forced to end assembly (e.g. no more time)
-     * @throws IllegalArgumentException if {@code player} does not belong to this game data.
-     * @throws TooManyItemsInHandException only if {@code player} is holding something in hand AND {@code force == false}.
+     * Ends the assembly phase for the given player, optionally forcing it.
+     * <p>
+     * This method processes the player's request to complete their ship assembly by assigning them a position
+     * on the route board, handling special cases such as forced endings (e.g. timeouts), and broadcasting the internal
+     * "shipboard assembled" signal. It also checks if all players have finished assembly and, if so, progresses the
+     * game phase accordingly.
+     *
+     * @param player the player who is ending the assembly phase
+     * @param force {@code true} to force the end of assembly (e.g. timeout); {@code false} for player's decision
+     * @param preferredPositionIndex optional preferred starting position index on the route board;
+     *                               if {@code null}, the first available position will be used.
+     *
+     * @throws IllegalArgumentException if the given {@code player} is not part of this game
+     * @throws AlreadyEndedAssemblyException if the player has already completed assembly
+     * @throws NoShipboardException if the player has no shipboard assigned
+     * @throws AlreadyPickedPosition if the {@code preferredPositionIndex} is already taken by another player
+     * @throws IllegalStartingPositionIndexException if the {@code preferredPositionIndex} is outside the valid range
+     * @throws TooManyItemsInHandException if the player has items in hand and {@code force} is {@code false}
+     *
      * @requires to be called during {@link GamePhaseType#ASSEMBLE}
      */
-    public void endAssembly(Player player, boolean force, Integer preferredPosition) throws AlreadyEndedAssemblyException, NoShipboardException, AlreadyPickedPosition,
-            TooManyItemsInHandException {
+    public void endAssembly(Player player, boolean force, Integer preferredPositionIndex) throws AlreadyEndedAssemblyException,
+            NoShipboardException, AlreadyPickedPosition, IllegalStartingPositionIndexException, TooManyItemsInHandException {
 
         if (!players.contains(player)) {
             throw new IllegalArgumentException("Player '" + player.getUsername() + "' is not in this game");
         }
 
-        //checks if anyone is sitting on the chosen position already
-        if(preferredPosition != null){
-            for(Player p : players){
-                if (p != player && preferredPosition.equals(p.getPosition())) {
-                    throw new AlreadyPickedPosition("Position " + preferredPosition + " is already taken");
+        if (preferredPositionIndex == null) {
+            // calculate first valid position as preferred
+            boolean alreadyOccupied = false;
+            preferredPositionIndex = -1;
+            do {
+                preferredPositionIndex++;
+                if (preferredPositionIndex >= startingPositions.size()) {
+                    throw new IllegalStartingPositionIndexException(preferredPositionIndex);
                 }
-            }
+                Integer preferredPosition = startingPositions.get(preferredPositionIndex);
+                if (players.stream().anyMatch(p -> preferredPosition.equals(p.getPosition()))) {
+                    alreadyOccupied = true;
+                }
+            } while (alreadyOccupied);
         }
 
+        // check if anyone is sitting on the preferred position already, or if it is not valid -> throw exception
+        if (preferredPositionIndex < 0 || preferredPositionIndex >= players.size()) {
+            throw new IllegalStartingPositionIndexException(preferredPositionIndex);
+        }
+        Integer preferredPosition = startingPositions.get(preferredPositionIndex);
+        if (players.stream().anyMatch(p -> p != player && preferredPosition.equals(p.getPosition()))) {
+            throw new AlreadyPickedPosition("Position " + preferredPosition + " is already taken");
+        }
 
         // handle player management
         if (force) {
-            //kept the previous implementation because if its forced preferredPosition may end up being null
-            player.forceEndAssembly(startingPositions.removeFirst());
+            player.forceEndAssembly(preferredPosition);
         } else {
-            //dont need to remove anymore cause it's being checked previously
-            player.endAssembly(startingPositions.get(preferredPosition));
+            player.endAssembly(preferredPosition);
         }
 
         // handle game management
         for (Player p : players) {
-            if (p.getPosition() == null) {
+            if (p.getPosition() == null) {  // not ended assemble yet
                 return;
             }
         }

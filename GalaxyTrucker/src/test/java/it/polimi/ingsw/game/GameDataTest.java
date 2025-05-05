@@ -4,11 +4,12 @@ import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.gamePhases.exceptions.AlreadyPickedPosition;
 import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.PlayableGamePhase;
+import it.polimi.ingsw.gamePhases.exceptions.IllegalStartingPositionIndexException;
 import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
-import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
 import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
@@ -92,7 +93,7 @@ class GameDataTest {
     }
 
     @Test
-    void testResumeGameInAssembly() throws TooManyItemsInHandException, AlreadyEndedAssemblyException, NoShipboardException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, InterruptedException, PlayerAlreadyInGameException, OutOfBuildingAreaException, GameAlreadyRunningException {
+    void testResumeGameInAssembly() throws AlreadyPickedPosition, AlreadyEndedAssemblyException, NoShipboardException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, InterruptedException, PlayerAlreadyInGameException, OutOfBuildingAreaException, GameAlreadyRunningException, TooManyItemsInHandException, IllegalStartingPositionIndexException {
         UUID gameId = runAndSaveGameUntilStep(0);
         Game g = GamesHandler.getInstance().getGame(gameId);
 
@@ -116,7 +117,7 @@ class GameDataTest {
      * @param step
      * @return
      */
-    UUID runAndSaveGameUntilStep(int step) throws PlayerAlreadyInGameException, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException, TooManyItemsInHandException, NoShipboardException, InterruptedException {
+    UUID runAndSaveGameUntilStep(int step) throws AlreadyPickedPosition, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException, TooManyItemsInHandException, NoShipboardException, InterruptedException, PlayerAlreadyInGameException, IllegalStartingPositionIndexException {
         Game g = GamesHandler.getInstance().createGame("Pippo", UUID.randomUUID());
 
         Player player1 = g.getGameData().getPlayers().stream().filter((p) -> p.getUsername().equals(g.getGameData().getGameLeader())).findFirst().get();
@@ -143,8 +144,8 @@ class GameDataTest {
             return g.getId();
         }
 
-        g.getGameData().endAssembly(player1, false);
-        g.getGameData().endAssembly(player2, false);
+        g.getGameData().endAssembly(player1, false, 1);
+        g.getGameData().endAssembly(player2, false, 2);
 
         Thread.sleep(2000);
         if(step == 2){

@@ -1,12 +1,10 @@
 package it.polimi.ingsw.view.cli;
 
-import it.polimi.ingsw.enums.Direction;
-import it.polimi.ingsw.enums.GameLevel;
-import it.polimi.ingsw.enums.GamePhaseType;
-import it.polimi.ingsw.enums.Rotation;
+import it.polimi.ingsw.enums.*;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.GameLevelStandards;
 import it.polimi.ingsw.util.Util;
@@ -73,7 +71,7 @@ public class AdventureCLIScreen extends CLIScreen{
      */
     @Override
     protected List<String> getScreenSpecificCommands() {
-        return List.of();
+        return List.of("endFlight|request to end the flight before the next adventure");
     }
 
     /**
@@ -89,7 +87,7 @@ public class AdventureCLIScreen extends CLIScreen{
         Player thisPlayer = getLastUpdate().getClientPlayer();
         CLIFrame shipboardFrame = thisPlayer.getShipBoard().getCLIRepresentation();
 
-        CLIFrame boardFrame = getBoardFrame(gameData.getLevel(), getLastUpdate().getCurrentGame().getPlayers());
+        CLIFrame boardFrame = getBoardFrame(gameData.getLevel(), gameData.getPlayers(), gameData.getPIRHandler());
 
         shipboardFrame = shipboardFrame.merge(boardFrame, Direction.NORTH, 2);
 
@@ -246,10 +244,20 @@ public class AdventureCLIScreen extends CLIScreen{
      * The resulting frame includes appropriate ANSI color codes for background and player pawns.
      *
      * @param level The {@link GameLevel} to render the board for.
+     * @param players The list of all the players in the game, also the ones not in flight,
+     *                sorted from most to the least advanced position.
+     * @param pirHandler The pirHandler of the game to retrieve which player is currently resolving a turn.
+     *                   Can be {@code null}; in that case all the players are not considered resolving any turn.
      * @return A {@link CLIFrame} object containing the string representation of the board,
      *         ready for display in a command-line interface, with appropriate background color set.
+     *
+     * @implNote the parameters can all be retrieved from gameData,
+     * but they are split to keep this method independent of gameData
      */
-    public CLIFrame getBoardFrame(GameLevel level, List<Player> players) {
+    public CLIFrame getBoardFrame(GameLevel level, List<Player> players, PIRHandler pirHandler) {
+        final String playerPlaceholderEmpty = "△";
+        final String playerPlaceholderFilled = "▲";
+
         //color related to level
         String bg = GameLevelStandards.getColorANSI(level, true);
         boolean[][] board = switch (level) {
@@ -259,23 +267,35 @@ public class AdventureCLIScreen extends CLIScreen{
         };
         ArrayList<Coord> buff_coords = new ArrayList<>(getCoords(level, Rotation.CLOCKWISE));
 
-        // TODO: implement players out of flight visualization
+        // store info
         List<PlayerPosAndColor> playersPosAndColor = new ArrayList<>();
-        for (int i = 0; i < players.size(); i++) {
-            playersPosAndColor.add(new PlayerPosAndColor(
-                    Util.getModularAt(buff_coords, players.get(i).getPosition()),
-                    players.get(i).getColor(),
-                    i == 0));
+        List<Player> playersOutOfFlight = new ArrayList<>();
+        List<Player> playersInTurn = new ArrayList<>();
+        for (Player player : players) {
+            // retrieve element info
+            Integer playerPos = player.getPosition();
+            // set player in turn info
+            if (pirHandler != null && pirHandler.isPlayerTurnActive(player)) {
+                playersInTurn.add(player);
+            }
+            // set player in/out-of flight info
+            if (playerPos == null) {
+                playersOutOfFlight.add(player);
+            } else {
+                playersPosAndColor.add(new PlayerPosAndColor(
+                        Util.getModularAt(buff_coords, playerPos),
+                        player.getColor(),
+                        playersPosAndColor.isEmpty()));
+            }
         }
 
+        // prepare board
         for (Coord coord : buff_coords) {
             board[coord.row()][coord.col()] = true;
         }
-
-        int maxl = 0;
         boolean found;
         String padding = " ".repeat(1);
-        ArrayList<String> res = new ArrayList<String>();
+        ArrayList<String> res = new ArrayList<>();
         for (int i = 0; i < board.length; i++) {
             StringBuilder sb = new StringBuilder(padding);
             for (int j = 0; j < board[i].length; j++) {
@@ -287,12 +307,12 @@ public class AdventureCLIScreen extends CLIScreen{
                         if (new_c.equals(pc.pos)) {
                             sb.append(pc.isLeader ? ANSI.BACKGROUND_WHITE : ANSI.BACKGROUND_BLACK)  // no racism
                                     .append(pc.color.toANSIColor(false))
-                                    .append("▲").append(ANSI.RESET);
+                                    .append(playerPlaceholderFilled).append(ANSI.RESET);
                             found = true;
                         }
                     }
                     if (!found) {
-                        sb.append(ANSI.WHITE + "△" + ANSI.RESET);
+                        sb.append(ANSI.WHITE + playerPlaceholderEmpty + ANSI.RESET);
                     }
 
                 } else {
@@ -304,41 +324,37 @@ public class AdventureCLIScreen extends CLIScreen{
                 }
             }
             sb.append(padding);
-            if (sb.toString().length() > maxl) maxl = sb.toString().length();
             res.add(sb.toString());
         }
+        CLIFrame frameBoard = new CLIFrame(res.toArray(new String[0])).paintBackground(bg);
 
-        GameData gameData = getLastUpdate().getCurrentGame();
-        ArrayList<Player> playersInTurn = new ArrayList<>();
-
-        boolean someone = false;
-        for (Player p : gameData.getPlayers()) {
-            if (gameData.getPIRHandler().isPlayerTurnActive(p)){
-                playersInTurn.add(p);
-                someone = true;
-            }
-
-        }
-        if (someone) {
-            StringBuilder sb = new StringBuilder();
-
-            int padding2 = (maxl - sb.toString().length()) / 4;
-
-            sb.append(" ".repeat(Math.max(0, (int) padding2)));
+        // add turn info
+        if (!playersInTurn.isEmpty()) {
+            StringBuilder sbPlayerTurnInfo = new StringBuilder(ANSI.BACKGROUND_BLACK + ANSI.WHITE);
 
             for (Player p : playersInTurn) {
-                sb.append(p.getColor().toANSIColor(false)).append(p.getUsername()).append(ANSI.RESET).append(" ");
+                sbPlayerTurnInfo.append(p.toColoredString()).append(", ");
             }
-            sb.append(ANSI.BLACK + "TURN" + ANSI.RESET);
+            sbPlayerTurnInfo.delete(sbPlayerTurnInfo.length() - 2, sbPlayerTurnInfo.length());  // remove last ", "
+            sbPlayerTurnInfo.append(playersInTurn.size() == 1 ? " is" : " are");
+            sbPlayerTurnInfo.append(" resolving the current turn");
 
-            int place = (int) res.size() / 2;
-
-            res.add(place, sb.toString());
+            frameBoard = frameBoard.merge(new CLIFrame(sbPlayerTurnInfo.toString())
+                            .wrap(frameBoard.getColumns() / 2, 0, AnchorPoint.CENTER),
+                    AnchorPoint.CENTER, AnchorPoint.CENTER);
         }
 
-        CLIFrame boardFrame = new CLIFrame(res.toArray(new String[0]));
-        boardFrame = boardFrame.paintBackground(bg);
+        // add players out of flight info
+        if (!playersOutOfFlight.isEmpty()) {
+            String[] poofLines = new String[playersOutOfFlight.size()];
+            for (int i = 0; i < playersOutOfFlight.size(); i++) {
+                poofLines[i] = playersOutOfFlight.get(i)
+                        .toColoredString(playerPlaceholderFilled + " ", "")
+                        + " is out of flight";
+            }
+            frameBoard = frameBoard.merge(new CLIFrame(poofLines), Direction.NORTH, 2);
+        }
 
-        return boardFrame;
+        return frameBoard;
     }
 }
