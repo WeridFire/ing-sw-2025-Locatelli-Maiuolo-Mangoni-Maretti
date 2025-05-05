@@ -1,5 +1,7 @@
 package it.polimi.ingsw.gamePhases;
 
+import it.polimi.ingsw.enums.AnchorPoint;
+import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
@@ -128,14 +130,14 @@ public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrint
     public CLIFrame getCLIRepresentation() {
 
         Map<Player, Float> scores = calculateScores(); // Get sorted scores
-        List<String> leaderboardLines = new ArrayList<>();
-        leaderboardLines.add(ANSI.BLUE + "  LEADERBOARD  " + ANSI.RESET);
-        leaderboardLines.add(""); // Empty line for spacing
+        CLIFrame frameLeaderboard = new CLIFrame(ANSI.BLUE + "LEADERBOARD");
 
-        int rank = 1;
+        int rank = 0;
         Float prevScore = null;
         int sameRankCount = 0;
 
+        CLIFrame framePlayers = new CLIFrame();
+        CLIFrame frameScores = new CLIFrame();
         for (Map.Entry<Player, Float> entry : scores.entrySet()) {
             float score = entry.getValue();
 
@@ -150,14 +152,17 @@ public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrint
 
             prevScore = score;
 
-            leaderboardLines.add(
-                    String.format(ANSI.WHITE + "%2d. " + ANSI.GREEN + "%-10s" + ANSI.YELLOW + "%5.1f" + ANSI.RESET,
-                            rank,
-                            entry.getKey().getUsername(),
-                            score)
+            framePlayers = framePlayers.merge(
+                    new CLIFrame(ANSI.WHITE + rank + ". " + ANSI.GREEN + entry.getKey().getUsername()),
+                    AnchorPoint.BOTTOM_LEFT, AnchorPoint.TOP_LEFT
             );
+
+            frameScores = frameScores.merge(new CLIFrame(ANSI.YELLOW + score), Direction.SOUTH);
         }
 
-        return new CLIFrame(leaderboardLines.toArray(new String[0]));
+        return frameLeaderboard.merge(
+                framePlayers.merge(frameScores, Direction.EAST, 2),
+                Direction.SOUTH
+        );
     }
 }
