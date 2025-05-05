@@ -33,23 +33,23 @@ public class AdventureCLIScreenTest {
         List<Player> players = preparePlayers(3, GameLevel.ONE);
 
         System.out.println("\nStarting positions:\n");
-        System.out.println(c.getBoardFrame(GameLevel.ONE, players));
+        System.out.println(c.getBoardFrame(GameLevel.ONE, players, null));
 
         players.get(1).setPosition(players.get(0).getPosition() + 1);
         players.sort(Comparator.comparingInt(Player::getOrder));
         System.out.println("\nThe second player advanced until it reached one position more than the leader:\n");
-        System.out.println(c.getBoardFrame(GameLevel.ONE, players));
+        System.out.println(c.getBoardFrame(GameLevel.ONE, players, null));
 
         players.get(2).setPosition(players.get(0).getPosition() + 7);
         players.sort(Comparator.comparingInt(Player::getOrder));
         System.out.println("\nThe third player advanced until it reached 7 positions more than the new leader:\n");
-        System.out.println(c.getBoardFrame(GameLevel.ONE, players));
+        System.out.println(c.getBoardFrame(GameLevel.ONE, players, null));
     }
 
     @Test
     public void testBoardLevelTwo() {
         AdventureCLIScreen c = new AdventureCLIScreen();
         List<Player> players = preparePlayers(4, GameLevel.TWO);
-        System.out.println(c.getBoardFrame(GameLevel.TWO, players));
+        System.out.println(c.getBoardFrame(GameLevel.TWO, players, null));
     }
 }
