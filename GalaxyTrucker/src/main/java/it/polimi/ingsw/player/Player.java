@@ -484,6 +484,34 @@ public class Player implements Serializable {
 
     /**
      * Get an ANSI-friendly colored username of this player.
+     * Color is this player's color, if present. If this player has no color, the color is default.
+     * @return The colored username.
+     */
+    public String toColoredString() {
+        return toColoredString(getUsername());
+    }
+
+    /**
+     * Get the specified string as ANSI-friendly colored string.
+     * Color is this player's color, if present. If this player has no color, the color is default.
+     * @param toShow The string to "paint" with the player's color.
+     * @return The colored string {@code toShow}.
+     */
+    public String toColoredString(String toShow) {
+        MainCabinTile.Color color = getColor();
+        StringBuilder name = new StringBuilder();
+        if (color != null) {
+            name.append(color.toANSIColor(false));
+        }
+        name.append(toShow);
+        if (color != null) {
+            name.append(ANSI.RESET);
+        }
+        return name.toString();
+    }
+
+    /**
+     * Get an ANSI-friendly colored username of this player.
      * Colors include both prefix and suffix.
      * Color is this player's color, if present. If this player has no color, the color is default.
      * @param prefix A string to show before the name, but with the same color
@@ -491,16 +519,7 @@ public class Player implements Serializable {
      * @return The colored username.
      */
     public String toColoredString(String prefix, String suffix) {
-        MainCabinTile.Color color = getColor();
-        StringBuilder name = new StringBuilder();
-        if (color != null) {
-            name.append(color.toANSIColor(false));
-        }
-        name.append(prefix).append(getUsername()).append(suffix);
-        if (color != null) {
-            name.append(ANSI.RESET);
-        }
-        return name.toString();
+        return toColoredString(prefix + getUsername() + suffix);
     }
 
     /**
