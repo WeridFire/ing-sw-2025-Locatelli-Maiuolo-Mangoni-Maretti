@@ -1,5 +1,6 @@
 package it.polimi.ingsw.gamePhases;
 
+import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
@@ -25,6 +26,12 @@ public class AdventureGamePhase extends PlayableGamePhase{
     @Override
     public void playLoop() throws InterruptedException {
         card.playEffect(gameData);
+        synchronized (gameData.getUnorderedPlayers()) {
+            if(gameData.getPlayers().isEmpty()){
+                GamesHandler gamesHandler = GamesHandler.getInstance();
+                gamesHandler.getGames().remove(gamesHandler.getGame(this.gameId));
+            }
+        }
     }
 
     @Override

@@ -10,7 +10,7 @@ import it.polimi.ingsw.util.ScoreCalculator;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import it.polimi.ingsw.view.cli.ICLIPrintable;
-
+import it.polimi.ingsw.util.GameLevelStandards;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.*;
@@ -44,16 +44,42 @@ public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrint
      */
     public Map<Player, Float> calculateScores(){
 
-        //TODO: add the scores for final positions on the board (depends on the game's level)
         float score;
         Map<Player, Float> playerScores = new HashMap<>();
 
+        //finds the count of the least exposed connectors
+        Integer leastExposedConnectors = null;
         for(Player p: gameData.getPlayers())
         {
+            int tempExposedConnectors = p.getShipBoard().getExposedConnectorsCount();
+            if(leastExposedConnectors == null || leastExposedConnectors > tempExposedConnectors)
+            {
+                leastExposedConnectors = tempExposedConnectors;
+            }
+        }
+
+        //calculates points
+        int i = 0;
+        for(Player p: gameData.getPlayers())
+        {
+            i++;
+
+            //points for the goods and repairs
            score = scoreCalculator.calculateScore(p);
+
+           //adds points for the positions
+           if(!p.isEndedFlight()){
+               score += GameLevelStandards.getFinishOrderRewards(gameData.getLevel()).get(i);
+           }
+
+           //adds points for the best ship
+           if(p.getShipBoard().getExposedConnectorsCount() == leastExposedConnectors){
+               score += GameLevelStandards.getAwardForBestLookingShip(gameData.getLevel());
+           }
            playerScores.put(p, score);
         }
 
+        //sorts the players
         return playerScores.entrySet().stream()
                 .sorted(Map.Entry.<Player, Float>comparingByValue().reversed())
                 .collect(Collectors.toMap(

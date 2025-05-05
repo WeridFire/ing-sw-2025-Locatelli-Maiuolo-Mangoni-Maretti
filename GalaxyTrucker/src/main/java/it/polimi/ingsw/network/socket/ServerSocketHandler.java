@@ -143,8 +143,8 @@ public class ServerSocketHandler implements IServer {
 	}
 
 	@Override
-	public void finishAssembling(IClient client) throws RemoteException {
-		SocketMessage mess = SocketMessage.finishAssemblingMessage();
+	public void finishAssembling(IClient client, Integer preferredPosition) throws RemoteException {
+		SocketMessage mess = SocketMessage.finishAssemblingMessage(preferredPosition);
 		sendSocketMessage(mess);
 	}
 

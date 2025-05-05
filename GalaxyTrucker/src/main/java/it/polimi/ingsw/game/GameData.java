@@ -15,6 +15,7 @@ import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
 import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
+import it.polimi.ingsw.shipboard.exceptions.AlreadyPickedPosition;
 import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.GameLevelStandards;
@@ -113,7 +114,7 @@ public class GameData implements Serializable {
         pirHandler = new PIRHandler();
         setLevel(GameLevel.TESTFLIGHT);
         setCurrentGamePhaseType(GamePhaseType.LOBBY);
-        setRequiredPlayers(2);
+        setRequiredPlayers(3);
     }
 
     /**
@@ -453,23 +454,39 @@ public class GameData implements Serializable {
      * @throws TooManyItemsInHandException only if {@code player} is holding something in hand AND {@code force == false}.
      * @requires to be called during {@link GamePhaseType#ASSEMBLE}
      */
-    public void endAssembly(Player player, boolean force) throws AlreadyEndedAssemblyException, NoShipboardException,
+    public void endAssembly(Player player, boolean force, Integer preferredPosition) throws AlreadyEndedAssemblyException, NoShipboardException, AlreadyPickedPosition,
             TooManyItemsInHandException {
+
         if (!players.contains(player)) {
             throw new IllegalArgumentException("Player '" + player.getUsername() + "' is not in this game");
         }
+
+        //checks if anyone is sitting on the chosen position already
+        if(preferredPosition != null){
+            for(Player p : players){
+                if (p != player && preferredPosition.equals(p.getPosition())) {
+                    throw new AlreadyPickedPosition("Position " + preferredPosition + " is already taken");
+                }
+            }
+        }
+
+
         // handle player management
         if (force) {
+            //kept the previous implementation because if its forced preferredPosition may end up being null
             player.forceEndAssembly(startingPositions.removeFirst());
         } else {
-            player.endAssembly(startingPositions.removeFirst());
+            //dont need to remove anymore cause it's being checked previously
+            player.endAssembly(startingPositions.get(preferredPosition));
         }
+
         // handle game management
         for (Player p : players) {
             if (p.getPosition() == null) {
                 return;
             }
         }
+
         // if here: no player left to finish assembly (<===> all players have a position on the route-board)
         // thanks to precondition it's possible to cast the current game phase
         ((AssembleGamePhase) getCurrentGamePhase()).notifyAllPlayersEndedAssembly();

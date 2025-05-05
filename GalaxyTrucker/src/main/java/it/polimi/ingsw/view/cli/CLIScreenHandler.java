@@ -254,7 +254,7 @@ public class CLIScreenHandler {
 		return gameClient;
 	}
 
-	protected ClientUpdate getLastUpdate() {
+	public ClientUpdate getLastUpdate() {
 		return lastUpdate;
 	}
 

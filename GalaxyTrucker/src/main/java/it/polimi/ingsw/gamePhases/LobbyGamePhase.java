@@ -1,5 +1,6 @@
 package it.polimi.ingsw.gamePhases;
 
+import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
@@ -28,6 +29,10 @@ public class LobbyGamePhase extends PlayableGamePhase{
 		synchronized (gameData.getUnorderedPlayers()){
 			while (gameData.getPlayers().size() < gameData.getRequiredPlayers()){
 				gameData.getUnorderedPlayers().wait();
+				if(gameData.getPlayers().isEmpty()){
+					GamesHandler gamesHandler = GamesHandler.getInstance();
+					gamesHandler.getGames().remove(gamesHandler.getGame(this.gameId));
+				}
 			}
 		}
 	}

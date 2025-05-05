@@ -18,6 +18,7 @@ import it.polimi.ingsw.playerInput.PIRUtils;
 import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
+import it.polimi.ingsw.shipboard.exceptions.AlreadyPickedPosition;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.rmi.RemoteException;
@@ -124,9 +125,9 @@ public class Game {
         for (Player player : getGameData().getPlayers()) {
             if (!player.getShipBoard().isEndedAssembly()) {
                 try {
-                    getGameData().endAssembly(player, true);
+                    getGameData().endAssembly(player, true, null);
                     System.out.println(this + " Forced end assemble for player '" + player.getUsername() + "'");
-                } catch (AlreadyEndedAssemblyException | NoShipboardException | TooManyItemsInHandException e) {
+                } catch (AlreadyEndedAssemblyException | NoShipboardException | TooManyItemsInHandException | AlreadyPickedPosition e) {
                     throw new RuntimeException(e);  // should never happen -> runtime exception
                 }
             }
@@ -151,6 +152,12 @@ public class Game {
         Card currentAdventureCard = gameData.getDeck().drawNextCard();
         AdventureGamePhase adventureGamePhase;
         while (currentAdventureCard != null) {
+
+            //skip the rest if there are no players flying
+            if(gameData.getPlayersInFlight().isEmpty()){
+                break;
+            }
+
             // create adventure
             adventureGamePhase = new AdventureGamePhase(id, gameData, currentAdventureCard);
             getGameData().setCurrentGamePhase(adventureGamePhase);
@@ -180,6 +187,7 @@ public class Game {
         System.out.println(this + " Started scoring phase");
         scoreScreenGamePhase.playLoop();
         notifyScoresToPlayers(scoreScreenGamePhase);
+
         //TODO: finire scoring phase
 
     }

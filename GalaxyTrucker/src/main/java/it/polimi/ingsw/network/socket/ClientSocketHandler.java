@@ -78,7 +78,7 @@ public class ClientSocketHandler implements IClient {
 						case PLACE_TILE -> getServer().placeTile(this,
 								(Coordinates) message.getArgs().getFirst(),
 								(Rotation) message.getArgs().get(1));
-						case FINISH_ASSEMBLING -> getServer().finishAssembling(this);
+						case FINISH_ASSEMBLING -> getServer().finishAssembling(this, (Integer) message.getArgs().getFirst());
 						case SHOW_CARD_GROUP -> getServer().showCardGroup(this, (Integer) message.getArgs().getFirst());
 						case HIDE_CARD_GROUP -> getServer().hideCardGroup(this);
 						case PIR_ACTIVATE_TILES -> getServer().pirActivateTiles(this,

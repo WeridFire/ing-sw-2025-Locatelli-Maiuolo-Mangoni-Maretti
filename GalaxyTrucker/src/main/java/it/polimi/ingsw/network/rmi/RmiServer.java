@@ -351,14 +351,14 @@ public class RmiServer implements IServer {
     }
 
 	@Override
-	public void finishAssembling(IClient client) throws RemoteException {
+	public void finishAssembling(IClient client, Integer preferredPosition) throws RemoteException {
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client, GamePhaseType.ASSEMBLE);
 		if (pg == null) return;
 		// else: actually try to perform the action
 
 		try {
-			pg.game.getGameData().endAssembly(pg.player, false);
-		} catch (NoShipboardException | AlreadyEndedAssemblyException | TooManyItemsInHandException e) {
+			pg.game.getGameData().endAssembly(pg.player, false, preferredPosition);
+		} catch (NoShipboardException | AlreadyEndedAssemblyException | TooManyItemsInHandException | AlreadyPickedPosition e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 			return;
 		}

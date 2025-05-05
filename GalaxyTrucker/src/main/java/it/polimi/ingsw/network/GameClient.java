@@ -79,4 +79,10 @@ public class GameClient implements IClient{
 		gameClient.getServer().connect(gameClient.getClient());
 		CLIScreenHandler.getInstance().runCli();
 	}
+
+	public static void main(GameClient gameClient) throws IOException, NotBoundException {
+		CLIScreenHandler.init(gameClient);
+		gameClient.getServer().connect(gameClient.getClient());
+		CLIScreenHandler.getInstance().runCli();
+	}
 }
