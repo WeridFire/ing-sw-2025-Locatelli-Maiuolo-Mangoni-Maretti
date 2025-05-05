@@ -1,7 +1,7 @@
 package it.polimi.ingsw.game;
 
-import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.TilesFactory;
+import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
@@ -10,18 +10,21 @@ import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
 import it.polimi.ingsw.shipboard.exceptions.TileWithoutNeighborException;
-import it.polimi.ingsw.shipboard.tiles.Tile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Cheats {
 
-	public static void cheatShipboard(Game game, Player player) throws AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, OutOfBuildingAreaException, RemoteException {
+	public static void cheatShipboard(Game game, Player player) throws AlreadyEndedAssemblyException, FixedTileException,
+			TileAlreadyPresentException, TileWithoutNeighborException, OutOfBuildingAreaException, RemoteException {
+		if (game.getGameData().getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE) {
+			return;
+		}
+
 		List<TileSkeleton> tileList = TilesFactory.createPileTiles();
 		tileList.add(34, null);
 		tileList.add(52, null);
@@ -76,6 +79,10 @@ public class Cheats {
 	}
 
 	public static void randomShipboard(Game game, Player player) throws RemoteException {
+		if (game.getGameData().getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE) {
+			return;
+		}
+
 		List<TileSkeleton> tilesLeft = game.getGameData().getCoveredTiles();
 		TileSkeleton randomTile = null;
 		ShipBoard playerShip = player.getShipBoard();
