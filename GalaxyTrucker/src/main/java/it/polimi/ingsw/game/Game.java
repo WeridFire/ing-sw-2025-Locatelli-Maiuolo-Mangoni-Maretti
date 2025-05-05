@@ -190,7 +190,8 @@ public class Game {
         scoreScreenGamePhase.playLoop();
         notifyScoresToPlayers(scoreScreenGamePhase);
 
-        //TODO: finire scoring phase
+        // TODO: end scoring phase
+        // TODO: delete saved game state file to avoid memory issues
 
     }
 

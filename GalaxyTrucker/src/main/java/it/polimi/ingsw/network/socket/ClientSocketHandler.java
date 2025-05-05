@@ -85,7 +85,7 @@ public class ClientSocketHandler implements IClient {
 						case REQUEST_END_FLIGHT -> getServer().requestEndFlight(this,
 								(KeepPlayerFlyingPredicate) message.getArgs().getFirst());
 						case PIR_ACTIVATE_TILES -> getServer().pirActivateTiles(this,
-													(Set<Coordinates>) message.getArgs().getFirst());
+								(Set<Coordinates>) message.getArgs().getFirst());
 						case PIR_ALLOCATE_REMOVE_LOADABLES -> {
 							boolean adding = (Boolean) message.getArgs().get(1);
 							if(adding){
