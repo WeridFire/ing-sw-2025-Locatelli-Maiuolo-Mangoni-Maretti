@@ -23,26 +23,16 @@ public class Player implements Serializable {
     private final String username;
     private UUID connectionUUID;
 
+    /**
+     * The player's shipboard
+     */
+    private ShipBoard shipBoard;
 
     /**
-     * true if the player desire to end the flight at the end of the current adventure
+     * Number of tiles that the player will have to pay for at the end of the game
+     * (destroyed tiles, or reserved and not used tiles)
      */
-    private boolean requestedEndFlight = false;
-
-    /**
-     * a predicate to execute just before ending the flight: if it's true, the player is safe and shall not end the flight
-     */
-    private Predicate<Player> saveFromEndFlight = null;
-
-    /**
-     * true if the player is out of the flight
-     */
-    private boolean endedFlight = false;
-
-    /**
-     * Tile currently held by the player
-     */
-    private TileSkeleton tileInHand;
+    private final List<TileSkeleton> lostTiles;
 
     /**
      * Tiles reserved by the player during building phase (MAX 2)
@@ -50,20 +40,21 @@ public class Player implements Serializable {
     private final List<TileSkeleton> reservedTiles;
 
     /**
-     * true <==> tile in hand has been picked from reserved tiles
+     * The id of the cardgroup the player is currently holding,
+     * or null if this player has not any cardgroup in hand at the moment.
+     */
+    private Integer cardGroupInHand;
+
+    /**
+     * Tile currently held by the player, or null if this player has no tile in hand at the moment.
+     */
+    private TileSkeleton tileInHand;
+
+    /**
+     * true if the tile in hand has been picked from reserved tiles
      * (can not discard and count as lost if not placed before end of assembly)
      */
-    private boolean isTileInHandFromReserved = false;
-
-    /**
-     * Number of tiles that the player will have to pay for at the end of the game (destroyed tiles or reserved and not used tiles)
-     */
-    private final List<TileSkeleton> lostTiles;
-
-    /**
-     * The player's shipboard
-     */
-    private ShipBoard shipBoard;
+    private boolean isTileInHandFromReserved;
 
     /**
      * The player's space credits
@@ -72,25 +63,43 @@ public class Player implements Serializable {
 
     /**
      * The player's absolute position on the flight board,
-     * or null if this player has not been placed on the route-board yet.
+     * or null if this player has not been placed on the route-board yet (or if it's not on it anymore).
      */
     private Integer position;
 
     /**
-     * The id of the cardgroup the player is currently holding,
-     * or null if this player has not any cardgroup in hand at the moment.
+     * true if the player is out of the flight
      */
-    private Integer cardGroupInHand;
+    private boolean endedFlight;
+
+    /**
+     * true if the player desire to end the flight at the end of the current adventure
+     */
+    private boolean requestedEndFlight;
+
+    /**
+     * a predicate to execute just before ending the flight: if it's true, the player is safe and shall not end the flight
+     */
+    private Predicate<Player> saveFromEndFlight;
 
 
     public Player(String username, UUID connectionUUID) {
         this.username = username;
         this.connectionUUID = connectionUUID;
-        reservedTiles = new ArrayList<>(2);
+
         lostTiles = new ArrayList<>();
+        reservedTiles = new ArrayList<>(2);
+
+        cardGroupInHand = null;
+        tileInHand = null;
+        isTileInHandFromReserved = false;
+
         credits = 0;
         position = null;
-        cardGroupInHand = null;
+
+        endedFlight = false;
+        requestedEndFlight = false;
+        saveFromEndFlight = null;
     }
 
     /**
@@ -112,31 +121,35 @@ public class Player implements Serializable {
         this.connectionUUID = null;
     }
 
+    public boolean isConnected(){
+        return getConnectionUUID() != null;
+    }
+
     /**
-     * @return tile held by the player
+     * @return tile held by the player, or {@code null} if this player has no tile in hand
      */
     public TileSkeleton getTileInHand() {
         return tileInHand;
     }
 
     /**
-     * @param tileInHand tile to be held by the player
+     * @param tileToHold tile to be held by the player
      * @throws AlreadyHaveTileInHandException if already have tile in hand
-     * @throws TileCanNotDisappearException if {@code tileInHand == null}: it would make the tile disappear from
+     * @throws TileCanNotDisappearException if {@code tileToHold == null}: it would make the tile disappear from
      * player's hand
      */
-    public void setTileInHand(TileSkeleton tileInHand) throws AlreadyHaveTileInHandException, TileCanNotDisappearException {
-        if (tileInHand == null) {
+    public void setTileInHand(TileSkeleton tileToHold) throws AlreadyHaveTileInHandException, TileCanNotDisappearException {
+        if (tileToHold == null) {
             throw new TileCanNotDisappearException("You have a tile in hand: it can not disappear.");
         }
         if (getTileInHand() != null) {
             throw new AlreadyHaveTileInHandException();
         }
-        this.tileInHand = tileInHand;
+        tileInHand = tileToHold;
     }
 
     /**
-     * Clear the hand. Requires to have put the tile in hand somewhere else before.
+     * Clear the hand from any tile. Requires to have put the tile in hand somewhere else before.
      */
     private void removeTileFromHand() {
         tileInHand = null;
@@ -155,7 +168,13 @@ public class Player implements Serializable {
     }
 
     /**
-     *
+     * @return the list of discarded tiles
+     */
+    public List<TileSkeleton> getLostTiles() {
+        return lostTiles;
+    }
+
+    /**
      * @return reserved tiles array
      */
     public List<TileSkeleton> getReservedTiles() {
@@ -180,19 +199,18 @@ public class Player implements Serializable {
     }
 
     /**
-     *
-     * @return the list of discarded tiles
-     */
-    public List<TileSkeleton> getLostTiles() {
-        return lostTiles;
-    }
-
-    /**
-     *
      * @return the player's shipboard
      */
     public ShipBoard getShipBoard() {
         return shipBoard;
+    }
+
+    /**
+     * Assigns the shipboard to the player
+     * @param shipBoard this player's shipboard
+     */
+    public void setShipBoard(ShipBoard shipBoard) {
+        this.shipBoard = shipBoard;
     }
 
     /**
@@ -208,14 +226,6 @@ public class Player implements Serializable {
         } catch (NullPointerException | UninitializedShipboardException e) {
             return null;
         }
-    }
-
-    /**
-     * Assigns the shipboard to the player
-     * @param shipBoard this player's shipboard
-     */
-    public void setShipBoard(ShipBoard shipBoard) {
-        this.shipBoard = shipBoard;
     }
 
     /**
@@ -256,7 +266,7 @@ public class Player implements Serializable {
 
     /**
      * Returns the <i>opposite</i> of the current position of the player for sorting purposes:
-     * ignores if the player has never been assigned to a position,
+     * ignores if the player has never been assigned to a position (or if it has not one anymore),
      * and in that case suppose the order privilege goes to those players who have a position.
      * <p>
      * <b>NOTE</b>: this is the opposite of the position, to get first the one with the most advanced position.
@@ -324,6 +334,15 @@ public class Player implements Serializable {
         }
     }
 
+    /**
+     * Discards the tile currently held in hand by the player and adds it back to the list
+     * of uncovered tiles in {@link GameData}.
+     * Reserved tiles cannot be discarded.
+     *
+     * @param gameData the current game data containing the uncovered tiles pool
+     * @throws NoTileInHandException if the player does not have a tile in hand
+     * @throws ReservedTileException if the tile in hand was taken from the reserved tiles of the player
+     */
     public void discardTile(GameData gameData) throws NoTileInHandException, ReservedTileException {
         TileSkeleton tileInHand = getTileInHand();
         if (tileInHand == null){
@@ -337,6 +356,22 @@ public class Player implements Serializable {
         removeTileFromHand();
     }
 
+    /**
+     * Places the tile currently in hand onto the ship board at the specified coordinates
+     * and with the specified rotation.
+     * The method ensures the tile is correctly rotated and placed; once placed, it is removed from the player's hand.
+     *
+     * @param coordinates the target coordinates where the tile should be placed
+     * @param rotation the rotation to apply before placing the tile
+     * @throws NoTileInHandException If there is no tile in hand.
+     * @throws NoShipboardException If the player does not have a ship board.
+     * @throws AlreadyEndedAssemblyException If this shipboard has already been consolidated as assembled.
+     * @throws OutOfBuildingAreaException If the coordinates are outside the valid building area.
+     * @throws TileAlreadyPresentException If there is already a tile at the specified coordinates.
+     * @throws FixedTileException If the provided tile has already been placed.
+     * @throws TileWithoutNeighborException If the provided coordinates are not adjacent to an already placed tile
+     * coordinates.
+     */
     public void placeTile(Coordinates coordinates, Rotation rotation) throws NoTileInHandException, NoShipboardException,
             FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, OutOfBuildingAreaException,
             AlreadyEndedAssemblyException {
@@ -356,6 +391,15 @@ public class Player implements Serializable {
         removeTileFromHand();
     }
 
+    /**
+     * Picks a tile with the given ID from the uncovered or reserved tiles and sets it as the current tile in hand.
+     * This operation is only allowed if the player is not already holding a tile or a group of cards.
+     *
+     * @param gameData the current game data containing the available tiles
+     * @param id the ID of the tile to pick
+     * @throws TooManyItemsInHandException if the player is already holding a tile or a card group
+     * @throws ThatTileIdDoesNotExistsException if no tile with the given ID exists in any valid pool
+     */
     public void pickTile(GameData gameData, Integer id) throws TooManyItemsInHandException, ThatTileIdDoesNotExistsException {
         if (getTileInHand() != null) {
             throw new AlreadyHaveTileInHandException();
@@ -459,10 +503,21 @@ public class Player implements Serializable {
         return name.toString();
     }
 
+    /**
+     * Returns whether the flight has officially ended for this player.
+     *
+     * @return {@code true} if the flight has ended; {@code false} otherwise
+     */
     public boolean isEndedFlight() {
         return endedFlight;
     }
 
+    /**
+     * Attempts to end the flight for this player.
+     * If a {@code saveFromEndFlight} predicate is defined and returns {@code true},
+     * the end is prevented and the predicate is cleared.
+     * Otherwise: the flight is ended, the end request is cleared, and any related data (e.g. position) is reset.
+     */
     public void endFlight() {
         if (saveFromEndFlight != null && saveFromEndFlight.test(this)) {
             // player has been saved from ending the flight
@@ -472,26 +527,36 @@ public class Player implements Serializable {
         endedFlight = true;
         requestedEndFlight = false;
         saveFromEndFlight = null;
+        position = null;
     }
 
+    /**
+     * Returns whether the player has requested to end the flight.
+     *
+     * @return {@code true} if the player has requested the end of flight; {@code false} otherwise
+     */
     public boolean hasRequestedEndFlight() {
         return requestedEndFlight;
     }
 
+    /**
+     * Requests to end the flight for this player without conditions.
+     */
     public void requestEndFlight() {
         requestedEndFlight = true;
     }
 
     /**
-     * @param saveFromEndFlight a SERIALIZABLE predicate to execute just before ending the flight:
-     *                          if it's true, the player is safe and shall not end the flight
+     * Requests to end the flight for this player, but allows for conditional cancellation.
+     * If the provided {@code saveFromEndFlight} predicate returns {@code true} when {@link #endFlight()}
+     * is called, the end of flight will be aborted.
+     *
+     * @param saveFromEndFlight a <strong>serializable</strong> predicate to be checked upon attempting to end the flight.
+     *                          If it evaluates to {@code true}, the flight will not be ended.
      */
     public void requestEndFlight(Predicate<Player> saveFromEndFlight) {
         requestedEndFlight = true;
         this.saveFromEndFlight = saveFromEndFlight;
     }
 
-    public boolean isConnected(){
-        return getConnectionUUID() != null;
-    }
 }
