@@ -9,6 +9,7 @@ import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.GameLevelStandards;
 import it.polimi.ingsw.util.Util;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class AdventureCLIScreen extends CLIScreen{
     }
 
     @Override
-    protected void processCommand(String command, String[] args) throws CommandNotAllowedException {
+    protected void processCommand(String command, String[] args) throws CommandNotAllowedException, RemoteException {
         switch(command){
             case "": break;  // on simple enter do nothing in particular
 
@@ -53,9 +54,9 @@ public class AdventureCLIScreen extends CLIScreen{
                 if (player.isEndedFlight()) {
                     setScreenMessage("You have already ended the flight.");
                 } else {
+                    getServer().requestEndFlight(getClient(), null);
                     setScreenMessage("The request to end the flight has been registered.\n" +
-                            "You will end the flight as soon as possible.");
-                    player.requestEndFlight();
+                            "You will end the flight right before the next Adventure.");
                 }
                 break;
 
@@ -330,16 +331,17 @@ public class AdventureCLIScreen extends CLIScreen{
 
         // add turn info
         if (!playersInTurn.isEmpty()) {
-            StringBuilder sbPlayerTurnInfo = new StringBuilder(ANSI.BACKGROUND_BLACK + ANSI.WHITE);
+            StringBuilder sbPlayerTurnInfo = new StringBuilder();
 
             for (Player p : playersInTurn) {
                 sbPlayerTurnInfo.append(p.toColoredString()).append(", ");
             }
-            sbPlayerTurnInfo.delete(sbPlayerTurnInfo.length() - 2, sbPlayerTurnInfo.length());  // remove last ", "
-            sbPlayerTurnInfo.append(playersInTurn.size() == 1 ? " is" : " are");
-            sbPlayerTurnInfo.append(" resolving the current turn");
+            sbPlayerTurnInfo.delete(sbPlayerTurnInfo.length() - 2, sbPlayerTurnInfo.length())  // remove last ", "
+                    .append(playersInTurn.size() == 1 ? " is" : " are")
+                    .append(" resolving the current turn");
 
             frameBoard = frameBoard.merge(new CLIFrame(sbPlayerTurnInfo.toString())
+                            .paintBackground(ANSI.BACKGROUND_BLACK)
                             .wrap(frameBoard.getColumns() / 2, 0, AnchorPoint.CENTER),
                     AnchorPoint.CENTER, AnchorPoint.CENTER);
         }
