@@ -2,6 +2,7 @@ package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.Rotation;
+import it.polimi.ingsw.player.kpf.KeepPlayerFlyingPredicate;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.util.Coordinates;
 
@@ -42,6 +43,9 @@ public interface IServer extends Remote {
 	void finishAssembling(IClient client, Integer preferredPosition) throws RemoteException;
 	void showCardGroup(IClient client, Integer id) throws RemoteException;
 	void hideCardGroup(IClient client) throws RemoteException;
+
+	// Adventure phase
+	void requestEndFlight(IClient client, KeepPlayerFlyingPredicate saveFromEndFlight) throws RemoteException;
 
 
 	//Debugging and Dev mode

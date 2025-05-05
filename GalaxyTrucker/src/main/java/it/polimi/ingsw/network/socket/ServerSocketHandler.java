@@ -5,6 +5,7 @@ import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.network.messages.SocketMessage;
+import it.polimi.ingsw.player.kpf.KeepPlayerFlyingPredicate;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.util.Coordinates;
 
@@ -158,6 +159,11 @@ public class ServerSocketHandler implements IServer {
 	public void hideCardGroup(IClient client) throws RemoteException {
 		SocketMessage mess = SocketMessage.hideCardGroupMessage();
 		sendSocketMessage(mess);
+	}
+
+	@Override
+	public void requestEndFlight(IClient client, KeepPlayerFlyingPredicate saveFromEndFlight) throws RemoteException {
+		sendSocketMessage(SocketMessage.endFlightMessage(saveFromEndFlight));
 	}
 
 	@Override

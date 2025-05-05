@@ -19,6 +19,7 @@ import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.*;
+import it.polimi.ingsw.player.kpf.KeepPlayerFlyingPredicate;
 import it.polimi.ingsw.playerInput.PIRs.PIR;
 import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
@@ -420,6 +421,16 @@ public class RmiServer implements IServer {
 		}
 
 		GameServer.getInstance().broadcastUpdate(pg.game);
+	}
+
+	@Override
+	public void requestEndFlight(IClient client, KeepPlayerFlyingPredicate saveFromEndFlight) throws RemoteException {
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client, GamePhaseType.ADVENTURE);
+		if (pg == null) return;
+		// else: actually try to perform the action
+
+		pg.player.requestEndFlight(saveFromEndFlight);
+		client.updateClient(new ClientUpdate(pg.connectionUUID, false));
 	}
 
 	@Override

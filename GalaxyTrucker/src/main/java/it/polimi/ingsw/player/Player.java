@@ -4,6 +4,7 @@ import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.game.exceptions.DrawTileException;
 import it.polimi.ingsw.player.exceptions.*;
+import it.polimi.ingsw.player.kpf.KeepPlayerFlyingPredicate;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.*;
 import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
@@ -16,7 +17,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 public class Player implements Serializable {
 
@@ -80,7 +80,7 @@ public class Player implements Serializable {
     /**
      * a predicate to execute just before ending the flight: if it's true, the player is safe and shall not end the flight
      */
-    private Predicate<Player> saveFromEndFlight;
+    private KeepPlayerFlyingPredicate saveFromEndFlight;
 
 
     public Player(String username, UUID connectionUUID) {
@@ -573,7 +573,7 @@ public class Player implements Serializable {
      * @param saveFromEndFlight a <strong>serializable</strong> predicate to be checked upon attempting to end the flight.
      *                          If it evaluates to {@code true}, the flight will not be ended.
      */
-    public void requestEndFlight(Predicate<Player> saveFromEndFlight) {
+    public void requestEndFlight(KeepPlayerFlyingPredicate saveFromEndFlight) {
         requestedEndFlight = true;
         this.saveFromEndFlight = saveFromEndFlight;
     }

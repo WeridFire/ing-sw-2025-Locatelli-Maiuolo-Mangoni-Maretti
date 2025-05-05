@@ -170,7 +170,7 @@ public class Game {
 
             // end flight for players that requested it
             for (Player player : getGameData().getPlayers(Player::hasRequestedEndFlight)) {
-                gameData.endFlight(player);
+                player.endFlight();
             }
 
             gameData.saveGameState();

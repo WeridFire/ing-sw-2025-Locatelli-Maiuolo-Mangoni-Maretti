@@ -5,6 +5,7 @@ import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.network.*;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.messages.SocketMessage;
+import it.polimi.ingsw.player.kpf.KeepPlayerFlyingPredicate;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.util.Coordinates;
 
@@ -81,6 +82,8 @@ public class ClientSocketHandler implements IClient {
 						case FINISH_ASSEMBLING -> getServer().finishAssembling(this, (Integer) message.getArgs().getFirst());
 						case SHOW_CARD_GROUP -> getServer().showCardGroup(this, (Integer) message.getArgs().getFirst());
 						case HIDE_CARD_GROUP -> getServer().hideCardGroup(this);
+						case REQUEST_END_FLIGHT -> getServer().requestEndFlight(this,
+								(KeepPlayerFlyingPredicate) message.getArgs().getFirst());
 						case PIR_ACTIVATE_TILES -> getServer().pirActivateTiles(this,
 													(Set<Coordinates>) message.getArgs().getFirst());
 						case PIR_ALLOCATE_REMOVE_LOADABLES -> {

@@ -49,8 +49,6 @@ public class GameData implements Serializable {
      */
     private final Set<Player> players;
 
-    private final Set<Player> deadPlayers;
-
     /**
      * The list of starting position for players on the route board
      */
@@ -103,7 +101,6 @@ public class GameData implements Serializable {
      * Constructs a new GameData object with a default game level.
      */
     public GameData(UUID gameId) {
-        this.deadPlayers = new HashSet<>();
         this.gameId = gameId;
         players = new HashSet<>();
         availableGoods = new HashMap<>();
@@ -528,15 +525,6 @@ public class GameData implements Serializable {
         }
         // else: in assemble can cast current game phase
         return ((AssembleGamePhase) getCurrentGamePhase()).getAssemblyTimerSlotIndex();
-    }
-
-    public void endFlight(Player p){
-        if (!players.contains(p)) return;
-
-        p.endFlight();
-
-        players.remove(p);
-        deadPlayers.add(p);
     }
 
     /**
