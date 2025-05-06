@@ -162,7 +162,7 @@ public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrint
 
         return frameLeaderboard.merge(
                 framePlayers.merge(frameScores, Direction.EAST, 2),
-                Direction.SOUTH
+                Direction.SOUTH, 1
         );
     }
 }
