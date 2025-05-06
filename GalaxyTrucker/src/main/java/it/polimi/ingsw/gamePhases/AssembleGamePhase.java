@@ -27,11 +27,11 @@ public class AssembleGamePhase extends PlayableGamePhase {
 
     /**
      * Constructs a new PlayableGamePhase as {@link GamePhaseType#ASSEMBLE}.
-     * Every time a timer runs out, executes {@code onTimerEndCallback}.
+     * Every time a timer stops or gets resumed: executes {@code onTimerSwitchCallback}.
      *
      * @param gameId The unique identifier of the game.
      * @param gameData The game data.
-     * @param onTimerSwitchCallback The callback function to be executed every time a timer runs out.
+     * @param onTimerSwitchCallback The callback function to be executed every time a timer switches state.
      */
     public AssembleGamePhase(UUID gameId, GameData gameData, Runnable onTimerSwitchCallback) {
         super(gameId, GamePhaseType.ASSEMBLE, gameData);
@@ -43,7 +43,7 @@ public class AssembleGamePhase extends PlayableGamePhase {
 
     /**
      * Constructs a new PlayableGamePhase as {@link GamePhaseType#ASSEMBLE}.
-     * Every time a timer runs out, does nothing except for waiting someone to restart it
+     * Every time a timer stops or gets resumed: does nothing.
      *
      * @param gameId        The unique identifier of the game.
      * @param gameData      The game data.
