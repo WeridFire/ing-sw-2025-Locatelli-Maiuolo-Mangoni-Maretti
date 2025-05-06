@@ -467,20 +467,20 @@ public class GameData implements Serializable {
             throw new IllegalArgumentException("Player '" + player.getUsername() + "' is not in this game");
         }
 
+        List<Integer> playersPositions = players.stream()
+                .map(Player::getPosition)
+                .filter(Objects::nonNull)
+                .toList();
+
         if (preferredPositionIndex == null) {
             // calculate first valid position as preferred
-            boolean alreadyOccupied = false;
             preferredPositionIndex = -1;
             do {
                 preferredPositionIndex++;
                 if (preferredPositionIndex >= startingPositions.size()) {
                     throw new IllegalStartingPositionIndexException(preferredPositionIndex);
                 }
-                Integer preferredPosition = startingPositions.get(preferredPositionIndex);
-                if (players.stream().anyMatch(p -> preferredPosition.equals(p.getPosition()))) {
-                    alreadyOccupied = true;
-                }
-            } while (alreadyOccupied);
+            } while (playersPositions.contains(startingPositions.get(preferredPositionIndex)));
         }
 
         // check if anyone is sitting on the preferred position already, or if it is not valid -> throw exception
@@ -488,8 +488,8 @@ public class GameData implements Serializable {
             throw new IllegalStartingPositionIndexException(preferredPositionIndex);
         }
         Integer preferredPosition = startingPositions.get(preferredPositionIndex);
-        if (players.stream().anyMatch(p -> p != player && preferredPosition.equals(p.getPosition()))) {
-            throw new AlreadyPickedPosition("Position " + preferredPosition + " is already taken");
+        if (playersPositions.contains(preferredPosition)) {
+            throw new AlreadyPickedPosition("Position at index " + preferredPositionIndex + " is already taken");
         }
 
         // handle player management
