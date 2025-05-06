@@ -1,8 +1,10 @@
 package it.polimi.ingsw.cards.enemy;
 
 import it.polimi.ingsw.cards.projectile.Projectile;
+import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.view.cli.CLIFrame;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.enums.Direction;
@@ -15,21 +17,30 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PiratesCardTest {
 
+    Player player1;
+    PiratesCard piratesCard;
+    Game testGame;
+    GameData testGameData;
 
-    Player player1 = new Player("SpaceTruckKing", UUID.randomUUID());
-    PiratesCard piratesCard = new PiratesCard(7, new Projectile[]{
-            Projectile.createHeavyCannonFire(Direction.NORTH),
-            Projectile.createLightCannonFire(Direction.NORTH),
-            Projectile.createHeavyCannonFire(Direction.NORTH),
-    }, 6, 2, "GT-cards_II_IT_013.jpg", 2);
-    Game testGame = GamesHandler.getInstance().startGame();
-    GameData testData = testGame.getGameData();
+    @BeforeEach
+    void setUp() throws PlayerAlreadyInGameException {
+        piratesCard = new PiratesCard(7, new Projectile[]{
+                Projectile.createHeavyCannonFire(Direction.NORTH),
+                Projectile.createLightCannonFire(Direction.NORTH),
+                Projectile.createHeavyCannonFire(Direction.NORTH),
+        }, 6, 2, "GT-cards_II_IT_013.jpg", 2);
+        testGame = GamesHandler.getInstance().createGame("SpaceTruckKing", UUID.randomUUID());
+        testGameData = testGame.getGameData();
+        player1 = testGameData.getPlayers().getFirst();
+        player1.setPosition(0);
+    }
+
 
     @Test
     void SevenPlusZeroShouldEqualSeven() {
 
         System.out.println("Test givePrize");
-        piratesCard.givePrize(player1, testData);
+        piratesCard.givePrize(player1, testGameData);
         assertEquals(7, player1.getCredits());
 
     }
