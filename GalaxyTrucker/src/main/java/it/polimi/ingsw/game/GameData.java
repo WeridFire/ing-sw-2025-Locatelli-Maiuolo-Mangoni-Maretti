@@ -109,8 +109,8 @@ public class GameData implements Serializable {
         deck = null;
         pirHandler = new PIRHandler();
         setLevel(GameLevel.TESTFLIGHT);
-        setCurrentGamePhaseType(GamePhaseType.LOBBY);
-        setRequiredPlayers(3);
+        setCurrentGamePhaseType(GamePhaseType.NONE);
+        setRequiredPlayers(2);
     }
 
     /**
@@ -254,7 +254,7 @@ public class GameData implements Serializable {
      */
     public void setCurrentGamePhase(PlayableGamePhase currentGamePhase) {
         this.currentGamePhase = currentGamePhase;
-        this.currentGamePhaseType = currentGamePhase.getGamePhaseType();
+        currentGamePhaseType = currentGamePhase.getGamePhaseType();
     }
 
     /**

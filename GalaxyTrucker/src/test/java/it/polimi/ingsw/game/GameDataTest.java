@@ -2,8 +2,10 @@ package it.polimi.ingsw.game;
 
 import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Deck;
+import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.exceptions.AlreadyPickedPosition;
 import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
@@ -13,6 +15,7 @@ import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
 import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
+import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.exceptions.*;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
@@ -42,7 +45,7 @@ class GameDataTest {
     void testConstructor() {
         assertEquals(gameId, gameData.getGameId());
         assertEquals(GameLevel.TESTFLIGHT, gameData.getLevel());
-        assertEquals(GamePhaseType.LOBBY, gameData.getCurrentGamePhaseType());
+        assertEquals(GamePhaseType.NONE, gameData.getCurrentGamePhaseType());
         assertTrue(gameData.getPlayers().isEmpty());
         assertEquals(2, gameData.getRequiredPlayers());
         assertNull(gameData.getGameLeader());
@@ -97,17 +100,25 @@ class GameDataTest {
         UUID gameId = runAndSaveGameUntilStep(0);
         Game g = GamesHandler.getInstance().getGame(gameId);
 
+        assertNotNull(g);
+
         GameData gameData = GameData.loadFromState(gameId);
 
         assertThrows(GameAlreadyRunningException.class,
                     () ->  GamesHandler.getInstance().resumeGame(gameData, UUID.randomUUID()));
 
         g.stopGame();
-        Thread.sleep(1000);
+
         GamesHandler.getInstance().resumeGame(gameData, UUID.randomUUID());
     }
 
 
+    private void stopAndSaveGame(GameData gameData) {
+        for (Player p : gameData.getPlayers()) {
+            p.disconnect();
+        }
+        gameData.saveGameState();
+    }
 
     /**
      * Step -1: stops in lobby (shouldnt serialize a game in lobby)
@@ -119,20 +130,23 @@ class GameDataTest {
      */
     UUID runAndSaveGameUntilStep(int step) throws AlreadyPickedPosition, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException, TooManyItemsInHandException, NoShipboardException, InterruptedException, PlayerAlreadyInGameException, IllegalStartingPositionIndexException {
         Game g = GamesHandler.getInstance().createGame("Pippo", UUID.randomUUID());
+        UUID gameId = g.getId();
+        GameData gameData = g.getGameData();
 
-        Player player1 = g.getGameData().getPlayers().stream().filter((p) -> p.getUsername().equals(g.getGameData().getGameLeader())).findFirst().get();
+        Player player1 = gameData.getPlayer(p -> Objects.equals(p.getUsername(), gameData.getGameLeader()));
         Player player2 = g.addPlayer("Player2", UUID.randomUUID());
 
         if(step == -1){
-            g.getGameData().saveGameState();
-            return g.getId();
+            stopAndSaveGame(gameData);
+            return gameId;
         }
 
-        Thread.sleep(1000);
+        g.testInitGame();
+        gameData.setCurrentGamePhase(new AssembleGamePhase(gameId, gameData));
 
         if(step == 0){
-            g.getGameData().saveGameState();
-            return g.getId();
+            stopAndSaveGame(gameData);
+            return gameId;
         }
 
         Thread.sleep(1000);
@@ -140,22 +154,22 @@ class GameDataTest {
         Cheats.cheatShipboard(g, player1);
         Cheats.cheatShipboard(g, player2);
         if(step == 1){
-            g.getGameData().saveGameState();
-            return g.getId();
+            stopAndSaveGame(gameData);
+            return gameId;
         }
 
-        g.getGameData().endAssembly(player1, false, 1);
-        g.getGameData().endAssembly(player2, false, 2);
+        gameData.endAssembly(player1, false, 1);
+        gameData.endAssembly(player2, false, 2);
 
         Thread.sleep(2000);
         if(step == 2){
-            g.getGameData().saveGameState();
-            return g.getId();
+            stopAndSaveGame(gameData);
+            return gameId;
         }
 
 
-        g.getGameData().saveGameState();
-        return g.getId();
+        stopAndSaveGame(gameData);
+        return gameId;
     }
 
     @Test
@@ -314,7 +328,8 @@ class GameDataTest {
     // Mock object creation helpers
 
     private TileSkeleton createMockTile(int id) {
-        return new TileSkeleton(null) {
+        return new TileSkeleton(Direction.sortedArray(SideType.UNIVERSAL, SideType.UNIVERSAL,
+                SideType.UNIVERSAL, SideType.UNIVERSAL).toArray(SideType[]::new)) {
             /**
              * Method to accept a visitor for this tile in the Visitor Pattern.
              *

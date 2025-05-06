@@ -82,15 +82,16 @@ public class Game {
      * Returns the game data of this game.
      * @return the {@code GameData} of the game.
      */
-    public GameData getGameData() {return gameData;}
+    public GameData getGameData() {
+        return gameData;
+    }
 
-    /**
-     * Starts and manages the game loop.
-     * <p>
-     * This method is currently a placeholder and needs to be implemented.
-     * </p>
-     */
-    public void gameLoop() throws InterruptedException, RemoteException {
+    private void playLobby() throws RemoteException, InterruptedException {
+        // play lobby only after no game phase has been started
+        if (getGameData().getCurrentGamePhaseType() != GamePhaseType.NONE) {
+            return;
+        }
+
         //*******//
         // LOBBY
         System.out.println(this + " In lobby");
@@ -99,9 +100,16 @@ public class Game {
         getGameData().setCurrentGamePhase(lobby);
         lobby.playLoop();
 
-        //Call function to initialize all players stuff.
+        // call function to initialize all players stuff
         System.out.println(this + " Initialization");
         initGame();
+    }
+
+    private void playAssemble() throws RemoteException, InterruptedException {
+        // play assemble only after lobby
+        if (getGameData().getCurrentGamePhaseType() != GamePhaseType.LOBBY) {
+            return;
+        }
 
         //**********//
         // ASSEMBLE
@@ -143,19 +151,31 @@ public class Game {
         gameData.getPIRHandler().joinEndTurn(gameData.getPlayers());
 
         gameData.saveGameState();
+    }
+
+    private void playFlight() throws InterruptedException {
+        // play flight only after assemble, or after another adventure... (*1)
+        GamePhaseType currentGamePhaseType = getGameData().getCurrentGamePhaseType();
+        if (currentGamePhaseType != GamePhaseType.ASSEMBLE && currentGamePhaseType != GamePhaseType.ADVENTURE) {
+            return;
+        }
 
         //********//
         // FLIGHT
         System.out.println(this + " Started flight phase");
 
-        // prepare the deck
-        gameData.getDeck().mixGroupsIntoCards();
+        // (*1) ... in that case: no need to prepare the deck -> only prepare if the game is arriving from assemble
+        if (currentGamePhaseType == GamePhaseType.ASSEMBLE) {
+            // prepare the deck
+            gameData.getDeck().mixGroupsIntoCards();
+        }
+
         // manage adventures
         Card currentAdventureCard = gameData.getDeck().drawNextCard();
         AdventureGamePhase adventureGamePhase;
         while (currentAdventureCard != null) {
 
-            //skip the rest if there are no players flying
+            // skip the rest if there are no players flying
             if(gameData.getPlayersInFlight().isEmpty()){
                 break;
             }
@@ -180,6 +200,14 @@ public class Game {
         }
 
         System.out.println(this + " Ended flight phase");
+    }
+
+    private void playEndgame() throws RemoteException, InterruptedException {
+        // play end of the game only after adventures and when no other cards are in the deck
+        if (getGameData().getCurrentGamePhaseType() != GamePhaseType.ADVENTURE
+                || getGameData().getDeck().getCurrentCard() != null) {
+            return;
+        }
 
         //********//
         // SCORE SCREEN
@@ -192,7 +220,17 @@ public class Game {
 
         // TODO: end scoring phase
         // TODO: delete saved game state file to avoid memory issues
+        // TODO: take in consideration to turn back to lobby with all the players instead of deleting the current game
+    }
 
+    /**
+     * Starts and manages the game loop.
+     */
+    public void gameLoop() throws InterruptedException, RemoteException {
+        playLobby();
+        playAssemble();
+        playFlight();
+        playEndgame();
     }
 
     /**
@@ -253,6 +291,10 @@ public class Game {
             player.setShipBoard(shipBoard);
             playerIndex++;
         }
+    }
+
+    public void testInitGame() {
+        initGame();
     }
 
     /**
