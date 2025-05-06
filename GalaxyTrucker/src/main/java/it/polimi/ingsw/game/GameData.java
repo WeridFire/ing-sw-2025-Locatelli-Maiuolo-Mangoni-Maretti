@@ -162,7 +162,7 @@ public class GameData implements Serializable {
     /**
      * Gets the list of players in the game, sorted by route order (first is the leader) and with filter applied.
      *
-     * @param filter a predicate to apply to each element to determine if it should be included.
+     * @param filter a predicate to apply to each player to determine if it should be included.
      * @return The list of players.
      */
     public List<Player> getPlayers(Predicate<Player> filter) {
@@ -179,6 +179,16 @@ public class GameData implements Serializable {
      */
     public List<Player> getPlayersInFlight() {
         return getPlayers(p -> !p.isEndedFlight());
+    }
+
+    /**
+     * Gets the first player in the game that matches the specified predicate.
+     *
+     * @param match a predicate to apply to the players to determine if it should be counted as "found".
+     * @return The searched player, or {@code null} if no player matches the predicate.
+     */
+    public Player getPlayer(Predicate<Player> match) {
+        return players.stream().filter(match).findFirst().orElse(null);
     }
 
     /**
@@ -277,10 +287,7 @@ public class GameData implements Serializable {
      * @throws PlayerAlreadyInGameException If the player is already in the game.
      */
     protected void addPlayer(Player player) throws PlayerAlreadyInGameException {
-        if (players.stream()
-                .map(Player::getUsername)
-                .collect(Collectors.toSet())
-                .contains(player.getUsername())) {
+        if (getPlayer(p -> p.getUsername().equals(player.getUsername())) != null) {
             throw new PlayerAlreadyInGameException(player.getUsername());
         }
         synchronized (players){

@@ -144,11 +144,7 @@ public class GameServer{
     }
 
 	public void broadcastUpdate(Game game) throws RemoteException {
-		for (Player player: game.getGameData()
-								.getPlayers()
-								.stream()
-								.filter(Player::isConnected).
-								collect(Collectors.toSet())){
+		for (Player player: game.getGameData().getPlayers(Player::isConnected)){
 			IClient client = clients.get(player.getConnectionUUID());
 			if (client != null){
 				client.updateClient(new ClientUpdate(player.getConnectionUUID()));

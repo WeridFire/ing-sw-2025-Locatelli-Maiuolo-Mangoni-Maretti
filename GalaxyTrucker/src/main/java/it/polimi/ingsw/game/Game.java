@@ -209,21 +209,23 @@ public class Game {
     }
 
 
+    private Player createAndAddPlayer(String username, UUID connectionUUID) throws PlayerAlreadyInGameException {
+        Player newPlayer = new Player(username, connectionUUID);
+        gameData.addPlayer(newPlayer);
+        return newPlayer;
+    }
+
     public Player addPlayer(String username, UUID connectionUUID) throws PlayerAlreadyInGameException {
-        if(gameData.getCurrentGamePhaseType() == GamePhaseType.LOBBY){
-            Player newPlayer = new Player(username, connectionUUID);
-            gameData.addPlayer(newPlayer);
-            return newPlayer;
+        GamePhaseType currentGamePhaseType = getGameData().getCurrentGamePhaseType();
+        if (currentGamePhaseType == GamePhaseType.NONE || currentGamePhaseType == GamePhaseType.LOBBY) {
+            return createAndAddPlayer(username, connectionUUID);
         }
 
-        Player existingDisconnectedPlayer = gameData.getPlayers()
-                        .stream()
-                        .filter((p) -> p.getUsername().equals(username) && !p.isConnected())
-                        .findFirst()
-                        .orElse(null);
-        if(existingDisconnectedPlayer == null){
-            throw new PlayerAlreadyInGameException(username);
-        }else{
+        Player existingDisconnectedPlayer = gameData.getPlayer(p ->
+                p.getUsername().equals(username) && !p.isConnected());
+        if (existingDisconnectedPlayer == null) {
+            return createAndAddPlayer(username, connectionUUID);
+        } else {
             existingDisconnectedPlayer.setConnectionUUID(connectionUUID);
             return existingDisconnectedPlayer;
         }
