@@ -11,7 +11,9 @@ import it.polimi.ingsw.util.Util;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AdventureCLIScreen extends CLIScreen{
 
@@ -24,7 +26,7 @@ public class AdventureCLIScreen extends CLIScreen{
         }
     }
 
-    private final ArrayList<Coord> coords = new ArrayList<>();
+    private final Map<GameLevel, List<Coord>> coordsForLevels = new HashMap<>();
 
 
     public AdventureCLIScreen() {
@@ -112,8 +114,9 @@ public class AdventureCLIScreen extends CLIScreen{
      *         Returns the cached list if already populated, otherwise returns the newly generated and cached list.
      */
     private List<Coord> getCoords(GameLevel level, Rotation turnDirection) {
-        if (!coords.isEmpty()) return coords;
+        if (coordsForLevels.containsKey(level)) return coordsForLevels.get(level);
 
+        List<Coord> coords = new ArrayList<>();
         switch(level){
             case TESTFLIGHT, ONE:
                 coords.add(new Coord(0, 10));
@@ -228,6 +231,9 @@ public class AdventureCLIScreen extends CLIScreen{
         for (int i = 0; i < 2; i++) {
             coords.add(coords.removeFirst());
         }
+
+        // store to avoid duplicated calculations
+        coordsForLevels.put(level, coords);
 
         return coords;
     }
