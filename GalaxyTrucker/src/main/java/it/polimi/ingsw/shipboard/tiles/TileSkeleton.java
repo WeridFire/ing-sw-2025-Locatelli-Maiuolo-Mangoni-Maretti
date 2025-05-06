@@ -10,6 +10,8 @@ import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import it.polimi.ingsw.view.cli.ICLIPrintable;
 
+import java.util.Arrays;
+
 /**
  * Generic structure of a Tile.
  */
@@ -24,8 +26,14 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
      * @param sides An array of sides, where for each Direction {@code d},
      *              its value {@code d.v <- d.getValue()} is used as index to specify the related side:
      *              {@code sides[d.v]} is the tile's side in direction {@code d}.
+     * @throws IllegalArgumentException If the sides array does not contain one element for each possible direction
+     *                                  in the {@link Direction values}.
      */
     public TileSkeleton(SideType[] sides) {
+        if (sides == null || sides.length != Direction.TOTAL_DIRECTIONS) {
+            throw new IllegalArgumentException("The sides array must contain exactly one side " +
+                    "for each of the possible directions: " + Arrays.toString(Direction.values()));
+        }
         this.sides = sides;
         this.appliedRotation = Rotation.NONE;
         fixedAt = null;

@@ -123,7 +123,7 @@ class LifeSupportSystemTileTest {
         };
 
         // Attempt to create a LifeSupportSystemTile with a null LoadableType
-        assertThrows(NullPointerException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             new LifeSupportSystemTile(validSides, null);
         }, "A NullPointerException should be thrown for a null LoadableType.");
     }

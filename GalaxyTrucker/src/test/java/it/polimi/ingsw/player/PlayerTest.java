@@ -193,7 +193,8 @@ class PlayerTest {
     }
 
     private TileSkeleton createMockTile(int id) {
-        return new TileSkeleton(null) {
+        return new TileSkeleton(Direction.sortedArray(SideType.UNIVERSAL, SideType.UNIVERSAL,
+                SideType.UNIVERSAL, SideType.UNIVERSAL).toArray(SideType[]::new)) {
             /**
              * Method to accept a visitor for this tile in the Visitor Pattern.
              *

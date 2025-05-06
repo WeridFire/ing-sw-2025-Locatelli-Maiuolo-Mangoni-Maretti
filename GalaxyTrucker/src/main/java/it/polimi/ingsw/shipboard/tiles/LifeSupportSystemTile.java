@@ -17,6 +17,8 @@ public class LifeSupportSystemTile extends TileSkeleton {
      *
      * @param sides               An array of sides defining the structure of the tile.
      * @param providedLifeSupport The type of crew that benefits from this life support system.
+     * @throws IllegalArgumentException If the {@code providedLifeSupport} is not among
+     *                                  {@link LoadableType#BROWN_ALIEN} or {@link LoadableType#PURPLE_ALIEN}
      */
     public LifeSupportSystemTile(SideType[] sides, LoadableType providedLifeSupport) {
         super(sides);
