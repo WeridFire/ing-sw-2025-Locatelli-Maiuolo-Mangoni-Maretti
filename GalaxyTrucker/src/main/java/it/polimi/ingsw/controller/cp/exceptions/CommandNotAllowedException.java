@@ -1,4 +1,4 @@
-package it.polimi.ingsw.gamePhases.exceptions;
+package it.polimi.ingsw.controller.cp.exceptions;
 
 public class CommandNotAllowedException extends Exception {
 	public CommandNotAllowedException(String command, String reason){

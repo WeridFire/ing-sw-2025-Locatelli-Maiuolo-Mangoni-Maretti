@@ -340,8 +340,8 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		if (endedAssembly) {
 			throw new AlreadyEndedAssemblyException();
 		}
-		validateStructure();
 		endedAssembly = true;
+		validateStructure();
 	}
 
 	/**

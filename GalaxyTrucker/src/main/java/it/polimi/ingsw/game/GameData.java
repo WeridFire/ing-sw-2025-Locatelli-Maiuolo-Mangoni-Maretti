@@ -1,6 +1,7 @@
 package it.polimi.ingsw.game;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
@@ -8,6 +9,7 @@ import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import it.polimi.ingsw.gamePhases.exceptions.IllegalStartingPositionIndexException;
+import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
 import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
@@ -20,6 +22,7 @@ import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.GameLevelStandards;
 
 import java.io.*;
+import java.rmi.RemoteException;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -509,6 +512,16 @@ public class GameData implements Serializable {
         // handle game management
         for (Player p : players) {
             if (p.getPosition() == null) {  // not ended assemble yet
+                // notify only this player about its end of assemble, and if it has no integrity problems
+                // if it has integrity problems -> already updates with requests to solve integrity problem
+                if (!player.getShipBoard().getVisitorCheckIntegrity().getProblem(true).isProblem()) {
+                    try {
+                        GameServer.getInstance().broadcastUpdateRefreshOnly(
+                                GamesHandler.getInstance().getGame(gameId), Set.of(player));
+                    } catch (RemoteException e) {
+                        System.err.println("RemoteException while notifying end of assemble without integrity problem");
+                    }
+                }
                 return;
             }
         }

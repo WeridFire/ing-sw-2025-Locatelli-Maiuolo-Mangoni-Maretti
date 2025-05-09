@@ -1,12 +1,11 @@
 package it.polimi.ingsw.view.cli;
 
+import it.polimi.ingsw.controller.cp.ICommandsProcessor;
+import it.polimi.ingsw.controller.cp.PhaseCommandsProcessor;
+import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.enums.AnchorPoint;
-import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
-import it.polimi.ingsw.network.IClient;
-import it.polimi.ingsw.network.IServer;
-import it.polimi.ingsw.network.messages.ClientUpdate;
+import it.polimi.ingsw.view.IView;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,30 +15,33 @@ public abstract class CLIScreen implements ICLIPrintable {
 	protected final String screenName;
 	private String screenMessage;
 	private final boolean forceActivate;
-	private int priority = 0;
+	private final int priority;
+
+	private final PhaseCommandsProcessor commandsProcessor;
+	private CLIView parentView;
 
 	/**
 	 * Abstract class for a CLI screen. Contains the standardized methods and fields to design a new screen.
 	 * A screen is an object that displays information on the CLI based on the current game state.
-	 * The user, based on the screen they are on, can perform different commands.
+	 * The user, based on the screen they are on, can perform different commands (see {@code commandsProcessor}).
 	 * A user can swap between screens using the screen global command. Screens differ in availability, and
 	 * based on the current state of the game there might be different available screens.
+	 *
 	 * @param screenName The identifier of the screen.
 	 * @param forceActivate if to forcefully activate this screen whenever an update satisfying it will be received.
 	 * @param priority if there are multiple screens not force-activable, priority will indicate which one to prioritize.
+	 *
+	 * @param commandsProcessor The commands processor that manages the execution of command and args.<br>
+	 * This implementation allows the main CLI logic to delegate to this specific active screen the handling of a command.
+	 * The specified processor manages how the command and the arguments are parsed and how the screen should execute it.
+	 * If it fails, the screen will display the error and the requirements for the command to execute.<br>
+	 * Note: the {@link ICommandsProcessor#processCommand(String, String[])} requires this.switchConditions() == true
 	 */
-	public CLIScreen(String screenName, boolean forceActivate, int priority) {
+	public CLIScreen(String screenName, boolean forceActivate, int priority, PhaseCommandsProcessor commandsProcessor) {
 		this.screenName = screenName;
 		this.forceActivate = forceActivate;
 		this.priority = priority;
-	}
-
-	/**
-	 * @param screenName The identifier of the screen.
-	 * @see #CLIScreen(String)  CLIScreen
-	 */
-	public CLIScreen(String screenName){
-		this(screenName, false, 0);
+		this.commandsProcessor = commandsProcessor;
 	}
 
 	/**
@@ -49,33 +51,35 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 */
 	protected abstract boolean switchConditions();
 
-	/**
-	 * This function basically allows the main CLI logic to delegate to the active screen the handling of a command.
-	 * Passes the command and the args, and the screen tries to execute. If it fails, the screen will display the error
-	 * and the requirements for the command to execute.
-	 *
-	 * @requires this.switchConditions() == true
-	 * @param command The command to execute
-	 * @param args The args to pass
-	 * @throws CommandNotAllowedException If the specified command can not be processed in this screen
-	 */
-	protected abstract void processCommand(String command, String[] args) throws RemoteException, CommandNotAllowedException;
+	public final void setParentView(CLIView parentView) {
+		this.parentView = parentView;
+	}
+
+	protected final IView getParentView() {
+		return parentView;
+	}
+
+	public final PhaseCommandsProcessor getCommandsProcessor() {
+		return commandsProcessor;
+	}
 
 	/**
 	 * Refreshes the whole screen. Causes the CLI to clear, print newly the screen using the specific screen logic,
 	 * and then prints any eventual error or message.
 	 */
-	protected final void refresh(){
+	protected final void refresh() {
+		if (parentView == null) throw new NullPointerException("Parent view is null");
+
 		CLIFrame screen = getCLIRepresentation();
 		if (screen == null) screen = new CLIFrame();
 
 		CLIFrame popups = new CLIFrame();
-		if(CLIScreenHandler.getInstance().isShowingHelpScreen){
+		if (parentView.isShowingHelpScreen) {
 			popups = popups.merge(popupAvailableCommands(),
 					AnchorPoint.CENTER, AnchorPoint.CENTER);
 		}
-		if(CLIScreenHandler.getInstance().isShowingAvailableScreens){
-			popups = popups.merge(CLIScreenHandler.getInstance().popupAvailableScreens(),
+		if (parentView.isShowingAvailableScreens) {
+			popups = popups.merge(parentView.popupAvailableScreens(),
 					AnchorPoint.CENTER, AnchorPoint.CENTER);
 		}
 
@@ -87,40 +91,18 @@ public abstract class CLIScreen implements ICLIPrintable {
 		// print the screen with popups at the center
 		System.out.println(screen.merge(popups, AnchorPoint.CENTER, AnchorPoint.CENTER));
 
-		if(getLastUpdate().getError() != null){
-			displayError();
-		}
-		if(screenMessage != null){
-			displayScreenMessage();
-		}
+		displayError();
+		displayScreenMessage();
+
 		System.out.print("\n> ");
 	}
-
-	/**
-	 * This function should return the commands available in the specific screen
-	 * to pass as parameter while calling the method printCommands.
-	 * Can be immutable.
-	 */
-	protected abstract List<String> getScreenSpecificCommands();
 
 	/*
 	!!!BELOW THIS YOU DON'T NEED TO OVERRIDE ANYTHING!!!
 	 */
 
 	protected final CLIFrame popupAvailableCommands(){
-		return popupCommands(screenName, getScreenSpecificCommands().toArray(new String[0]));
-	}
-
-	protected final IClient getClient(){
-		return CLIScreenHandler.getInstance().getGameClient().getClient();
-	}
-
-	protected final IServer getServer() throws RemoteException {
-		return getClient().getServer();
-	}
-
-	protected final ClientUpdate getLastUpdate(){
-		return CLIScreenHandler.getInstance().getLastUpdate();
+		return popupCommands(screenName, commandsProcessor.getAvailableCommands().toArray(new String[0]));
 	}
 
 	public final boolean isForceActivate() {
@@ -132,15 +114,16 @@ public abstract class CLIScreen implements ICLIPrintable {
 	}
 
 	private void displayError(){
-		if(getLastUpdate().getError() != null){
-			System.out.println(ANSI.RED + "[SERVER ERROR] " + getLastUpdate().getError() + ANSI.RESET);
+		String error = CommonState.getLastUpdate().getError();
+		if (error != null) {
+			System.out.println(ANSI.RED + "[SERVER ERROR] " + error + ANSI.RESET);
 		}
 	}
 
 	private void displayScreenMessage(){
-		if(this.screenMessage != null){
+		if (screenMessage != null) {
 			System.out.println(ANSI.YELLOW + "[SCREEN INFO] " + screenMessage + ANSI.RESET);
-			this.screenMessage = null;
+			screenMessage = null;
 		}
 	}
 
@@ -149,7 +132,7 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * execution of the command on the client-side checks). Causes a full screen refresh.
 	 * @param message The message to display in yellow under the screen.
 	 */
-	final void setScreenMessage(String message){
+	protected final void setScreenMessage(String message){
 		setScreenMessage(message, true);
 	}
 
@@ -162,10 +145,10 @@ public abstract class CLIScreen implements ICLIPrintable {
 	 * @param refresh {@code true} if a full screen refresh is desired with the setting of this message,
 	 *                           {@code false} otherwise (note that no refresh <===> no screen message visualization)
 	 */
-	final void setScreenMessage(String message, boolean refresh){
+	protected final void setScreenMessage(String message, boolean refresh){
 		this.screenMessage = message;
 		if (refresh) {
-			this.refresh();
+			parentView.onRefresh();
 		}
 	}
 

@@ -1,13 +1,13 @@
 package it.polimi.ingsw.view.cli;
 
+import it.polimi.ingsw.controller.cp.MenuCommandsProcessor;
+import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.game.GameData;
-import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
+import it.polimi.ingsw.network.GameClient;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class MenuCLIScreen extends CLIScreen {
 
@@ -15,78 +15,13 @@ public class MenuCLIScreen extends CLIScreen {
 	 * Creates a screen used for displaying the main-menu phase. Displays the available games
 	 * and allows commands to join and create a match.
 	 */
-	public MenuCLIScreen() {
-		super("menu", true, 0);
+	public MenuCLIScreen(GameClient gameClient) {
+		super("menu", true, 0, new MenuCommandsProcessor(gameClient));
 	}
 
 	@Override
 	protected boolean switchConditions() {
-		return getLastUpdate().getCurrentGame() == null;
-	}
-
-	/*
-	@Override
-	protected void printScreen() {
-		if (!getLastUpdate().getAvailableGames().isEmpty()) {
-			System.out.println(ANSI.ANSI_YELLOW + "\n======= AVAILABLE GAMES =======" + ANSI.ANSI_RESET);
-			getLastUpdate().getAvailableGames().forEach((g) ->
-					System.out.printf(ANSI.ANSI_GREEN + "[%s] " + ANSI.ANSI_BLUE + "(%d/%d players)" + ANSI.ANSI_RESET + " %n",
-							g.getGameId().toString(),
-							g.getPlayers().size(),
-							g.getRequiredPlayers())
-			);
-			System.out.println(ANSI.ANSI_YELLOW + "================================" + ANSI.ANSI_RESET);
-			System.out.println("\n" + ANSI.ANSI_GREEN_BACKGROUND + ANSI.ANSI_BLACK
-					+ " Tip: " + ANSI.ANSI_RESET + ANSI.ANSI_GREEN
-					+ "Join a game with " + ANSI.ANSI_YELLOW + ">join"
-					+ ANSI.ANSI_RESET);
-		} else {
-			System.out.println(ANSI.ANSI_RED + "There are no available games." + ANSI.ANSI_RESET);
-			System.out.println("\n" + ANSI.ANSI_GREEN_BACKGROUND + ANSI.ANSI_BLACK
-					+ " Tip: " + ANSI.ANSI_RESET + ANSI.ANSI_GREEN
-					+ "Create a game with " + ANSI.ANSI_YELLOW + ">create"
-					+ ANSI.ANSI_RESET);
-		}
-	}
-	 */
-
-	@Override
-	protected void processCommand(String command, String[] args) throws RemoteException, CommandNotAllowedException {
-		switch(command){
-			case "": break;  // on simple enter do nothing in particular
-
-			case "refresh":
-				getServer().ping(getClient());
-				break;
-			case "join":
-				if (args.length == 2) {
-					UUID uuid = UUID.fromString(args[0]);
-					String username = args[1];
-					getServer().joinGame(getClient(), uuid, username);
-				} else {
-					setScreenMessage("Usage: join <uuid> <username>");
-				}
-				break;
-			case "create":
-				if (args.length == 1) {
-					String username = args[0];
-					// Call the appropriate method to handle create logic here
-					getServer().createGame(getClient(), username);
-				} else {
-					setScreenMessage("Usage: create <username>");
-				}
-				break;
-
-			// refuses unavailable commands
-			default: throw new CommandNotAllowedException();
-		}
-	}
-
-	@Override
-	protected List<String> getScreenSpecificCommands() {
-		return List.of("refresh|Refresh the game list.",
-				"join|Join an existing game.",
-				"create|Create a new game.");
+		return CommonState.getGameData() == null;
 	}
 
 	@Override
@@ -99,7 +34,7 @@ public class MenuCLIScreen extends CLIScreen {
 		CLIFrame title = new CLIFrame(new String[]{ANSI.BACKGROUND_RED + ANSI.WHITE + "AVAILABLE GAMES" + ANSI.RESET});
 		gamesListBorder = gamesListBorder.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 1, 0);
 
-		List<GameData> availableGames = getLastUpdate().getAvailableGames();
+		List<GameData> availableGames = CommonState.getLastUpdate().getAvailableGames();
 		if (!availableGames.isEmpty()) {
 			List<String> gameLines = new ArrayList<>();
 			availableGames.stream()

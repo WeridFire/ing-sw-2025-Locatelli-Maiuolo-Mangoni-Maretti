@@ -15,10 +15,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.ExportException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -51,7 +48,7 @@ public class GameServer{
 		} catch (ExportException e) {
 			String errorMessage = "RMI server can't be exported: failure in binding on port "
 					+ rmiPort + " with name " + serverName +
-					".\nThat's probably because an other instance of the Server is already running.";
+					".\nThat's probably because an other instance of the Server is already running.\n" + e.getMessage();
 			System.err.println(errorMessage);
 			throw new AlreadyRunningServerException(errorMessage);
 		} catch (Exception e) { // Catching all exceptions to see what's going wrong
@@ -63,7 +60,7 @@ public class GameServer{
 			socketServer = new SocketServer(listenSocket);
 			System.out.println("Socket server bound on port " + socketPort + ".");
 		} catch (BindException e) {
-			String errorMessage = "Socket server can't bind on port " + socketPort + ".";
+			String errorMessage = "Socket server can't bind on port " + socketPort + ".\n" + e.getMessage();
 			System.err.println(errorMessage);
 			throw new AlreadyRunningServerException(errorMessage);
 		} catch (IOException e) {
@@ -154,7 +151,7 @@ public class GameServer{
 	 * like broadcastUpdate but it specifies which clients should and which should NOT refresh their view
 	 */
 	public void broadcastUpdateRefreshOnly(Game game, Set<Player> playersToRefreshView) throws RemoteException {
-		for (Player player: game.getGameData().getPlayers()){
+		for (Player player: game.getGameData().getPlayers(Player::isConnected)){
 			IClient client = clients.get(player.getConnectionUUID());
 			if (client != null){
 				client.updateClient(new ClientUpdate(player.getConnectionUUID(), playersToRefreshView.contains(player)));

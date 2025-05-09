@@ -3,7 +3,7 @@ package it.polimi.ingsw.view.gui.managers;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
-import it.polimi.ingsw.view.cli.CLIScreenHandler;
+import it.polimi.ingsw.controller.states.State;
 import it.polimi.ingsw.view.gui.UIs.JoinGameUI;
 import it.polimi.ingsw.view.gui.UIs.LobbyUI;
 import it.polimi.ingsw.view.gui.utils.AlertUtils;
@@ -66,7 +66,7 @@ public class ClientManager {
      * @return the last ClientUpdate received
      */
     public ClientUpdate getLastUpdate() {
-        return CLIScreenHandler.getInstance().getLastUpdate();
+        return State.getInstance().getLastUpdate();
     }
 
     public Consumer<Node> getSceneUpdater() {
@@ -121,19 +121,21 @@ public class ClientManager {
         try {
             gameClient = new GameClient(useRmi,
                     HOST,
-                    useRmi ? RMI_PORT : SOCKET_PORT
+                    useRmi ? RMI_PORT : SOCKET_PORT,
+                    true
             );
 
             new Thread(() -> {
                 try {
-                    GameClient.main(gameClient);
-                } catch (IOException | NotBoundException e) {
-                    throw new RuntimeException(e);
+                    GameClient.start(gameClient);
+                } catch (RemoteException e) {
+                    gameClient.getView().showError(e.getMessage());
                 }
             }).start();
 
-        } catch (Exception e) {
-            AlertUtils.showError("Connection Error", "No game server available on " + HOST + ":" + (useRmi ? RMI_PORT : SOCKET_PORT));
+        } catch (IOException | NotBoundException e) {
+            AlertUtils.showError("Connection Error",
+                    "No game server available on " + HOST + ":" + (useRmi ? RMI_PORT : SOCKET_PORT));
             return;
         }
 
@@ -193,7 +195,7 @@ public class ClientManager {
         try {
             gameClient.getClient().getServer().ping(gameClient.getClient());
         } catch (RemoteException e) {
-            throw new RuntimeException(e);
+            gameClient.getView().showError("Remote Exception", e.getMessage());
         }
 
         List<UUID> activeGames =
@@ -206,7 +208,7 @@ public class ClientManager {
             try {
                 gameClient.getClient().getServer().joinGame(gameClient.getClient(), UUID.fromString(uuid), username);
             } catch (RemoteException e) {
-                throw new RuntimeException(e);
+                gameClient.getView().showError("Remote Exception", e.getMessage());
             }
         },
                 activeGames.stream().map(

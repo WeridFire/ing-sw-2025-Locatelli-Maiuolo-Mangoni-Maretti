@@ -129,7 +129,7 @@ public class PIRActivateTiles extends PIR {
 
 		// Command hint
 		frame = frame.merge(
-				new CLIFrame(ANSI.WHITE + "Command: " + ANSI.GREEN + ">activate (x,y), (x,y), ..." + ANSI.RESET),
+				new CLIFrame(ANSI.WHITE + "Command: " + ANSI.GREEN + ">activate (row,col), (row,col), ..." + ANSI.RESET),
 				Direction.SOUTH, 2
 		);
 

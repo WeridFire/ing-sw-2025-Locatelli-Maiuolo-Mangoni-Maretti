@@ -10,7 +10,7 @@ import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.game.exceptions.*;
 import it.polimi.ingsw.gamePhases.exceptions.AlreadyPickedPosition;
-import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
+import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.gamePhases.exceptions.IllegalStartingPositionIndexException;
 import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
 import it.polimi.ingsw.network.messages.ClientUpdate;
@@ -359,13 +359,11 @@ public class RmiServer implements IServer {
 
 		try {
 			pg.game.getGameData().endAssembly(pg.player, false, preferredPosition);
+			// note: here no broadcast/update because is already managed by endAssembly
 		} catch (NoShipboardException | AlreadyEndedAssemblyException | TooManyItemsInHandException |
                  AlreadyPickedPosition | IllegalStartingPositionIndexException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
-			return;
 		}
-
-        GameServer.getInstance().broadcastUpdate(pg.game);
     }
 
 	@Override

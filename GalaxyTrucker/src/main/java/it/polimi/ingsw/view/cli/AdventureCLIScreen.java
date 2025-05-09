@@ -1,15 +1,16 @@
 package it.polimi.ingsw.view.cli;
 
+import it.polimi.ingsw.controller.cp.AdventureCommandsProcessor;
+import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.enums.*;
 import it.polimi.ingsw.game.GameData;
-import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
+import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.GameLevelStandards;
 import it.polimi.ingsw.util.Util;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,9 +18,7 @@ import java.util.Map;
 
 public class AdventureCLIScreen extends CLIScreen{
 
-    /**
-     * Utility Record.
-     * */
+    /** Utility Record */
     private record Coord(int row, int col){
         public boolean equals(Coord c) {
             return row == c.row && col == c.col;
@@ -29,9 +28,9 @@ public class AdventureCLIScreen extends CLIScreen{
     private final Map<GameLevel, List<Coord>> coordsForLevels = new HashMap<>();
 
 
-    public AdventureCLIScreen() {
+    public AdventureCLIScreen(GameClient gameClient) {
         // note that forceActivate is false because other screens can be activated during an adventure, like PIRs
-        super("adventure", false, 0);
+        super("adventure", false, 0, new AdventureCommandsProcessor(gameClient));
     }
 
     /**
@@ -42,39 +41,7 @@ public class AdventureCLIScreen extends CLIScreen{
      */
     @Override
     protected boolean switchConditions() {
-        return getLastUpdate().getCurrentGame() != null &&
-                getLastUpdate().getCurrentGame().getCurrentGamePhaseType() == GamePhaseType.ADVENTURE;
-    }
-
-    @Override
-    protected void processCommand(String command, String[] args) throws CommandNotAllowedException, RemoteException {
-        switch(command){
-            case "": break;  // on simple enter do nothing in particular
-
-            case "endFlight":
-                Player player = getLastUpdate().getClientPlayer();
-                if (player.isEndedFlight()) {
-                    setScreenMessage("You have already ended the flight.");
-                } else {
-                    getServer().requestEndFlight(getClient(), null);
-                    setScreenMessage("The request to end the flight has been registered.\n" +
-                            "You will end the flight right before the next Adventure.");
-                }
-                break;
-
-            // refuses unavailable commands
-            default: throw new CommandNotAllowedException();
-        }
-    }
-
-    /**
-     * This function should return the commands available in the specific screen
-     * to pass as parameter while calling the method printCommands.
-     * Can be immutable.
-     */
-    @Override
-    protected List<String> getScreenSpecificCommands() {
-        return List.of("endFlight|request to end the flight before the next adventure");
+        return CommonState.isCurrentPhase(GamePhaseType.ADVENTURE);
     }
 
     /**
@@ -85,9 +52,9 @@ public class AdventureCLIScreen extends CLIScreen{
     @Override
     public CLIFrame getCLIRepresentation() {
 
-        GameData gameData = getLastUpdate().getCurrentGame();
+        GameData gameData = CommonState.getGameData();
 
-        Player thisPlayer = getLastUpdate().getClientPlayer();
+        Player thisPlayer = CommonState.getPlayer();
         CLIFrame shipboardFrame = thisPlayer.getShipBoard().getCLIRepresentation();
 
         CLIFrame boardFrame = getBoardFrame(gameData.getLevel(), gameData.getPlayers(), gameData.getPIRHandler());

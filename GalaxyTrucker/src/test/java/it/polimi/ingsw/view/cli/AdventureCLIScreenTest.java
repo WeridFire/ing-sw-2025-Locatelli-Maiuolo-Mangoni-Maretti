@@ -1,17 +1,33 @@
 package it.polimi.ingsw.view.cli;
 
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.network.GameClient;
+import it.polimi.ingsw.network.GameServer;
+import it.polimi.ingsw.network.exceptions.AlreadyRunningServerException;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.util.GameLevelStandards;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.rmi.NotBoundException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
 public class AdventureCLIScreenTest {
+
+    private GameClient mockClient;
+
+    @BeforeEach
+    public void setup() throws AlreadyRunningServerException, InterruptedException, NotBoundException, IOException {
+        if (!GameServer.isRunning()) {
+            GameServer.start();
+        }
+        mockClient = new GameClient(false, "localhost", 1234, false);
+    }
 
     private List<Player> preparePlayers(int nPlayers, GameLevel gameLevel) {
         List<Player> players = new ArrayList<>(nPlayers);
@@ -29,7 +45,7 @@ public class AdventureCLIScreenTest {
 
     @Test
     public void testBoardLevelOne() {
-        AdventureCLIScreen c = new AdventureCLIScreen();
+        AdventureCLIScreen c = new AdventureCLIScreen(mockClient);
         List<Player> players = preparePlayers(3, GameLevel.ONE);
 
         System.out.println("\nStarting positions:\n");
@@ -48,7 +64,7 @@ public class AdventureCLIScreenTest {
 
     @Test
     public void testBoardLevelTwo() {
-        AdventureCLIScreen c = new AdventureCLIScreen();
+        AdventureCLIScreen c = new AdventureCLIScreen(mockClient);
         List<Player> players = preparePlayers(4, GameLevel.TWO);
         System.out.println(c.getBoardFrame(GameLevel.TWO, players, null));
     }

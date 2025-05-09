@@ -473,8 +473,8 @@ public class Player implements Serializable {
         clearCardGroupInHand();
 
         // actually call the end of ship assembly
-        shipBoard.endAssembly();
         setPosition(startingPosition);
+        shipBoard.endAssembly();
     }
 
     @Override

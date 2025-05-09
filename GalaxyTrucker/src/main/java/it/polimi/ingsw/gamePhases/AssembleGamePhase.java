@@ -4,7 +4,7 @@ import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
-import it.polimi.ingsw.gamePhases.exceptions.CommandNotAllowedException;
+import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;

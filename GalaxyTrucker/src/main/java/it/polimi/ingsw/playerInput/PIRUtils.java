@@ -276,7 +276,7 @@ public class PIRUtils {
 			boolean revalidateStructure;
 
 			// 1. notify about problems
-			PIRDelay pirInfo = new PIRDelay(player, 3,
+			PIRDelay pirInfo = new PIRDelay(player, 6,
 					"Unfortunately, your Ship has some integrity problems...", null);
 			integritySequence.addPlayerInputRequest(pirInfo);
 			pirHandler.setAndRunTurn(pirInfo, false);

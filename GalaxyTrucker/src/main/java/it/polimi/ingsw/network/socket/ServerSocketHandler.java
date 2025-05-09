@@ -39,14 +39,17 @@ public class ServerSocketHandler implements IServer {
 
 	@Override
 	public void connect(IClient client) {
-		//A socket is always connected on creation, so we shouldn't worry about implementing this. Just for consistency,
-		//this method will send a getUpdate request to the server, so that it can verify the connection. However note
-		//that THE CONNECTION IS ALREADY PRESENT!
-		ping(client);
+		// A socket is always connected on creation, so we shouldn't worry about implementing this.
+		// Just for consistency, this method should send a getUpdate request to the server (ping),
+		// so that it can verify the connection.
+		// However, noting that THE CONNECTION IS ALREADY PRESENT and that ping would another time the starting screen,
+		// this method does NOTHING.
+
+		// ping(client);
 	}
 
 	@Override
-	public void createGame(IClient client, String username) throws RemoteException {
+	public void createGame(IClient client, String username) {
 		SocketMessage mess = SocketMessage.createGameMessage(username);
 		sendSocketMessage(mess);
 	}
@@ -76,13 +79,13 @@ public class ServerSocketHandler implements IServer {
 	}
 
 	@Override
-	public void pirAllocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException {
+	public void pirAllocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) {
 		SocketMessage mess = SocketMessage.pirAllocateRemoveLoadables(cargoToAdd, true);
 		sendSocketMessage(mess);
 	}
 
 	@Override
-	public void pirRemoveLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToRemove) throws RemoteException {
+	public void pirRemoveLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToRemove) {
 		SocketMessage mess = SocketMessage.pirAllocateRemoveLoadables(cargoToRemove, false);
 		sendSocketMessage(mess);
 	}
@@ -95,13 +98,13 @@ public class ServerSocketHandler implements IServer {
 	}
 
 	@Override
-	public void pirSelectMultipleChoice(IClient client, int selection) throws RemoteException {
+	public void pirSelectMultipleChoice(IClient client, int selection) {
 		SocketMessage mess = SocketMessage.pirSelectMultipleChoice(selection);
 		sendSocketMessage(mess);
 	}
 
 	@Override
-	public void updateGameSettings(IClient client, GameLevel level, int minPlayers) throws RemoteException {
+	public void updateGameSettings(IClient client, GameLevel level, int minPlayers) {
 		SocketMessage mess = SocketMessage.updateSettingsMessage(level, minPlayers);
 		sendSocketMessage(mess);
 	}
@@ -121,59 +124,59 @@ public class ServerSocketHandler implements IServer {
 	}
 
 	@Override
-	public void discardTile(IClient client) throws RemoteException {
+	public void discardTile(IClient client) {
 		SocketMessage mess = SocketMessage.discardTileMessage();
 		sendSocketMessage(mess);
 	}
 
 	@Override
-	public void reserveTile(IClient client) throws RemoteException {
+	public void reserveTile(IClient client) {
 		SocketMessage mess = SocketMessage.reserveTileMessage();
 		sendSocketMessage(mess);
 	}
 
 	@Override
-	public void pickTile(IClient client, Integer id) throws RemoteException {
+	public void pickTile(IClient client, Integer id) {
 		SocketMessage mess = SocketMessage.pickTileMessage(id);
 		sendSocketMessage(mess);
 	}
 
 	@Override
-	public void placeTile(IClient client, Coordinates coordinates, Rotation rotation) throws RemoteException {
+	public void placeTile(IClient client, Coordinates coordinates, Rotation rotation) {
 		sendSocketMessage(SocketMessage.placeMessage(coordinates, rotation));
 	}
 
 	@Override
-	public void finishAssembling(IClient client, Integer preferredPosition) throws RemoteException {
+	public void finishAssembling(IClient client, Integer preferredPosition) {
 		SocketMessage mess = SocketMessage.finishAssemblingMessage(preferredPosition);
 		sendSocketMessage(mess);
 	}
 
 	@Override
-	public void showCardGroup(IClient client, Integer id) throws RemoteException {
+	public void showCardGroup(IClient client, Integer id) {
 		SocketMessage mess =SocketMessage.showCardGroupMessage(id);
 		sendSocketMessage(mess);
 	}
 
 	@Override
-	public void hideCardGroup(IClient client) throws RemoteException {
+	public void hideCardGroup(IClient client) {
 		SocketMessage mess = SocketMessage.hideCardGroupMessage();
 		sendSocketMessage(mess);
 	}
 
 	@Override
-	public void requestEndFlight(IClient client, KeepPlayerFlyingPredicate saveFromEndFlight) throws RemoteException {
+	public void requestEndFlight(IClient client, KeepPlayerFlyingPredicate saveFromEndFlight) {
 		sendSocketMessage(SocketMessage.endFlightMessage(saveFromEndFlight));
 	}
 
 	@Override
-	public void useCheat(IClient client, String cheatName) throws RemoteException {
+	public void useCheat(IClient client, String cheatName) {
 		SocketMessage mess = SocketMessage.cheatMessage(cheatName);
 		sendSocketMessage(mess);
 	}
 
 	@Override
-	public void resumeGame(IClient client, UUID gameId) throws RemoteException {
+	public void resumeGame(IClient client, UUID gameId) {
 		SocketMessage mess = SocketMessage.resumeGameMessage(gameId);
 		sendSocketMessage(mess);
 	}
