@@ -3,8 +3,8 @@ package it.polimi.ingsw.network;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.rmi.RmiClient;
 import it.polimi.ingsw.network.socket.SocketClient;
-import it.polimi.ingsw.view.IView;
 import it.polimi.ingsw.controller.states.State;
+import it.polimi.ingsw.view.View;
 import it.polimi.ingsw.view.cli.CLIView;
 import it.polimi.ingsw.view.gui.GUIView;
 
@@ -20,7 +20,7 @@ public class GameClient implements IClient{
 	private final boolean useRMI;
 	private RmiClient rmiClient = null;
 	private SocketClient socketClient = null;
-	private final IView view;
+	private final View view;
 
 	/**
 	 * The main game client. Based on the selected options, this client will instance a connection using either RMI or
@@ -86,7 +86,7 @@ public class GameClient implements IClient{
 		State.getInstance().setLastUpdate(clientUpdate);
 	}
 
-	public IView getView() {
+	public View getView() {
 		return view;
 	}
 

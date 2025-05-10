@@ -1,47 +1,33 @@
 package it.polimi.ingsw.view.cli;
 
 import it.polimi.ingsw.controller.cp.ICommandsProcessor;
-import it.polimi.ingsw.controller.cp.ViewCommandsProcessor;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
-import it.polimi.ingsw.view.IView;
-import it.polimi.ingsw.controller.states.State;
+import it.polimi.ingsw.view.View;
 
-import java.rmi.RemoteException;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class CLIView implements IView {
-
-	private final GameClient gameClient;
-	private final ViewCommandsProcessor commandsProcessor;
-	private final List<Consumer<ClientUpdate>> listenersOnUpdate;
+public class CLIView extends View {
 
 	private final Deque<CLIScreen> currentScreens;
 	private final Set<CLIScreen> allScreens;
-
-	private boolean isInitialized = false;
 
 	protected boolean isShowingHelpScreen = false;
 	protected boolean isShowingAvailableScreens = false;
 
 	public CLIView(GameClient gameClient){
-		this.gameClient = gameClient;
-		commandsProcessor = new ViewCommandsProcessor(this);
-		listenersOnUpdate = new ArrayList<>();
+		super(gameClient);
 
 		currentScreens = new LinkedList<>();
 		allScreens = new HashSet<>();
 	}
 
 	@Override
-	public void init() {
-		if (isInitialized) return;
-
+	public void _init() {
 		allScreens.add(new MenuCLIScreen(gameClient));  // menu
 		allScreens.add(new LobbyCLIScreen(gameClient));  // lobby
 		allScreens.add(new AssembleCLIScreen(gameClient));  // assemble
@@ -51,16 +37,10 @@ public class CLIView implements IView {
 		for (CLIScreen screen : allScreens) {
 			screen.setParentView(this);
 		}
-
-		isInitialized = true;
 	}
 
 	@Override
-	public synchronized void onUpdate(ClientUpdate update) {
-		if (update == null) {
-			throw new RuntimeException("Newly received update cannot be null.");
-		}
-
+	public void _onUpdate(ClientUpdate update) {
 		// now forget about the current screen
 		currentScreens.clear();
 
@@ -83,24 +63,6 @@ public class CLIView implements IView {
 				activateScreen("Menu");
 			}
 		}
-
-		// now just refresh the current screen (if update requires it)
-		if (update.isRefreshRequired()) {
-			onRefresh();
-		}
-
-		// at the end: callback all the registered listeners
-		synchronized (listenersOnUpdate) {
-			listenersOnUpdate.forEach(listener -> listener.accept(update));
-			listenersOnUpdate.clear();
-		}
-	}
-
-	@Override
-	public void registerOnUpdateListener(Consumer<ClientUpdate> onUpdate) {
-		synchronized (listenersOnUpdate) {
-			listenersOnUpdate.add(onUpdate);
-		}
 	}
 
 	/**
@@ -120,7 +82,7 @@ public class CLIView implements IView {
 			String[] args = commandParts.toArray(new String[0]);
 
 			if (getCurrentScreen() != null) {
-				commandsProcessor.processCommand(cmd, args);
+				getCommandsProcessor().processCommand(cmd, args);
 			}
 		}
 	}
@@ -132,25 +94,17 @@ public class CLIView implements IView {
 		isShowingHelpScreen = false;
 		// propagate to current screen management of empty message
         try {
-            commandsProcessor.propagateProcessCommand("", null);
+			getCommandsProcessor().propagateProcessCommand("", null);
         } catch (CommandNotAllowedException e) {
-            // no problem, do nothing
+            // no problem, do simple refresh
+			onRefresh();
         }
     }
 
 	@Override
-	public synchronized void onRefresh() {
+	protected void _onRefresh() {
 		getCurrentScreen().refresh();
 	}
-
-	@Override
-	public void onPing() {
-        try {
-            gameClient.getServer().ping(gameClient.getClient());
-        } catch (RemoteException e) {
-            showError(e.getMessage());
-        }
-    }
 
 	@Override
 	public void onScreen(String screenName) {
@@ -178,21 +132,6 @@ public class CLIView implements IView {
 	}
 
 	@Override
-	public void onDebug() {
-		ClientUpdate.saveDebugUpdate(State.getInstance().getLastUpdate());
-		showInfo("The current game state was saved to update.json");
-	}
-
-	@Override
-	public void onCheat(String cheatName) {
-        try {
-            gameClient.getServer().useCheat(gameClient.getClient(), cheatName);
-        } catch (RemoteException e) {
-            showError(e.getMessage());
-        }
-    }
-
-	@Override
 	public void showInfo(String title, String content) {
 		getCurrentScreen().setScreenMessage(ANSI.WHITE + title + " >> " + content);
 	}
@@ -205,11 +144,6 @@ public class CLIView implements IView {
 	@Override
 	public void showError(String title, String content) {
 		getCurrentScreen().setScreenMessage(ANSI.RED + title + " >> " + content);
-	}
-
-	@Override
-	public ViewCommandsProcessor getCommandsProcessor() {
-		return commandsProcessor;
 	}
 
 	@Override

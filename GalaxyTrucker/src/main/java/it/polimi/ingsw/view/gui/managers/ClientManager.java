@@ -4,9 +4,9 @@ import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.controller.states.State;
-import it.polimi.ingsw.view.IView;
 import it.polimi.ingsw.view.gui.UIs.JoinGameUI;
 import it.polimi.ingsw.view.gui.UIs.LobbyUI;
+import it.polimi.ingsw.view.View;
 import it.polimi.ingsw.view.gui.utils.AlertUtils;
 import it.polimi.ingsw.view.gui.UIs.LoginUI;
 import javafx.application.Platform;
@@ -91,7 +91,7 @@ public class ClientManager {
      * @param args The args to pass.
      */
     public void simulateCommand(String command, String... args) {
-        IView view = getGameClient().getView();
+        View view = getGameClient().getView();
 
         // prepare to wait for update
         final Object lock = new Object();

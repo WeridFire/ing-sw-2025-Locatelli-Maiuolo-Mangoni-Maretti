@@ -4,7 +4,7 @@ import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
-import it.polimi.ingsw.view.IView;
+import it.polimi.ingsw.view.View;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -13,9 +13,9 @@ public abstract class PhaseCommandsProcessor implements ICommandsProcessor {
 
     protected IClient client;
     protected IServer server;
-    protected IView view;
+    protected View view;
 
-    public PhaseCommandsProcessor(IClient client, IServer server, IView view) {
+    public PhaseCommandsProcessor(IClient client, IServer server, View view) {
         this.client = client;
         this.server = server;
         this.view = view;

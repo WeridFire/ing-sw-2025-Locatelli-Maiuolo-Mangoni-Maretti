@@ -1,13 +1,13 @@
 package it.polimi.ingsw.controller.cp;
 
 import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
-import it.polimi.ingsw.view.IView;
+import it.polimi.ingsw.view.View;
 
 public class ViewCommandsProcessor implements ICommandsProcessor {
 
-    private final IView view;
+    private final View view;
 
-    public ViewCommandsProcessor(IView view) {
+    public ViewCommandsProcessor(View view) {
         this.view = view;
     }
 

@@ -1,11 +1,6 @@
 package it.polimi.ingsw.view;
 
-import it.polimi.ingsw.controller.cp.ICommandsProcessor;
-import it.polimi.ingsw.controller.cp.ViewCommandsProcessor;
 import it.polimi.ingsw.network.messages.ClientUpdate;
-
-import java.util.Deque;
-import java.util.function.Consumer;
 
 /**
  * Represents a generic View in the client-side architecture of the game.
@@ -17,42 +12,14 @@ import java.util.function.Consumer;
 public interface IView {
 
     /**
-     * Initializes the internal components or data structures of the view.
-     * <p>
-     * This method is intended to be called once before the view is used, typically after construction
-     * but before invoking {@link #run()} or processing any updates. Its purpose is to set up screens,
-     * handlers, or other necessary elements required for the view to function correctly.
-     * <p>
-     * Calling this method multiple times should be safe; implementations are expected to guard against
-     * redundant initialization. However, there is no need to invoke this method more than once.
-     *
-     * @implSpec Implementations should ensure that repeated invocations do not perform duplicate work.
-     */
-    void init();
-
-    /**
      * Called whenever the game state is updated.
      * <p>
      * The implementation should handle screen transitions, refreshes, or any other reaction
      * to changes in the observable game state.
      *
-     * @implNote callback all the registered listeners with {@link #registerOnUpdateListener(Consumer)}.
-     *
      * @param update the most recent update to the game state; never {@code null}.
      */
     void onUpdate(ClientUpdate update);
-
-    /**
-     * Registers a listener that will be notified and removed whenever the first new {@link ClientUpdate}
-     * is received by the view.
-     * <p>
-     * This method allows external components to hook into the update flow and react to changes in the game state.
-     * Multiple listeners can be registered if supported by the implementation.
-     *
-     * @param onUpdate a {@link Consumer} function that will be invoked with the first new received {@code ClientUpdate}.
-     *                 Must not be {@code null}.
-     */
-    void registerOnUpdateListener(Consumer<ClientUpdate> onUpdate);
 
     /**
      * Starts the execution of the view logic.
@@ -60,57 +27,6 @@ public interface IView {
      * Runs the main input loop, listening for user commands and interacting with the controller accordingly.
      */
     void run();
-
-    /**
-     * Called when an empty command or "void" input is given.
-     * <p>
-     * Useful for refreshing state or dismissing temporary overlays/popups.
-     */
-    void onVoid();
-
-    /**
-     * Requests the view to refresh its current state.
-     * <p>
-     * This typically re-renders the screen or updates visible information.
-     */
-    void onRefresh();
-
-    /**
-     * Executes a ping to the server from the view.
-     * <p>
-     * Can be used to check connectivity or keep the connection alive.
-     */
-    void onPing();
-
-    /**
-     * Switches the active screen to the one identified by the given name.
-     * <p>
-     * If the screen name is {@code null}, the view should show a list of available screens.
-     *
-     * @param screenName the name of the screen to switch to; case-insensitive, or {@code null} to display options.
-     */
-    void onScreen(String screenName);
-
-    /**
-     * Displays the help screen.
-     * <p>
-     * Typically, shows a list of available commands or user guidance.
-     */
-    void onHelp();
-
-    /**
-     * Triggers debug behavior for developers or advanced users.
-     * <p>
-     * For example, this may dump the current game state to a file.
-     */
-    void onDebug();
-
-    /**
-     * Sends a cheat command to the server (if enabled and permitted).
-     *
-     * @param cheatName the name of the cheat to activate.
-     */
-    void onCheat(String cheatName);
 
     /**
      * Displays an informational message to the user with a title and detailed content.
@@ -168,24 +84,4 @@ public interface IView {
     default void showError(String error) {
         showError("Error", error);
     }
-
-    /**
-     * Returns the primary command processor responsible for handling global commands in this view context.
-     * <p>
-     * This processor manages top-level commands and acts as the entry point for interpreting user input
-     * before potentially delegating to screen-specific logic via {@link #getCommandsProcessors()}.
-     *
-     * @return the {@link ViewCommandsProcessor} instance associated with this view.
-     */
-    ViewCommandsProcessor getCommandsProcessor();
-
-    /**
-     * Returns the stack of command processors associated with this view.
-     * <p>
-     * Commands are routed through this stack in order to find a handler.
-     * Typically, each active screen contributes its own command processor.
-     *
-     * @return a deque of {@link ICommandsProcessor} instances, from top (most important screen) to bottom.
-     */
-    Deque<ICommandsProcessor> getCommandsProcessors();
 }
