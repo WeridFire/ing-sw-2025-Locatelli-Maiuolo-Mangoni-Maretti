@@ -21,6 +21,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -85,7 +86,7 @@ public class ClientManager {
      * Actually process the command for the view, without the need for user to insert it manually.
      * For this reason: it MUST be a valid command for the current game state!
      * <p>
-     * At the end, this functions is blocked before return to wait for the new ClientUpdate.
+     * At the end, this functions is blocked before return to wait for the view response (refresh).
      *
      * @param command The command to execute.
      * @param args The args to pass.
@@ -93,25 +94,16 @@ public class ClientManager {
     public void simulateCommand(String command, String... args) {
         View view = getGameClient().getView();
 
-        // prepare to wait for update
-        final Object lock = new Object();
-        Consumer<ClientUpdate> onUpdate = _ -> {
-            synchronized (lock) {
-                lock.notifyAll();
-            }
-        };
-        view.registerOnUpdateListener(onUpdate);
+        CountDownLatch latch = new CountDownLatch(1);
+        Runnable onRefresh = latch::countDown;
+        view.doOnceOnRefresh(onRefresh);
 
-        // process the command
         view.getCommandsProcessor().processCommand(command, args);
 
-        // wait for update
-        synchronized (lock) {
-            try {
-                lock.wait();
-            } catch (InterruptedException e) {
-                view.showError("Interrupted Exception", e.getMessage());
-            }
+        try {
+            latch.await();  // blocks until refresh happens
+        } catch (InterruptedException e) {
+            view.showError("Interrupted Exception", e.getMessage());
         }
     }
 
