@@ -4,6 +4,7 @@ import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.controller.states.State;
+import it.polimi.ingsw.view.IView;
 import it.polimi.ingsw.view.gui.UIs.JoinGameUI;
 import it.polimi.ingsw.view.gui.UIs.LobbyUI;
 import it.polimi.ingsw.view.gui.utils.AlertUtils;
@@ -78,6 +79,40 @@ public class ClientManager {
             throw new IllegalStateException("Game client not initialized");
         }
         return gameClient;
+    }
+
+    /**
+     * Actually process the command for the view, without the need for user to insert it manually.
+     * For this reason: it MUST be a valid command for the current game state!
+     * <p>
+     * At the end, this functions is blocked before return to wait for the new ClientUpdate.
+     *
+     * @param command The command to execute.
+     * @param args The args to pass.
+     */
+    public void simulateCommand(String command, String... args) {
+        IView view = getGameClient().getView();
+
+        // prepare to wait for update
+        final Object lock = new Object();
+        Consumer<ClientUpdate> onUpdate = _ -> {
+            synchronized (lock) {
+                lock.notifyAll();
+            }
+        };
+        view.registerOnUpdateListener(onUpdate);
+
+        // process the command
+        view.getCommandsProcessor().processCommand(command, args);
+
+        // wait for update
+        synchronized (lock) {
+            try {
+                lock.wait();
+            } catch (InterruptedException e) {
+                view.showError("Interrupted Exception", e.getMessage());
+            }
+        }
     }
 
     /**
@@ -177,11 +212,7 @@ public class ClientManager {
      * @param username the username of the client creating the game
      */
     public void handleCreateGame(String username) {
-        try {
-            gameClient.getClient().getServer().createGame(gameClient.getClient(), username);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        simulateCommand("create", username);
 
         sceneUpdater.accept(new LobbyUI(username).getLayout());
     }
@@ -192,28 +223,20 @@ public class ClientManager {
      * @param username the username of the client attempting to join
      */
     public void handleJoinGame(String username) {
-        try {
-            gameClient.getClient().getServer().ping(gameClient.getClient());
-        } catch (RemoteException e) {
-            gameClient.getView().showError("Remote Exception", e.getMessage());
-        }
+        simulateCommand("refresh");  // to fetch currently available games
 
-        List<UUID> activeGames =
-                getLastUpdate().getAvailableGames().stream().map(GameData::getGameId).toList();
+        List<UUID> activeGames = getLastUpdate().getAvailableGames().stream()
+                .map(GameData::getGameId).toList();
 
         System.out.println(activeGames);
 
         JoinGameUI joinGameUI = new JoinGameUI(uuid -> {
             System.out.println("Trying to join game with UUID: " + uuid);
-            try {
-                gameClient.getClient().getServer().joinGame(gameClient.getClient(), UUID.fromString(uuid), username);
-            } catch (RemoteException e) {
-                gameClient.getView().showError("Remote Exception", e.getMessage());
-            }
+            simulateCommand("join", uuid, username);
         },
-                activeGames.stream().map(
-                        UUID::toString
-                ).collect(Collectors.toList())
+                activeGames.stream()
+                        .map(UUID::toString)
+                        .collect(Collectors.toList())
         );
 
         sceneUpdater.accept(joinGameUI.getLayout());

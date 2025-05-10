@@ -12,12 +12,14 @@ import it.polimi.ingsw.controller.states.State;
 
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class CLIView implements IView {
 
 	private final GameClient gameClient;
 	private final ViewCommandsProcessor commandsProcessor;
+	private final List<Consumer<ClientUpdate>> listenersOnUpdate;
 
 	private final Deque<CLIScreen> currentScreens;
 	private final Set<CLIScreen> allScreens;
@@ -30,6 +32,7 @@ public class CLIView implements IView {
 	public CLIView(GameClient gameClient){
 		this.gameClient = gameClient;
 		commandsProcessor = new ViewCommandsProcessor(this);
+		listenersOnUpdate = new ArrayList<>();
 
 		currentScreens = new LinkedList<>();
 		allScreens = new HashSet<>();
@@ -84,6 +87,19 @@ public class CLIView implements IView {
 		// now just refresh the current screen (if update requires it)
 		if (update.isRefreshRequired()) {
 			onRefresh();
+		}
+
+		// at the end: callback all the registered listeners
+		synchronized (listenersOnUpdate) {
+			listenersOnUpdate.forEach(listener -> listener.accept(update));
+			listenersOnUpdate.clear();
+		}
+	}
+
+	@Override
+	public void registerOnUpdateListener(Consumer<ClientUpdate> onUpdate) {
+		synchronized (listenersOnUpdate) {
+			listenersOnUpdate.add(onUpdate);
 		}
 	}
 
@@ -189,6 +205,11 @@ public class CLIView implements IView {
 	@Override
 	public void showError(String title, String content) {
 		getCurrentScreen().setScreenMessage(ANSI.RED + title + " >> " + content);
+	}
+
+	@Override
+	public ViewCommandsProcessor getCommandsProcessor() {
+		return commandsProcessor;
 	}
 
 	@Override

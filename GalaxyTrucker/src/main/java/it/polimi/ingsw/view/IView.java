@@ -1,9 +1,11 @@
 package it.polimi.ingsw.view;
 
 import it.polimi.ingsw.controller.cp.ICommandsProcessor;
+import it.polimi.ingsw.controller.cp.ViewCommandsProcessor;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 
 import java.util.Deque;
+import java.util.function.Consumer;
 
 /**
  * Represents a generic View in the client-side architecture of the game.
@@ -34,9 +36,23 @@ public interface IView {
      * The implementation should handle screen transitions, refreshes, or any other reaction
      * to changes in the observable game state.
      *
+     * @implNote callback all the registered listeners with {@link #registerOnUpdateListener(Consumer)}.
+     *
      * @param update the most recent update to the game state; never {@code null}.
      */
     void onUpdate(ClientUpdate update);
+
+    /**
+     * Registers a listener that will be notified and removed whenever the first new {@link ClientUpdate}
+     * is received by the view.
+     * <p>
+     * This method allows external components to hook into the update flow and react to changes in the game state.
+     * Multiple listeners can be registered if supported by the implementation.
+     *
+     * @param onUpdate a {@link Consumer} function that will be invoked with the first new received {@code ClientUpdate}.
+     *                 Must not be {@code null}.
+     */
+    void registerOnUpdateListener(Consumer<ClientUpdate> onUpdate);
 
     /**
      * Starts the execution of the view logic.
@@ -152,6 +168,16 @@ public interface IView {
     default void showError(String error) {
         showError("Error", error);
     }
+
+    /**
+     * Returns the primary command processor responsible for handling global commands in this view context.
+     * <p>
+     * This processor manages top-level commands and acts as the entry point for interpreting user input
+     * before potentially delegating to screen-specific logic via {@link #getCommandsProcessors()}.
+     *
+     * @return the {@link ViewCommandsProcessor} instance associated with this view.
+     */
+    ViewCommandsProcessor getCommandsProcessor();
 
     /**
      * Returns the stack of command processors associated with this view.
