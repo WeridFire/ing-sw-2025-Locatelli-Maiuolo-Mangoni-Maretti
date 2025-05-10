@@ -391,7 +391,7 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
                 case "confirm" -> validateConfirmCommand();
                 case "remove" -> validateRemoveCommand(args);
                 case "endTurn" -> true;
-                default -> throw new CommandNotAllowedException();
+                default -> throw new CommandNotAllowedException(command, args);
             };
         }
     }

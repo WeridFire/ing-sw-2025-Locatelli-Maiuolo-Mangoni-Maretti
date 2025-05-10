@@ -76,7 +76,9 @@ public class ViewCommandsProcessor implements ICommandsProcessor {
             }
         }
         if (!processed) {
-            throw (firstException == null) ? new CommandNotAllowedException() : firstException;
+            throw (firstException == null)
+                    ? new CommandNotAllowedException(command, "it's not global and there are no other commands processors.")
+                    : firstException;
         }
     }
 }

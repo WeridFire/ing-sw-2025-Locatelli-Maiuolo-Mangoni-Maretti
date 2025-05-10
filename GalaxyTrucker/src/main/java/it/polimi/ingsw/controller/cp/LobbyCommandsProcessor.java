@@ -69,7 +69,7 @@ public class LobbyCommandsProcessor extends PhaseCommandsProcessor {
             case "leave": return true;
 
             // refuses unavailable commands
-            default: throw new CommandNotAllowedException();
+            default: throw new CommandNotAllowedException(command, args);
         }
     }
 

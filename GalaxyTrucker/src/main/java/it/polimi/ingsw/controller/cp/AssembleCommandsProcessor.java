@@ -235,7 +235,7 @@ public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
                 return false;
 
             // refuses unavailable commands
-            default : throw new CommandNotAllowedException();
+            default: throw new CommandNotAllowedException(command, args);
         }
 
     }

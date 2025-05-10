@@ -32,7 +32,7 @@ public class AdventureCommandsProcessor extends PhaseCommandsProcessor {
                 return true;
 
             // refuses unavailable commands
-            default : throw new CommandNotAllowedException();
+            default: throw new CommandNotAllowedException(command, args);
         }
     }
 
