@@ -1,7 +1,9 @@
 package it.polimi.ingsw.view.gui.UIs;
 
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
@@ -84,6 +86,14 @@ public class LobbyUI implements INodeRefreshableOnUpdateUI {
     @Override
     public void refreshOnUpdate(ClientUpdate update) {
         GameData game = update.getCurrentGame();
+
+        if (game.getCurrentGamePhaseType().equals(GamePhaseType.ASSEMBLE)){
+            Platform.runLater(() -> {
+                ClientManager.getInstance().updateScene(new AssembleUI());
+            });
+            return;
+        }
+
         boolean canChangeSettings = update.isGameLeader();
 
         Platform.runLater(() -> {
