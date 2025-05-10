@@ -103,13 +103,15 @@ public class RmiServer implements IServer {
 	public void createGame(IClient client, String username) throws RemoteException {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		try {
-			Game g = gamesHandler.createGame(username, connectionUUID);
-			System.out.println("Created new game: " + g.getId());
-			client.updateClient(new ClientUpdate(connectionUUID));
+			Game game = gamesHandler.createGame(username, connectionUUID);
+			if (game == null) {
+				throw new Exception("Game creation failed");
+			}
+			System.out.println("Created new game: " + game.getId());
+			GameServer.getInstance().broadcastUpdateAll();
 		} catch (Exception e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
-
 	}
 
 	@Override
@@ -121,11 +123,9 @@ public class RmiServer implements IServer {
 				throw new GameNotFoundException(gameId);
 			}
 			game.addPlayer(username, connectionUUID);
-			if(game != null){
-				//notify everyone that a new player has joined -> refreshes their view
-				GameServer.getInstance().broadcastUpdate(game);
-			}
-		} catch (PlayerAlreadyInGameException | GameNotFoundException e) {
+            //notify everyone that a new player has joined -> refreshes their view
+            GameServer.getInstance().broadcastUpdate(game);
+        } catch (PlayerAlreadyInGameException | GameNotFoundException e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
 	}

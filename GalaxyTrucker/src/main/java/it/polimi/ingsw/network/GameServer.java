@@ -138,6 +138,14 @@ public class GameServer{
         }
     }
 
+	public void broadcastUpdateAll() throws RemoteException {
+		for (Map.Entry<UUID, IClient> entry : clients.entrySet()) {
+			UUID uuid = entry.getKey();
+			IClient client = entry.getValue();
+			client.updateClient(new ClientUpdate(uuid));
+		}
+	}
+
 	public void broadcastUpdate(Game game) throws RemoteException {
 		for (Player player: game.getGameData().getPlayers(Player::isConnected)){
 			IClient client = clients.get(player.getConnectionUUID());

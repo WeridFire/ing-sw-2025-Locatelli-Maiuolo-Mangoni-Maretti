@@ -1,8 +1,7 @@
 package it.polimi.ingsw.view.gui.UIs;
 
-import com.sun.tools.javac.Main;
-import it.polimi.ingsw.MainApp;
-import it.polimi.ingsw.network.GameClient;
+import it.polimi.ingsw.controller.states.MenuState;
+import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.collections.FXCollections;
 import javafx.scene.control.*;
@@ -11,7 +10,7 @@ import javafx.geometry.Pos;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class JoinGameUI {
+public class JoinGameUI implements INodeRefreshableOnUpdateUI {
     private final VBox layout;
     private final TextField gameUUIDField;
     private final Button joinGameButton;
@@ -38,7 +37,7 @@ public class JoinGameUI {
             if (!uuid.isEmpty()) {
                 onJoinGame.accept(uuid);
 
-                ClientManager.getInstance().getSceneUpdater().accept(new LobbyUI(ClientManager.getInstance().getUsername()).getLayout());
+                ClientManager.getInstance().updateScene(new LobbyUI(ClientManager.getInstance().getUsername()));
 
             } else {
                 Alert alert = new Alert(Alert.AlertType.WARNING, "Please enter a valid game UUID.");
@@ -53,5 +52,14 @@ public class JoinGameUI {
 
     public VBox getLayout() {
         return layout;
+    }
+
+    private void refreshActiveGamesList(List<String> activeGames) {
+        activeGamesList.getItems().setAll(activeGames);
+    }
+
+    @Override
+    public void refreshOnUpdate(ClientUpdate update) {
+        refreshActiveGamesList(MenuState.getActiveGamesUUID());
     }
 }

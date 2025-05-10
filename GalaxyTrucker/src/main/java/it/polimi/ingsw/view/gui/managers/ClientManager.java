@@ -1,14 +1,12 @@
 package it.polimi.ingsw.view.gui.managers;
 
-import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.controller.states.MenuState;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.controller.states.State;
-import it.polimi.ingsw.view.gui.UIs.JoinGameUI;
-import it.polimi.ingsw.view.gui.UIs.LobbyUI;
 import it.polimi.ingsw.view.View;
+import it.polimi.ingsw.view.gui.UIs.*;
 import it.polimi.ingsw.view.gui.utils.AlertUtils;
-import it.polimi.ingsw.view.gui.UIs.LoginUI;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -19,11 +17,8 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * Manages the client-side GUI flow, including login, game creation, and game joining.
@@ -38,6 +33,8 @@ public class ClientManager {
 
     private GameClient gameClient;
     private String username;
+
+    private Consumer<ClientUpdate> refreshOnUpdate = null;
 
 
     public static ClientManager getInstance() {
@@ -62,6 +59,18 @@ public class ClientManager {
         instance = this;
     }
 
+    public void updateScene(Node layout) {
+        sceneUpdater.accept(layout);
+    }
+
+    public void updateScene(INodeRefreshableOnUpdateUI refreshableNode) {
+        updateScene(refreshableNode.getLayout());
+        View view = gameClient.getView();
+        view.unregisterOnUpdateListener(refreshOnUpdate);
+        refreshOnUpdate = refreshableNode::refreshOnUpdate;
+        view.registerOnUpdateListener(refreshOnUpdate);
+    }
+
     /**
      * Retrieves the latest update from the CLI screen handler.
      *
@@ -69,10 +78,6 @@ public class ClientManager {
      */
     public ClientUpdate getLastUpdate() {
         return State.getInstance().getLastUpdate();
-    }
-
-    public Consumer<Node> getSceneUpdater() {
-        return sceneUpdater;
     }
 
     public GameClient getGameClient() {
@@ -119,7 +124,7 @@ public class ClientManager {
             }
         });
 
-        sceneUpdater.accept(clientLoginUI.getLayout());
+        updateScene(clientLoginUI.getLayout());
         primaryStage.setTitle("Client Login");
         primaryStage.setOnCloseRequest(event -> {
             showLauncherCallback.run();
@@ -184,7 +189,7 @@ public class ClientManager {
 
         VBox gameLayout = new VBox(15, createButton, joinButton);
         gameLayout.setAlignment(Pos.CENTER);
-        sceneUpdater.accept(gameLayout);
+        updateScene(gameLayout);
         primaryStage.setTitle("Join or Create Game");
         primaryStage.setOnCloseRequest(event -> {
             showLauncherCallback.run();
@@ -206,7 +211,7 @@ public class ClientManager {
     public void handleCreateGame(String username) {
         simulateCommand("create", username);
 
-        sceneUpdater.accept(new LobbyUI(username).getLayout());
+        updateScene(new LobbyUI(username));
     }
 
     /**
@@ -215,23 +220,14 @@ public class ClientManager {
      * @param username the username of the client attempting to join
      */
     public void handleJoinGame(String username) {
-        simulateCommand("refresh");  // to fetch currently available games
-
-        List<UUID> activeGames = getLastUpdate().getAvailableGames().stream()
-                .map(GameData::getGameId).toList();
-
-        System.out.println(activeGames);
+        simulateCommand("ping");  // to fetch currently available games
 
         JoinGameUI joinGameUI = new JoinGameUI(uuid -> {
             System.out.println("Trying to join game with UUID: " + uuid);
             simulateCommand("join", uuid, username);
-        },
-                activeGames.stream()
-                        .map(UUID::toString)
-                        .collect(Collectors.toList())
-        );
+        }, MenuState.getActiveGamesUUID());
 
-        sceneUpdater.accept(joinGameUI.getLayout());
+        updateScene(joinGameUI);
     }
 
 
