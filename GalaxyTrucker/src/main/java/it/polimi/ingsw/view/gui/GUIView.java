@@ -7,6 +7,7 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.View;
+import it.polimi.ingsw.view.gui.utils.AlertUtils;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -36,63 +37,62 @@ public class GUIView extends View {
 
     @Override
     public void _onUpdate(ClientUpdate update) {
+        /*
         System.out.println("GUI function: onUpdate -> " + update.getClientUUID()
                 + " | refresh: " + update.isRefreshRequired());
-        // TODO: implement
+        */
+        // TODO: implement (e.g. transform any active YerNoChoice pir into confirmation Alert, and more...)
     }
 
     @Override
     public void run() {
-        System.out.println("GUI function: run");
-        // TODO: implement
+        // System.out.println("GUI function: run");
     }
 
     @Override
     public void onVoid() {
-        System.out.println("GUI function: onVoid");
+        // System.out.println("GUI function: onVoid");
         onRefresh();
-        // TODO: implement
     }
 
     @Override
     protected void _onRefresh() {
-        System.out.println("GUI function: onRefresh");
-        // TODO: implement
+        // System.out.println("GUI function: onRefresh");
     }
 
     @Override
     public void onScreen(String screenName) {
         System.out.println("GUI function: onScreen -> " + screenName);
-        onRefresh();
         // TODO: implement
+        onRefresh();
     }
 
     @Override
     public void onHelp() {
         System.out.println("GUI function: onHelp");
-        onRefresh();
         // TODO: implement
+        onRefresh();
     }
 
     @Override
     public void showInfo(String title, String content) {
-        System.out.println("GUI function: showInfo -> [" + title + "] >> " + content);
+        // System.out.println("GUI function: showInfo -> [" + title + "] >> " + content);
+        AlertUtils.showInfo(title, content);
         onRefresh();
-        // TODO: implement
     }
 
     @Override
     public void showWarning(String title, String content) {
-        System.out.println("GUI function: showWarning -> [" + title + "] >> " + content);
+        // System.out.println("GUI function: showWarning -> [" + title + "] >> " + content);
+        AlertUtils.showWarning(title, content);
         onRefresh();
-        // TODO: implement
     }
 
     @Override
     public void showError(String title, String content) {
-        System.out.println("GUI function: showError -> [" + title + "] >> " + content);
+        // System.out.println("GUI function: showError -> [" + title + "] >> " + content);
+        AlertUtils.showError(title, content);
         onRefresh();
-        // TODO: implement
     }
 
     @Override

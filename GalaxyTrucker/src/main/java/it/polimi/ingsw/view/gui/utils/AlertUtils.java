@@ -19,10 +19,20 @@ public class AlertUtils {
         return alert.showAndWait().filter(response -> response == yes).isPresent();
     }
 
-    public static void showError(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+    private static void alertShow(Alert alert, String title, String content) {
         alert.setTitle(title);
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+    public static void showError(String title, String content) {
+        alertShow(new Alert(Alert.AlertType.ERROR), title, content);
+    }
+    public static void showWarning(String title, String content) {
+        alertShow(new Alert(Alert.AlertType.WARNING), title, content);
+    }
+    public static void showInfo(String title, String content) {
+        alertShow(new Alert(Alert.AlertType.INFORMATION), title, content);
+    }
+
 }
