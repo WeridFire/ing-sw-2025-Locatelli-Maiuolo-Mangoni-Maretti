@@ -46,7 +46,7 @@ public class ServerManager {
             boolean serverStarted = false;
             try {
                 GameServer.start();
-                serverStatusText = "Server running on localhost:port"; // Update port later
+                serverStatusText = "Server running on " + GameServer.getInstance().getCompleteAddress();
                 serverStarted = true;
             } catch (AlreadyRunningServerException e) {
                 Platform.runLater(() -> AlertUtils.showError("Server Error", e.getMessage()));

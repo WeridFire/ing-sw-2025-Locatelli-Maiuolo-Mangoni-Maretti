@@ -4,6 +4,7 @@ import it.polimi.ingsw.controller.states.MenuState;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.controller.states.State;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.View;
 import it.polimi.ingsw.view.gui.UIs.*;
 import it.polimi.ingsw.view.gui.utils.AlertUtils;
@@ -146,9 +147,9 @@ public class ClientManager {
      */
     private void attemptConnection(String username, boolean useRmi) {
         this.username = username;
-        String HOST = "localhost";
-        int SOCKET_PORT = 1234;
-        int RMI_PORT = 1111;
+        String HOST = Default.HOST;
+        int SOCKET_PORT = Default.SOCKET_PORT;
+        int RMI_PORT = Default.RMI_PORT;
 
         try {
             gameClient = new GameClient(useRmi,

@@ -4,6 +4,7 @@ import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.rmi.RmiClient;
 import it.polimi.ingsw.network.socket.SocketClient;
 import it.polimi.ingsw.controller.states.State;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.View;
 import it.polimi.ingsw.view.cli.CLIView;
 import it.polimi.ingsw.view.gui.GUIView;
@@ -91,12 +92,12 @@ public class GameClient implements IClient{
 	}
 
 	public static void main(String[] args) throws IOException, NotBoundException {
-		boolean useRMI = (args.length > 0) ? Boolean.parseBoolean(args[0]) : false;
+		boolean useRMI = (args.length > 0) ? Boolean.parseBoolean(args[0]) : Default.USE_RMI;
 		GameClient gameClient = new GameClient(
 				useRMI,
-				(args.length > 1) ? args[1] : "localhost",
-				(args.length > 2) ? Integer.parseInt(args[2]) : (useRMI ? 1111 : 1234),
-				(args.length > 3) ? Boolean.parseBoolean(args[3]) : false
+				(args.length > 1) ? args[1] : Default.HOST,
+				(args.length > 2) ? Integer.parseInt(args[2]) : Default.PORT(useRMI),
+				(args.length > 3) ? Boolean.parseBoolean(args[3]) : Default.USE_GUI
 		);
 
 		start(gameClient);

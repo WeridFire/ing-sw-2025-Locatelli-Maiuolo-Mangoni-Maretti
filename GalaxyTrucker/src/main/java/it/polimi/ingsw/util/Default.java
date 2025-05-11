@@ -1,0 +1,17 @@
+package it.polimi.ingsw.util;
+
+public class Default {
+
+    // network
+    public static final String HOST = "localhost";
+    public static final int RMI_PORT = 1111;
+    public static final int SOCKET_PORT = 1234;
+    public static int PORT(boolean useRMI) {
+        return useRMI ? RMI_PORT : SOCKET_PORT;
+    }
+
+    // client
+    public static boolean USE_RMI = false;
+    public static boolean USE_GUI = false;
+
+}

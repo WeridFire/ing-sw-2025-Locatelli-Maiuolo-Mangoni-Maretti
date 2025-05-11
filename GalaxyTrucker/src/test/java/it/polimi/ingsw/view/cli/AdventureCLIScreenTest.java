@@ -6,6 +6,7 @@ import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.network.exceptions.AlreadyRunningServerException;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.ShipBoard;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.util.GameLevelStandards;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ public class AdventureCLIScreenTest {
         if (!GameServer.isRunning()) {
             GameServer.start();
         }
-        mockClient = new GameClient(false, "localhost", 1234, false);
+        mockClient = new GameClient(Default.USE_RMI, Default.HOST, Default.PORT(Default.USE_RMI), Default.USE_GUI);
     }
 
     private List<Player> preparePlayers(int nPlayers, GameLevel gameLevel) {

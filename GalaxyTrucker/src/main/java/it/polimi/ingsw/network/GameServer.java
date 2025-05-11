@@ -6,10 +6,13 @@ import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.rmi.RmiServer;
 import it.polimi.ingsw.network.socket.SocketServer;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.util.Default;
 
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -18,11 +21,12 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 public class GameServer{
 
+	private final int socketPort;
 	private SocketServer socketServer;
+	private final int rmiPort;
 	private RmiServer rmiServer;
 	private final Map<UUID, IClient> clients = new HashMap<>();
 	private final ExecutorService executor = Executors.newFixedThreadPool(2);
@@ -36,6 +40,8 @@ public class GameServer{
 	 */
 	private GameServer(int rmiPort, int socketPort) throws AlreadyRunningServerException {
 		final String serverName = "GalaxyTruckerServer";
+		this.rmiPort = rmiPort;
+		this.socketPort = socketPort;
 
 		// try starting servers (RMI and Socket) to know if ports are allowed
 		// RMI
@@ -116,6 +122,26 @@ public class GameServer{
 		return instance != null;
 	}
 
+	public static String getLocalIPAddress() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            return "127.0.0.1";
+        }
+    }
+
+	public int getRMIPort() {
+		return rmiPort;
+	}
+
+	public int getSocketPort() {
+		return socketPort;
+	}
+
+	public String getCompleteAddress() {
+		return getLocalIPAddress() + "[RMI:" + getRMIPort() + "|Socket:" + getSocketPort() + "]";
+	}
+
 	public static GameServer getInstance() {
 		try {
 			start();
@@ -127,7 +153,7 @@ public class GameServer{
 
 	public static void start() throws AlreadyRunningServerException {
 		if (isRunning()) throw new AlreadyRunningServerException("Server is already running.");
-		instance = new GameServer(1111, 1234);
+		instance = new GameServer(Default.RMI_PORT, Default.SOCKET_PORT);
 	}
 
 	public static void main(String[] args) {
