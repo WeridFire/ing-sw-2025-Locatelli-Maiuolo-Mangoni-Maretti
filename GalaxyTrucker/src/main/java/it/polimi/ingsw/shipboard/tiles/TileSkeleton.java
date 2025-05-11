@@ -21,6 +21,8 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
     private Coordinates fixedAt;
     private String cliSymbol = "?";
     private int id;
+    private String textureName;
+
     /**
      * Construct the tile with specified parameters.
      * @param sides An array of sides, where for each Direction {@code d},
@@ -180,6 +182,22 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
      */
     public void setTileId(int id) {
         this.id = id;
+    }
+
+    /**
+     * @return the name of the texture associated with this tile, or {@code null} if no texture name has been set
+     */
+    public String getTextureName() {
+        return textureName;
+    }
+
+    /**
+     * Sets the name of the texture associated with this tile
+     *
+     * @param textureName the tile texture name to set
+     */
+    public void setTextureName(String textureName) {
+        this.textureName = textureName;
     }
 
 

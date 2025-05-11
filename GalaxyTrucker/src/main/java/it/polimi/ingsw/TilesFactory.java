@@ -26,13 +26,16 @@ public class TilesFactory {
      * @return A {@code Tile} instance representing the main cabin.
      */
     public static MainCabinTile createMainCabinTile(MainCabinTile.Color color) {
-        /*
-        Blue -> "GT-new_tiles_16_for web33.jpg"
-        Green -> "GT-new_tiles_16_for web34.jpg"
-        Red -> "GT-new_tiles_16_for web52.jpg"
-        Yellow -> "GT-new_tiles_16_for web61.jpg"
-         */
-        return new MainCabinTile(color);
+        MainCabinTile tile = new MainCabinTile(color);
+        tile.setTextureName(
+                switch (color) {
+                    case BLUE -> "GT-new_tiles_16_for web33.jpg";
+                    case GREEN -> "GT-new_tiles_16_for web34.jpg";
+                    case RED -> "GT-new_tiles_16_for web52.jpg";
+                    case YELLOW -> "GT-new_tiles_16_for web61.jpg";
+                }
+        );
+        return tile;
     }
 
     /**
@@ -120,7 +123,9 @@ public class TilesFactory {
                 throw new IllegalArgumentException
                         ("compactTilesSides must all have 4 and only 4 characters: invalid for " + currentTileSidesString);
             }
-            result.add(tileConstructor.apply(currentTileSidesString));
+            TileSkeleton tile = tileConstructor.apply(currentTileSidesString);
+            tile.setTextureName("GT-new_tiles_16_for web" + referenceNumber + ".jpg");
+            result.add(tile);
         }
 
         return result;
