@@ -19,7 +19,7 @@ public enum Asset {
      * <p>
      * Maps specific credit amounts to corresponding asset filenames.
      *
-     * @param value the credit value (e.g., 2, 5, 10, 50)
+     * @param value the credit value (e.g., 1, 2, 5, 10, 50)
      * @return the filename of the cardboard image for the given credit
      */
     public static String getCredit(int value) {

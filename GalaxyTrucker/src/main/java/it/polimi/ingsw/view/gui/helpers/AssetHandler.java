@@ -4,7 +4,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.util.HashMap;
 import java.util.Map;
-import java.nio.file.Path;
 
 /**
  * Utility class for loading and caching image assets as {@link ImageView} instances.
@@ -35,7 +34,7 @@ public class AssetHandler {
      * @return an {@link ImageView} displaying the loaded image
      */
     public static ImageView loadImage(String textureName, boolean preserveRatio) {
-        String fullPath = Path.of(textureName).toString();
+        String fullPath = Path.of(textureName);
 
         // Attempt to retrieve from cache
         Image image = imageCache.get(fullPath);
@@ -86,9 +85,6 @@ public class AssetHandler {
      * @return an {@link ImageView} with default size
      */
     public static ImageView loadImage(String name) {
-        ImageView imageView = loadImage(name, DEFAULT_PRESERVE_RATIO);
-        imageView.setFitWidth(DEFAULT_WIDTH);
-        imageView.setFitHeight(DEFAULT_HEIGHT);
-        return imageView;
+        return loadImage(name, DEFAULT_PRESERVE_RATIO);
     }
 }
