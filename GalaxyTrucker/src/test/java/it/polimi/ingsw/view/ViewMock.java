@@ -10,15 +10,21 @@ import it.polimi.ingsw.view.gui.GUIView;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.UUID;
 
 public class ViewMock extends GUIView {
 
     private final String mockName;
     private State mockState;
+    private UUID clientUUID;
 
     public ViewMock(String mockName) {
         super();
         this.mockName = mockName;
+    }
+
+    public UUID getClientUUID() {
+        return clientUUID;
     }
 
     @Override
@@ -36,6 +42,7 @@ public class ViewMock extends GUIView {
                 + " | refresh: " + update.isRefreshRequired());
 
          */
+        clientUUID  = update.getClientUUID();
     }
 
     @Override

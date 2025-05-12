@@ -15,7 +15,6 @@ public class ClientMock extends RmiClient {
     private final IServer rmiServerMock;
 
     public ClientMock() throws RemoteException {
-        super();
         try {
             Registry registry = LocateRegistry.getRegistry(Default.HOST, Default.RMI_PORT);
             rmiServerMock = (IServer) registry.lookup(Default.RMI_SERVER_NAME);
