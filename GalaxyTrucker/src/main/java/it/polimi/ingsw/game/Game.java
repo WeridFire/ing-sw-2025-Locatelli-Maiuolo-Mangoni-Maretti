@@ -282,7 +282,7 @@ public class Game {
 
         gameData.setCoveredTiles(t);
 
-        gameData.setDeck(new Deck(gameData.getLevel()));
+        gameData.setDeck(Deck.random(gameData.getLevel()));
 
         int playerIndex = 0;
         for (Player player : gameData.getPlayers()) {

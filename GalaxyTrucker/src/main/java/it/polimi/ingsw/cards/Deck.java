@@ -11,7 +11,7 @@ public class Deck implements Serializable {
     /**
      * The list of cards present in the deck.
      */
-    final List<Card> deck = new ArrayList<>();
+    private final List<Card> deck = new ArrayList<>();
     private Card currentCard = null;
 
     /**
@@ -42,12 +42,16 @@ public class Deck implements Serializable {
         gameLevel = deck.gameLevel;
     }
 
+    private Deck(GameLevel gameLevel) {
+        this.gameLevel = gameLevel;
+    }
+
     /**
      * Instance a deck with randomly selected cards, based on a level.
      * @param level The deck level.
      */
-    public Deck(GameLevel level){
-        gameLevel = level;
+    public static Deck random(GameLevel level){
+        Deck result = new Deck(level);
 
         List<Card> tutorialPool;
         List<Card> l1Pool;
@@ -57,8 +61,8 @@ public class Deck implements Serializable {
                 //for the tutorial is simply puts 8 cards randomly into the deck. No cardsgroup here.
                 tutorialPool = DeckFactory.createTutorialDeck();
                 Collections.shuffle(tutorialPool);
-                while (deck.size() < 8){
-                    deck.add(tutorialPool.removeFirst());
+                while (result.deck.size() < 8){
+                    result.deck.add(tutorialPool.removeFirst());
                 }
                 break;
             case ONE:
@@ -68,11 +72,11 @@ public class Deck implements Serializable {
                 //flight predictions, so not secret.
                 //TODO: fact check the content and dimension of the level 1 flight groups. On board these are not
                 // displayed (atleast in the digital resources)
-                while(cardsGroups.size() < 4){
+                while(result.cardsGroups.size() < 4){
                     List<Card> groupCard = new ArrayList<>();
                     groupCard.add(l1Pool.removeFirst());
                     groupCard.add(l1Pool.removeFirst());
-                    cardsGroups.add(new CardsGroup(groupCard, cardsGroups.isEmpty()));
+                    result.cardsGroups.add(new CardsGroup(groupCard, result.cardsGroups.isEmpty()));
                 }
                 break;
             case TWO:
@@ -82,15 +86,61 @@ public class Deck implements Serializable {
                 Collections.shuffle(l1Pool);
                 //Create 4 cardgroups each with 2 cards from level 2 and 1 from level 1. Also makes only the first
                 //Cardgroup secret.
-                while(cardsGroups.size() < 4){
+                while(result.cardsGroups.size() < 4){
                     List<Card> groupCard = new ArrayList<>();
                     groupCard.add(l1Pool.removeFirst());
                     groupCard.add(l2Pool.removeFirst());
                     groupCard.add(l2Pool.removeFirst());
-                    cardsGroups.add(new CardsGroup(groupCard, cardsGroups.isEmpty()));
+                    result.cardsGroups.add(new CardsGroup(groupCard, result.cardsGroups.isEmpty()));
                 }
                 break;
         }
+
+        return result;
+    }
+
+    /**
+     * Creates a deck with a deterministic set of cards and (optionally) groups them into
+     * {@link CardsGroup}s of fixed size.
+     * <p>
+     * This method is typically used for testing or predefined setups where card selection is not randomized.
+     * It assigns the {@link GameLevel} of the deck based on the highest level among the provided cards,
+     * unless no grouping is requested.
+     *
+     * @param cards the list of cards to include in the deck. Must not be {@code null}.
+     * @param groupsSize if non-{@code null}, groups the cards into {@link CardsGroup}s of the given size.
+     *                   Each group contains {@code groupsSize} cards, except possibly the last one.
+     *                   If {@code null}, all cards are added to the deck directly with no grouping.
+     *                   If {@code < 1}, it defaults to {@code 1}.
+     * @return a {@link Deck} instance with cards deterministically arranged, optionally grouped.
+     */
+    public static Deck deterministic(List<Card> cards, Integer groupsSize) {
+        GameLevel level = null;
+        if (groupsSize != null) {
+            for (Card card : cards) {
+                level = GameLevel.max(level, card.getLevel());
+            }
+        }
+
+        Deck result = new Deck(level);
+        if (groupsSize == null) {
+            result.deck.addAll(cards);
+            return result;
+        } // else
+        if (groupsSize < 1) groupsSize = 1;
+        int cardInGroupIndex = 0;
+        List<Card> groupCard = new ArrayList<>();
+        for (Card card : cards) {
+            if (cardInGroupIndex == groupsSize) {
+                result.cardsGroups.add(new CardsGroup(groupCard, result.cardsGroups.isEmpty()));
+                cardInGroupIndex = 0;
+                groupCard.clear();
+            }
+            groupCard.add(card);
+            cardInGroupIndex++;
+        }
+
+        return result;
     }
 
     /**

@@ -19,7 +19,7 @@ class DeckTest {
 
     @Test
     void testTutorialDeck() {
-        Deck deck = new Deck(GameLevel.TESTFLIGHT);
+        Deck deck = Deck.random(GameLevel.TESTFLIGHT);
         assertEquals(0, deck.getGroupsAvailability().size());
         deck.mixGroupsIntoCards();
         for (int i = 0; i < 8; i++) {
@@ -30,7 +30,7 @@ class DeckTest {
 
     @Test
     void testLevelOneDeck() throws CardsGroupException {
-        Deck deck = new Deck(GameLevel.ONE);
+        Deck deck = Deck.random(GameLevel.ONE);
         assertArrayEquals(new Boolean[] {null, true, true, true}, deck.getGroupsAvailability().toArray());
         for (int i = 0; i < 4; i++) {
             List<Card> cards = deck.getGroup(i).getGroupCards();
@@ -48,7 +48,7 @@ class DeckTest {
 
     @Test
     void testLevelTwoDeck() throws CardsGroupException {
-        Deck deck = new Deck(GameLevel.TWO);
+        Deck deck = Deck.random(GameLevel.TWO);
         assertArrayEquals(new Boolean[] {null, true, true, true}, deck.getGroupsAvailability().toArray());
         for (int i = 0; i < 4; i++) {
             List<Card> cards = deck.getGroup(i).getGroupCards();

@@ -359,7 +359,7 @@ class GameDataTest {
     }
 
     private Deck createMockDeck() {
-        return new Deck(GameLevel.TESTFLIGHT);
+        return Deck.random(GameLevel.TESTFLIGHT);
     }
 
 }
