@@ -12,4 +12,10 @@ public enum GameLevel implements Serializable {
             default -> TESTFLIGHT;
         };
     }
+
+    public static GameLevel max(GameLevel l1, GameLevel l2) {
+        if (l1 == null) return l2;
+        if (l2 == null) return l1;
+        return (l1.ordinal() > l2.ordinal()) ? l1 : l2;
+    }
 }
