@@ -3,7 +3,6 @@ package it.polimi.ingsw.view.cli;
 import it.polimi.ingsw.controller.cp.ICommandsProcessor;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
-import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.View;
@@ -19,8 +18,8 @@ public class CLIView extends View {
 	protected boolean isShowingHelpScreen = false;
 	protected boolean isShowingAvailableScreens = false;
 
-	public CLIView(GameClient gameClient){
-		super(gameClient);
+	public CLIView(){
+		super();
 
 		currentScreens = new LinkedList<>();
 		allScreens = new HashSet<>();

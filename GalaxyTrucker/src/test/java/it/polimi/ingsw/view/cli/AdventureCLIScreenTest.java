@@ -27,7 +27,7 @@ public class AdventureCLIScreenTest {
         if (!GameServer.isRunning()) {
             GameServer.start();
         }
-        mockClient = new GameClient(Default.USE_RMI, Default.HOST, Default.PORT(Default.USE_RMI), Default.USE_GUI);
+        mockClient = GameClient.create(Default.USE_RMI, Default.HOST, Default.PORT(Default.USE_RMI), Default.USE_GUI);
     }
 
     private List<Player> preparePlayers(int nPlayers, GameLevel gameLevel) {

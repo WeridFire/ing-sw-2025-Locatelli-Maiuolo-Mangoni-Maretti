@@ -1,5 +1,7 @@
 package it.polimi.ingsw.network.rmi;
 
+import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.IClient;
@@ -10,16 +12,31 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class RmiClient extends UnicastRemoteObject implements IClient {
 
-	final IServer server;
-	final GameClient gameClient;
+	private IServer server;
+	private GameClient gameClient;
 
 	/**
-	 * The RMI Client. Allows the server to access it and make calls on it, by exposing methods such as updateClient.
+	 * The RMI Client.
+	 * Allows the server to access it and make calls on it, by exposing methods such as updateClient.
 	 * @param server A reference to the RMI (proxy) server.
 	 * @param gameClient A reference to the generic game client.
-	 * @throws RemoteException
 	 */
 	public RmiClient(IServer server, GameClient gameClient) throws RemoteException {
+		init(server, gameClient);
+	}
+
+	/**
+	 * An empty RMI Client: needs to be initialized. Useful to avoid circular dependence from GameClient.
+	 * Allows the server to access it and make calls on it, by exposing methods such as updateClient.
+	 */
+	public RmiClient() throws RemoteException { }
+
+	/**
+	 * Initialization method to call right after creating an empty instance of RmiClient,
+	 * to avoid GameClient circular dependence.
+	 * @see #RmiClient(IServer, GameClient)
+	 */
+	public void init(IServer server, GameClient gameClient) {
 		this.server = server;
 		this.gameClient = gameClient;
 	}

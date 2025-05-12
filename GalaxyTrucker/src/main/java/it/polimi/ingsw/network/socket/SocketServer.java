@@ -38,9 +38,9 @@ public class SocketServer {
 																	new BufferedReader(socketRx),
 																	new PrintWriter(socketTx));
 			UUID connectionUUID = GameServer.getInstance().registerClient(handler);
+			System.out.println("Detected a new connection: " + connectionUUID);
 			//Confirm connection and send notify client with assigned UUID
 			handler.updateClient(new ClientUpdate(connectionUUID));
-			System.out.println("Detected a new connection.");
 			new Thread(() -> {
 				try {
 					handler.runVirtualView();

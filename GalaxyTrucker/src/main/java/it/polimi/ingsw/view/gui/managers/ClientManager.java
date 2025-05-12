@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.gui.managers;
 
+import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.controller.states.MenuState;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
@@ -78,7 +79,7 @@ public class ClientManager {
      * @return the last ClientUpdate received
      */
     public ClientUpdate getLastUpdate() {
-        return State.getInstance().getLastUpdate();
+        return CommonState.getLastUpdate();
     }
 
     public GameClient getGameClient() {
@@ -152,7 +153,7 @@ public class ClientManager {
         int RMI_PORT = Default.RMI_PORT;
 
         try {
-            gameClient = new GameClient(useRmi,
+            gameClient = GameClient.create(useRmi,
                     HOST,
                     useRmi ? RMI_PORT : SOCKET_PORT,
                     true

@@ -4,7 +4,6 @@ import it.polimi.ingsw.controller.cp.*;
 import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.controller.states.PIRState;
 import it.polimi.ingsw.enums.GamePhaseType;
-import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.View;
 import it.polimi.ingsw.view.gui.utils.AlertUtils;
@@ -21,10 +20,6 @@ public class GUIView extends View {
     private AssembleCommandsProcessor cpAssemble;  // assemble
     private AdventureCommandsProcessor cpAdventure;  // flight and adventure cards
     private PIRCommandsProcessor cpPIR;  // input
-
-    public GUIView(GameClient gameClient){
-        super(gameClient);
-    }
 
     @Override
     public void _init() {

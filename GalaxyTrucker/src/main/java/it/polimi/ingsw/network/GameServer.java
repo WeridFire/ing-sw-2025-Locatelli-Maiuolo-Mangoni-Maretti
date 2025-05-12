@@ -39,7 +39,6 @@ public class GameServer{
 	 * @param socketPort The port for the SOCKET server.
 	 */
 	private GameServer(int rmiPort, int socketPort) throws AlreadyRunningServerException {
-		final String serverName = "GalaxyTruckerServer";
 		this.rmiPort = rmiPort;
 		this.socketPort = socketPort;
 
@@ -49,11 +48,11 @@ public class GameServer{
 			rmiServer = new RmiServer();
 			IServer stub = (IServer) UnicastRemoteObject.exportObject(rmiServer, 0);
 			Registry registry = LocateRegistry.createRegistry(rmiPort);
-			registry.rebind(serverName, stub);
-			System.out.println("RMI server bound on port " + rmiPort + " with name " + serverName + ".");
+			registry.rebind(Default.RMI_SERVER_NAME, stub);
+			System.out.println("RMI server bound on port " + rmiPort + " with name " + Default.RMI_SERVER_NAME + ".");
 		} catch (ExportException e) {
 			String errorMessage = "RMI server can't be exported: failure in binding on port "
-					+ rmiPort + " with name " + serverName +
+					+ rmiPort + " with name " + Default.RMI_SERVER_NAME +
 					".\nThat's probably because an other instance of the Server is already running.\n" + e.getMessage();
 			System.err.println(errorMessage);
 			throw new AlreadyRunningServerException(errorMessage);

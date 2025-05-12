@@ -8,21 +8,37 @@ import it.polimi.ingsw.network.IServer;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.Base64;
 
 public class SocketClient implements IClient {
-	final BufferedReader input;
-	final IServer server;
-	final GameClient gameClient;
+	private BufferedReader input;
+	private IServer server;
+	private GameClient gameClient;
 
 	/**
-	 * Creates a Socket Client, which will accept messages from the server and parse them. Will then forward these
-	 * parsed messages to the GameClient.
+	 * The Socket Client.
+	 * Accept messages from the server and parse them. Will then forward these parsed messages to the GameClient.
 	 * @param input The input stream, from where the server will communicate.
 	 * @param output The output stream, used to create the ServerSocketHandler.
 	 * @param gameClient The game client.
 	 */
 	public SocketClient(BufferedReader input, BufferedWriter output, GameClient gameClient) {
+		init(input, output, gameClient);
+	}
+
+	/**
+	 * An empty Socket Client: needs to be initialized. Useful to avoid circular dependence from GameClient.
+	 * Accept messages from the server and parse them. Will then forward these parsed messages to the GameClient.
+	 */
+	public SocketClient() throws RemoteException { }
+
+	/**
+	 * Initialization method to call right after creating an empty instance of SocketClient,
+	 * to avoid GameClient circular dependence.
+	 * @see #SocketClient(BufferedReader, BufferedWriter, GameClient) 
+	 */
+	public void init(BufferedReader input, BufferedWriter output, GameClient gameClient) {
 		this.input = input;
 		this.server = new ServerSocketHandler(output);
 		this.gameClient = gameClient;

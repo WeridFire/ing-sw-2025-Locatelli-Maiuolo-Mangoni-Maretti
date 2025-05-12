@@ -16,17 +16,33 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-public class GameClient implements IClient{
+public class GameClient implements IClient {
 
-	private final boolean useRMI;
-	private RmiClient rmiClient = null;
-	private SocketClient socketClient = null;
+	private final IClient specClient;
 	private final View view;
+	private final State linkedState;
 
 	/**
-	 * The main game client. Based on the selected options, this client will instance a connection using either RMI or
-	 * socket protocol, onto the desired host & port. This gameClient will also handle all the method calls from the
-	 * server on the client (basically just the updates).
+	 * The main game client.
+	 * With this constructor, all the elements that composes this class are already instantiated:
+	 * useful for abstraction from those constructions.
+	 * This gameClient will also handle all the method calls from the server on the client (basically just the updates).
+	 *
+	 * @param specClient the low-level client the game will use (RMI / Socket)
+	 * @param view the view this client will interact with (GUI / TUI)
+	 * @param linkedState the state of the game this client is linked to
+	 */
+	public GameClient(IClient specClient, View view, State linkedState) {
+		this.specClient = specClient;
+		this.view = view;
+		this.linkedState = linkedState;
+	}
+
+	/**
+	 * The main game client.
+	 * Based on the selected options, this client will instance a connection using either RMI or socket protocol,
+	 * onto the desired host & port.
+	 * This game client will also handle all the method calls from the server on the client (basically just the updates).
 	 *
 	 * @param useRMI {@code true} to use RMI, {@code false} to use Socket.
 	 * @param host The host IP address
@@ -36,18 +52,34 @@ public class GameClient implements IClient{
 	 * @throws IOException Signals that some sort of I/O exception has occurred
 	 * @throws NotBoundException The RMI server is not present
 	 */
-	public GameClient(boolean useRMI, String host, Integer port, boolean useGUI) throws IOException, NotBoundException {
-		this.useRMI = useRMI;
-		if(useRMI){
-			final String serverName = "GalaxyTruckerServer";
+	public static GameClient create(boolean useRMI, String host, Integer port, boolean useGUI)
+			throws IOException, NotBoundException {
+		GameClient gc;
+
+		// state
+		State state = State.getInstance();
+
+		// view
+		View view = useGUI ? new GUIView() : new CLIView();
+
+		// low level client
+		if (useRMI) {
 			Registry registry = LocateRegistry.getRegistry(host, port);
-			IServer server = (IServer) registry.lookup(serverName);
-			rmiClient = new RmiClient(server, this);
-		}else{
+			IServer server = (IServer) registry.lookup(Default.RMI_SERVER_NAME);
+			RmiClient rmiClient = new RmiClient();
+			// create game client
+			gc = new GameClient(rmiClient, view, state);
+			// init low level client (RMI)
+			rmiClient.init(server, gc);
+		} else {
 			Socket serverSocket = new Socket(host, port);
 			InputStreamReader socketRx = new InputStreamReader(serverSocket.getInputStream());
 			OutputStreamWriter socketTx = new OutputStreamWriter(serverSocket.getOutputStream());
-			socketClient = new SocketClient(new BufferedReader(socketRx), new BufferedWriter(socketTx), this);
+			SocketClient socketClient = new SocketClient();
+			// create game client
+			gc = new GameClient(socketClient, view, state);
+			// init low level client (Socket)
+			socketClient.init(new BufferedReader(socketRx), new BufferedWriter(socketTx), gc);
 			new Thread(() -> {
 				try {
 					socketClient.runVirtualServer();
@@ -57,19 +89,25 @@ public class GameClient implements IClient{
 			}).start();
 		}
 
-		view = useGUI ? new GUIView(this) : new CLIView(this);
-		view.init();
+		// init view
+		view.init(gc);
+
+		return gc;
 	}
 
 	/**
 	 * @return The low-level client the Game is currently using, either RMI or Socket.
 	 */
 	public IClient getClient(){
-		if(useRMI){
-			return rmiClient;
-		}else{
-			return socketClient;
-		}
+		return specClient;
+	}
+
+	public View getView() {
+		return view;
+	}
+
+	public State getLinkedState() {
+		return linkedState;
 	}
 
 	@Override
@@ -77,23 +115,19 @@ public class GameClient implements IClient{
         try {
             return getClient().getServer();
         } catch (RemoteException e) {
-            view.showError(e.getMessage());
+            getView().showError(e.getMessage());
 			return null;
         }
     }
 
 	@Override
 	public void updateClient(ClientUpdate clientUpdate) {
-		State.getInstance().setLastUpdate(clientUpdate);
-	}
-
-	public View getView() {
-		return view;
+		getLinkedState().setLastUpdate(clientUpdate);
 	}
 
 	public static void main(String[] args) throws IOException, NotBoundException {
 		boolean useRMI = (args.length > 0) ? Boolean.parseBoolean(args[0]) : Default.USE_RMI;
-		GameClient gameClient = new GameClient(
+		GameClient gameClient = GameClient.create(
 				useRMI,
 				(args.length > 1) ? args[1] : Default.HOST,
 				(args.length > 2) ? Integer.parseInt(args[2]) : Default.PORT(useRMI),
@@ -112,10 +146,10 @@ public class GameClient implements IClient{
 	 */
 	public static void start(GameClient gameClient) throws RemoteException {
 		// attach the view in observer pattern
-		State.getInstance().attachView(gameClient.view);
+		gameClient.getLinkedState().attachView(gameClient.getView());
 		// connect the client to the server
 		gameClient.getServer().connect(gameClient.getClient());
         // run the view (blocking function)
-		gameClient.view.run();
+		gameClient.getView().run();
 	}
 }

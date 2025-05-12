@@ -2,7 +2,7 @@ package it.polimi.ingsw.view;
 
 import it.polimi.ingsw.controller.cp.ICommandsProcessor;
 import it.polimi.ingsw.controller.cp.ViewCommandsProcessor;
-import it.polimi.ingsw.controller.states.State;
+import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 
@@ -14,7 +14,8 @@ import java.util.function.Consumer;
 
 public abstract class View implements IView {
 
-    protected final GameClient gameClient;
+    protected GameClient gameClient;
+
     private final ViewCommandsProcessor commandsProcessor;
 
     private final Set<Runnable> listenersOnRefreshOnce;
@@ -24,8 +25,7 @@ public abstract class View implements IView {
 
     protected boolean isInitialized;
 
-    public View(GameClient gameClient) {
-        this.gameClient = gameClient;
+    public View() {
         commandsProcessor = new ViewCommandsProcessor(this);
 
         listenersOnRefreshOnce = new HashSet<>();
@@ -40,25 +40,27 @@ public abstract class View implements IView {
      * Initializes the internal components or data structures of the view.
      * <p>
      * This method is intended to be called once before the view is used, typically after construction
-     * but before invoking {@link #run()} or processing any updates. Its purpose is to set up screens,
-     * handlers, or other necessary elements required for the view to function correctly.
+     * but before invoking {@link #run()} or processing any updates.
+     * Its purpose is to link the related game client (useful to avoid circular dependence from it) and
+     * to set up screens, handlers, or other necessary elements required for the view to function correctly.
      * <p>
      * Calling this method multiple times is safe: the implementation guards against redundant initialization.
-     * However, there is no need to invoke this method more than once.
+     * However, there is no need to call this method more than once.
      *
      * @implNote To define the initialization logic, override the {@link #_init()} method.
      */
-    public final void init() {
+    public final void init(GameClient gameClient) {
         if (isInitialized) return;
+        this.gameClient = gameClient;
         _init();
         isInitialized = true;
     }
 
     /**
      * Contains the actual implementation of the initialization logic for this component.
-     * This method is called only once by {@link #init()} and should not be invoked directly.
+     * This method is called only once by {@link #init(GameClient)} and should not be invoked directly.
      *
-     * @see #init()
+     * @see #init(GameClient)
      */
     protected abstract void _init();
 
@@ -239,7 +241,7 @@ public abstract class View implements IView {
      * Triggers debug behavior to save the last update
      */
     public void onDebug() {
-        ClientUpdate.saveDebugUpdate(State.getInstance().getLastUpdate());
+        ClientUpdate.saveDebugUpdate(CommonState.getLastUpdate());
         showInfo("The current game state was saved to update.json");
     }
 

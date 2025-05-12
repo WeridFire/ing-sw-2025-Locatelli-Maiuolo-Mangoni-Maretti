@@ -4,6 +4,7 @@ public class Default {
 
     // network
     public static final String HOST = "localhost";
+    public static final String RMI_SERVER_NAME = "GalaxyTruckerServer";
     public static final int RMI_PORT = 1111;
     public static final int SOCKET_PORT = 1234;
     public static int PORT(boolean useRMI) {
