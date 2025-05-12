@@ -1,5 +1,6 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.network.GameClientMock;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.network.exceptions.AlreadyRunningServerException;
@@ -9,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -51,6 +54,23 @@ public class MegaTest {
         return clients[index];
     }
 
+    private GameClientMock expectRefreshOnlyForAndGet(int refreshAndGet, int... otherExpectedRefreshes) {
+        joinAll();
+        Set<Integer> otherExpectedRefreshSet = new HashSet<>(otherExpectedRefreshes.length + 1);
+        otherExpectedRefreshSet.add(refreshAndGet);
+        for (int i = 0; i < otherExpectedRefreshes.length; i++) {
+            otherExpectedRefreshSet.add(otherExpectedRefreshes[i]);
+        }
+        for (int i = 0; i < N_CLIENTS; i++) {
+            if (otherExpectedRefreshSet.contains(i)) {
+                clients[i].expectRefresh();
+            } else {
+                clients[i].expectNoRefresh();
+            }
+        }
+        return clients[refreshAndGet];
+    }
+
     private GameClientMock expectRefreshForAllAndGet(int index) {
         joinAll();
         for (GameClientMock client : clients) {
@@ -63,6 +83,17 @@ public class MegaTest {
     public void test() {
         expectRefreshOnlyFor(0).simulateCommand("ping");
         expectRefreshForAllAndGet(0).simulateCommand("create", "alfa");
+        joinAll();
+
+        UUID gameUUID = clients[0].getMockThis().getLinkedState().getLastUpdate().getCurrentGame().getGameId();
+        ArrayList<Game> games = GamesHandler.getInstance().getGames();
+        assertEquals(1, games.size());
+        assertEquals(games.getFirst().getId(), gameUUID);
+
+        expectRefreshOnlyForAndGet(1, 0)
+                .simulateCommand("join", gameUUID.toString(), "beta");
+
+        expectRefreshOnlyFor(2).simulateCommand("create", "gamma");
     }
 
 }

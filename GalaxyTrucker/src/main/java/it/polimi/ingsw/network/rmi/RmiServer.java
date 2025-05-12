@@ -108,7 +108,11 @@ public class RmiServer implements IServer {
 				throw new Exception("Game creation failed");
 			}
 			System.out.println("Created new game: " + game.getId());
-			GameServer.getInstance().broadcastUpdateAll();
+			GameServer.getInstance().broadcastUpdateAllRefreshOnlyIf((clientUUID, clientInterface) -> {
+				// refresh only the clients that are not in a game yet, or this client
+				return (GamesHandler.getInstance().findGameByClientUUID(clientUUID) == null)
+						|| clientInterface.equals(client);
+			});
 		} catch (Exception e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}

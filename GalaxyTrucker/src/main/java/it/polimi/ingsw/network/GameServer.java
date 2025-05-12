@@ -21,6 +21,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.BiPredicate;
 
 public class GameServer{
 
@@ -168,6 +169,14 @@ public class GameServer{
 			UUID uuid = entry.getKey();
 			IClient client = entry.getValue();
 			client.updateClient(new ClientUpdate(uuid));
+		}
+	}
+
+	public void broadcastUpdateAllRefreshOnlyIf(BiPredicate<UUID, IClient> refreshCondition) throws RemoteException {
+		for (Map.Entry<UUID, IClient> entry : clients.entrySet()) {
+			UUID uuid = entry.getKey();
+			IClient client = entry.getValue();
+			client.updateClient(new ClientUpdate(uuid, refreshCondition.test(uuid, client)));
 		}
 	}
 

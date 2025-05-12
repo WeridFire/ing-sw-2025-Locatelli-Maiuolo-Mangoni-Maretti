@@ -128,7 +128,7 @@ public class GameClientMock implements IClient {
         return this;
     }
     public GameClientMock expectRefresh() {
-        return expectRefresh(1000, new Exception("Expected refresh. Did not refresh."));
+        return expectRefresh(1000, new Exception("Expected refresh for " + mockName + ". Did not refresh."));
     }
 
     public GameClientMock expectNoRefresh(long timeoutMillis, Throwable orElse) {
@@ -154,7 +154,7 @@ public class GameClientMock implements IClient {
         return this;
     }
     public GameClientMock expectNoRefresh() {
-        return expectNoRefresh(1000, new Exception("Expected no refresh. Did refresh."));
+        return expectNoRefresh(1000, new Exception("Expected no refresh for " + mockName + ". Did refresh."));
     }
 
     public GameClientMock joinAll() {
