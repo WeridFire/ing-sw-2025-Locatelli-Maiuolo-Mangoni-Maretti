@@ -3,15 +3,12 @@ package it.polimi.ingsw;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
-import it.polimi.ingsw.game.exceptions.GameNotFoundException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.player.Player;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Singleton class for managing game creation and retrieval.
@@ -150,8 +147,10 @@ public class GamesHandler {
     }
 
     public Game findGameByClientUUID(UUID clientUUID) {
-        return GamesHandler.getInstance().getGames().stream()
-                .filter(game -> game.getGameData().getPlayer(p -> p.getConnectionUUID() == clientUUID) != null)
+        return getGames().stream()
+                .filter(game ->
+                        game.getGameData().getPlayer(p ->
+                                p.getConnectionUUID().equals(clientUUID)) != null)
                 .findFirst().orElse(null);
     }
 
