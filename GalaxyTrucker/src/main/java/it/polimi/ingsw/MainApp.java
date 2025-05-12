@@ -1,6 +1,7 @@
 package it.polimi.ingsw;
 
 // Keep necessary imports
+import it.polimi.ingsw.view.gui.helpers.AssetHandler;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import it.polimi.ingsw.view.gui.managers.ServerManager;
 import javafx.application.Application;
@@ -48,6 +49,8 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         primaryStage.setTitle("Game Launcher");
+
+        AssetHandler.preLoadTextures();
 
         // Initialize the root container
         root = new VBox(15);
