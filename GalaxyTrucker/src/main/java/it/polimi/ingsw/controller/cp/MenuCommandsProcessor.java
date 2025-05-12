@@ -16,7 +16,8 @@ public class MenuCommandsProcessor extends PhaseCommandsProcessor {
     public List<String> getAvailableCommands() {
         return List.of("refresh|Refresh the game list.",
                 "join|Join an existing game.",
-                "create|Create a new game.");
+                "create|Create a new game.",
+                "resume|Resume an interrupted game.");
     }
 
     @Override
@@ -40,6 +41,13 @@ public class MenuCommandsProcessor extends PhaseCommandsProcessor {
                 }
                 return true;
 
+            case "resume" :
+                if (args.length != 1) {
+                    view.showWarning("Usage: resume <game-uuid>");
+                    return false;
+                }
+                return true;
+
             // refuses unavailable commands
             default: throw new CommandNotAllowedException(command, args);
         }
@@ -54,6 +62,7 @@ public class MenuCommandsProcessor extends PhaseCommandsProcessor {
                             UUID.fromString(args[0]),
                             args[1]);
             case "create" -> server.createGame(client, args[0]);
+            case "resume" -> server.resumeGame(client, UUID.fromString(args[0]));
         }
     }
 }
