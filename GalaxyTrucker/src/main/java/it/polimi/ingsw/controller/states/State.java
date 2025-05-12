@@ -22,6 +22,21 @@ public class State {
         return instance;
     }
 
+    /**
+     * Replaces the current singleton instance with a custom {@link State} instance.
+     * <p>
+     * <strong>This method forcefully overrides the internal state singleton and should be used
+     * <em>only</em> for testing purposes.</strong>
+     * Improper use in production code may lead to inconsistent or invalid application state,
+     * breaking the expected lifecycle of the singleton.
+     *
+     * @param state the new {@link State} instance to set as the singleton.
+     *              May be {@code null} to clear the instance entirely.
+     */
+    public synchronized static void overrideInstance(State state) {
+        instance = state;
+    }
+
     // END OF SINGLETON LOGIC
 
     private final List<IView> viewsToUpdate;

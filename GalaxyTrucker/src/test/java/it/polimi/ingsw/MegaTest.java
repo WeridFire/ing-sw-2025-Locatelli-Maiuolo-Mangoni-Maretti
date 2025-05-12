@@ -1,11 +1,18 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.cards.Deck;
+import it.polimi.ingsw.cards.DeckFactory;
+import it.polimi.ingsw.controller.states.State;
+import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.network.GameClientMock;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.network.exceptions.AlreadyRunningServerException;
+import it.polimi.ingsw.shipboard.SideType;
+import it.polimi.ingsw.shipboard.tiles.BatteryComponentTile;
+import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -192,35 +199,83 @@ public class MegaTest {
 
         // client 0 pings -> expect refresh only for client 0
         expectRefreshOnlyFor(0).simulateCommand("ping");
-
         // client 0 creates game -> expect refresh for all
         expectRefreshForAllAndGet(0).simulateCommand("create", COOL_NAMES[0]);
-
         syncClients();
 
         // validate game was created and stored
-        UUID gameUUID = clients[0].getMockThis().getLinkedState().getLastUpdate().getCurrentGame().getGameId();
+        UUID alphaGameUUID = clients[0].getMockThis().getLinkedState().getLastUpdate().getCurrentGame().getGameId();
         assertEquals(1, games.size());
         Game alphaGame = games.getFirst();
-        assertEquals(alphaGame.getId(), gameUUID);
+        assertEquals(alphaGame.getId(), alphaGameUUID);
 
         // validate client-game associations
         assertEquals(alphaGame, GamesHandler.getInstance().findGameByClientUUID(clients[0].getClientUUID()));
-        assertNull(GamesHandler.getInstance().findGameByClientUUID(clients[1].getClientUUID()));
+        for (int i = 1; i < N_CLIENTS; i++) {
+            assertNull(GamesHandler.getInstance().findGameByClientUUID(clients[i].getClientUUID()));
+        }
 
         // client 1 joins client 0's game
         // -> expect to enter in assemble phase for client 0 and 1 (those in the game)
         expectGamePhase(GamePhaseType.ASSEMBLE, 0, 1);
-        clients[1].simulateCommand("join", gameUUID.toString(), COOL_NAMES[1]);
+        clients[1].simulateCommand("join", alphaGameUUID.toString(), COOL_NAMES[1]);
         syncClients();
 
         // validate client 1 joined the correct game
+        assertEquals(alphaGame, GamesHandler.getInstance().findGameByClientUUID(clients[0].getClientUUID()));
         assertEquals(alphaGame, GamesHandler.getInstance().findGameByClientUUID(clients[1].getClientUUID()));
+        for (int i = 2; i < N_CLIENTS; i++) {
+            assertNull(GamesHandler.getInstance().findGameByClientUUID(clients[i].getClientUUID()));
+        }
 
         // client 2 independently creates another game -> all but those already in a game expect a refresh
         expectRefreshForAndGet(2, null, Set.of(0, 1))
                 .simulateCommand("create", COOL_NAMES[2]);
         // client 2 ping -> refresh only for it
         expectRefreshOnlyFor(2).simulateCommand("ping");
+        syncClients();
+
+        // validate game was created and stored correctly
+        UUID gammaGameUUID = clients[2].getMockThis().getLinkedState().getLastUpdate().getCurrentGame().getGameId();
+        assertEquals(2, games.size());
+        Game gammaGame = games.get(1);
+        assertEquals(gammaGame.getId(), gammaGameUUID);
+        assertNotEquals(alphaGame, gammaGame);
+        assertNotEquals(alphaGameUUID, gammaGameUUID);
+
+        // validate client 2 joined the correct game
+        assertEquals(alphaGame, GamesHandler.getInstance().findGameByClientUUID(clients[0].getClientUUID()));
+        assertEquals(alphaGame, GamesHandler.getInstance().findGameByClientUUID(clients[1].getClientUUID()));
+        assertEquals(gammaGame, GamesHandler.getInstance().findGameByClientUUID(clients[2].getClientUUID()));
+        for (int i = 3; i < N_CLIENTS; i++) {
+            assertNull(GamesHandler.getInstance().findGameByClientUUID(clients[i].getClientUUID()));
+        }
+
+        // =============== end of "networking" tests, now start tests in alpha game ============== //
+
+        // abort nondeterminism in starting data
+        List<TileSkeleton> tiles = TilesFactory.createPileTiles();
+        alphaGame.getGameData().setCoveredTiles(tiles);
+        alphaGame.getGameData().setDeck(Deck.deterministic(DeckFactory.createTutorialDeck(), null));
+        // note: shipboards are already deterministic
+
+        State.overrideInstance(clients[0].getMockThis().getLinkedState());
+        clients[0].awaitConditionOnUpdate(gc -> {
+                    BatteryComponentTile tile0;
+                    try {
+                        tile0 = (BatteryComponentTile) gc.getLinkedState().getLastUpdate()
+                                .getClientPlayer().getTileInHand();
+                    } catch (ClassCastException e) {
+                        return false;
+                    }
+                    return (tile0.getTileId() == 0)
+                            && (tile0.getSide(Direction.EAST) == SideType.SINGLE)
+                            && (tile0.getSide(Direction.NORTH) == SideType.UNIVERSAL)
+                            && (tile0.getSide(Direction.WEST) == SideType.SMOOTH)
+                            && (tile0.getSide(Direction.SOUTH) == SideType.DOUBLE)
+                            && (tile0.getCapacity() == 2);
+                }, "draw tile 0 [2B:1302]")
+                .simulateCommand("draw")
+                .joinAll();
     }
 }
