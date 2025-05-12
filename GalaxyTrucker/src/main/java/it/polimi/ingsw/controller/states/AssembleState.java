@@ -2,6 +2,7 @@ package it.polimi.ingsw.controller.states;
 
 import it.polimi.ingsw.cards.CardsGroup;
 import it.polimi.ingsw.cards.exceptions.CardsGroupException;
+import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.util.List;
@@ -19,6 +20,10 @@ public class AssembleState extends CommonState {
             // note: in here also if both are null, but in that case nothing happens -> no problem
             tileInHand = getPlayer().getTileInHand();
         }
+    }
+
+    public static ShipBoard getShipBoard() {
+        return getLastUpdate().getClientPlayer().getShipBoard();
     }
 
     public static TileSkeleton getTileInHand() {
