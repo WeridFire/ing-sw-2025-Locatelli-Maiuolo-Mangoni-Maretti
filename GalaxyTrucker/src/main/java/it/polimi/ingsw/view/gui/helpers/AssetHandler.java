@@ -2,7 +2,11 @@ package it.polimi.ingsw.view.gui.helpers;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,6 +52,46 @@ public class AssetHandler {
         ImageView imageView = new ImageView(image);
         imageView.setPreserveRatio(preserveRatio);
         return imageView;
+    }
+
+    public static Image loadRawImage(String textureName) {
+        String fullPath = Path.of(textureName);
+
+        // Attempt to retrieve from cache
+        Image image = imageCache.get(fullPath);
+
+        // Load and cache if not present
+        if (image == null) {
+            image = new Image(fullPath);
+            imageCache.put(fullPath, image);
+        }
+
+        return image;
+    }
+
+    public static void preLoadTextures(){
+        new Thread(() -> {
+            List<String> textures = new ArrayList<>();
+
+            File folder = new File("assets/tiles");
+            File[] files = folder.listFiles();
+
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile() && (file.getName().endsWith(".png") || file.getName().endsWith(".jpg") || file.getName().endsWith(".jpeg"))) {
+                        System.out.println("Loading " + file.getName());
+                        textures.add(Path.of(file.getName()));
+                    }
+                }
+            }
+
+            for (String textureName : textures) {
+                if (textureName.isEmpty()) break;
+                loadRawImage(textureName);
+            }
+
+            System.out.println("Loaded " + textures.size() + " tile textures.");
+        }).start();
     }
 
     /**

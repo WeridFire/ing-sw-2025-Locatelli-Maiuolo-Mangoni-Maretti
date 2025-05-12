@@ -65,9 +65,8 @@ public class Path {
             return BASE_PATH + TYPE.CARDBOARD.toString() + textureName;
         } else if (textureName.startsWith(MINIMUM_DIFFERENT_PREFIX_CARD)) {
             return BASE_PATH + TYPE.CARD.toString() + textureName;
-        } else if (textureName.startsWith(MINIMUM_DIFFERENT_PREFIX_TILE)) {
+        } else {
             return BASE_PATH + TYPE.TILE.toString() + textureName;
         }
-        return "";
     }
 }
