@@ -124,7 +124,7 @@ public class TilesFactory {
                         ("compactTilesSides must all have 4 and only 4 characters: invalid for " + currentTileSidesString);
             }
             TileSkeleton tile = tileConstructor.apply(currentTileSidesString);
-            tile.setTextureName("GT-new_tiles_16_for web" + referenceNumber + ".jpg");
+            tile.setTextureName("GT-new_tiles_16_for web" + ((referenceNumber > 1) ? referenceNumber : "") + ".jpg");
             result.add(tile);
         }
 
