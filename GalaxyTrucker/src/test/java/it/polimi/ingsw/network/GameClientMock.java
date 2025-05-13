@@ -2,7 +2,6 @@ package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.controller.states.State;
 import it.polimi.ingsw.network.messages.ClientUpdate;
-import it.polimi.ingsw.view.View;
 import it.polimi.ingsw.view.ViewMock;
 import org.junit.jupiter.api.function.Executable;
 
@@ -32,6 +31,7 @@ public class GameClientMock implements IClient {
     private final AtomicReference<Throwable> errorSetter;
 
     private final List<Consumer<ClientUpdate>> updateListeners = new ArrayList<>();
+    private final List<Runnable> refreshListeners = new ArrayList<>();
     private final Set<Thread> threads = new HashSet<>();
 
     /**
@@ -64,6 +64,7 @@ public class GameClientMock implements IClient {
         mockClient.init(mockThis);
         mockView.init(mockThis);
         mockView.registerOnUpdateListener(this::onUpdate);
+        mockView.registerPermanentOnRefreshListener(this::onRefresh);
 
         // now simulate the real start
         new Thread(() -> {
@@ -102,8 +103,8 @@ public class GameClientMock implements IClient {
     /**
      * @return the mock view associated with this client.
      */
-    public View getView() {
-        return getMockThis().getView();
+    public ViewMock getMockView() {
+        return mockView;
     }
 
     /**
@@ -121,6 +122,15 @@ public class GameClientMock implements IClient {
     private void onUpdate(ClientUpdate clientUpdate) {
         for (Consumer<ClientUpdate> consumer : updateListeners) {
             consumer.accept(clientUpdate);
+        }
+    }
+
+    /**
+     * Internal listener that dispatches refreshes to registered consumers.
+     */
+    private void onRefresh() {
+        for (Runnable runnable : refreshListeners) {
+            runnable.run();
         }
     }
 
@@ -176,7 +186,7 @@ public class GameClientMock implements IClient {
      * @return this instance for chaining
      */
     public GameClientMock simulateCommand(String command, String... args) {
-        getView().getCommandsProcessor().processCommand(command, args);
+        getMockView().getCommandsProcessor().processCommand(command, args);
         return this;
     }
 
@@ -187,12 +197,12 @@ public class GameClientMock implements IClient {
      * @param orElse error to be raised if refresh doesn't happen
      * @return this instance for chaining
      */
-    public GameClientMock expectRefresh(long timeoutMillis, Throwable orElse) {
+    public GameClientMock assertRefresh(long timeoutMillis, AssertionError orElse) {
         assert timeoutMillis > 0;
         assert orElse != null;
 
         final CountDownLatch latch = new CountDownLatch(1);
-        getView().doOnceOnRefresh(latch::countDown);
+        getMockView().doOnceOnRefresh(latch::countDown);
 
         threadAddAndRunAssertDoesNotThrow(() -> {
             boolean refreshed = latch.await(timeoutMillis, TimeUnit.MILLISECONDS);
@@ -203,12 +213,12 @@ public class GameClientMock implements IClient {
         return this;
     }
     /**
-     * Shorthand version of {@link #expectRefresh(long, Throwable)} with default timeout and error.
+     * Shorthand version of {@link #assertRefresh(long, AssertionError)} with default timeout and error.
      *
      * @return this instance for chaining
      */
-    public GameClientMock expectRefresh() {
-        return expectRefresh(100, new Exception("Expected refresh for " + mockName + ". Did not refresh."));
+    public GameClientMock assertRefresh() {
+        return assertRefresh(100, new AssertionError("Expected refresh for " + mockName + ". Did not refresh."));
     }
 
     /**
@@ -218,12 +228,12 @@ public class GameClientMock implements IClient {
      * @param orElse error to be raised if a refresh does happen
      * @return this instance for chaining
      */
-    public GameClientMock expectNoRefresh(long timeoutMillis, Throwable orElse) {
+    public GameClientMock assertNoRefresh(long timeoutMillis, AssertionError orElse) {
         assert timeoutMillis > 0;
         assert orElse != null;
 
         final CountDownLatch latch = new CountDownLatch(1);
-        getView().doOnceOnRefresh(latch::countDown);
+        getMockView().doOnceOnRefresh(latch::countDown);
 
         threadAddAndRunAssertDoesNotThrow(() -> {
             boolean refreshed = latch.await(timeoutMillis, TimeUnit.MILLISECONDS);
@@ -234,12 +244,64 @@ public class GameClientMock implements IClient {
         return this;
     }
     /**
-     * Shorthand version of {@link #expectNoRefresh(long, Throwable)} with default timeout and error.
+     * Shorthand version of {@link #assertNoRefresh(long, AssertionError)} with default timeout and error.
      *
      * @return this instance for chaining
      */
-    public GameClientMock expectNoRefresh() {
-        return expectNoRefresh(100, new Exception("Expected no refresh for " + mockName + ". Did refresh."));
+    public GameClientMock assertNoRefresh() {
+        return assertNoRefresh(100, new AssertionError("Expected no refresh for " + mockName + ". Did refresh."));
+    }
+
+    /**
+     * Waits until the specified condition is satisfied after a refresh.
+     * Fails with the given error if the timeout expires before the condition becomes true.
+     *
+     * @param condition predicate tested on the mock client
+     * @param conditionFriendlyName description for logging or error reporting
+     * @param timeoutMillis timeout in milliseconds
+     * @param orElse error to raise on timeout
+     * @return this instance for chaining
+     */
+    public GameClientMock awaitConditionOnRefresh(Predicate<GameClientMock> condition, String conditionFriendlyName,
+                                                 long timeoutMillis, Throwable orElse) {
+        assert condition != null;
+        assert timeoutMillis > 0;
+        assert orElse != null;
+
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        Runnable checkCondition = () -> {
+            if (condition.test(this)) {
+                latch.countDown();
+            }
+        };
+        refreshListeners.add(checkCondition);
+
+        threadAddAndRunAssertDoesNotThrow(() -> {
+            boolean success = latch.await(timeoutMillis, TimeUnit.MILLISECONDS);
+            if (!success) {
+                errorSetter.set(orElse);
+            } else {
+                System.out.println("Thread awaitConditionOnRefresh \"" + conditionFriendlyName
+                        + "\" ended from " + mockName);
+            }
+            refreshListeners.remove(checkCondition);
+        });
+
+        return this;
+    }
+    /**
+     * Shorthand version of {@link #awaitConditionOnRefresh(Predicate, String, long, Throwable)}
+     * with default timeout and error.
+     *
+     * @param condition predicate tested on the mock client
+     * @param conditionFriendlyName human-readable name for the condition
+     * @return this instance for chaining
+     */
+    public GameClientMock awaitConditionOnRefresh(Predicate<GameClientMock> condition, String conditionFriendlyName) {
+        return awaitConditionOnRefresh(condition, conditionFriendlyName, 500,
+                new AssertionError("Expected condition \"" + conditionFriendlyName
+                        + "\" for " + mockName + ". Not satisfied in the recent updates."));
     }
 
     /**
@@ -252,7 +314,7 @@ public class GameClientMock implements IClient {
      * @param orElse error to raise on timeout
      * @return this instance for chaining
      */
-    public GameClientMock awaitConditionOnUpdate(Predicate<GameClient> condition, String conditionFriendlyName,
+    public GameClientMock awaitConditionOnUpdate(Predicate<GameClientMock> condition, String conditionFriendlyName,
                                                  long timeoutMillis, Throwable orElse) {
         assert condition != null;
         assert timeoutMillis > 0;
@@ -261,7 +323,7 @@ public class GameClientMock implements IClient {
         final CountDownLatch latch = new CountDownLatch(1);
 
         Consumer<ClientUpdate> checkCondition = _ -> {
-            if (condition.test(getMockThis())) {
+            if (condition.test(this)) {
                 latch.countDown();
             }
         };
@@ -275,6 +337,7 @@ public class GameClientMock implements IClient {
                 System.out.println("Thread awaitConditionOnUpdate \"" + conditionFriendlyName
                         + "\" ended from " + mockName);
             }
+            updateListeners.remove(checkCondition);
         });
 
         return this;
@@ -287,9 +350,9 @@ public class GameClientMock implements IClient {
      * @param conditionFriendlyName human-readable name for the condition
      * @return this instance for chaining
      */
-    public GameClientMock awaitConditionOnUpdate(Predicate<GameClient> condition, String conditionFriendlyName) {
+    public GameClientMock awaitConditionOnUpdate(Predicate<GameClientMock> condition, String conditionFriendlyName) {
         return awaitConditionOnUpdate(condition, conditionFriendlyName, 500,
-                new Exception("Expected condition \"" + conditionFriendlyName
+                new AssertionError("Expected condition \"" + conditionFriendlyName
                         + "\" for " + mockName + ". Not satisfied in the recent updates."));
     }
 }

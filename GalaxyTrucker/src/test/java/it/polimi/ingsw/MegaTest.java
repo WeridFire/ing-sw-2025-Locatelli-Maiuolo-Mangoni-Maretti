@@ -81,7 +81,7 @@ public class MegaTest {
         // initialize clients and expect their initial refresh
         clients = new GameClientMock[N_CLIENTS];
         for (int i = 0; i < N_CLIENTS; i++) {
-            clients[i] = new GameClientMock(getCoolName(i), error).expectRefresh();
+            clients[i] = new GameClientMock(getCoolName(i), error).assertRefresh();
         }
     }
 
@@ -103,9 +103,9 @@ public class MegaTest {
         syncClients();
         for (int i = 0; i < N_CLIENTS; i++) {
             if (i == index) {
-                clients[i].expectRefresh();
+                clients[i].assertRefresh();
             } else {
-                clients[i].expectNoRefresh();
+                clients[i].assertNoRefresh();
             }
         }
         return clients[index];
@@ -150,9 +150,9 @@ public class MegaTest {
 
         for (int i = 0; i < N_CLIENTS; i++) {
             if (toRefresh.contains(i)) {
-                clients[i].expectRefresh();
+                clients[i].assertRefresh();
             } else {
-                clients[i].expectNoRefresh();
+                clients[i].assertNoRefresh();
             }
         }
         return clients[refreshAndGet];
@@ -167,7 +167,7 @@ public class MegaTest {
     private GameClientMock expectRefreshForAllAndGet(int index) {
         syncClients();
         for (GameClientMock client : clients) {
-            client.expectRefresh();
+            client.assertRefresh();
         }
         return clients[index];
     }
@@ -180,8 +180,8 @@ public class MegaTest {
      */
     private void expectGamePhase(GamePhaseType phase, int... indexes) {
         for (int i : indexes) {
-            clients[i].awaitConditionOnUpdate(gc -> {
-                GameData gd = gc.getLinkedState().getLastUpdate().getCurrentGame();
+            clients[i].awaitConditionOnUpdate(gcm -> {
+                GameData gd = gcm.getMockThis().getLinkedState().getLastUpdate().getCurrentGame();
                 return gd != null && gd.getCurrentGamePhaseType() == phase;
             }, "game phase == " + phase);
         }
@@ -231,6 +231,16 @@ public class MegaTest {
         // client 2 independently creates another game -> all but those already in a game expect a refresh
         expectRefreshForAndGet(2, null, Set.of(0, 1))
                 .simulateCommand("create", COOL_NAMES[2]);
+        // client 2 wrong command ping as "pig" -> refresh only for it and ensure it's a wrong command
+        syncClients();
+        clients[2].awaitConditionOnRefresh(gcm -> {
+            try {
+                return gcm.getMockView().getErrors().getFirst().startsWith("Error_Rejected command: pig");
+            } catch (NoSuchElementException e) {
+                return false;
+            }
+            }, "expected error on wrong command 'pig'"
+        ).simulateCommand("pig");
         // client 2 ping -> refresh only for it
         expectRefreshOnlyFor(2).simulateCommand("ping");
         syncClients();
@@ -260,10 +270,10 @@ public class MegaTest {
         // note: shipboards are already deterministic
 
         State.overrideInstance(clients[0].getMockThis().getLinkedState());
-        clients[0].awaitConditionOnUpdate(gc -> {
+        clients[0].awaitConditionOnUpdate(gcm -> {
                     BatteryComponentTile tile0;
                     try {
-                        tile0 = (BatteryComponentTile) gc.getLinkedState().getLastUpdate()
+                        tile0 = (BatteryComponentTile) gcm.getMockThis().getLinkedState().getLastUpdate()
                                 .getClientPlayer().getTileInHand();
                     } catch (ClassCastException e) {
                         return false;
