@@ -31,6 +31,12 @@ public class MenuCommandsProcessor extends PhaseCommandsProcessor {
                     view.showWarning("Usage: join <uuid> <username>");
                     return false;
                 }
+                try {
+                    UUID uuid = UUID.fromString(args[0]);
+                } catch (IllegalArgumentException e) {
+                    view.showError("Invalid UUID: [" + args[0] + "]. Please enter a valid game UUID.");
+                    return false;
+                }
                 return true;
 
             case "create" :

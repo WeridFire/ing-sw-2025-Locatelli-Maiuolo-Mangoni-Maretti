@@ -215,6 +215,29 @@ public class MegaTest {
             assertNull(GamesHandler.getInstance().findGameByClientUUID(clients[i].getClientUUID()));
         }
 
+        // client 1 wrong attempt in joining client 0's game with invalid UUID
+        // -> expect to catch and block command client-side
+        clients[1].awaitConditionOnRefresh(gcm -> {
+                    try {
+                        return gcm.getMockView().getErrors().getLast().startsWith("Error_Invalid UUID: [false-UUID]");
+                    } catch (NoSuchElementException e) {
+                        return false;
+                    }
+                }, "expected error on join with invalid UUID: [false-UUID]"
+        ).simulateCommand("join", "false-UUID", COOL_NAMES[1]);
+        syncClients();
+
+        // client 1 wrong attempt in joining client 0's game with valid UUID but not of a game
+        // -> expect to catch and block command client-side
+        UUID wrongUUID = UUID.randomUUID();
+        clients[1].awaitConditionOnUpdate(gcm -> {
+            String error = gcm.getMockThis().getLinkedState().getLastUpdate().getError();
+            if (error == null) return false;
+            return error.startsWith("Could not find a game with UUID " + wrongUUID);
+            }, "expected error on join with wrong UUID"
+        ).simulateCommand("join", wrongUUID.toString(), COOL_NAMES[1]);
+        syncClients();
+
         // client 1 joins client 0's game
         // -> expect to enter in assemble phase for client 0 and 1 (those in the game)
         expectGamePhase(GamePhaseType.ASSEMBLE, 0, 1);
@@ -235,11 +258,11 @@ public class MegaTest {
         syncClients();
         clients[2].awaitConditionOnRefresh(gcm -> {
             try {
-                return gcm.getMockView().getErrors().getFirst().startsWith("Error_Rejected command: pig");
+                return gcm.getMockView().getErrors().getLast().startsWith("Error_Rejected command: pig");
             } catch (NoSuchElementException e) {
                 return false;
             }
-            }, "expected error on wrong command 'pig'"
+            }, "expected error on wrong command: [pig]"
         ).simulateCommand("pig");
         // client 2 ping -> refresh only for it
         expectRefreshOnlyFor(2).simulateCommand("ping");
