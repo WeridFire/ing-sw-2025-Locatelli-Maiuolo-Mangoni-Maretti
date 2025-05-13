@@ -2,6 +2,7 @@ package it.polimi.ingsw.shipboard;
 
 import it.polimi.ingsw.game.Cheats;
 import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
@@ -23,7 +24,7 @@ class ShipBoardTest {
     private ShipBoard shipBoard1;
 
     @BeforeEach
-    void setup() throws PlayerAlreadyInGameException, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException {
+    void setup() throws PlayerAlreadyInGameException, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException, GameAlreadyRunningException {
         game1 = new Game();
         UUID uuid1 = UUID.randomUUID();
         player1 = new Player("player1", uuid1);

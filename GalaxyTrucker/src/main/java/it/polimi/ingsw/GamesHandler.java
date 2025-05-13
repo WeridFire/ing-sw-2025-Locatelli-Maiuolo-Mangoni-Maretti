@@ -113,7 +113,11 @@ public class GamesHandler {
         Game createdGame = startGame();
         games.add(createdGame);
 
-        createdGame.addPlayer(username, connectionUUID);
+        try {
+            createdGame.addPlayer(username, connectionUUID);
+        } catch (GameAlreadyRunningException e) {
+            throw new RuntimeException(e);  // should never happen -> runtime exception
+        }
         return createdGame;
 	}
 
@@ -125,7 +129,8 @@ public class GamesHandler {
      * @param connectionUUID The connection fo the player that sent the command.
      * @return The newly game object.
      */
-    public Game resumeGame(GameData savedGameState, UUID connectionUUID) throws PlayerAlreadyInGameException, GameAlreadyRunningException {
+    public Game resumeGame(GameData savedGameState, UUID connectionUUID) throws PlayerAlreadyInGameException,
+            GameAlreadyRunningException {
         Game createdGame = new Game(savedGameState);
         if(games.stream().anyMatch((g) -> g.getId().equals(savedGameState.getGameId()))){
             throw new GameAlreadyRunningException(createdGame.getId());

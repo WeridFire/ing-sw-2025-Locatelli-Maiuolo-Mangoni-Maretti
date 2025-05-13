@@ -5,6 +5,7 @@ import it.polimi.ingsw.TilesFactory;
 import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.AdventureGamePhase;
 import it.polimi.ingsw.gamePhases.AssembleGamePhase;
@@ -246,23 +247,31 @@ public class Game {
         return true;
     }
 
-
-    private Player createAndAddPlayer(String username, UUID connectionUUID) throws PlayerAlreadyInGameException {
-        Player newPlayer = new Player(username, connectionUUID);
-        gameData.addPlayer(newPlayer);
-        return newPlayer;
-    }
-
-    public Player addPlayer(String username, UUID connectionUUID) throws PlayerAlreadyInGameException {
+    /**
+     * Create a Player with the specified username, assign it the specified client connection UUID and return it.
+     * If this game has already started check that the username matches among those of previously connected players,
+     * and if so also whether that player actually disconnected.
+     *
+     * @param username the new player's unique (for this game) name
+     * @param connectionUUID the connection UUID of the client associated to the new player
+     * @return the created player
+     * @throws PlayerAlreadyInGameException if the player is already in this game
+     * @throws GameAlreadyRunningException if this instance of game is not in main menu nor lobby and the username is
+     * NOT of a disconnected player.
+     */
+    public Player addPlayer(String username, UUID connectionUUID) throws PlayerAlreadyInGameException,
+            GameAlreadyRunningException {
         GamePhaseType currentGamePhaseType = getGameData().getCurrentGamePhaseType();
         if (currentGamePhaseType == GamePhaseType.NONE || currentGamePhaseType == GamePhaseType.LOBBY) {
-            return createAndAddPlayer(username, connectionUUID);
+            Player newPlayer = new Player(username, connectionUUID);
+            gameData.addPlayer(newPlayer);
+            return newPlayer;
         }
 
         Player existingDisconnectedPlayer = gameData.getPlayer(p ->
                 p.getUsername().equals(username) && !p.isConnected());
         if (existingDisconnectedPlayer == null) {
-            return createAndAddPlayer(username, connectionUUID);
+            throw new GameAlreadyRunningException("Attempted to join a game that has already started!");
         } else {
             existingDisconnectedPlayer.setConnectionUUID(connectionUUID);
             return existingDisconnectedPlayer;

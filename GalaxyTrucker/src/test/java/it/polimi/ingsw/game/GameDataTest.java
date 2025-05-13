@@ -128,7 +128,7 @@ class GameDataTest {
      * @param step
      * @return
      */
-    UUID runAndSaveGameUntilStep(int step) throws AlreadyPickedPosition, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException, TooManyItemsInHandException, NoShipboardException, InterruptedException, PlayerAlreadyInGameException, IllegalStartingPositionIndexException {
+    UUID runAndSaveGameUntilStep(int step) throws AlreadyPickedPosition, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException, TooManyItemsInHandException, NoShipboardException, InterruptedException, PlayerAlreadyInGameException, IllegalStartingPositionIndexException, GameAlreadyRunningException {
         Game g = GamesHandler.getInstance().createGame("Pippo", UUID.randomUUID());
         UUID gameId = g.getId();
         GameData gameData = g.getGameData();

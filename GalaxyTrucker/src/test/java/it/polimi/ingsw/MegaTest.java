@@ -193,12 +193,18 @@ public class MegaTest {
      */
     @Test
     public void test() {
+
+        // =============== network tests (connections, state of all...) ============== //
+
         // ensure no game at the beginning
         ArrayList<Game> games = GamesHandler.getInstance().getGames();
         assertEquals(0, games.size());
 
         // client 0 pings -> expect refresh only for client 0
         expectRefreshOnlyFor(0).simulateCommand("ping");
+
+        // --------- alpha game ---------- //
+
         // client 0 creates game -> expect refresh for all
         expectRefreshForAllAndGet(0).simulateCommand("create", COOL_NAMES[0]);
         syncClients();
@@ -251,9 +257,12 @@ public class MegaTest {
             assertNull(GamesHandler.getInstance().findGameByClientUUID(clients[i].getClientUUID()));
         }
 
+        // --------- gamma game ---------- //
+
         // client 2 independently creates another game -> all but those already in a game expect a refresh
         expectRefreshForAndGet(2, null, Set.of(0, 1))
                 .simulateCommand("create", COOL_NAMES[2]);
+
         // client 2 wrong command ping as "pig" -> refresh only for it and ensure it's a wrong command
         syncClients();
         clients[2].awaitConditionOnRefresh(gcm -> {
@@ -264,6 +273,7 @@ public class MegaTest {
             }
             }, "expected error on wrong command: [pig]"
         ).simulateCommand("pig");
+
         // client 2 ping -> refresh only for it
         expectRefreshOnlyFor(2).simulateCommand("ping");
         syncClients();
@@ -284,10 +294,26 @@ public class MegaTest {
             assertNull(GamesHandler.getInstance().findGameByClientUUID(clients[i].getClientUUID()));
         }
 
+        // ------ ensure no other client can join alpha game (it is already started) ------ //
+
+        syncClients();
+        clients[3].awaitConditionOnUpdate(gcm -> {
+                String error = gcm.getMockThis().getLinkedState().getLastUpdate().getError();
+                if (error == null) return false;
+                return error.startsWith("Attempted to join a game that has already started!");
+            }, "expected not join in alpha game"
+        ).simulateCommand("join", alphaGameUUID.toString(), COOL_NAMES[3]);
+
         // =============== end of "networking" tests, now start tests in alpha game ============== //
+
+        // ------ assemble ------ //
 
         // abort nondeterminism in starting data
         List<TileSkeleton> tiles = TilesFactory.createPileTiles();
+        int i = 0;
+        for (TileSkeleton tile : tiles) {
+            tile.setTileId(i);
+        }
         alphaGame.getGameData().setCoveredTiles(tiles);
         alphaGame.getGameData().setDeck(Deck.deterministic(DeckFactory.createTutorialDeck(), null));
         // note: shipboards are already deterministic
@@ -306,9 +332,13 @@ public class MegaTest {
                             && (tile0.getSide(Direction.NORTH) == SideType.UNIVERSAL)
                             && (tile0.getSide(Direction.WEST) == SideType.SMOOTH)
                             && (tile0.getSide(Direction.SOUTH) == SideType.DOUBLE)
-                            && (tile0.getCapacity() == 2);
-                }, "draw tile 0 [2B:1302]")
+                            && (tile0.getCapacity() == 2)
+                            && (tile0.getTextureName().equals("GT-new_tiles_16_for web.jpg"));
+                }, "draw tile 0 [B2:1302]")
                 .simulateCommand("draw")
                 .joinAll();
+        State.overrideInstance(null);
+
+
     }
 }

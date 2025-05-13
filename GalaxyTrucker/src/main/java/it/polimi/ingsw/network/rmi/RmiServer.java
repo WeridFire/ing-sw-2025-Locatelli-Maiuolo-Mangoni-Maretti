@@ -129,10 +129,10 @@ public class RmiServer implements IServer {
 			game.addPlayer(username, connectionUUID);
             //notify everyone that a new player has joined -> refreshes their view
             GameServer.getInstance().broadcastUpdate(game);
-        } catch (PlayerAlreadyInGameException | GameNotFoundException e) {
+        } catch (PlayerAlreadyInGameException | GameNotFoundException | GameAlreadyRunningException e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
-	}
+    }
 
 	@Override
 	public void quitGame(IClient client) throws RemoteException {

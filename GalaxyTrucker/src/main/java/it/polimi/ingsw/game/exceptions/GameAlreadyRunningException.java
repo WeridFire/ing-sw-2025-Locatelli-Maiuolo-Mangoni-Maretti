@@ -4,7 +4,12 @@ import java.util.UUID;
 
 public class GameAlreadyRunningException extends Exception{
 
+	public GameAlreadyRunningException(String message) {
+		super(message);
+	}
+
 	public GameAlreadyRunningException(UUID gameId) {
-		super("The GamesHandler detected a game with the same UUID already running. Cannot resume the game.");
+		this("The GamesHandler detected a game with the same UUID [" + gameId
+				+ "] already running. Cannot resume the game.");
 	}
 }
