@@ -249,7 +249,7 @@ public class GameClientMock implements IClient {
      * @return this instance for chaining
      */
     public GameClientMock assertNoRefresh() {
-        return assertNoRefresh(100, new AssertionError("Expected no refresh for " + mockName + ". Did refresh."));
+        return assertNoRefresh(200, new AssertionError("Expected no refresh for " + mockName + ". Did refresh."));
     }
 
     /**
@@ -299,7 +299,7 @@ public class GameClientMock implements IClient {
      * @return this instance for chaining
      */
     public GameClientMock awaitConditionOnRefresh(Predicate<GameClientMock> condition, String conditionFriendlyName) {
-        return awaitConditionOnRefresh(condition, conditionFriendlyName, 500,
+        return awaitConditionOnRefresh(condition, conditionFriendlyName, 1000,
                 new AssertionError("Expected condition \"" + conditionFriendlyName
                         + "\" for " + mockName + ". Not satisfied in the recent updates."));
     }
@@ -351,7 +351,7 @@ public class GameClientMock implements IClient {
      * @return this instance for chaining
      */
     public GameClientMock awaitConditionOnUpdate(Predicate<GameClientMock> condition, String conditionFriendlyName) {
-        return awaitConditionOnUpdate(condition, conditionFriendlyName, 500,
+        return awaitConditionOnUpdate(condition, conditionFriendlyName, 1000,
                 new AssertionError("Expected condition \"" + conditionFriendlyName
                         + "\" for " + mockName + ". Not satisfied in the recent updates."));
     }

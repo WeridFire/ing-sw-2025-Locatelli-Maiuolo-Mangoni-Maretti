@@ -313,6 +313,7 @@ public class MegaTest {
         int i = 0;
         for (TileSkeleton tile : tiles) {
             tile.setTileId(i);
+            i++;
         }
         alphaGame.getGameData().setCoveredTiles(tiles);
         alphaGame.getGameData().setDeck(Deck.deterministic(DeckFactory.createTutorialDeck(), null));
@@ -337,7 +338,66 @@ public class MegaTest {
                 }, "draw tile 0 [B2:1302]")
                 .simulateCommand("draw")
                 .joinAll();
+        syncClients();
+        State.overrideInstance(clients[1].getMockThis().getLinkedState());
+        clients[1].awaitConditionOnUpdate(gcm -> {
+                    BatteryComponentTile tile0;
+                    try {
+                        tile0 = (BatteryComponentTile) gcm.getMockThis().getLinkedState().getLastUpdate()
+                                .getClientPlayer().getTileInHand();
+                    } catch (ClassCastException e) {
+                        return false;
+                    }
+                    return (tile0.getTileId() == 1)
+                            && (tile0.getSide(Direction.EAST) == SideType.DOUBLE)
+                            && (tile0.getSide(Direction.NORTH) == SideType.UNIVERSAL)
+                            && (tile0.getSide(Direction.WEST) == SideType.SMOOTH)
+                            && (tile0.getSide(Direction.SOUTH) == SideType.SMOOTH)
+                            && (tile0.getCapacity() == 2)
+                            && !(tile0.getTextureName().equals("GT-new_tiles_16_for web.jpg"));
+                }, "draw tile 1 [B2:2300]")
+                .simulateCommand("draw")
+                .joinAll();
+
+        State.overrideInstance(clients[0].getMockThis().getLinkedState());
+        for (TileSkeleton tile : tiles) {
+            clients[0].simulateCommand("draw");
+            clients[0].simulateCommand("discard");
+        }
         State.overrideInstance(null);
+
+        syncClients();
+        State.overrideInstance(clients[1].getMockThis().getLinkedState());
+        clients[1].awaitConditionOnUpdate(gcm -> {
+                    String error = gcm.getMockThis().getLinkedState().getLastUpdate().getError();
+                    if (error == null) return false;
+                    return error.startsWith("There are no covered tiles available.");
+                }, "expected error on no more tiles available to draw"
+        ).simulateCommand("draw");
+
+        //non va?
+        clients[1].simulateCommand("discard");
+        clients[1].awaitConditionOnUpdate(gcm -> {
+                    BatteryComponentTile tile0;
+                    try {
+                        tile0 = (BatteryComponentTile) gcm.getMockThis().getLinkedState().getLastUpdate()
+                                .getClientPlayer().getTileInHand();
+                    } catch (ClassCastException e) {
+                        return false;
+                    }
+                    return (tile0.getTileId() == 0)
+                            && (tile0.getSide(Direction.EAST) == SideType.DOUBLE)
+                            && (tile0.getSide(Direction.NORTH) == SideType.UNIVERSAL)
+                            && (tile0.getSide(Direction.WEST) == SideType.SMOOTH)
+                            && (tile0.getSide(Direction.SOUTH) == SideType.SMOOTH)
+                            && (tile0.getCapacity() == 2)
+                            && !(tile0.getTextureName().equals("GT-new_tiles_16_for web.jpg"));
+                }, "pick tile 0 [B2:2300]")
+                .simulateCommand("pick", "0")
+                .joinAll();
+
+
+
 
 
     }
