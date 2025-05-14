@@ -18,4 +18,7 @@ public class Default {
     //GUI
     public static final String BACK_TILE_PATH = "GT-new_tiles_16_for web157.jpg";
 
+    //GENRAL
+    public static final int TOTAL_TILES_NUMBER = 157;
+
 }
