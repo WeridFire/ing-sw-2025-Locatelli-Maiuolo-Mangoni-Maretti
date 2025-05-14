@@ -1,0 +1,156 @@
+package it.polimi.ingsw.util;
+
+import java.util.*;
+
+/**
+ * Utility class for parsing cmd-style command strings with custom options.
+ * It extracts declared options and stores them in a helpful map.
+ * Remaining parts of the command (the actual command name and positional arguments) are stored under a special key.
+ */
+public class CommandOptionsParser {
+
+    public static class IllegalFormatException extends Exception {
+        protected IllegalFormatException(String message) {
+            super(message);
+        }
+    }
+
+    /**
+     * Reserved key used in the resulting map to store the remaining non-option part of the command.
+     * For example, if the input is "command argument --opt_name1 opt_value1 --opt_name2 opt_value2",
+     * the reminder would be "command argument".
+     */
+    public static final String COMMAND_REMINDER = "__cmdrem__";
+
+    /**
+     * Describes how to find a single option in a command string.
+     */
+    public static class OptionFinder {
+        private final Set<String> optionAlias;
+        private final String optionID;
+        private final String defaultValue;
+
+        /**
+         * Constructs an OptionFinder with multiple aliases.
+         *
+         * @param optionAlias all valid forms of the option (e.g., {"-f", "--force"})
+         * @param optionID a unique identifier to be used as a key in the result map
+         * @param defaultValue a value to use when the specified option is not found
+         * @throws IllegalArgumentException if {@code optionID} is equal to {@link #COMMAND_REMINDER}
+         */
+        public OptionFinder(final Collection<String> optionAlias, final String optionID, final String defaultValue) {
+            if (COMMAND_REMINDER.equals(optionID)) {
+                throw new IllegalArgumentException("optionID can not be " + COMMAND_REMINDER);
+            }
+            this.optionAlias = new HashSet<>(optionAlias);
+            this.optionID = optionID;
+            this.defaultValue = defaultValue;
+        }
+
+        /**
+         * Constructs an OptionFinder with a single alias.
+         *
+         * @param optionDeclaration the option name (e.g., "--force")
+         * @param optionID a unique identifier to be used as a key in the result map
+         */
+        public OptionFinder(final String optionDeclaration, final String optionID, final String defaultValue) {
+            this(Set.of(optionDeclaration), optionID, defaultValue);
+        }
+
+        /**
+         * @return all valid forms of this option
+         */
+        protected Set<String> getOptionAlias() {
+            return optionAlias;
+        }
+
+        /**
+         * @return the key under which the parsed value will be stored
+         */
+        protected String getOptionID() {
+            return optionID;
+        }
+
+        /**
+         * @return the value used when this option is not found in the command
+         */
+        protected String getDefaultValue() {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Parses a command string using the provided list of {@link OptionFinder} rules.
+     * Recognized options are extracted and stored one by one,
+     * and the rest of the command is stored under {@link #COMMAND_REMINDER}.
+     *
+     * @param command the full command string to parse (e.g. "command argument --opt_name1 opt_value1
+     *                --opt_name2 opt_value2")
+     * @param optionsFinder a list of rules to recognize all the possible options, with default values
+     * @return a map of parsed values: option IDs as keys and parsed values as values,
+     *         plus a {@link #COMMAND_REMINDER} entry for the rest of the command
+     * @throws IllegalArgumentException if in the {@code optionsFinder} provided two (or more) different options
+     * share a common alias
+     * @throws IllegalFormatException <ul>
+     *     <li>if an option is found in the command but its value is missing</li>
+     *     <li>if an option is listed twice in the command</li>
+     * </ul>
+     */
+    public static HashMap<String, String> parse(String command, List<OptionFinder> optionsFinder) throws IllegalFormatException {
+        StringBuilder reminder = new StringBuilder();
+        String[] words = command.trim().split("\\s+");
+        HashMap<String, String> options = new HashMap<>();
+
+        // build a map from option alias to its OptionFinder
+        HashMap<String, OptionFinder> aliasMap = new HashMap<>();
+        for (OptionFinder opt : optionsFinder) {
+            for (String alias : opt.getOptionAlias()) {
+                if (aliasMap.containsKey(alias)) {
+                    throw new IllegalArgumentException("Option alias '" + alias + "' already exists for the option '"
+                            + aliasMap.get(alias).getOptionID() + "'. Attempted to use it again for the option '"
+                            + opt.getOptionID() + "'.");
+                }
+                aliasMap.put(alias, opt);
+            }
+        }
+
+        // iterate through the command words
+        for (int i = 0; i < words.length; ) {
+            String word = words[i];
+            if (aliasMap.containsKey(word)) {
+                if (options.containsKey(word)) {
+                    throw new CommandOptionsParser.IllegalFormatException(
+                            "Option '" + word + "' found twice in the command.");
+                }
+
+                OptionFinder opt = aliasMap.get(word);
+
+                // check that a value follows
+                if (i + 1 >= words.length) {
+                    throw new CommandOptionsParser.IllegalFormatException(
+                            "Expected value after option '" + word + "'.");
+                }
+
+                String value = words[i + 1];
+                options.put(opt.getOptionID(), value);
+                i += 2;
+            } else {
+                // not a known option, append to the command reminder
+                if (!reminder.isEmpty()) reminder.append(" ");
+                reminder.append(word);
+                i++;
+            }
+        }
+
+        // add default values if needed
+        for (OptionFinder opt : optionsFinder) {
+            if (!options.containsKey(opt.getOptionID())) {
+                options.put(opt.getOptionID(), opt.getDefaultValue());
+            }
+        }
+
+        // add command reminder and return
+        options.put(COMMAND_REMINDER, reminder.toString());
+        return options;
+    }
+}
