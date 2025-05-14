@@ -67,6 +67,32 @@ public class MegaTest {
     }
 
     /**
+     * Ensures all the specified client threads complete execution and fails if any error was raised during
+     * their execution.
+     */
+    private void syncClients(int... indexes) {
+        for (int i : indexes) {
+            clients[i].joinAll();
+        }
+        if (error.get() != null) {
+            fail(error.get().getMessage());
+        }
+    }
+
+    /**
+     * Ensures the client threads for the client at the specified index complete execution
+     * and fails if any error was raised during their execution.
+     * This method should be called after a test step applied to a single client to synchronize
+     * and validate all side effects.
+     */
+    private void syncClient(int index) {
+        clients[index].joinAll();
+        if (error.get() != null) {
+            fail(error.get().getMessage());
+        }
+    }
+
+    /**
      * Initializes the game server and mock clients before each test execution.
      *
      * @throws NotBoundException if server binding fails
@@ -305,6 +331,7 @@ public class MegaTest {
         ).simulateCommand("join", alphaGameUUID.toString(), COOL_NAMES[3]);
 
         // =============== end of "networking" tests, now start tests in alpha game ============== //
+        syncClients();
 
         // ------ assemble ------ //
 
@@ -319,6 +346,7 @@ public class MegaTest {
         alphaGame.getGameData().setDeck(Deck.deterministic(DeckFactory.createTutorialDeck(), null));
         // note: shipboards are already deterministic
 
+        // alpha draws the first tile
         State.overrideInstance(clients[0].getMockThis().getLinkedState());
         clients[0].awaitConditionOnUpdate(gcm -> {
                     BatteryComponentTile tile0;
@@ -336,9 +364,10 @@ public class MegaTest {
                             && (tile0.getCapacity() == 2)
                             && (tile0.getTextureName().equals("GT-new_tiles_16_for web.jpg"));
                 }, "draw tile 0 [B2:1302]")
-                .simulateCommand("draw")
-                .joinAll();
-        syncClients();
+                .simulateCommand("draw");
+        syncClient(0);
+
+        // beta draws the second tile
         State.overrideInstance(clients[1].getMockThis().getLinkedState());
         clients[1].awaitConditionOnUpdate(gcm -> {
                     BatteryComponentTile tile0;
@@ -354,19 +383,28 @@ public class MegaTest {
                             && (tile0.getSide(Direction.WEST) == SideType.SMOOTH)
                             && (tile0.getSide(Direction.SOUTH) == SideType.SMOOTH)
                             && (tile0.getCapacity() == 2)
-                            && !(tile0.getTextureName().equals("GT-new_tiles_16_for web.jpg"));
+                            && (tile0.getTextureName().equals("GT-new_tiles_16_for web2.jpg"));
                 }, "draw tile 1 [B2:2300]")
-                .simulateCommand("draw")
-                .joinAll();
+                .simulateCommand("draw");
+        syncClient(1);
 
+        // discard those tiles
+        clients[0].assertRefresh().simulateCommand("discard");
+        clients[1].assertRefresh().simulateCommand("discard");
+        syncClients(0, 1);
+
+        // alpha draws and discard all the other tiles, to have all uncovered
+        int leftTiles = tiles.size() - 2;  // already discarded 2 tiles
         State.overrideInstance(clients[0].getMockThis().getLinkedState());
-        for (TileSkeleton tile : tiles) {
-            clients[0].simulateCommand("draw");
-            clients[0].simulateCommand("discard");
+        for (i = 0; i < leftTiles; i++) {
+            clients[0].awaitConditionOnUpdate(gcm ->
+                    gcm.getMockThis().getLinkedState().getLastUpdate().getError() == null,
+                    "expected no error on draw tiles"
+            ).simulateCommand("draw").joinAll();
+            clients[0].assertRefresh().simulateCommand("discard");
+            syncClient(0);
         }
-        State.overrideInstance(null);
 
-        syncClients();
         State.overrideInstance(clients[1].getMockThis().getLinkedState());
         clients[1].awaitConditionOnUpdate(gcm -> {
                     String error = gcm.getMockThis().getLinkedState().getLastUpdate().getError();
@@ -374,9 +412,11 @@ public class MegaTest {
                     return error.startsWith("There are no covered tiles available.");
                 }, "expected error on no more tiles available to draw"
         ).simulateCommand("draw");
+        syncClient(1);
 
         //non va?
-        clients[1].simulateCommand("discard");
+        State.overrideInstance(clients[1].getMockThis().getLinkedState());
+        clients[1].simulateCommand("discard").joinAll();
         clients[1].awaitConditionOnUpdate(gcm -> {
                     BatteryComponentTile tile0;
                     try {
@@ -386,15 +426,15 @@ public class MegaTest {
                         return false;
                     }
                     return (tile0.getTileId() == 0)
-                            && (tile0.getSide(Direction.EAST) == SideType.DOUBLE)
+                            && (tile0.getSide(Direction.EAST) == SideType.SINGLE)
                             && (tile0.getSide(Direction.NORTH) == SideType.UNIVERSAL)
                             && (tile0.getSide(Direction.WEST) == SideType.SMOOTH)
-                            && (tile0.getSide(Direction.SOUTH) == SideType.SMOOTH)
+                            && (tile0.getSide(Direction.SOUTH) == SideType.DOUBLE)
                             && (tile0.getCapacity() == 2)
-                            && !(tile0.getTextureName().equals("GT-new_tiles_16_for web.jpg"));
-                }, "pick tile 0 [B2:2300]")
-                .simulateCommand("pick", "0")
-                .joinAll();
+                            && (tile0.getTextureName().equals("GT-new_tiles_16_for web.jpg"));
+                }, "pick tile 0 [B2:1302]")
+                .simulateCommand("pick", "0");
+        syncClient(1);
 
 
 

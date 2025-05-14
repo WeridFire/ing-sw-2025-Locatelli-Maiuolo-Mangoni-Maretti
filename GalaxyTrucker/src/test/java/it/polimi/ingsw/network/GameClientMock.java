@@ -191,82 +191,21 @@ public class GameClientMock implements IClient {
     }
 
     /**
-     * Awaits a view refresh event and fails if it does not occur within the timeout.
-     *
-     * @param timeoutMillis timeout duration in milliseconds
-     * @param orElse error to be raised if refresh doesn't happen
-     * @return this instance for chaining
-     */
-    public GameClientMock assertRefresh(long timeoutMillis, AssertionError orElse) {
-        assert timeoutMillis > 0;
-        assert orElse != null;
-
-        final CountDownLatch latch = new CountDownLatch(1);
-        getMockView().doOnceOnRefresh(latch::countDown);
-
-        threadAddAndRunAssertDoesNotThrow(() -> {
-            boolean refreshed = latch.await(timeoutMillis, TimeUnit.MILLISECONDS);
-            if (!refreshed) errorSetter.set(orElse);
-            else System.out.println("Thread expectRefresh ended from " + mockName);
-        });
-
-        return this;
-    }
-    /**
-     * Shorthand version of {@link #assertRefresh(long, AssertionError)} with default timeout and error.
-     *
-     * @return this instance for chaining
-     */
-    public GameClientMock assertRefresh() {
-        return assertRefresh(100, new AssertionError("Expected refresh for " + mockName + ". Did not refresh."));
-    }
-
-    /**
-     * Awaits for a timeout period expecting no refresh to occur. Fails if a refresh happens.
-     *
-     * @param timeoutMillis timeout duration in milliseconds
-     * @param orElse error to be raised if a refresh does happen
-     * @return this instance for chaining
-     */
-    public GameClientMock assertNoRefresh(long timeoutMillis, AssertionError orElse) {
-        assert timeoutMillis > 0;
-        assert orElse != null;
-
-        final CountDownLatch latch = new CountDownLatch(1);
-        getMockView().doOnceOnRefresh(latch::countDown);
-
-        threadAddAndRunAssertDoesNotThrow(() -> {
-            boolean refreshed = latch.await(timeoutMillis, TimeUnit.MILLISECONDS);
-            if (refreshed) errorSetter.set(orElse);
-            else System.out.println("Thread expectNoRefresh ended from " + mockName);
-        });
-
-        return this;
-    }
-    /**
-     * Shorthand version of {@link #assertNoRefresh(long, AssertionError)} with default timeout and error.
-     *
-     * @return this instance for chaining
-     */
-    public GameClientMock assertNoRefresh() {
-        return assertNoRefresh(200, new AssertionError("Expected no refresh for " + mockName + ". Did refresh."));
-    }
-
-    /**
      * Waits until the specified condition is satisfied after a refresh.
      * Fails with the given error if the timeout expires before the condition becomes true.
      *
      * @param condition predicate tested on the mock client
      * @param conditionFriendlyName description for logging or error reporting
      * @param timeoutMillis timeout in milliseconds
-     * @param orElse error to raise on timeout
+     * @param onConditionMet error to raise on condition met (if did not want that condition).
+     * {@code null} if no problem when the condition is met.
+     * @param onTimeout error to raise on timeout. {@code null} if no problem when the time runs out.
      * @return this instance for chaining
      */
     public GameClientMock awaitConditionOnRefresh(Predicate<GameClientMock> condition, String conditionFriendlyName,
-                                                 long timeoutMillis, Throwable orElse) {
+                                                 long timeoutMillis, Throwable onConditionMet, Throwable onTimeout) {
         assert condition != null;
         assert timeoutMillis > 0;
-        assert orElse != null;
 
         final CountDownLatch latch = new CountDownLatch(1);
 
@@ -279,19 +218,25 @@ public class GameClientMock implements IClient {
 
         threadAddAndRunAssertDoesNotThrow(() -> {
             boolean success = latch.await(timeoutMillis, TimeUnit.MILLISECONDS);
-            if (!success) {
-                errorSetter.set(orElse);
-            } else {
-                System.out.println("Thread awaitConditionOnRefresh \"" + conditionFriendlyName
-                        + "\" ended from " + mockName);
+            if (success) {
+                if (onConditionMet != null) {
+                    errorSetter.set(onConditionMet);
+                }
             }
+            else {
+                if (onTimeout != null) {
+                    errorSetter.set(onTimeout);
+                }
+            }
+            System.out.println("Thread awaitConditionOnRefresh \"" + conditionFriendlyName
+                    + "\" ended for " + mockName + " caused by " + (success ? "condition met" : "timeout"));
             refreshListeners.remove(checkCondition);
         });
 
         return this;
     }
     /**
-     * Shorthand version of {@link #awaitConditionOnRefresh(Predicate, String, long, Throwable)}
+     * Shorthand version of {@link #awaitConditionOnRefresh(Predicate, String, long, Throwable, Throwable)}
      * with default timeout and error.
      *
      * @param condition predicate tested on the mock client
@@ -299,9 +244,51 @@ public class GameClientMock implements IClient {
      * @return this instance for chaining
      */
     public GameClientMock awaitConditionOnRefresh(Predicate<GameClientMock> condition, String conditionFriendlyName) {
-        return awaitConditionOnRefresh(condition, conditionFriendlyName, 1000,
+        return awaitConditionOnRefresh(condition, conditionFriendlyName, 500, null,
                 new AssertionError("Expected condition \"" + conditionFriendlyName
                         + "\" for " + mockName + ". Not satisfied in the recent updates."));
+    }
+
+    /**
+     * Awaits a view refresh event and fails if it does not occur within the timeout.
+     *
+     * @param timeoutMillis timeout duration in milliseconds
+     * @param orElse error to be raised if refresh doesn't happen
+     * @return this instance for chaining
+     */
+    public GameClientMock assertRefresh(long timeoutMillis, AssertionError orElse) {
+        return awaitConditionOnRefresh(_ -> true, "assertRefresh",
+                timeoutMillis, null, orElse);
+    }
+    /**
+     * Shorthand version of {@link #assertRefresh(long, AssertionError)} with default timeout and error.
+     *
+     * @return this instance for chaining
+     */
+    public GameClientMock assertRefresh() {
+        return assertRefresh(100, new AssertionError("Expected refresh for "
+                + mockName + ". Did not refresh."));
+    }
+
+    /**
+     * Awaits for a timeout period expecting no refresh to occur. Fails if a refresh happens.
+     *
+     * @param timeoutMillis timeout duration in milliseconds
+     * @param orElse error to be raised if a refresh does happen
+     * @return this instance for chaining
+     */
+    public GameClientMock assertNoRefresh(long timeoutMillis, AssertionError orElse) {
+        return awaitConditionOnRefresh(_ -> true, "assertNoRefresh",
+                timeoutMillis, orElse, null);
+    }
+    /**
+     * Shorthand version of {@link #assertNoRefresh(long, AssertionError)} with default timeout and error.
+     *
+     * @return this instance for chaining
+     */
+    public GameClientMock assertNoRefresh() {
+        return assertNoRefresh(200, new AssertionError("Expected no refresh for "
+                + mockName + ". Did refresh."));
     }
 
     /**
@@ -311,14 +298,15 @@ public class GameClientMock implements IClient {
      * @param condition predicate tested on the mock client
      * @param conditionFriendlyName description for logging or error reporting
      * @param timeoutMillis timeout in milliseconds
-     * @param orElse error to raise on timeout
+     * @param onConditionMet error to raise on condition met (if did not want that condition).
+     * {@code null} if no problem when the condition is met.
+     * @param onTimeout error to raise on timeout. {@code null} if no problem when the time runs out.
      * @return this instance for chaining
      */
     public GameClientMock awaitConditionOnUpdate(Predicate<GameClientMock> condition, String conditionFriendlyName,
-                                                 long timeoutMillis, Throwable orElse) {
+                                                 long timeoutMillis, Throwable onConditionMet, Throwable onTimeout) {
         assert condition != null;
         assert timeoutMillis > 0;
-        assert orElse != null;
 
         final CountDownLatch latch = new CountDownLatch(1);
 
@@ -331,19 +319,25 @@ public class GameClientMock implements IClient {
 
         threadAddAndRunAssertDoesNotThrow(() -> {
             boolean success = latch.await(timeoutMillis, TimeUnit.MILLISECONDS);
-            if (!success) {
-                errorSetter.set(orElse);
-            } else {
-                System.out.println("Thread awaitConditionOnUpdate \"" + conditionFriendlyName
-                        + "\" ended from " + mockName);
+            if (success) {
+                if (onConditionMet != null) {
+                    errorSetter.set(onConditionMet);
+                }
             }
+            else {
+                if (onTimeout != null) {
+                    errorSetter.set(onTimeout);
+                }
+            }
+            System.out.println("Thread awaitConditionOnUpdate \"" + conditionFriendlyName
+                    + "\" ended for " + mockName);
             updateListeners.remove(checkCondition);
         });
 
         return this;
     }
     /**
-     * Shorthand version of {@link #awaitConditionOnUpdate(Predicate, String, long, Throwable)}
+     * Shorthand version of {@link #awaitConditionOnUpdate(Predicate, String, long, Throwable, Throwable)}
      * with default timeout and error.
      *
      * @param condition predicate tested on the mock client
@@ -351,8 +345,50 @@ public class GameClientMock implements IClient {
      * @return this instance for chaining
      */
     public GameClientMock awaitConditionOnUpdate(Predicate<GameClientMock> condition, String conditionFriendlyName) {
-        return awaitConditionOnUpdate(condition, conditionFriendlyName, 1000,
+        return awaitConditionOnUpdate(condition, conditionFriendlyName, 500, null,
                 new AssertionError("Expected condition \"" + conditionFriendlyName
                         + "\" for " + mockName + ". Not satisfied in the recent updates."));
+    }
+
+    /**
+     * Awaits a view update event and fails if it does not occur within the timeout.
+     *
+     * @param timeoutMillis timeout duration in milliseconds
+     * @param orElse error to be raised if an update doesn't happen
+     * @return this instance for chaining
+     */
+    public GameClientMock assertUpdate(long timeoutMillis, AssertionError orElse) {
+        return awaitConditionOnUpdate(_ -> true, "assertUpdate",
+                timeoutMillis, null, orElse);
+    }
+    /**
+     * Shorthand version of {@link #assertUpdate(long, AssertionError)} with default timeout and error.
+     *
+     * @return this instance for chaining
+     */
+    public GameClientMock assertUpdate() {
+        return assertUpdate(100, new AssertionError("Expected update for "
+                + mockName + ". Did not update."));
+    }
+
+    /**
+     * Awaits for a timeout period expecting no update to occur. Fails if an update happens.
+     *
+     * @param timeoutMillis timeout duration in milliseconds
+     * @param orElse error to be raised if an update does happen
+     * @return this instance for chaining
+     */
+    public GameClientMock assertNoUpdate(long timeoutMillis, AssertionError orElse) {
+        return awaitConditionOnUpdate(_ -> true, "assertNoUpdate",
+                timeoutMillis, orElse, null);
+    }
+    /**
+     * Shorthand version of {@link #assertNoUpdate(long, AssertionError)} with default timeout and error.
+     *
+     * @return this instance for chaining
+     */
+    public GameClientMock assertNoUpdate() {
+        return assertNoUpdate(200, new AssertionError("Expected no update for "
+                + mockName + ". Did update."));
     }
 }
