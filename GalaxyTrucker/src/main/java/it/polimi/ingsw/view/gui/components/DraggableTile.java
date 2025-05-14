@@ -1,6 +1,5 @@
 package it.polimi.ingsw.view.gui.components;
 
-import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.gui.UIs.AssembleUI;
@@ -87,8 +86,6 @@ public class DraggableTile extends StackPane {
             if (position == WhichPane.SHIPGRID) {
                 return;
             }
-
-            if (position == WhichPane.DRAWN) {}
 
             setPosition(WhichPane.FLOATING);
             Dragboard dragboard = imageView.startDragAndDrop(TransferMode.MOVE);

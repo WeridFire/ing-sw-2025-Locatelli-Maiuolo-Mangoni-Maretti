@@ -4,15 +4,20 @@ import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.util.BoardCoordinates;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.gui.UIs.AssembleUI;
 import it.polimi.ingsw.view.gui.helpers.WhichPane;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.paint.Color;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,12 +27,13 @@ import java.util.Map;
  */
 public class ShipGrid extends GridPane {
     private static final String DEFAULT_CELL_STYLE = "-fx-background-color: lightgray; -fx-border-color: darkgray;";
-    private static final String HIGHLIGHT_CELL_STYLE = "-fx-background-color: lightblue; -fx-border-color: blue;";
-    private static final double CELL_SIZE = 100;
-    private static final double TILE_VIEW_SIZE = 80;
-    private int baseRow, baseCol;
+    private static final String SHIP_CELL_STYLE = "-fx-background-color: lightblue; -fx-border-color: blue;";
+    private static final String HIGHLIGHT_CELL_STYLE = "-fx-background-color: #ffffe0; -fx-border-color: #ffeb3b";
 
-    Map<Coordinates, StackPane> grid = new HashMap<>();
+    private static final double CELL_SIZE = 100;
+    private int baseRow, baseCol;
+    private final Map<Coordinates, StackPane> grid = new HashMap<>();
+    private final Map<StackPane, Coordinates> cells = new HashMap<>();
 
     /**
      * Creates a new ship grid with specified dimensions.
@@ -38,6 +44,7 @@ public class ShipGrid extends GridPane {
     public ShipGrid(int rows, int cols) {
         super();
         initializeGrid(rows, cols);
+        updateGridFromShipBoard();
     }
 
     /**
@@ -61,6 +68,7 @@ public class ShipGrid extends GridPane {
                 StackPane cell = createCell();
                 this.add(cell, c, r);
                 grid.put(new Coordinates(r + baseRow, c + baseCol),cell);
+                cells.put(cell, new Coordinates(r + baseRow, c + baseCol));
             }
         }
     }
@@ -77,15 +85,20 @@ public class ShipGrid extends GridPane {
             else {
                 grid.get(coordinates).getChildren().clear();
             }
-
+        }
+        for (Coordinates coordinates : grid.keySet()) {
+            if (BoardCoordinates.isOnBoard(LobbyState.getGameLevel(), coordinates)) {
+                grid.get(coordinates).setStyle(SHIP_CELL_STYLE);
+            }
         }
     }
 
-    public void wasPlacedLastTime(boolean lastTimeWasPlaced) {
+    public void wasPlacedLastTime(boolean lastTimeWasPlaced, int row, int col) {
         if (!lastTimeWasPlaced) {
             Platform.runLater(()->{
                 ClientManager.getInstance().simulateCommand("discard");
             });
+            this.grid.get(new Coordinates(row + baseRow, col + baseCol)).getChildren().clear();
         }
     }
 
@@ -122,7 +135,11 @@ public class ShipGrid extends GridPane {
         });
 
         cell.setOnDragExited(event -> {
-            cell.setStyle(DEFAULT_CELL_STYLE);
+            if (BoardCoordinates.isOnBoard(LobbyState.getGameLevel(), cells.get(cell))) {
+                cell.setStyle(SHIP_CELL_STYLE);
+            }else{
+                cell.setStyle(DEFAULT_CELL_STYLE);
+            }
             event.consume();
         });
 
@@ -154,7 +171,7 @@ public class ShipGrid extends GridPane {
                     ClientManager.getInstance().simulateCommand("place",  Integer.toString(row+baseRow), Integer.toString(col+baseCol));
                     int after = ClientManager.getInstance().getLastUpdate().getClientPlayer().getShipBoard().getTiles().size();
 
-                    wasPlacedLastTime(before != after);
+                    wasPlacedLastTime(before != after, row, col);
                 });
 
                 success = true;

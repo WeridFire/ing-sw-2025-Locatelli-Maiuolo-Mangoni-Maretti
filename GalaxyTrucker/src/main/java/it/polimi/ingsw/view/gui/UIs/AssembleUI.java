@@ -5,13 +5,12 @@ import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.view.gui.components.CoveredTilesPane;
 import it.polimi.ingsw.view.gui.components.DraggableTile;
 import it.polimi.ingsw.view.gui.components.ShipGrid;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.geometry.Insets;
 
 import java.util.List;
 
@@ -19,14 +18,11 @@ import java.util.List;
  * UI component for the ship assembly phase of the game.
  */
 public class AssembleUI implements INodeRefreshableOnUpdateUI {
-    private static final int COVERED_TILE_SIZE = 80;
-    private static final int COVERED_PANE_SIZE = 400;
-    private static final int MAX_RANDOM_POSITION = 240;
 
     private final GridPane mainGrid;
     private final GridPane topGrid;
     private final GridPane leftGrid;
-    private final Pane rightPane;
+    private Pane rightPane;
 
     public static DraggableTile isBeeingDragged;
     public static void setIsBeeingDragged(DraggableTile isBeeingDragged) {
@@ -40,7 +36,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
 
         topGrid = createDrawnTilesGrid(3, 8);
         leftGrid = createShipGrid();
-        rightPane = createCoveredTilesPane(30);
+        rightPane = createCoveredTilesPane();
 
         // Setup layout
         mainGrid.add(topGrid, 0, 0, 2, 1);
@@ -105,20 +101,9 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     /**
      * Creates the pane containing covered tiles.
      */
-    private Pane createCoveredTilesPane(int tileCount) {
-        Pane pane = new Pane();
-        pane.setBackground(new Background(
-                new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
-        pane.setPrefSize(COVERED_PANE_SIZE, COVERED_PANE_SIZE);
-
-        for (int i = 0; i < tileCount; i++) {
-            DraggableTile tile = new DraggableTile();
-            tile.setSize(COVERED_TILE_SIZE, COVERED_TILE_SIZE);
-            tile.setLayoutX(Math.random() * MAX_RANDOM_POSITION);
-            tile.setLayoutY(Math.random() * MAX_RANDOM_POSITION);
-            pane.getChildren().add(tile);
-        }
-        return pane;
+    private Pane createCoveredTilesPane() {
+        rightPane = new CoveredTilesPane();
+        return rightPane;
     }
 
     /**
