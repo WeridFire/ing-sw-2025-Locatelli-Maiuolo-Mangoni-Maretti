@@ -12,6 +12,7 @@ import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.network.exceptions.AlreadyRunningServerException;
 import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.tiles.BatteryComponentTile;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -235,6 +236,17 @@ public class MegaTest {
         expectRefreshForAllAndGet(0).simulateCommand("create", COOL_NAMES[0]);
         syncClients();
 
+        // ensure client 0 is now a player with the first color available
+        assertEquals(MainCabinTile.Color.values()[0],
+                clients[0].getMockThis().getLinkedState().getLastUpdate().getClientPlayer().getColor());
+
+        // ensure client 1 is now a player with in its linked state one game with one player with the first color available
+        assertEquals(MainCabinTile.Color.values()[0],
+                clients[1].getMockThis().getLinkedState()
+                        .getLastUpdate().getAvailableGames().getFirst()
+                        .getPlayers().getFirst()
+                        .getColor());
+
         // validate game was created and stored
         UUID alphaGameUUID = clients[0].getMockThis().getLinkedState().getLastUpdate().getCurrentGame().getGameId();
         assertEquals(1, games.size());
@@ -257,24 +269,40 @@ public class MegaTest {
                     }
                 }, "expected error on join with invalid UUID: [false-UUID]"
         ).simulateCommand("join", "false-UUID", COOL_NAMES[1]);
-        syncClients();
+        syncClient(1);
 
         // client 1 wrong attempt in joining client 0's game with valid UUID but not of a game
         // -> expect to catch and block command client-side
         UUID wrongUUID = UUID.randomUUID();
         clients[1].awaitConditionOnUpdate(gcm -> {
-            String error = gcm.getMockThis().getLinkedState().getLastUpdate().getError();
-            if (error == null) return false;
-            return error.startsWith("Could not find a game with UUID " + wrongUUID);
-            }, "expected error on join with wrong UUID"
+                    String error = gcm.getMockThis().getLinkedState().getLastUpdate().getError();
+                    if (error == null) return false;
+                    return error.startsWith("Could not find a game with UUID " + wrongUUID);
+                }, "expected error on join with wrong UUID"
         ).simulateCommand("join", wrongUUID.toString(), COOL_NAMES[1]);
-        syncClients();
+        syncClient(1);
+
+        // client 1 wrong attempt in joining client 0's game with alpha game's UUID but already used color option
+        // -> expect to catch and block command client-side
+        clients[1].awaitConditionOnRefresh(gcm -> {
+                    try {
+                        return gcm.getMockView().getWarnings().getLast().startsWith("Warning_Invalid color 'BLUE'.");
+                    } catch (NoSuchElementException e) {
+                        return false;
+                    }
+                }, "warning on already used option 'color' blue"
+        ).simulateCommand("join", alphaGameUUID.toString(), COOL_NAMES[1], "--color", "blue");
+        syncClient(1);
 
         // client 1 joins client 0's game
         // -> expect to enter in assemble phase for client 0 and 1 (those in the game)
         expectGamePhase(GamePhaseType.ASSEMBLE, 0, 1);
         clients[1].simulateCommand("join", alphaGameUUID.toString(), COOL_NAMES[1]);
-        syncClients();
+        syncClient(1);
+
+        // ensure client 1 is now a player with the second color available
+        assertEquals(MainCabinTile.Color.values()[1],
+                clients[1].getMockThis().getLinkedState().getLastUpdate().getClientPlayer().getColor());
 
         // validate client 1 joined the correct game
         assertEquals(alphaGame, GamesHandler.getInstance().findGameByClientUUID(clients[0].getClientUUID()));
@@ -285,12 +313,41 @@ public class MegaTest {
 
         // --------- gamma game ---------- //
 
-        // client 2 independently creates another game -> all but those already in a game expect a refresh
+        // client 2 independently tries to create another game with 'color' option empty
+        clients[2].awaitConditionOnRefresh(gcm -> {
+                    try {
+                        return gcm.getMockView().getWarnings().getLast().startsWith(
+                                "Warning_Usage for optional parameter 'color' is [-c | --color <color>].");
+                    } catch (NoSuchElementException e) {
+                        return false;
+                    }
+                }, "warning on empty option 'color'"
+        ).simulateCommand("create", COOL_NAMES[2], "--color");
+        syncClient(2);
+
+        // client 2 independently tries to create another game with 'color' option wrong
+        clients[2].awaitConditionOnRefresh(gcm -> {
+                    try {
+                        return gcm.getMockView().getWarnings().getLast().startsWith(
+                                "Warning_Invalid color 'PURPLE'.");
+                    } catch (NoSuchElementException e) {
+                        return false;
+                    }
+                }, "warning on wrong option 'color' as purple"
+        ).simulateCommand("create", COOL_NAMES[2], "-c", "purple");
+        syncClient(2);
+
+        // client 2 independently creates another game with 'color' GREEN ->
+        // all but those already in a game expect a refresh
         expectRefreshForAndGet(2, null, Set.of(0, 1))
-                .simulateCommand("create", COOL_NAMES[2]);
+                .simulateCommand("create", COOL_NAMES[2], "-c", "GreEn");
+        syncClients();
+
+        // ensure client 2 is now a player with color GREEN
+        assertEquals(MainCabinTile.Color.GREEN,
+                clients[2].getMockThis().getLinkedState().getLastUpdate().getClientPlayer().getColor());
 
         // client 2 wrong command ping as "pig" -> refresh only for it and ensure it's a wrong command
-        syncClients();
         clients[2].awaitConditionOnRefresh(gcm -> {
             try {
                 return gcm.getMockView().getErrors().getLast().startsWith("Error_Rejected command: pig");
@@ -347,7 +404,6 @@ public class MegaTest {
         // note: shipboards are already deterministic
 
         // alpha draws the first tile
-        State.overrideInstance(clients[0].getMockThis().getLinkedState());
         clients[0].awaitConditionOnUpdate(gcm -> {
                     BatteryComponentTile tile0;
                     try {
@@ -368,7 +424,6 @@ public class MegaTest {
         syncClient(0);
 
         // beta draws the second tile
-        State.overrideInstance(clients[1].getMockThis().getLinkedState());
         clients[1].awaitConditionOnUpdate(gcm -> {
                     BatteryComponentTile tile0;
                     try {
@@ -395,7 +450,6 @@ public class MegaTest {
 
         // alpha draws and discard all the other tiles, to have all uncovered
         int leftTiles = tiles.size() - 2;  // already discarded 2 tiles
-        State.overrideInstance(clients[0].getMockThis().getLinkedState());
         for (i = 0; i < leftTiles; i++) {
             clients[0].awaitConditionOnUpdate(gcm ->
                     gcm.getMockThis().getLinkedState().getLastUpdate().getError() == null,
@@ -405,7 +459,6 @@ public class MegaTest {
             syncClient(0);
         }
 
-        State.overrideInstance(clients[1].getMockThis().getLinkedState());
         clients[1].awaitConditionOnUpdate(gcm -> {
                     String error = gcm.getMockThis().getLinkedState().getLastUpdate().getError();
                     if (error == null) return false;
@@ -414,8 +467,6 @@ public class MegaTest {
         ).simulateCommand("draw");
         syncClient(1);
 
-        //non va?
-        State.overrideInstance(clients[1].getMockThis().getLinkedState());
         clients[1].simulateCommand("discard").joinAll();
         clients[1].awaitConditionOnUpdate(gcm -> {
                     BatteryComponentTile tile0;

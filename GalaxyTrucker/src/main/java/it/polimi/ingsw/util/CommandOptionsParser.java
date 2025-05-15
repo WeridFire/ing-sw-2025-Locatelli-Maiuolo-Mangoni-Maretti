@@ -160,6 +160,19 @@ public class CommandOptionsParser {
         return options;
     }
 
+    /**
+     * Like {@link #parse(String, List)}, but with command separated into commandName and args
+     * @param commandName the word that identify the command
+     * @param optionsFinder array of words representing all the content of a command after the first word
+     *                      (which is {@code commandName})
+     */
+    public static HashMap<String, String> parse(String commandName, String[] args, List<OptionFinder> optionsFinder)
+            throws IllegalFormatException {
+        StringBuilder command = new StringBuilder(commandName);
+        for (String arg : args) command.append(' ').append(arg);
+        return parse(command.toString(), optionsFinder);
+    }
+
     public static String getCommandName(HashMap<String, String> parsedCommandWithOptions) {
         String fullCommand = parsedCommandWithOptions.get(COMMAND_REMINDER);
         if (fullCommand == null) return null;

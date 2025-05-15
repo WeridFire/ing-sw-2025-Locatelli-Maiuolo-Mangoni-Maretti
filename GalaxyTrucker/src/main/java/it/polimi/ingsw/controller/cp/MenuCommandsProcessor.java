@@ -14,8 +14,6 @@ public class MenuCommandsProcessor extends PhaseCommandsProcessor {
         super(gameClient);
     }
 
-    private HashMap<String, String> lastCreateWithOptions = null;
-
     @Override
     public List<String> getAvailableCommands() {
         return List.of("refresh|Refresh the game list.",
@@ -23,9 +21,50 @@ public class MenuCommandsProcessor extends PhaseCommandsProcessor {
                 "create|Create a new game.");
     }
 
+    private MainCabinTile.Color lastOptionsColor = null;
+
+    private boolean validateLastOptionsColor(MainCabinTile.Color[] availableColors, String lastOptionsColorString) {
+        String helper;
+        if (availableColors == null || availableColors.length == 0) {
+            helper = null;
+            availableColors = new MainCabinTile.Color[]{ null };
+        } else {
+            helper = Arrays.toString(availableColors);
+        }
+
+        if (lastOptionsColorString == null) {  // set default as first available color
+            lastOptionsColor = availableColors[0];
+        }
+        else if (lastOptionsColorString.isEmpty()) {  // "-c" but not specified color after
+            view.showWarning("Usage for optional parameter 'color' is [-c | --color <color>]."
+                    + "\nPlease use a valid color" + (helper != null ? ", among the following: " + helper : "") + ".");
+            return false;
+        }
+        else {
+            lastOptionsColorString = lastOptionsColorString.toUpperCase();
+            try {
+                lastOptionsColor = MainCabinTile.Color.valueOf(lastOptionsColorString);
+                if (!Set.of(availableColors).contains(lastOptionsColor)) {
+                    throw new IllegalArgumentException();  // caught below
+                }
+            } catch (IllegalArgumentException e) {
+                view.showWarning("Invalid color '" + lastOptionsColorString + "'.\nPlease use a valid color"
+                        + (helper != null ? ", among the following: " + helper : "") + ".");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     @Override
     protected boolean validateCommand(String command, String[] args) throws CommandNotAllowedException {
-        lastCreateWithOptions = null;
+        HashMap<String, String> cmdWithOptionColor = CommandOptionsParser.parse(command, args, List.of(
+                new CommandOptionsParser.OptionFinder(Set.of("-c", "--color"),
+                        "color", null)
+        ));
+        int cmdWithOptionColorArgsLength = CommandOptionsParser.getCommandArgs(cmdWithOptionColor).length;
+        String lastOptionsColorString = cmdWithOptionColor.get("color");
 
         switch (command) {
             case "" : return true;  // valid onVoid
@@ -33,46 +72,30 @@ public class MenuCommandsProcessor extends PhaseCommandsProcessor {
             case "refresh" : return true;
 
             case "join" :
-                if (args.length != 2) {
-                    view.showWarning("Usage: join <uuid> <username>");
+                // check uuid and username presence
+                if (cmdWithOptionColorArgsLength != 2) {
+                    view.showWarning("Usage: join <uuid> <username> [-c | --color <color>]");
                     return false;
                 }
+                // check uuid validity
+                UUID uuid;
                 try {
-                    UUID uuid = UUID.fromString(args[0]);
+                    uuid = UUID.fromString(args[0]);
                 } catch (IllegalArgumentException e) {
                     view.showError("Invalid UUID: [" + args[0] + "]. Please enter a valid game UUID.");
                     return false;
                 }
-                return true;
+                // check color validity
+                return validateLastOptionsColor(MenuState.getAvailableColorsForGame(uuid), lastOptionsColorString);
 
             case "create" :
-                StringBuilder fullCommand = new StringBuilder(command);
-                for (String arg : args) fullCommand.append(' ').append(arg);
-                lastCreateWithOptions = CommandOptionsParser.parse(fullCommand.toString(), List.of(
-                                new CommandOptionsParser.OptionFinder(Set.of("-c", "--color"),
-                                        "color", null),
-                                new CommandOptionsParser.OptionFinder(Set.of("-p", "--password"),
-                                        "password", "")
-                        ));
-                String[] cmdArgs = CommandOptionsParser.getCommandArgs(lastCreateWithOptions);
                 // check username presence
-                if (cmdArgs.length != 1) {
-                    view.showWarning("Usage: create <username> [-c | --color <"
-                            + Arrays.toString(MainCabinTile.Color.values()) + ">] [-p | --password <password>]");
+                if (cmdWithOptionColorArgsLength != 1) {
+                    view.showWarning("Usage: create <username> [-c | --color <color>]");
                     return false;
                 }
                 // check color validity
-                String color = lastCreateWithOptions.get("color");
-                if (color != null && !color.isEmpty()) {
-                    try {
-                        MainCabinTile.Color.valueOf(color);
-                    } catch (IllegalArgumentException e) {
-                        view.showWarning("Usage for optional parameter color is [-c | --color <"
-                                + Arrays.toString(MainCabinTile.Color.values()) + ">]");
-                        return false;
-                    }
-                }
-                return true;
+                return validateLastOptionsColor(MainCabinTile.Color.values(), lastOptionsColorString);
 
             // refuses unavailable commands
             default: throw new CommandNotAllowedException(command, args);
@@ -85,10 +108,12 @@ public class MenuCommandsProcessor extends PhaseCommandsProcessor {
             case "" -> view.onRefresh();  // on simple enter refresh
             case "refresh" -> server.ping(client);
             case "join" -> server.joinGame(client,
-                            UUID.fromString(args[0]),
-                            args[1]);
-            case "create" -> server.createGame(client, CommandOptionsParser.getCommandArgs(lastCreateWithOptions)[0],
-                    MainCabinTile.Color.valueOf(lastCreateWithOptions.get("color").toUpperCase()));
+                    UUID.fromString(args[0]),
+                    args[1],
+                    lastOptionsColor);
+            case "create" -> server.createGame(client,
+                    args[0],
+                    lastOptionsColor);
         }
     }
 }

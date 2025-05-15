@@ -186,6 +186,7 @@ public class GameClientMock implements IClient {
      * @return this instance for chaining
      */
     public GameClientMock simulateCommand(String command, String... args) {
+        State.overrideInstance(getMockThis().getLinkedState());
         getMockView().getCommandsProcessor().processCommand(command, args);
         return this;
     }

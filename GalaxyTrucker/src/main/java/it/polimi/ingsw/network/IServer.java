@@ -18,7 +18,7 @@ public interface IServer extends Remote {
 
 	void connect(IClient client) throws RemoteException;
 	void createGame(IClient client, String username, MainCabinTile.Color desiredColor) throws RemoteException;
-	void joinGame(IClient client, UUID gameId, String username) throws RemoteException;
+	void joinGame(IClient client, UUID gameId, String username, MainCabinTile.Color desiredColor) throws RemoteException;
 	void quitGame(IClient client) throws RemoteException;
 	void ping(IClient client) throws RemoteException;
 	void resumeGame(IClient client, UUID gameId) throws RemoteException;

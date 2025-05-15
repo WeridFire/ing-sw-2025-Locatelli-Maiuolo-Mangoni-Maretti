@@ -7,6 +7,7 @@ import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.network.messages.SocketMessage;
 import it.polimi.ingsw.player.kpf.KeepPlayerFlyingPredicate;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.io.BufferedWriter;
@@ -49,14 +50,14 @@ public class ServerSocketHandler implements IServer {
 	}
 
 	@Override
-	public void createGame(IClient client, String username, String password, String desiredColor) {
-		SocketMessage mess = SocketMessage.createGameMessage(username, password, desiredColor);
+	public void createGame(IClient client, String username, MainCabinTile.Color desiredColor) {
+		SocketMessage mess = SocketMessage.createGameMessage(username, desiredColor);
 		sendSocketMessage(mess);
 	}
 
 	@Override
-	public void joinGame(IClient client, UUID gameId, String username) {
-		SocketMessage mess = SocketMessage.joinGameMessage(gameId, username);
+	public void joinGame(IClient client, UUID gameId, String username, MainCabinTile.Color desiredColor) {
+		SocketMessage mess = SocketMessage.joinGameMessage(gameId, username, desiredColor);
 		sendSocketMessage(mess);
 	}
 

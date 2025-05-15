@@ -5,7 +5,6 @@ import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 

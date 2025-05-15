@@ -2,9 +2,11 @@ package it.polimi.ingsw;
 
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.game.exceptions.ColorAlreadyInUseException;
 import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -103,10 +105,12 @@ public class GamesHandler {
      * Creates a game and adds the player into the game. Makes sure that the player is not already in another game.
      * @param username The username the player wants to join with.
      * @param connectionUUID The connection id of the player
+     * @param desiredColor The color this player wants to use for the game
      * @return The created game.
      * @throws PlayerAlreadyInGameException The player is in another game.
      */
-    public Game createGame(String username, UUID connectionUUID) throws PlayerAlreadyInGameException {
+    public Game createGame(String username, UUID connectionUUID, MainCabinTile.Color desiredColor)
+            throws PlayerAlreadyInGameException {
         if(findGameByClientUUID(connectionUUID) != null){
             throw new PlayerAlreadyInGameException(username);
         }
@@ -114,8 +118,8 @@ public class GamesHandler {
         games.add(createdGame);
 
         try {
-            createdGame.addPlayer(username, connectionUUID);
-        } catch (GameAlreadyRunningException e) {
+            createdGame.addPlayer(username, connectionUUID, desiredColor);
+        } catch (GameAlreadyRunningException | ColorAlreadyInUseException e) {
             throw new RuntimeException(e);  // should never happen -> runtime exception
         }
         return createdGame;
@@ -138,7 +142,11 @@ public class GamesHandler {
         games.add(createdGame);
         startGame(createdGame);
 
-        createdGame.addPlayer(savedGameState.getGameLeader(), connectionUUID);
+        try {
+            createdGame.addPlayer(savedGameState.getGameLeader(), connectionUUID, null);
+        } catch (ColorAlreadyInUseException e) {
+            throw new RuntimeException(e);  // should never happen -> runtime exception
+        }
 
         return createdGame;
     }

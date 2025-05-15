@@ -5,6 +5,7 @@ import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.game.Cheats;
 import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.game.exceptions.ColorAlreadyInUseException;
 import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.player.Player;
@@ -13,6 +14,7 @@ import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
 import it.polimi.ingsw.shipboard.exceptions.TileWithoutNeighborException;
 import it.polimi.ingsw.shipboard.tiles.CabinTile;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.shipboard.tiles.Tile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
@@ -34,11 +36,11 @@ class ShipBoardTest {
     private List<TileSkeleton> tiles;
 
     @BeforeEach
-    void setup() throws PlayerAlreadyInGameException, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException, GameAlreadyRunningException {
+    void setup() throws PlayerAlreadyInGameException, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException, GameAlreadyRunningException, ColorAlreadyInUseException {
         game1 = new Game();
         UUID uuid1 = UUID.randomUUID();
-        player1 = new Player("player1", uuid1);
-        game1.addPlayer(player1.getUsername(), uuid1);
+        player1 = new Player("player1", uuid1, MainCabinTile.Color.BLUE);
+        game1.addPlayer(player1.getUsername(), uuid1, MainCabinTile.Color.BLUE);
         shipBoard1 = new ShipBoard(GameLevel.TESTFLIGHT);
         player1.setShipBoard(shipBoard1);
 

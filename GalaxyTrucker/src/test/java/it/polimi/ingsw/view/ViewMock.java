@@ -77,6 +77,7 @@ public class ViewMock extends GUIView {
 
     @Override
     public void showInfo(String title, String content) {
+        System.out.println(mockName + " INFO >> " + title + " - " + content);
         infos.add(title + "_" + content);
         onRefresh();
     }
@@ -86,6 +87,7 @@ public class ViewMock extends GUIView {
 
     @Override
     public void showWarning(String title, String content) {
+        System.out.println(mockName + " WARNING >> " + title + " - " + content);
         warnings.add(title + "_" + content);
         onRefresh();
     }
@@ -95,6 +97,7 @@ public class ViewMock extends GUIView {
 
     @Override
     public void showError(String title, String content) {
+        System.out.println(mockName + " ERROR >> " + title + " - " + content);
         errors.add(title + "_" + content);
         onRefresh();
     }

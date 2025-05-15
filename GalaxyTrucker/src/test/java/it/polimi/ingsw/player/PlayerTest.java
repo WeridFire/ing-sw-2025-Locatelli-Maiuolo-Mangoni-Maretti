@@ -14,6 +14,7 @@ import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
 import it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
 import it.polimi.ingsw.shipboard.tiles.CabinTile;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.shipboard.visitors.TileVisitor;
@@ -47,8 +48,8 @@ class PlayerTest {
 
     @BeforeEach
     void setUp() {
-        player1 = new Player("SpaceTruckKing", UUID.randomUUID());
-        shipBoard1 = ShipBoard.create(GameLevel.TWO, 0);
+        player1 = new Player("SpaceTruckKing", UUID.randomUUID(), MainCabinTile.Color.BLUE);
+        shipBoard1 = ShipBoard.create(GameLevel.TWO, MainCabinTile.Color.BLUE);
         gameId = UUID.randomUUID();
         gameData = new GameData(gameId);
     }

@@ -59,13 +59,13 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	/**
 	 * Creates a ShipBoard for the player with specified index, already managing the main cabin placement.
 	 * @param level The game level to play (for the shipboard form)
-	 * @param playerIndex The player index (for the main-cabin color)
+	 * @param color The player color (for the main-cabin color)
 	 * @return The created ShipBoard
 	 * @throws IllegalArgumentException if {@code playerIndex} is not coherent with players number
 	 */
-	public static ShipBoard create(GameLevel level, int playerIndex) {
+	public static ShipBoard create(GameLevel level, MainCabinTile.Color color) {
 		ShipBoard sb = new ShipBoard(level);
-		sb.color = MainCabinTile.Color.fromPlayerIndex(playerIndex);
+		sb.color = color;
 		MainCabinTile mainCabin = TilesFactory.createMainCabinTile(sb.color);
         try {
             sb.forceSetTile(mainCabin, BoardCoordinates.getMainCabinCoordinates());

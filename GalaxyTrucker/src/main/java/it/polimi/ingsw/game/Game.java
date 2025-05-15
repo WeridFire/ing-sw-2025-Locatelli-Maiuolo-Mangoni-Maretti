@@ -5,6 +5,7 @@ import it.polimi.ingsw.TilesFactory;
 import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.game.exceptions.ColorAlreadyInUseException;
 import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.AdventureGamePhase;
@@ -21,6 +22,7 @@ import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.gamePhases.exceptions.AlreadyPickedPosition;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.rmi.RemoteException;
@@ -254,16 +256,25 @@ public class Game {
      *
      * @param username the new player's unique (for this game) name
      * @param connectionUUID the connection UUID of the client associated to the new player
+     * @param desiredColor the color this player wants to use for the game.
+     * Note: if the player to add is trying to reconnect, the desired color is ignored and the previous is kept.
+     *
      * @return the created player
+     *
      * @throws PlayerAlreadyInGameException if the player is already in this game
      * @throws GameAlreadyRunningException if this instance of game is not in main menu nor lobby and the username is
      * NOT of a disconnected player.
+     * @throws ColorAlreadyInUseException if the desired color is already taken by another player.
      */
-    public Player addPlayer(String username, UUID connectionUUID) throws PlayerAlreadyInGameException,
-            GameAlreadyRunningException {
+    public Player addPlayer(String username, UUID connectionUUID, MainCabinTile.Color desiredColor)
+            throws PlayerAlreadyInGameException, GameAlreadyRunningException, ColorAlreadyInUseException {
+
         GamePhaseType currentGamePhaseType = getGameData().getCurrentGamePhaseType();
         if (currentGamePhaseType == GamePhaseType.NONE || currentGamePhaseType == GamePhaseType.LOBBY) {
-            Player newPlayer = new Player(username, connectionUUID);
+            if (gameData.getPlayer(p -> p.getColor().equals(desiredColor)) != null) {
+                throw new ColorAlreadyInUseException(desiredColor);
+            }
+            Player newPlayer = new Player(username, connectionUUID, desiredColor);
             gameData.addPlayer(newPlayer);
             return newPlayer;
         }
@@ -293,12 +304,10 @@ public class Game {
 
         gameData.setDeck(Deck.random(gameData.getLevel()));
 
-        int playerIndex = 0;
         for (Player player : gameData.getPlayers()) {
-            ShipBoard shipBoard = ShipBoard.create(gameData.getLevel(), playerIndex);
+            ShipBoard shipBoard = ShipBoard.create(gameData.getLevel(), player.getColor());
             shipBoard.attachIntegrityListener(new PIRUtils.ShipIntegrityListener(player, this));
             player.setShipBoard(shipBoard);
-            playerIndex++;
         }
     }
 

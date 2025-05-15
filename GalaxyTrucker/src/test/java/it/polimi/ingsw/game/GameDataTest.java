@@ -5,6 +5,7 @@ import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.game.exceptions.ColorAlreadyInUseException;
 import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.exceptions.AlreadyPickedPosition;
 import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
@@ -17,6 +18,7 @@ import it.polimi.ingsw.player.exceptions.NoShipboardException;
 import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
 import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.exceptions.*;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.shipboard.visitors.TileVisitor;
@@ -96,7 +98,7 @@ class GameDataTest {
     }
 
     @Test
-    void testResumeGameInAssembly() throws AlreadyPickedPosition, AlreadyEndedAssemblyException, NoShipboardException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, InterruptedException, PlayerAlreadyInGameException, OutOfBuildingAreaException, GameAlreadyRunningException, TooManyItemsInHandException, IllegalStartingPositionIndexException {
+    void testResumeGameInAssembly() throws AlreadyPickedPosition, AlreadyEndedAssemblyException, NoShipboardException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, InterruptedException, PlayerAlreadyInGameException, OutOfBuildingAreaException, GameAlreadyRunningException, TooManyItemsInHandException, IllegalStartingPositionIndexException, ColorAlreadyInUseException {
         UUID gameId = runAndSaveGameUntilStep(0);
         Game g = GamesHandler.getInstance().getGame(gameId);
 
@@ -128,13 +130,15 @@ class GameDataTest {
      * @param step
      * @return
      */
-    UUID runAndSaveGameUntilStep(int step) throws AlreadyPickedPosition, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException, TooManyItemsInHandException, NoShipboardException, InterruptedException, PlayerAlreadyInGameException, IllegalStartingPositionIndexException, GameAlreadyRunningException {
-        Game g = GamesHandler.getInstance().createGame("Pippo", UUID.randomUUID());
+    UUID runAndSaveGameUntilStep(int step) throws AlreadyPickedPosition, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException, TooManyItemsInHandException, NoShipboardException, InterruptedException, PlayerAlreadyInGameException, IllegalStartingPositionIndexException, GameAlreadyRunningException, ColorAlreadyInUseException {
+        Game g = GamesHandler.getInstance().createGame("Pippo", UUID.randomUUID(), MainCabinTile.Color.BLUE);
         UUID gameId = g.getId();
         GameData gameData = g.getGameData();
 
         Player player1 = gameData.getPlayer(p -> Objects.equals(p.getUsername(), gameData.getGameLeader()));
-        Player player2 = g.addPlayer("Player2", UUID.randomUUID());
+        assertThrows(ColorAlreadyInUseException.class, () ->
+                g.addPlayer("Player2", UUID.randomUUID(), MainCabinTile.Color.BLUE));
+        Player player2 = g.addPlayer("Player2", UUID.randomUUID(), MainCabinTile.Color.RED);
 
         if(step == -1){
             stopAndSaveGame(gameData);
@@ -174,8 +178,8 @@ class GameDataTest {
 
     @Test
     void testAddPlayer() throws PlayerAlreadyInGameException {
-        Player player1 = new Player("Player1", UUID.randomUUID());
-        Player player2 = new Player("Player2", UUID.randomUUID());
+        Player player1 = new Player("Player1", UUID.randomUUID(), MainCabinTile.Color.BLUE);
+        Player player2 = new Player("Player2", UUID.randomUUID(), MainCabinTile.Color.RED);
 
         gameData.addPlayer(player1);
         assertEquals(1, gameData.getPlayers().size());
@@ -190,7 +194,7 @@ class GameDataTest {
 
     @Test
     void testAddDuplicatePlayer() {
-        Player player = new Player("Player", UUID.randomUUID());
+        Player player = new Player("Player", UUID.randomUUID(), MainCabinTile.Color.BLUE);
 
         assertDoesNotThrow(() -> gameData.addPlayer(player));
 
@@ -198,7 +202,7 @@ class GameDataTest {
         assertThrows(PlayerAlreadyInGameException.class, () -> gameData.addPlayer(player));
 
         // Try to add a different player with the same username
-        Player sameNamePlayer = new Player("Player", UUID.randomUUID());
+        Player sameNamePlayer = new Player("Player", UUID.randomUUID(), MainCabinTile.Color.RED);
         assertThrows(PlayerAlreadyInGameException.class, () -> gameData.addPlayer(sameNamePlayer));
     }
 
@@ -250,7 +254,7 @@ class GameDataTest {
 
     @Test
     void testMovePlayerForward() throws PlayerAlreadyInGameException {
-        Player player = new Player("Player", UUID.randomUUID());
+        Player player = new Player("Player", UUID.randomUUID(), MainCabinTile.Color.BLUE);
         player.setPosition(5);
         gameData.addPlayer(player);
 
@@ -260,7 +264,7 @@ class GameDataTest {
 
     @Test
     void testMovePlayerBackward() throws PlayerAlreadyInGameException {
-        Player player = new Player("Player", UUID.randomUUID());
+        Player player = new Player("Player", UUID.randomUUID(), MainCabinTile.Color.BLUE);
         player.setPosition(5);
         gameData.addPlayer(player);
 
@@ -270,9 +274,9 @@ class GameDataTest {
 
     @Test
     void testPlayerMovementWithOtherPlayers() throws PlayerAlreadyInGameException {
-        Player player1 = new Player("Player1", UUID.randomUUID());
-        Player player2 = new Player("Player2", UUID.randomUUID());
-        Player player3 = new Player("Player3", UUID.randomUUID());
+        Player player1 = new Player("Player1", UUID.randomUUID(), MainCabinTile.Color.BLUE);
+        Player player2 = new Player("Player2", UUID.randomUUID(), MainCabinTile.Color.RED);
+        Player player3 = new Player("Player3", UUID.randomUUID(), MainCabinTile.Color.GREEN);
 
         player1.setPosition(5);
         player2.setPosition(7); // Player on the path

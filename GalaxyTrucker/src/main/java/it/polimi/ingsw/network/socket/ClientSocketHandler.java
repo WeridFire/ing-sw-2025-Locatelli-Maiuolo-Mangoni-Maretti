@@ -58,11 +58,12 @@ public class ClientSocketHandler implements IClient {
 				try{
 					switch (message.getType()) {
 						case PING -> getServer().ping(this);
-						case JOIN_GAME -> getServer()
-										.joinGame(
-												this,
-												(UUID) message.getArgs().getFirst(),
-												(String) message.getArgs().get(1));
+						case JOIN_GAME -> getServer().joinGame(
+								this,
+								(UUID) message.getArgs().getFirst(),
+								(String) message.getArgs().get(1),
+								(MainCabinTile.Color) message.getArgs().get(2)
+						);
 						case CREATE_GAME -> getServer().createGame(
 								this,
 								(String) message.getArgs().getFirst(),

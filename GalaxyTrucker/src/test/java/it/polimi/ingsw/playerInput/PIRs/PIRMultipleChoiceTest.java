@@ -1,6 +1,7 @@
 package it.polimi.ingsw.playerInput.PIRs;
 
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +12,7 @@ public class PIRMultipleChoiceTest {
 	@Test
 	void testPIRMultipleChoiceCLI() {
 		// Dummy player for testing
-		Player testPlayer = new Player("PlayerTest", UUID.randomUUID());
+		Player testPlayer = new Player("PlayerTest", UUID.randomUUID(), MainCabinTile.Color.BLUE);
 
 		// Example options for the PIR
 		String[] options = new String[] {
@@ -40,7 +41,7 @@ public class PIRMultipleChoiceTest {
 	@Test
 	void testPIRMultipleChoiceCLIVeryLongMessage() {
 		// Dummy player for testing
-		Player testPlayer = new Player("PlayerTest", UUID.randomUUID());
+		Player testPlayer = new Player("PlayerTest", UUID.randomUUID(), MainCabinTile.Color.BLUE);
 
 		// Example options for the PIR
 		String[] options = new String[] {
