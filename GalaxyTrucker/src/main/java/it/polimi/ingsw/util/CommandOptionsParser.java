@@ -92,7 +92,6 @@ public class CommandOptionsParser {
      * @throws IllegalArgumentException if in the {@code optionsFinder} provided two (or more) different options
      * share a common alias
      * @throws IllegalFormatException <ul>
-     *     <li>if an option is found in the command but its value is missing</li>
      *     <li>if an option is listed twice in the command</li>
      * </ul>
      */
@@ -139,13 +138,9 @@ public class CommandOptionsParser {
                     value.append(words[i++]);
                 }
 
-                // check that a value follows
-                if (value.isEmpty()) {
-                    throw new CommandOptionsParser.IllegalFormatException(
-                            "Expected value after option '" + word + "'.");
-                }
-
-                // save the value
+                // save the value - note: valid also for empty values as a sign of presence
+                // e.g. if the command is "git push --force" the alias '--force' is saved with value ""
+                // to notify its presence
                 options.put(optionKey, value.toString());
             } else {
                 // not a known option, append to the command reminder

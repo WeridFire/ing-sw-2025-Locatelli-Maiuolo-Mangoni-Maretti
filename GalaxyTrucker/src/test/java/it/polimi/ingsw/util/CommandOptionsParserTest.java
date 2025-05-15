@@ -38,11 +38,12 @@ class CommandOptionsParserTest {
     }
 
     @Test
-    public void testMissingValue() {
-        assertThrows(CommandOptionsParser.IllegalFormatException.class, () -> CommandOptionsParser.parse(
-                "command arg1 arg2 -h true --text", finders));
-        assertDoesNotThrow(() -> CommandOptionsParser.parse(
-                "command arg1 arg2", finders));
+    public void testMissingValue() throws CommandOptionsParser.IllegalFormatException {
+        assertEquals("", CommandOptionsParser.parse("command arg1 arg2 -t cool text --help",
+                finders).get("help"));
+        assertEquals("", CommandOptionsParser.parse("command arg1 arg2 -h -t cool text",
+                finders).get("help"));
+        assertDoesNotThrow(() -> CommandOptionsParser.parse("command arg1 arg2", finders));
     }
 
     @Test
