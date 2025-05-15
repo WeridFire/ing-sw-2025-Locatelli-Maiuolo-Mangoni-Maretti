@@ -107,8 +107,8 @@ public class SocketMessage implements Serializable{
 	 * @param username The username to use
 	 * @return The socket message containing the desired information.
 	 */
-	public static SocketMessage createGameMessage(String username){
-		return new SocketMessage(MessageType.CREATE_GAME, List.of(username));
+	public static SocketMessage createGameMessage(String username, String password, String desiredColor) {
+		return new SocketMessage(MessageType.CREATE_GAME, Arrays.asList(username, password, desiredColor));
 	}
 
 	/**

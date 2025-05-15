@@ -100,13 +100,15 @@ public class RmiServer implements IServer {
 	}
 
 	@Override
-	public void createGame(IClient client, String username) throws RemoteException {
+	public void createGame(IClient client, String username, String desiredColor)
+			throws RemoteException {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		try {
 			Game game = gamesHandler.createGame(username, connectionUUID);
 			if (game == null) {
 				throw new Exception("Game creation failed");
 			}
+			// todo: implement desired color
 			System.out.println("Created new game: " + game.getId());
 			GameServer.getInstance().broadcastUpdateAllRefreshOnlyIf((clientUUID, clientInterface) -> {
 				// refresh only the clients that are not in a game yet, or this client

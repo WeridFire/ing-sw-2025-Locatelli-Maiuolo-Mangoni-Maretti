@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class CommandOptionsParser {
 
-    public static class IllegalFormatException extends Exception {
+    public static class IllegalFormatException extends RuntimeException {
         protected IllegalFormatException(String message) {
             super(message);
         }
@@ -91,9 +91,7 @@ public class CommandOptionsParser {
      *         plus a {@link #COMMAND_REMINDER} entry for the rest of the command
      * @throws IllegalArgumentException if in the {@code optionsFinder} provided two (or more) different options
      * share a common alias
-     * @throws IllegalFormatException <ul>
-     *     <li>if an option is listed twice in the command</li>
-     * </ul>
+     * @throws IllegalFormatException if an option is listed twice in the command
      */
     public static HashMap<String, String> parse(String command, List<OptionFinder> optionsFinder)
             throws IllegalFormatException {
@@ -160,5 +158,20 @@ public class CommandOptionsParser {
         // add command reminder and return
         options.put(COMMAND_REMINDER, reminder.toString());
         return options;
+    }
+
+    public static String getCommandName(HashMap<String, String> parsedCommandWithOptions) {
+        String fullCommand = parsedCommandWithOptions.get(COMMAND_REMINDER);
+        if (fullCommand == null) return null;
+        else return fullCommand.split(" ")[0];
+    }
+
+    public static String[] getCommandArgs(HashMap<String, String> parsedCommandWithOptions) {
+        String fullCommand = parsedCommandWithOptions.get(COMMAND_REMINDER);
+        if (fullCommand == null) return new String[0];
+        else {
+            String[] commandArgs = fullCommand.split(" ");
+            return Arrays.copyOfRange(commandArgs, 1, commandArgs.length);
+        }
     }
 }

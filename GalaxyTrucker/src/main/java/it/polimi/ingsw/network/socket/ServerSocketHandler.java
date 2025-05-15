@@ -49,8 +49,8 @@ public class ServerSocketHandler implements IServer {
 	}
 
 	@Override
-	public void createGame(IClient client, String username) {
-		SocketMessage mess = SocketMessage.createGameMessage(username);
+	public void createGame(IClient client, String username, String password, String desiredColor) {
+		SocketMessage mess = SocketMessage.createGameMessage(username, password, desiredColor);
 		sendSocketMessage(mess);
 	}
 

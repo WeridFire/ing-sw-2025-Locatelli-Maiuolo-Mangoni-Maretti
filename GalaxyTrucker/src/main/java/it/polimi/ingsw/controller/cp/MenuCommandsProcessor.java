@@ -1,16 +1,20 @@
 package it.polimi.ingsw.controller.cp;
 
 import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
+import it.polimi.ingsw.controller.states.MenuState;
 import it.polimi.ingsw.network.GameClient;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
+import it.polimi.ingsw.util.CommandOptionsParser;
 
 import java.rmi.RemoteException;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class MenuCommandsProcessor extends PhaseCommandsProcessor {
     public MenuCommandsProcessor(GameClient gameClient) {
         super(gameClient);
     }
+
+    private HashMap<String, String> lastCreateWithOptions = null;
 
     @Override
     public List<String> getAvailableCommands() {
@@ -21,6 +25,8 @@ public class MenuCommandsProcessor extends PhaseCommandsProcessor {
 
     @Override
     protected boolean validateCommand(String command, String[] args) throws CommandNotAllowedException {
+        lastCreateWithOptions = null;
+
         switch (command) {
             case "" : return true;  // valid onVoid
 
@@ -40,9 +46,31 @@ public class MenuCommandsProcessor extends PhaseCommandsProcessor {
                 return true;
 
             case "create" :
-                if (args.length != 1) {
-                    view.showWarning("Usage: create <username>");
+                StringBuilder fullCommand = new StringBuilder(command);
+                for (String arg : args) fullCommand.append(' ').append(arg);
+                lastCreateWithOptions = CommandOptionsParser.parse(fullCommand.toString(), List.of(
+                                new CommandOptionsParser.OptionFinder(Set.of("-c", "--color"),
+                                        "color", null),
+                                new CommandOptionsParser.OptionFinder(Set.of("-p", "--password"),
+                                        "password", "")
+                        ));
+                String[] cmdArgs = CommandOptionsParser.getCommandArgs(lastCreateWithOptions);
+                // check username presence
+                if (cmdArgs.length != 1) {
+                    view.showWarning("Usage: create <username> [-c | --color <"
+                            + Arrays.toString(MainCabinTile.Color.values()) + ">] [-p | --password <password>]");
                     return false;
+                }
+                // check color validity
+                String color = lastCreateWithOptions.get("color");
+                if (color != null && !color.isEmpty()) {
+                    try {
+                        MainCabinTile.Color.valueOf(color);
+                    } catch (IllegalArgumentException e) {
+                        view.showWarning("Usage for optional parameter color is [-c | --color <"
+                                + Arrays.toString(MainCabinTile.Color.values()) + ">]");
+                        return false;
+                    }
                 }
                 return true;
 
@@ -59,7 +87,8 @@ public class MenuCommandsProcessor extends PhaseCommandsProcessor {
             case "join" -> server.joinGame(client,
                             UUID.fromString(args[0]),
                             args[1]);
-            case "create" -> server.createGame(client, args[0]);
+            case "create" -> server.createGame(client, CommandOptionsParser.getCommandArgs(lastCreateWithOptions)[0],
+                    MainCabinTile.Color.valueOf(lastCreateWithOptions.get("color").toUpperCase()));
         }
     }
 }

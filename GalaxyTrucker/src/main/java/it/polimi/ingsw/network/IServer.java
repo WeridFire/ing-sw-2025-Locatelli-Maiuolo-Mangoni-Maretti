@@ -4,6 +4,7 @@ import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.player.kpf.KeepPlayerFlyingPredicate;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.rmi.Remote;
@@ -16,7 +17,7 @@ import java.util.UUID;
 public interface IServer extends Remote {
 
 	void connect(IClient client) throws RemoteException;
-	void createGame(IClient client, String username) throws RemoteException;
+	void createGame(IClient client, String username, MainCabinTile.Color desiredColor) throws RemoteException;
 	void joinGame(IClient client, UUID gameId, String username) throws RemoteException;
 	void quitGame(IClient client) throws RemoteException;
 	void ping(IClient client) throws RemoteException;
