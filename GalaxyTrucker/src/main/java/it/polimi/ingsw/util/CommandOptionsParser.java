@@ -96,21 +96,27 @@ public class CommandOptionsParser {
      *     <li>if an option is listed twice in the command</li>
      * </ul>
      */
-    public static HashMap<String, String> parse(String command, List<OptionFinder> optionsFinder) throws IllegalFormatException {
+    public static HashMap<String, String> parse(String command, List<OptionFinder> optionsFinder)
+            throws IllegalFormatException {
         StringBuilder reminder = new StringBuilder();
         String[] words = command.trim().split("\\s+");
         HashMap<String, String> options = new HashMap<>();
 
-        // build a map from option alias to its OptionFinder
-        HashMap<String, OptionFinder> aliasMap = new HashMap<>();
+        // build a map from option alias to its key
+        HashMap<String, String> aliasMap = new HashMap<>();
         for (OptionFinder opt : optionsFinder) {
+            String optionID = opt.getOptionID();
+            if (aliasMap.containsValue(optionID)) {
+                throw new IllegalArgumentException("Option '" + optionID + "' already exists." +
+                        " Attempted to use it from another OptionFinder.");
+            }
             for (String alias : opt.getOptionAlias()) {
                 if (aliasMap.containsKey(alias)) {
                     throw new IllegalArgumentException("Option alias '" + alias + "' already exists for the option '"
-                            + aliasMap.get(alias).getOptionID() + "'. Attempted to use it again for the option '"
-                            + opt.getOptionID() + "'.");
+                            + aliasMap.get(alias) + "'. Attempted to use it again for the option '"
+                            + optionID + "'.");
                 }
-                aliasMap.put(alias, opt);
+                aliasMap.put(alias, opt.getOptionID());
             }
         }
 
@@ -118,25 +124,32 @@ public class CommandOptionsParser {
         for (int i = 0; i < words.length; ) {
             String word = words[i];
             if (aliasMap.containsKey(word)) {
-                if (options.containsKey(word)) {
+                if (options.containsKey(aliasMap.get(word))) {
                     throw new CommandOptionsParser.IllegalFormatException(
                             "Option '" + word + "' found twice in the command.");
                 }
 
-                OptionFinder opt = aliasMap.get(word);
+                String optionKey = aliasMap.get(word);
+
+                // catch all the following values as content, until a new alias is found or the command ends
+                StringBuilder value = new StringBuilder();
+                i++;  // start from the next word
+                while (i < words.length && !aliasMap.containsKey(words[i])) {
+                    if (!value.isEmpty()) value.append(' ');
+                    value.append(words[i++]);
+                }
 
                 // check that a value follows
-                if (i + 1 >= words.length) {
+                if (value.isEmpty()) {
                     throw new CommandOptionsParser.IllegalFormatException(
                             "Expected value after option '" + word + "'.");
                 }
 
-                String value = words[i + 1];
-                options.put(opt.getOptionID(), value);
-                i += 2;
+                // save the value
+                options.put(optionKey, value.toString());
             } else {
                 // not a known option, append to the command reminder
-                if (!reminder.isEmpty()) reminder.append(" ");
+                if (!reminder.isEmpty()) reminder.append(' ');
                 reminder.append(word);
                 i++;
             }
