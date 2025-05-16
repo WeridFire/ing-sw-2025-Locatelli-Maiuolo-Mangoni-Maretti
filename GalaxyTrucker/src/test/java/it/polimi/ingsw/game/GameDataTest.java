@@ -79,7 +79,7 @@ class GameDataTest {
 
     @Test
     void testSetCurrentGamePhase() {
-        PlayableGamePhase mockPhase = new PlayableGamePhase(gameId, GamePhaseType.ADVENTURE, gameData) {
+        PlayableGamePhase mockPhase = new PlayableGamePhase(GamePhaseType.ADVENTURE, gameData) {
             @Override
             public void playLoop() {}
 

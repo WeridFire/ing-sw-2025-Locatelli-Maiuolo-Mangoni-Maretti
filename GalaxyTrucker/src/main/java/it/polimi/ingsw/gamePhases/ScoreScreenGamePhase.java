@@ -23,8 +23,8 @@ public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrint
     private final ScoreCalculator scoreCalculator;
 
     public ScoreScreenGamePhase(UUID gameId, GameData gameData) {
-        super(gameId, GamePhaseType.ENDGAME, gameData);
         this.scoreCalculator = new ScoreCalculator();
+        super(GamePhaseType.ENDGAME, gameData);
     }
 
     @Override

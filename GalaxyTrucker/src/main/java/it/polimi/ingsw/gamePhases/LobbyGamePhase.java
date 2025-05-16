@@ -16,11 +16,10 @@ public class LobbyGamePhase extends PlayableGamePhase{
 	/**
 	 * Constructs a new PlayableGamePhase.
 	 *
-	 * @param gameId        The unique identifier of the game.
 	 * @param gameData      The game data.
 	 */
-	public LobbyGamePhase(UUID gameId, GameData gameData) {
-		super(gameId, GamePhaseType.LOBBY, gameData);
+	public LobbyGamePhase(GameData gameData) {
+		super(GamePhaseType.LOBBY, gameData);
 	}
 
 	@Override

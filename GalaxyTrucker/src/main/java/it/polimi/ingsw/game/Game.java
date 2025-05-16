@@ -51,7 +51,7 @@ public class Game {
      * @param resumeGame The game data to resume.
      */
     public Game(GameData resumeGame) {
-        this.id = resumeGame.getGameId();
+        id = resumeGame.getGameId();
         loadGameData(resumeGame);
     }
 
@@ -59,7 +59,7 @@ public class Game {
      * Creates a new game, with a new game.
      */
     public Game(){
-        this.id = UUID.randomUUID();
+        id = UUID.randomUUID();
         loadGameData(new GameData(id));
     }
 
@@ -99,7 +99,7 @@ public class Game {
         // LOBBY
         System.out.println(this + " In lobby");
 
-        LobbyGamePhase lobby = new LobbyGamePhase(id, gameData);
+        LobbyGamePhase lobby = new LobbyGamePhase(gameData);
         getGameData().setCurrentGamePhase(lobby);
         lobby.playLoop();
 
@@ -118,7 +118,7 @@ public class Game {
         // ASSEMBLE
         System.out.println(this + " Started assemble phase");
 
-        AssembleGamePhase assemble = new AssembleGamePhase(id, gameData, () -> {
+        AssembleGamePhase assemble = new AssembleGamePhase(gameData, () -> {
             // notify all players about the new game state with an expired timer
             try {
                 GameServer.getInstance().broadcastUpdate(this);
@@ -184,7 +184,7 @@ public class Game {
             }
 
             // create adventure
-            adventureGamePhase = new AdventureGamePhase(id, gameData, currentAdventureCard);
+            adventureGamePhase = new AdventureGamePhase(gameData, currentAdventureCard);
             getGameData().setCurrentGamePhase(adventureGamePhase);
             // notify all the players about the new adventure card
             notifyAdventureToPlayers(gameData.getPlayersInFlight().getFirst(), currentAdventureCard);
@@ -215,7 +215,7 @@ public class Game {
         //********//
         // SCORE SCREEN
         ScoreScreenGamePhase scoreScreenGamePhase;
-        scoreScreenGamePhase = new ScoreScreenGamePhase(id, gameData);
+        scoreScreenGamePhase = new ScoreScreenGamePhase(gameData);
         getGameData().setCurrentGamePhase(scoreScreenGamePhase);
         System.out.println(this + " Started scoring phase");
         scoreScreenGamePhase.playLoop();
