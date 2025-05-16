@@ -78,37 +78,31 @@ public class Cheats {
 
 	}
 
-	public static void randomShipboard(Game game, Player player) throws RemoteException {
-		if (game.getGameData().getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE) {
-			return;
-		}
-
-		List<TileSkeleton> tilesLeft = game.getGameData().getCoveredTiles();
+	public static void randomFillShipboard(ShipBoard playerShip, List<TileSkeleton> tilesLeft) throws RemoteException {
 		TileSkeleton randomTile = null;
-		ShipBoard playerShip = player.getShipBoard();
 
 		// randomly fill the shipboard
 		for (int r = 2; r <= 12; r++) {
 			for (int c = 2; c <= 12; c++) {
 				if (randomTile == null) {
 					randomTile = tilesLeft.removeFirst();
-                    try {
-                        randomTile.rotateTile(Rotation.random());
-                    } catch (FixedTileException e) {
-                        throw new RuntimeException(e);  // should never happen -> runtime exception
-                    }
-                }
+					try {
+						randomTile.rotateTile(Rotation.random());
+					} catch (FixedTileException e) {
+						throw new RuntimeException(e);  // should never happen -> runtime exception
+					}
+				}
 				try {
 					playerShip.setTile(randomTile, new Coordinates(r, c));
 					randomTile = null;  // to retrieve new random tile next time
 				} catch (TileWithoutNeighborException e) {
 					// note: this error should be avoided when forcefully constructing the ship
-                    try {
-                        playerShip.forceSetTile(randomTile, new Coordinates(r, c));
-                    } catch (FixedTileException ex) {
-                        throw new RuntimeException(ex);  // should never happen -> runtime exception
-                    }
-                    randomTile = null;  // to retrieve new random tile next time
+					try {
+						playerShip.forceSetTile(randomTile, new Coordinates(r, c));
+					} catch (FixedTileException ex) {
+						throw new RuntimeException(ex);  // should never happen -> runtime exception
+					}
+					randomTile = null;  // to retrieve new random tile next time
 				} catch (Exception e) {
 					// ok: ignore placing in wrong coordinates
 				}
@@ -116,13 +110,21 @@ public class Cheats {
 		}
 
 		if (randomTile != null) {
-            try {
-                randomTile.resetRotation();
-            } catch (FixedTileException e) {
-                throw new RuntimeException(e);  // should never happen -> runtime exception
-            }
+			try {
+				randomTile.resetRotation();
+			} catch (FixedTileException e) {
+				throw new RuntimeException(e);  // should never happen -> runtime exception
+			}
 			tilesLeft.set(0, randomTile);
-        }
+		}
+	}
+
+	public static void randomShipboard(Game game, Player player) throws RemoteException {
+		if (game.getGameData().getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE) {
+			return;
+		}
+
+		randomFillShipboard(player.getShipBoard(), game.getGameData().getCoveredTiles());
 
 		GameServer.getInstance().broadcastUpdate(game);
 	}
