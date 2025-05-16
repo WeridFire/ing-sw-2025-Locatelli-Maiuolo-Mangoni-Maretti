@@ -10,6 +10,7 @@ import it.polimi.ingsw.shipboard.tiles.*;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
 import it.polimi.ingsw.shipboard.visitors.TileVisitor;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.util.Pair;
 
 import java.util.*;
 
@@ -21,7 +22,7 @@ public class VisitorCheckIntegrity implements TileVisitor {
     private final Map<Coordinates, TileSkeleton> visitedTiles;
     private final List<TileCluster> clusters;
     private final Set<TileSkeleton> intrinsicallyWrongTiles;
-    private final List<Map.Entry<TileSkeleton, TileSkeleton>> illegallyWeldedTiles;
+    private final List<Pair<TileSkeleton>> illegallyWeldedTiles;
     private final Set<TileSkeleton> tilesWithHumans;
     private TileSkeleton mainCabin;
 
@@ -94,14 +95,25 @@ public class VisitorCheckIntegrity implements TileVisitor {
     }
 
     private void addToClusters(TileSkeleton tile) {
+        Coordinates tileCoordinates = tile.forceGetCoordinates();
+
+        /* first of all signal if it would be illegally welded *
+        for (Coordinates neighborCoordinates : tileCoordinates.getNeighbors()) {
+            TileSkeleton neighborTile = visitedTiles.get(neighborCoordinates);
+            if (neighborTile != null) {  // there is threat to be illegally welded
+                Direction neighborDirection = tileCoordinates.getNeighborDirection(neighborCoordinates);
+                if (!SideType.areCompatible(tile.getSide(neighborDirection),
+                        neighborTile.getSide(neighborDirection.getRotated(Rotation.OPPOSITE)))) {
+                    illegallyWeldedTiles.add(new Pair<>(tile, neighborTile));
+                }
+            }
+        }
+        /**/
+
         List<TileCluster> weldedClusters = new ArrayList<>();
 
         // store as visited tile
-        try {
-            visitedTiles.put(tile.getCoordinates(), tile);
-        } catch (NotFixedTileException e) {
-            throw new RuntimeException(e);  // should never happen -> runtime error
-        }
+        visitedTiles.put(tileCoordinates, tile);
 
         // store all the clusters welded to this tile
         for (TileCluster cluster : clusters) {

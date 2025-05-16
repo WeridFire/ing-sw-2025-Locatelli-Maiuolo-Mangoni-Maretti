@@ -1,5 +1,7 @@
 package it.polimi.ingsw.util;
 
+import it.polimi.ingsw.TilesFactory;
+
 public class Default {
 
     // network
@@ -19,6 +21,6 @@ public class Default {
     public static final String BACK_TILE_PATH = "GT-new_tiles_16_for web157.jpg";
 
     //GENRAL
-    public static final int TOTAL_TILES_NUMBER = 157;
+    public static final int TOTAL_TILES_NUMBER = TilesFactory.createPileTiles().size();
 
 }

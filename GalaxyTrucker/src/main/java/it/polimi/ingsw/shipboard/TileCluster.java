@@ -1,5 +1,6 @@
 package it.polimi.ingsw.shipboard;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
 import it.polimi.ingsw.shipboard.tiles.Tile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
@@ -112,6 +113,7 @@ public class TileCluster implements Serializable {
         }
     }
 
+    @JsonIgnore
     public String toString(String fgColor) {
         StringBuilder builder = new StringBuilder();
         builder.append("[");
@@ -125,5 +127,10 @@ public class TileCluster implements Serializable {
         builder.delete(len - 2, len);
         builder.append("]");
         return builder.toString();
+    }
+
+    @Override @JsonIgnore
+    public String toString() {
+        return toString(ANSI.YELLOW);
     }
 }

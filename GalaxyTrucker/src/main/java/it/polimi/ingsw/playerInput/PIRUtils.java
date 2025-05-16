@@ -240,6 +240,7 @@ public class PIRUtils {
 			// list tilecluster -> list set Coordinates
 			List<Set<Coordinates>> coordCluster = new ArrayList<>();
 			for (TileCluster cluster : clustersToKeep) {
+				System.out.println(cluster.toString(ANSI.GREEN));
 				coordCluster.add(cluster.getTiles().stream().
 						map(TileSkeleton::forceGetCoordinates)
 						.collect(Collectors.toSet()));
@@ -285,12 +286,14 @@ public class PIRUtils {
 			revalidateStructure = manageIntegrityProblemClustersToRemove(integrityProblem.getClustersToRemove());
 			if (revalidateStructure) {
 				playerShip.validateStructure();
+				return;
 			}
 
 			// 3. notify about all the clusters competing to stay in the ship
 			revalidateStructure = manageIntegrityProblemClustersToKeep(integrityProblem.getClustersToKeep());
 			if (revalidateStructure) {
 				playerShip.validateStructure();
+				return;
 			}
 
 			// notify end of integrity problem
