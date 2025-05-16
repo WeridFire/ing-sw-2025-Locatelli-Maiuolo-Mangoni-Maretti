@@ -14,8 +14,6 @@ public class ScoreCalculator implements Serializable {
     private static final int YELLOW_GOODS_MULTIPLIER = 3;
     private static final int RED_GOODS_MULTIPLIER = 4;
 
-    public ScoreCalculator(){}
-
     /**
      * Counts all the goods and adds up the value
      * then adds credits to the score
@@ -23,7 +21,7 @@ public class ScoreCalculator implements Serializable {
      * @param p player of which we are calculating the score
      * @return the player's score
      */
-    public float calculateScore(Player p){
+    public static float calculateScore(Player p){
         float score = 0;
         int goodsCount;
         CalculatorCargoInfo<CargoHoldTile> goodsInfo;
