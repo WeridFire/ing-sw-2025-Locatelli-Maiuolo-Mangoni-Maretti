@@ -76,7 +76,7 @@ public class CLIView extends View {
 		while (true) {
 			String command = scan.nextLine().trim();  // Reading the full line for commands with arguments
 
-			List<String> commandParts = new ArrayList<>(Arrays.asList(command.split(" ")));
+			List<String> commandParts = new ArrayList<>(Arrays.asList(command.split("\\s+")));
 			String cmd = commandParts.removeFirst();
 			String[] args = commandParts.toArray(new String[0]);
 
