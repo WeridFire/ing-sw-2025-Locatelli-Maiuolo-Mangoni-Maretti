@@ -130,8 +130,8 @@ public class ShipGrid extends GridPane {
             Platform.runLater(() -> {
                 ClientManager.getInstance().simulateCommand("discard"); // Tell server to discard the tile in hand
             });
-            if (AssembleUI.isBeeingDragged != null) {
-                AssembleUI.isBeeingDragged.setPosition(WhichPane.DRAWN); // Reset tile's logical position
+            if (AssembleUI.getIsBeeingDragged() != null) {
+                AssembleUI.getIsBeeingDragged().setPosition(WhichPane.DRAWN); // Reset tile's logical position
             }
             // Clear the tile from the visual cell
             Coordinates logicalCoords = new Coordinates(visualRow + baseRow, visualCol + baseCol);
@@ -190,7 +190,7 @@ public class ShipGrid extends GridPane {
             boolean success = false;
 
             if (db.hasString() && Objects.equals(db.getString(), "tile") && cell.getChildren().isEmpty()) {
-                DraggableTile draggedTile = AssembleUI.isBeeingDragged;
+                DraggableTile draggedTile = AssembleUI.getIsBeeingDragged();
                 if (draggedTile != null) {
                     cell.getChildren().add(draggedTile);
                     draggedTile.setPosition(WhichPane.SHIPGRID);

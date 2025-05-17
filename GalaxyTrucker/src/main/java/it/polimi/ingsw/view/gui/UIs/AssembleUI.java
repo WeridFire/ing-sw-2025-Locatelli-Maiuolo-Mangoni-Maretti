@@ -23,9 +23,12 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     private final GridPane leftGrid;
     private static Pane rightPane;
 
-    public static DraggableTile isBeeingDragged;
+    private static DraggableTile isBeeingDragged;
     public static void setIsBeeingDragged(DraggableTile isBeeingDragged) {
         AssembleUI.isBeeingDragged = isBeeingDragged;
+    }
+    public static DraggableTile getIsBeeingDragged() {
+        return isBeeingDragged;
     }
     /**
      * Creates a new assembly UI with all required components.
