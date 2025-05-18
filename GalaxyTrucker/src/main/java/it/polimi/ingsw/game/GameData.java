@@ -6,9 +6,11 @@ import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
+import it.polimi.ingsw.game.exceptions.PlayerNotInGameException;
 import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.PlayableGamePhase;
 import it.polimi.ingsw.gamePhases.exceptions.IllegalStartingPositionIndexException;
+import it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTypeException;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
@@ -445,6 +447,29 @@ public class GameData implements Serializable {
         this.uncoveredTiles.clear();
         if (uncoveredTiles != null) {
             this.uncoveredTiles.addAll(uncoveredTiles);
+        }
+    }
+
+    /**
+     * Makes a player spectate another player's shipboard. The username must be identical to the target username, and
+     * letter case must be identical.
+     * @param player The player that wants to spectate another player.
+     * @param targetUsername The username of the player to spectate (case-sensitive!)
+     * @throws IncorrectGamePhaseTypeException If the action was performed during a phase that is not assemble or adventure.
+     * @throws PlayerNotInGameException If the targetUsername is not a valid player.
+     */
+    public void makePlayerSpectate(Player player, String targetUsername) throws IncorrectGamePhaseTypeException, PlayerNotInGameException {
+        if(this.getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE &&
+                getCurrentGamePhaseType() != GamePhaseType.ADVENTURE){
+            throw new IncorrectGamePhaseTypeException(this.getCurrentGamePhaseType());
+        }
+        if(getPlayersInFlight()
+                .stream()
+                .map(Player::getUsername)
+                .anyMatch(username -> username.equals(targetUsername))) {
+            player.setSpectating(targetUsername);
+        }else{
+            throw new PlayerNotInGameException(targetUsername);
         }
     }
 
