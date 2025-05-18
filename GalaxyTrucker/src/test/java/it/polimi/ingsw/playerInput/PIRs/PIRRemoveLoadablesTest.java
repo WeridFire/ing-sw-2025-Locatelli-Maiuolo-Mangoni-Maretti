@@ -5,6 +5,7 @@ import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.CLIFrame;
@@ -22,8 +23,8 @@ public class PIRRemoveLoadablesTest {
 
 	@BeforeEach
 	void setUp() {
-		player = new Player("TestCommander", UUID.randomUUID());
-		shipBoard = ShipBoard.create(GameLevel.TWO, 0);
+		player = new Player("TestCommander", UUID.randomUUID(), MainCabinTile.Color.BLUE);
+		shipBoard = ShipBoard.create(GameLevel.TWO, MainCabinTile.Color.BLUE);
 		player.setShipBoard(shipBoard);
 		fillShipboardWithTiles(shipBoard, TilesFactory.createPileTiles());
 

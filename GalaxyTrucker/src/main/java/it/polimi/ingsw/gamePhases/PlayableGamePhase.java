@@ -18,26 +18,24 @@ import java.util.UUID;
 public abstract class PlayableGamePhase implements Serializable {
 
     /** The type of the game phase. */
-    GamePhaseType gamePhaseType;
-
+    protected final GamePhaseType gamePhaseType;
 
     /** The unique identifier of the game. */
-    UUID gameId;
+    protected final UUID gameId;
 
     /** The game data associated with this phase. */
-    GameData gameData;
+    protected final GameData gameData;
 
     /**
      * Constructs a new PlayableGamePhase.
      *
-     * @param gameId The unique identifier of the game.
      * @param gamePhaseType The type of the game phase.
      * @param gameData The game data.
      */
-    public PlayableGamePhase(UUID gameId, GamePhaseType gamePhaseType, GameData gameData) {
-        this.gameId = gameId;
+    public PlayableGamePhase(GamePhaseType gamePhaseType, GameData gameData) {
         this.gamePhaseType = gamePhaseType;
         this.gameData = gameData;
+        gameId = gameData.getGameId();
     }
 
     /**

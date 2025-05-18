@@ -2,16 +2,15 @@ package it.polimi.ingsw;
 
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.game.exceptions.ColorAlreadyInUseException;
 import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
-import it.polimi.ingsw.game.exceptions.GameNotFoundException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Singleton class for managing game creation and retrieval.
@@ -106,17 +105,23 @@ public class GamesHandler {
      * Creates a game and adds the player into the game. Makes sure that the player is not already in another game.
      * @param username The username the player wants to join with.
      * @param connectionUUID The connection id of the player
+     * @param desiredColor The color this player wants to use for the game
      * @return The created game.
      * @throws PlayerAlreadyInGameException The player is in another game.
      */
-    public Game createGame(String username, UUID connectionUUID) throws PlayerAlreadyInGameException {
+    public Game createGame(String username, UUID connectionUUID, MainCabinTile.Color desiredColor)
+            throws PlayerAlreadyInGameException {
         if(findGameByClientUUID(connectionUUID) != null){
             throw new PlayerAlreadyInGameException(username);
         }
         Game createdGame = startGame();
         games.add(createdGame);
 
-        createdGame.addPlayer(username, connectionUUID);
+        try {
+            createdGame.addPlayer(username, connectionUUID, desiredColor);
+        } catch (GameAlreadyRunningException | ColorAlreadyInUseException e) {
+            throw new RuntimeException(e);  // should never happen -> runtime exception
+        }
         return createdGame;
 	}
 
@@ -128,7 +133,8 @@ public class GamesHandler {
      * @param connectionUUID The connection fo the player that sent the command.
      * @return The newly game object.
      */
-    public Game resumeGame(GameData savedGameState, UUID connectionUUID) throws PlayerAlreadyInGameException, GameAlreadyRunningException {
+    public Game resumeGame(GameData savedGameState, UUID connectionUUID) throws PlayerAlreadyInGameException,
+            GameAlreadyRunningException {
         Game createdGame = new Game(savedGameState);
         if(games.stream().anyMatch((g) -> g.getId().equals(savedGameState.getGameId()))){
             throw new GameAlreadyRunningException(createdGame.getId());
@@ -136,7 +142,11 @@ public class GamesHandler {
         games.add(createdGame);
         startGame(createdGame);
 
-        createdGame.addPlayer(savedGameState.getGameLeader(), connectionUUID);
+        try {
+            createdGame.addPlayer(savedGameState.getGameLeader(), connectionUUID, null);
+        } catch (ColorAlreadyInUseException e) {
+            throw new RuntimeException(e);  // should never happen -> runtime exception
+        }
 
         return createdGame;
     }
@@ -150,8 +160,10 @@ public class GamesHandler {
     }
 
     public Game findGameByClientUUID(UUID clientUUID) {
-        return GamesHandler.getInstance().getGames().stream()
-                .filter(game -> game.getGameData().getPlayer(p -> p.getConnectionUUID() == clientUUID) != null)
+        return getGames().stream()
+                .filter(game ->
+                        game.getGameData().getPlayer(p ->
+                                p.getConnectionUUID().equals(clientUUID)) != null)
                 .findFirst().orElse(null);
     }
 

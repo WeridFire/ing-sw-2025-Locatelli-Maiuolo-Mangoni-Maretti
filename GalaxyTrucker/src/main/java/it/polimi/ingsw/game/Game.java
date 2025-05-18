@@ -5,6 +5,8 @@ import it.polimi.ingsw.TilesFactory;
 import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.cards.Deck;
 import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.game.exceptions.ColorAlreadyInUseException;
+import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.AdventureGamePhase;
 import it.polimi.ingsw.gamePhases.AssembleGamePhase;
@@ -20,6 +22,7 @@ import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.gamePhases.exceptions.AlreadyPickedPosition;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.rmi.RemoteException;
@@ -48,7 +51,7 @@ public class Game {
      * @param resumeGame The game data to resume.
      */
     public Game(GameData resumeGame) {
-        this.id = resumeGame.getGameId();
+        id = resumeGame.getGameId();
         loadGameData(resumeGame);
     }
 
@@ -56,7 +59,7 @@ public class Game {
      * Creates a new game, with a new game.
      */
     public Game(){
-        this.id = UUID.randomUUID();
+        id = UUID.randomUUID();
         loadGameData(new GameData(id));
     }
 
@@ -96,7 +99,7 @@ public class Game {
         // LOBBY
         System.out.println(this + " In lobby");
 
-        LobbyGamePhase lobby = new LobbyGamePhase(id, gameData);
+        LobbyGamePhase lobby = new LobbyGamePhase(gameData);
         getGameData().setCurrentGamePhase(lobby);
         lobby.playLoop();
 
@@ -115,7 +118,7 @@ public class Game {
         // ASSEMBLE
         System.out.println(this + " Started assemble phase");
 
-        AssembleGamePhase assemble = new AssembleGamePhase(id, gameData, () -> {
+        AssembleGamePhase assemble = new AssembleGamePhase(gameData, () -> {
             // notify all players about the new game state with an expired timer
             try {
                 GameServer.getInstance().broadcastUpdate(this);
@@ -181,7 +184,7 @@ public class Game {
             }
 
             // create adventure
-            adventureGamePhase = new AdventureGamePhase(id, gameData, currentAdventureCard);
+            adventureGamePhase = new AdventureGamePhase(gameData, currentAdventureCard);
             getGameData().setCurrentGamePhase(adventureGamePhase);
             // notify all the players about the new adventure card
             notifyAdventureToPlayers(gameData.getPlayersInFlight().getFirst(), currentAdventureCard);
@@ -212,7 +215,7 @@ public class Game {
         //********//
         // SCORE SCREEN
         ScoreScreenGamePhase scoreScreenGamePhase;
-        scoreScreenGamePhase = new ScoreScreenGamePhase(id, gameData);
+        scoreScreenGamePhase = new ScoreScreenGamePhase(gameData);
         getGameData().setCurrentGamePhase(scoreScreenGamePhase);
         System.out.println(this + " Started scoring phase");
         scoreScreenGamePhase.playLoop();
@@ -246,23 +249,40 @@ public class Game {
         return true;
     }
 
+    /**
+     * Create a Player with the specified username, assign it the specified client connection UUID and return it.
+     * If this game has already started check that the username matches among those of previously connected players,
+     * and if so also whether that player actually disconnected.
+     *
+     * @param username the new player's unique (for this game) name
+     * @param connectionUUID the connection UUID of the client associated to the new player
+     * @param desiredColor the color this player wants to use for the game.
+     * Note: if the player to add is trying to reconnect, the desired color is ignored and the previous is kept.
+     *
+     * @return the created player
+     *
+     * @throws PlayerAlreadyInGameException if the player is already in this game
+     * @throws GameAlreadyRunningException if this instance of game is not in main menu nor lobby and the username is
+     * NOT of a disconnected player.
+     * @throws ColorAlreadyInUseException if the desired color is already taken by another player.
+     */
+    public Player addPlayer(String username, UUID connectionUUID, MainCabinTile.Color desiredColor)
+            throws PlayerAlreadyInGameException, GameAlreadyRunningException, ColorAlreadyInUseException {
 
-    private Player createAndAddPlayer(String username, UUID connectionUUID) throws PlayerAlreadyInGameException {
-        Player newPlayer = new Player(username, connectionUUID);
-        gameData.addPlayer(newPlayer);
-        return newPlayer;
-    }
-
-    public Player addPlayer(String username, UUID connectionUUID) throws PlayerAlreadyInGameException {
         GamePhaseType currentGamePhaseType = getGameData().getCurrentGamePhaseType();
         if (currentGamePhaseType == GamePhaseType.NONE || currentGamePhaseType == GamePhaseType.LOBBY) {
-            return createAndAddPlayer(username, connectionUUID);
+            if (gameData.getPlayer(p -> p.getColor().equals(desiredColor)) != null) {
+                throw new ColorAlreadyInUseException(desiredColor);
+            }
+            Player newPlayer = new Player(username, connectionUUID, desiredColor);
+            gameData.addPlayer(newPlayer);
+            return newPlayer;
         }
 
         Player existingDisconnectedPlayer = gameData.getPlayer(p ->
                 p.getUsername().equals(username) && !p.isConnected());
         if (existingDisconnectedPlayer == null) {
-            return createAndAddPlayer(username, connectionUUID);
+            throw new GameAlreadyRunningException("Attempted to join a game that has already started!");
         } else {
             existingDisconnectedPlayer.setConnectionUUID(connectionUUID);
             return existingDisconnectedPlayer;
@@ -282,14 +302,12 @@ public class Game {
 
         gameData.setCoveredTiles(t);
 
-        gameData.setDeck(new Deck(gameData.getLevel()));
+        gameData.setDeck(Deck.random(gameData.getLevel()));
 
-        int playerIndex = 0;
         for (Player player : gameData.getPlayers()) {
-            ShipBoard shipBoard = ShipBoard.create(gameData.getLevel(), playerIndex);
+            ShipBoard shipBoard = ShipBoard.create(gameData.getLevel(), player.getColor());
             shipBoard.attachIntegrityListener(new PIRUtils.ShipIntegrityListener(player, this));
             player.setShipBoard(shipBoard);
-            playerIndex++;
         }
     }
 

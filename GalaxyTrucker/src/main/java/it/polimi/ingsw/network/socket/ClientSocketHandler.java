@@ -7,6 +7,7 @@ import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.messages.SocketMessage;
 import it.polimi.ingsw.player.kpf.KeepPlayerFlyingPredicate;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.io.BufferedReader;
@@ -57,14 +58,17 @@ public class ClientSocketHandler implements IClient {
 				try{
 					switch (message.getType()) {
 						case PING -> getServer().ping(this);
-						case JOIN_GAME -> getServer()
-										.joinGame(
-												this,
-												(UUID) message.getArgs().getFirst(),
-												(String) message.getArgs().get(1));
+						case JOIN_GAME -> getServer().joinGame(
+								this,
+								(UUID) message.getArgs().getFirst(),
+								(String) message.getArgs().get(1),
+								(MainCabinTile.Color) message.getArgs().get(2)
+						);
 						case CREATE_GAME -> getServer().createGame(
-												this,
-												(String) message.getArgs().getFirst());
+								this,
+								(String) message.getArgs().getFirst(),
+								(MainCabinTile.Color) message.getArgs().get(1)
+						);
 						case UPDATE_SETTINGS -> getServer().updateGameSettings(
 								this,
 								(GameLevel) message.getArgs().getFirst(),

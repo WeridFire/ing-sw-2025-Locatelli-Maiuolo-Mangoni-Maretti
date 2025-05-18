@@ -8,17 +8,25 @@ import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.view.gui.GUIView;
 
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.*;
 
 public class ViewMock extends GUIView {
 
     private final String mockName;
     private State mockState;
+    private UUID clientUUID;
+
+    private final List<String> infos = new ArrayList<>();
+    private final List<String> warnings = new ArrayList<>();
+    private final List<String> errors = new ArrayList<>();
 
     public ViewMock(String mockName) {
         super();
         this.mockName = mockName;
+    }
+
+    public UUID getClientUUID() {
+        return clientUUID;
     }
 
     @Override
@@ -36,11 +44,13 @@ public class ViewMock extends GUIView {
                 + " | refresh: " + update.isRefreshRequired());
 
          */
+        clientUUID  = update.getClientUUID();
     }
 
     @Override
     public void onVoid() {
-
+        System.out.println(mockName + " >> void");
+        onRefresh();
     }
 
     @Override
@@ -50,12 +60,14 @@ public class ViewMock extends GUIView {
 
     @Override
     public void onScreen(String screenName) {
-
+        System.out.println(mockName + " >> screen -> " + screenName);
+        onRefresh();
     }
 
     @Override
     public void onHelp() {
-
+        System.out.println(mockName + " >> help");
+        onRefresh();
     }
 
     @Override
@@ -65,17 +77,32 @@ public class ViewMock extends GUIView {
 
     @Override
     public void showInfo(String title, String content) {
-
+        System.out.println(mockName + " INFO >> " + title + " - " + content);
+        infos.add(title + "_" + content);
+        onRefresh();
+    }
+    public List<String> getInfos() {
+        return infos;
     }
 
     @Override
     public void showWarning(String title, String content) {
-
+        System.out.println(mockName + " WARNING >> " + title + " - " + content);
+        warnings.add(title + "_" + content);
+        onRefresh();
+    }
+    public List<String> getWarnings() {
+        return warnings;
     }
 
     @Override
     public void showError(String title, String content) {
-
+        System.out.println(mockName + " ERROR >> " + title + " - " + content);
+        errors.add(title + "_" + content);
+        onRefresh();
+    }
+    public List<String> getErrors() {
+        return errors;
     }
 
     private Player getPlayer() {

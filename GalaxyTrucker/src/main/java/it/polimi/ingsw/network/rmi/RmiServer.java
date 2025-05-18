@@ -28,6 +28,7 @@ import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.*;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
@@ -100,10 +101,11 @@ public class RmiServer implements IServer {
 	}
 
 	@Override
-	public void createGame(IClient client, String username) throws RemoteException {
+	public void createGame(IClient client, String username, MainCabinTile.Color desiredColor)
+			throws RemoteException {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		try {
-			Game game = gamesHandler.createGame(username, connectionUUID);
+			Game game = gamesHandler.createGame(username, connectionUUID, desiredColor);
 			if (game == null) {
 				throw new Exception("Game creation failed");
 			}
@@ -119,20 +121,21 @@ public class RmiServer implements IServer {
 	}
 
 	@Override
-	public void joinGame(IClient client, UUID gameId, String username) throws RemoteException {
+	public void joinGame(IClient client, UUID gameId, String username, MainCabinTile.Color desiredColor) throws RemoteException {
 		UUID connectionUUID = gameServer.getUUIDbyConnection(client);
 		try {
 			Game game = gamesHandler.getGame(gameId);
 			if(game == null) {
 				throw new GameNotFoundException(gameId);
 			}
-			game.addPlayer(username, connectionUUID);
+			game.addPlayer(username, connectionUUID, desiredColor);
             //notify everyone that a new player has joined -> refreshes their view
             GameServer.getInstance().broadcastUpdate(game);
-        } catch (PlayerAlreadyInGameException | GameNotFoundException e) {
+        } catch (PlayerAlreadyInGameException | GameNotFoundException | GameAlreadyRunningException
+				 | ColorAlreadyInUseException e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
-	}
+    }
 
 	@Override
 	public void quitGame(IClient client) throws RemoteException {

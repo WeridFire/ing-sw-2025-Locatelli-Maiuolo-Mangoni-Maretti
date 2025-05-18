@@ -1,6 +1,7 @@
 package it.polimi.ingsw.playerInput.PIRs;
 
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +12,7 @@ public class PIRYesNoChoiceTest {
 	@Test
 	void testPIRMultipleChoiceCLI() {
 		// Dummy player for testing
-		Player testPlayer = new Player("PlayerTest", UUID.randomUUID());
+		Player testPlayer = new Player("PlayerTest", UUID.randomUUID(), MainCabinTile.Color.BLUE);
 
 		PIRYesNoChoice pir = new PIRYesNoChoice(testPlayer, 30, "Do you want to activate the shields?", true);
 

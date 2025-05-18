@@ -7,6 +7,7 @@ import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRActivateTiles;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.CLIFrame;
@@ -24,8 +25,8 @@ public class PIRActivateTilesTest {
 
 	@BeforeEach
 	void setUp() {
-		player = new Player("TestCommander", UUID.randomUUID());
-		shipBoard = ShipBoard.create(GameLevel.TWO, 0);
+		player = new Player("TestCommander", UUID.randomUUID(), MainCabinTile.Color.BLUE);
+		shipBoard = ShipBoard.create(GameLevel.TWO, MainCabinTile.Color.BLUE);
 		player.setShipBoard(shipBoard);
 	}
 

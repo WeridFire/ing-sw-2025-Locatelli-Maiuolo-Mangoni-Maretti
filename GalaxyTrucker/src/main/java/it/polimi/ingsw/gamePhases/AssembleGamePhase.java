@@ -29,12 +29,11 @@ public class AssembleGamePhase extends PlayableGamePhase {
      * Constructs a new PlayableGamePhase as {@link GamePhaseType#ASSEMBLE}.
      * Every time a timer stops or gets resumed: executes {@code onTimerSwitchCallback}.
      *
-     * @param gameId The unique identifier of the game.
      * @param gameData The game data.
      * @param onTimerSwitchCallback The callback function to be executed every time a timer switches state.
      */
-    public AssembleGamePhase(UUID gameId, GameData gameData, Runnable onTimerSwitchCallback) {
-        super(gameId, GamePhaseType.ASSEMBLE, gameData);
+    public AssembleGamePhase(GameData gameData, Runnable onTimerSwitchCallback) {
+        super(GamePhaseType.ASSEMBLE, gameData);
         totalTimerRotations = GameLevelStandards.getTimerSlotsCount(gameData.getLevel());
         howManyTimerRotationsLeft = totalTimerRotations;
         setOnTimerSwitchCallback(onTimerSwitchCallback);
@@ -49,7 +48,7 @@ public class AssembleGamePhase extends PlayableGamePhase {
      * @param gameData      The game data.
      */
     public AssembleGamePhase(UUID gameId, GameData gameData) {
-        this(gameId, gameData, null);
+        this(gameData, null);
     }
 
     private void setTimerRunning(boolean running) {

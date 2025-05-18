@@ -6,6 +6,7 @@ import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.network.exceptions.AlreadyRunningServerException;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.ShipBoard;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.util.GameLevelStandards;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,8 +34,8 @@ public class AdventureCLIScreenTest {
     private List<Player> preparePlayers(int nPlayers, GameLevel gameLevel) {
         List<Player> players = new ArrayList<>(nPlayers);
         for (int i = 0; i < nPlayers; i++) {
-            players.add(new Player("player " + (i + 1), UUID.randomUUID()));
-            players.getLast().setShipBoard(ShipBoard.create(gameLevel, i));
+            players.add(new Player("player " + (i + 1), UUID.randomUUID(), MainCabinTile.Color.fromPlayerIndex(i)));
+            players.getLast().setShipBoard(ShipBoard.create(gameLevel, MainCabinTile.Color.fromPlayerIndex(i)));
         }
 
         List<Integer> positions = new ArrayList<>(GameLevelStandards.getFlightBoardParkingLots(gameLevel));

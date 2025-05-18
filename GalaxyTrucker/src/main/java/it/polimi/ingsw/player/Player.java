@@ -29,6 +29,11 @@ public class Player implements Serializable {
     private ShipBoard shipBoard;
 
     /**
+     * The player color. Implemented as the same of its ship main cabin color.
+     */
+    private final MainCabinTile.Color color;
+
+    /**
      * Number of tiles that the player will have to pay for at the end of the game
      * (destroyed tiles, or reserved and not used tiles)
      */
@@ -83,9 +88,10 @@ public class Player implements Serializable {
     private KeepPlayerFlyingPredicate saveFromEndFlight;
 
 
-    public Player(String username, UUID connectionUUID) {
+    public Player(String username, UUID connectionUUID, MainCabinTile.Color color) {
         this.username = username;
         this.connectionUUID = connectionUUID;
+        this.color = color;
 
         lostTiles = new ArrayList<>();
         reservedTiles = new ArrayList<>(2);
@@ -208,24 +214,19 @@ public class Player implements Serializable {
     /**
      * Assigns the shipboard to the player
      * @param shipBoard this player's shipboard
+     * @implSpec the shipboard main cabin color must be equals to this player color
      */
     public void setShipBoard(ShipBoard shipBoard) {
         this.shipBoard = shipBoard;
     }
 
     /**
-     * Returns the player's color. It's exactly the color of his main cabin, so this method requires to be called
-     * after setting up the shipboard (ensure {@link #setShipBoard(ShipBoard)} has been called).
+     * Returns the player's color. It's exactly the color of his main cabin.
      *
-     * @return the player's color, or {@code null} if no shipboard has been assigned to the player yet
-     * or if the assigned shipboard has not been properly initialized.
+     * @return the player's color.
      */
     public MainCabinTile.Color getColor() {
-        try {
-            return shipBoard.getColor();
-        } catch (NullPointerException | UninitializedShipboardException e) {
-            return null;
-        }
+        return color;
     }
 
     /**

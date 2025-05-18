@@ -42,6 +42,12 @@ public enum SideType {
         }
     }
 
+    public static boolean areCompatible(SideType s1, SideType s2) {
+        if (areWeldable(s1, s2)) return true;  // weldable ==> compatible
+        // else: not weldable but still have chance to be compatible
+        return (s1 == SMOOTH && s2 == SMOOTH);
+    }
+
     public static String getCLIRepresentation(SideType side, Direction pointing) {
         List<String> reps = switch (side) {
             case UNIVERSAL -> Direction.sortedArray("⁅", "╨┴", "⁆", "╥┬");

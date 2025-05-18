@@ -4,6 +4,7 @@ import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.player.kpf.KeepPlayerFlyingPredicate;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.io.*;
@@ -105,20 +106,22 @@ public class SocketMessage implements Serializable{
 	/**
 	 * Creates a socket message to tell the server to create a game and join it, using the specified username.
 	 * @param username The username to use
+	 * @param desiredColor The color this player wants to use for the game
 	 * @return The socket message containing the desired information.
 	 */
-	public static SocketMessage createGameMessage(String username){
-		return new SocketMessage(MessageType.CREATE_GAME, List.of(username));
+	public static SocketMessage createGameMessage(String username, MainCabinTile.Color desiredColor) {
+		return new SocketMessage(MessageType.CREATE_GAME, Arrays.asList(username, desiredColor));
 	}
 
 	/**
 	 * Creates a socket message to tell the server to join a game identified by ID using a specified username
-	 * @param username The username to use
 	 * @param gameId The game ID to join
+	 * @param username The username to use
+	 * @param desiredColor The color this player wants to use for the game
 	 * @return The socket message containing the desired information.
 	 */
-	public static SocketMessage joinGameMessage(UUID gameId, String username){
-		return new SocketMessage(MessageType.JOIN_GAME, List.of(gameId, username));
+	public static SocketMessage joinGameMessage(UUID gameId, String username, MainCabinTile.Color desiredColor){
+		return new SocketMessage(MessageType.JOIN_GAME, List.of(gameId, username, desiredColor));
 	}
 
 	/**

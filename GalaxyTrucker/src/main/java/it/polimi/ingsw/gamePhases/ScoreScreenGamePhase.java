@@ -20,11 +20,8 @@ import java.util.stream.Collectors;
 
 public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrintable, Serializable {
 
-    private final ScoreCalculator scoreCalculator;
-
-    public ScoreScreenGamePhase(UUID gameId, GameData gameData) {
-        super(gameId, GamePhaseType.ENDGAME, gameData);
-        this.scoreCalculator = new ScoreCalculator();
+    public ScoreScreenGamePhase(GameData gameData) {
+        super(GamePhaseType.ENDGAME, gameData);
     }
 
     @Override
@@ -50,35 +47,36 @@ public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrint
         Map<Player, Float> playerScores = new HashMap<>();
 
         //finds the count of the least exposed connectors
-        Integer leastExposedConnectors = null;
-        for(Player p: gameData.getPlayers())
-        {
+        int leastExposedConnectors = Integer.MAX_VALUE;
+        for(Player p: gameData.getPlayers()) {
             int tempExposedConnectors = p.getShipBoard().getExposedConnectorsCount();
-            if(leastExposedConnectors == null || leastExposedConnectors > tempExposedConnectors)
-            {
+            if (leastExposedConnectors > tempExposedConnectors) {
                 leastExposedConnectors = tempExposedConnectors;
             }
         }
 
         //calculates points
         int i = 0;
+        List<Integer> finishOrderRewards = GameLevelStandards.getFinishOrderRewards(gameData.getLevel());
+        int awardForBestLookingShip = GameLevelStandards.getAwardForBestLookingShip(gameData.getLevel());
         for(Player p: gameData.getPlayers())
         {
-            i++;
-
             //points for the goods and repairs
-           score = scoreCalculator.calculateScore(p);
+            score = ScoreCalculator.calculateScore(p);
 
-           //adds points for the positions
-           if(!p.isEndedFlight()){
-               score += GameLevelStandards.getFinishOrderRewards(gameData.getLevel()).get(i);
-           }
+            //adds points for the positions
+            if(!p.isEndedFlight()){
+                score += finishOrderRewards.get(i);
+            }
 
-           //adds points for the best ship
-           if(p.getShipBoard().getExposedConnectorsCount() == leastExposedConnectors){
-               score += GameLevelStandards.getAwardForBestLookingShip(gameData.getLevel());
-           }
-           playerScores.put(p, score);
+            //adds points for the best ship
+            if(p.getShipBoard().getExposedConnectorsCount() == leastExposedConnectors){
+                score += awardForBestLookingShip;
+            }
+
+            playerScores.put(p, score);
+
+            i++;
         }
 
         //sorts the players
@@ -90,36 +88,6 @@ public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrint
                         (e1, e2) -> e1,
                         LinkedHashMap::new
                 ));
-    }
-
-    //Used in testing
-    public void printScores(Map<Player, Float> sortedScores) {
-
-        System.out.println("Player Scores (Descending Order):");
-        System.out.println("--------------------------------");
-
-        int rank = 1;
-        Float prevScore = null;
-        int sameRankCount = 0;
-
-        for (Map.Entry<Player, Float> entry : sortedScores.entrySet()) {
-            float currentScore = entry.getValue();
-
-            // If score is different from previous, update rank
-            if (prevScore != null && currentScore == prevScore) {
-                sameRankCount++;    // Increment tie counter
-            } else {
-                rank += 1 + sameRankCount;  // Apply accumulated ties
-                sameRankCount = 0;      // Reset counter
-            }
-
-            System.out.printf("%d. %s: %.2f%n",
-                    rank,
-                    entry.getKey().getUsername(),
-                    currentScore);
-
-            prevScore = currentScore;
-        }
     }
 
     /**

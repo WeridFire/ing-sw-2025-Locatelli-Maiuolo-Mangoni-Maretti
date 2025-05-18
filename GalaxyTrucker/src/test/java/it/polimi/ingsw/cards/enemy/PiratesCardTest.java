@@ -3,6 +3,7 @@ package it.polimi.ingsw.cards.enemy;
 import it.polimi.ingsw.cards.projectile.Projectile;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,8 @@ class PiratesCardTest {
                 Projectile.createLightCannonFire(Direction.NORTH),
                 Projectile.createHeavyCannonFire(Direction.NORTH),
         }, 6, 2, "GT-cards_II_IT_013.jpg", 2);
-        testGame = GamesHandler.getInstance().createGame("SpaceTruckKing", UUID.randomUUID());
+        testGame = GamesHandler.getInstance().createGame("SpaceTruckKing", UUID.randomUUID(),
+                MainCabinTile.Color.BLUE);
         testGameData = testGame.getGameData();
         player1 = testGameData.getPlayers().getFirst();
         player1.setPosition(0);

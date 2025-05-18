@@ -15,11 +15,11 @@ public class AdventureGamePhase extends PlayableGamePhase{
     /**
      * Constructs a new PlayableGamePhase.
      *
-     * @param gameId        The unique identifier of the game.
      * @param gameData      The game data.
+     * @param card the adventure card to play in {@link #playLoop()}
      */
-    public AdventureGamePhase(UUID gameId, GameData gameData, Card card) {
-        super(gameId, GamePhaseType.ADVENTURE, gameData);
+    public AdventureGamePhase(GameData gameData, Card card) {
+        super(GamePhaseType.ADVENTURE, gameData);
         this.card = card;
     }
 
