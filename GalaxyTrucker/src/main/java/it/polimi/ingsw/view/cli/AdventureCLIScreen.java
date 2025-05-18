@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.cli;
 
 import it.polimi.ingsw.controller.cp.AdventureCommandsProcessor;
+import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.enums.*;
 import it.polimi.ingsw.game.GameData;
@@ -52,16 +53,23 @@ public class AdventureCLIScreen extends CLIScreen{
     @Override
     public CLIFrame getCLIRepresentation() {
 
-        GameData gameData = CommonState.getGameData();
+        String spectatedPlayerUsername = AssembleState.getPlayer().getSpectating();
+        Player spectatedPlayer = AssembleState.getGameData().getPlayersInFlight()
+                .stream()
+                .filter((p) -> p.getUsername().equals(spectatedPlayerUsername))
+                .findFirst()
+                .orElse(AssembleState.getPlayer()); //default fallback to own shipboard in case something goes wrong
 
-        Player thisPlayer = CommonState.getPlayer();
-        CLIFrame shipboardFrame = thisPlayer.getShipBoard().getCLIRepresentation();
+        // frame for shipboard
+        CLIFrame frameShipboard = spectatedPlayer.getShipBoard().getCLIRepresentation();
+
+        GameData gameData = CommonState.getGameData();
 
         CLIFrame boardFrame = getBoardFrame(gameData.getLevel(), gameData.getPlayers(), gameData.getPIRHandler());
 
-        shipboardFrame = shipboardFrame.merge(boardFrame, Direction.NORTH, 2);
+        frameShipboard = frameShipboard.merge(boardFrame, Direction.NORTH, 2);
 
-        return shipboardFrame;
+        return frameShipboard;
     }
 
     /**

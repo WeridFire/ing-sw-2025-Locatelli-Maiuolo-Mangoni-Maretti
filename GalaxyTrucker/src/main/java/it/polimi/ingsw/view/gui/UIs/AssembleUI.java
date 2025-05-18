@@ -1,18 +1,17 @@
 package it.polimi.ingsw.view.gui.UIs;
 
-import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.LobbyState;
-import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.network.messages.ClientUpdate;
-import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.view.gui.components.CoveredTilesPane;
 import it.polimi.ingsw.view.gui.components.DraggableTile;
+import it.polimi.ingsw.view.gui.components.DrawnTilesGrid;
 import it.polimi.ingsw.view.gui.components.ShipGrid;
+import it.polimi.ingsw.view.gui.helpers.WhichPane;
 import javafx.application.Platform;
 import javafx.scene.Node;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 
-import java.util.List;
 
 /**
  * UI component for the ship assembly phase of the game.
@@ -20,13 +19,16 @@ import java.util.List;
 public class AssembleUI implements INodeRefreshableOnUpdateUI {
 
     private final GridPane mainGrid;
-    private final GridPane topGrid;
+    private ScrollPane topScrollPane;
     private final GridPane leftGrid;
-    private Pane rightPane;
+    private static Pane rightPane;
 
-    public static DraggableTile isBeeingDragged;
+    private static DraggableTile isBeeingDragged;
     public static void setIsBeeingDragged(DraggableTile isBeeingDragged) {
         AssembleUI.isBeeingDragged = isBeeingDragged;
+    }
+    public static DraggableTile getIsBeeingDragged() {
+        return isBeeingDragged;
     }
     /**
      * Creates a new assembly UI with all required components.
@@ -34,12 +36,12 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     public AssembleUI() {
         mainGrid = new GridPane();
 
-        topGrid = createDrawnTilesGrid(3, 8);
+        topScrollPane = createDrawnTilesScrollPane();
         leftGrid = createShipGrid();
         rightPane = createCoveredTilesPane();
 
         // Setup layout
-        mainGrid.add(topGrid, 0, 0, 2, 1);
+        mainGrid.add(topScrollPane, 0, 0, 2, 1);
         mainGrid.add(leftGrid, 0, 1);
         mainGrid.add(rightPane, 1, 1);
 
@@ -50,32 +52,22 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
      * Configures grid components to resize properly.
      */
     private void configureGridBehavior() {
-        for (Node node : new Node[]{topGrid, leftGrid, rightPane}) {
+        for (Node node : new Node[]{topScrollPane, leftGrid, rightPane}) {
             GridPane.setHgrow(node, Priority.ALWAYS);
             GridPane.setVgrow(node, Priority.ALWAYS);
         }
     }
 
     /**
-     * Creates the grid for displaying drawn tiles.
+     * Creates the scrollable pane for displaying drawn tiles.
      */
-    private GridPane createDrawnTilesGrid(int rows, int cols) {
-        GameData game = AssembleState.getLastUpdate().getCurrentGame();
-        List<TileSkeleton> drawnTiles = game.getUncoveredTiles();
-        int counter = 0;
-
-        GridPane grid = new GridPane();
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
-                if (counter < drawnTiles.size()) {
-                    DraggableTile draggableTile = new DraggableTile(drawnTiles.get(counter));
-                    counter++;
-                    grid.add(draggableTile, c, r);
-                }
-            }
-        }
-
-        return grid;
+    private ScrollPane createDrawnTilesScrollPane() {
+        DrawnTilesGrid drawnTilesGrid = new DrawnTilesGrid();
+        ScrollPane scrollPane = new ScrollPane(drawnTilesGrid);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        return scrollPane;
     }
 
     /**
@@ -120,11 +112,12 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     public void refreshOnUpdate(ClientUpdate update) {
         // Update the drawn tiles grid with fresh data
         Platform.runLater(() -> {
-            GridPane newTopGrid = createDrawnTilesGrid(3, 8);
-            mainGrid.getChildren().remove(topGrid);
-            mainGrid.add(newTopGrid, 0, 0, 2, 1);
-            GridPane.setHgrow(newTopGrid, Priority.ALWAYS);
-            GridPane.setVgrow(newTopGrid, Priority.ALWAYS);
+            ScrollPane newTopScrollPane = createDrawnTilesScrollPane();
+            mainGrid.getChildren().remove(topScrollPane);
+            topScrollPane = newTopScrollPane;
+            mainGrid.add(topScrollPane, 0, 0, 2, 1);
+            GridPane.setHgrow(topScrollPane, Priority.ALWAYS);
+            GridPane.setVgrow(topScrollPane, Priority.ALWAYS);
 
             ((ShipGrid) leftGrid).updateGridFromShipBoard();
         });

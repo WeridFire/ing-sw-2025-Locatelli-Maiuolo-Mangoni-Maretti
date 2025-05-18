@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
 
 public class GameServer{
 
@@ -170,6 +171,20 @@ public class GameServer{
 			IClient client = entry.getValue();
 			client.updateClient(new ClientUpdate(uuid));
 		}
+	}
+
+	/**
+	 * Updates all the players that are currently watching a specficic shipboard.
+	 * @param game The game this update should relate to
+	 * @param targetShipboard The shipboard's owner the players that need to update are spectating
+	 * @throws RemoteException
+	 */
+	public void broadcastUpdateShipboardSpectators(Game game, Player targetShipboard) throws RemoteException{
+		Set<Player> playersToUpdate = game.getGameData().getPlayersInFlight()
+				.stream()
+				.filter((p) -> p.getSpectating().equals(targetShipboard.getUsername()))
+				.collect(Collectors.toSet());
+		broadcastUpdateRefreshOnly(game, playersToUpdate);
 	}
 
 	public void broadcastUpdateAllRefreshOnlyIf(BiPredicate<UUID, IClient> refreshCondition) throws RemoteException {

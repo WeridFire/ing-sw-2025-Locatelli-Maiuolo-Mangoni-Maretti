@@ -29,6 +29,12 @@ public class Player implements Serializable {
     private ShipBoard shipBoard;
 
     /**
+     * The name of the player that the current player is spectating.
+     * String is used instead of the Player instance to avoid NullPointerExceptions during game serialization
+     */
+    private String spectating;
+
+    /**
      * The player color. Implemented as the same of its ship main cabin color.
      */
     private final MainCabinTile.Color color;
@@ -87,6 +93,22 @@ public class Player implements Serializable {
      */
     private KeepPlayerFlyingPredicate saveFromEndFlight;
 
+    /**
+     * Gets the player that is currently being spectated
+     * @return
+     */
+	public String getSpectating(){
+        return spectating;
+    }
+
+    /**
+     * Sets the player that needs to be spectated. No checks are performed at this state (see usages for checks)
+     * @param spectating The username of the target player to spectate
+     */
+    public void setSpectating(String spectating){
+        this.spectating = spectating;
+    }
+
 
     public Player(String username, UUID connectionUUID, MainCabinTile.Color color) {
         this.username = username;
@@ -106,6 +128,8 @@ public class Player implements Serializable {
         endedFlight = false;
         requestedEndFlight = false;
         saveFromEndFlight = null;
+
+        spectating = username;
     }
 
     /**

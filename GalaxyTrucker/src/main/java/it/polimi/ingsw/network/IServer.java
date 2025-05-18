@@ -48,6 +48,8 @@ public interface IServer extends Remote {
 	// Adventure phase
 	void requestEndFlight(IClient client, KeepPlayerFlyingPredicate saveFromEndFlight) throws RemoteException;
 
+	//Assemble and Adventure
+	void spectatePlayerShipboard(IClient client, String username) throws RemoteException;
 
 	//Debugging and Dev mode
 	void useCheat(IClient client, String cheatName) throws RemoteException;
