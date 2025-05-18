@@ -106,6 +106,7 @@ public class ClientSocketHandler implements IClient {
 						case CHEAT -> getServer().useCheat(this, (String) message.getArgs().getFirst());
 						case RESUME_GAME -> getServer().resumeGame(this, (UUID) message.getArgs().getFirst());
 						case QUIT_GAME -> getServer().quitGame(this);
+						case SPECTATE -> getServer().spectatePlayerShipboard(this, (String) message.getArgs().getFirst());
 					}
 				}catch(IllegalArgumentException e){
 					System.err.println("ERROR WHILE PARSING MESSAGE! Message:");

@@ -12,6 +12,7 @@ import it.polimi.ingsw.game.exceptions.*;
 import it.polimi.ingsw.gamePhases.exceptions.AlreadyPickedPosition;
 import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.gamePhases.exceptions.IllegalStartingPositionIndexException;
+import it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTypeException;
 import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.GameServer;
@@ -345,7 +346,6 @@ public class RmiServer implements IServer {
 	public void placeTile(IClient client, Coordinates coordinates, Rotation rotation) throws RemoteException {
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client, GamePhaseType.ASSEMBLE);
 		if (pg == null) return;
-		// else: actually try to perform the action
 
 		try {
 			pg.player.placeTile(coordinates, rotation);
@@ -355,7 +355,7 @@ public class RmiServer implements IServer {
 			return;
         }
 
-		GameServer.getInstance().broadcastUpdateRefreshOnly(pg.game, Set.of(pg.player));
+		GameServer.getInstance().broadcastUpdateShipboardSpectators(pg.game, pg.player);
     }
 
 	@Override
@@ -433,10 +433,21 @@ public class RmiServer implements IServer {
 	public void requestEndFlight(IClient client, KeepPlayerFlyingPredicate saveFromEndFlight) throws RemoteException {
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client, GamePhaseType.ADVENTURE);
 		if (pg == null) return;
-		// else: actually try to perform the action
 
 		pg.player.requestEndFlight(saveFromEndFlight);
 		client.updateClient(new ClientUpdate(pg.connectionUUID, false));
+	}
+
+	@Override
+	public void spectatePlayerShipboard(IClient client, String username) throws RemoteException {
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
+		if (pg == null) return;
+		try {
+			pg.game.getGameData().makePlayerSpectate(pg.player, username);
+			client.updateClient(new ClientUpdate(pg.connectionUUID, true));
+		} catch (IncorrectGamePhaseTypeException | PlayerNotInGameException e) {
+			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
+		}
 	}
 
 	@Override
@@ -479,7 +490,5 @@ public class RmiServer implements IServer {
 		} catch (PlayerAlreadyInGameException | GameAlreadyRunningException e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
-
-
 	}
 }

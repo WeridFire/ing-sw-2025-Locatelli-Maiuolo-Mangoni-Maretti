@@ -33,7 +33,8 @@ public class SocketMessage implements Serializable{
 		PIR_SELECT_MULTIPLE_CHOICE,
 		CHEAT,
 		RESUME_GAME,
-		QUIT_GAME
+		QUIT_GAME,
+		SPECTATE
 	}
 
 	private MessageType type;
@@ -234,6 +235,10 @@ public class SocketMessage implements Serializable{
 
 	public static SocketMessage resumeGameMessage(UUID gameId){
 		return new SocketMessage(MessageType.RESUME_GAME, List.of(gameId));
+	}
+
+	public static SocketMessage spectatePlayerShipboardMessage(String targetUsername){
+		return new SocketMessage(MessageType.SPECTATE, List.of((targetUsername)));
 	}
 
 	public static SocketMessage quitGameMessage(){
