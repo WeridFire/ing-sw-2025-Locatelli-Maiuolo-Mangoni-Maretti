@@ -97,7 +97,7 @@ public class VisitorCheckIntegrity implements TileVisitor {
     private void addToClusters(TileSkeleton tile) {
         Coordinates tileCoordinates = tile.forceGetCoordinates();
 
-        /* first of all signal if it would be illegally welded *
+        /* first of all signal if it would be illegally welded */
         for (Coordinates neighborCoordinates : tileCoordinates.getNeighbors()) {
             TileSkeleton neighborTile = visitedTiles.get(neighborCoordinates);
             if (neighborTile != null) {  // there is threat to be illegally welded

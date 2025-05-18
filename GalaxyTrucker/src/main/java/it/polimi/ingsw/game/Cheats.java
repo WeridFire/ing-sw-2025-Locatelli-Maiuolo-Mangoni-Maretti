@@ -19,10 +19,9 @@ import java.util.List;
 
 public class Cheats {
 
-	public static void cheatShipboard(Game game, Player player) throws AlreadyEndedAssemblyException, FixedTileException,
-			TileAlreadyPresentException, TileWithoutNeighborException, OutOfBuildingAreaException, RemoteException {
+	private static List<TileSkeleton> validatePhaseAndGetTilesAsGfxElements(Game game) {
 		if (game.getGameData().getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE) {
-			return;
+			return null;
 		}
 
 		List<TileSkeleton> tileList = TilesFactory.createPileTiles();
@@ -30,6 +29,14 @@ public class Cheats {
 		tileList.add(52, null);
 		tileList.add(61, null);
 		tileList.add(33, null);
+		return tileList;
+	}
+
+	public static void cheatShipboard(Game game, Player player) throws AlreadyEndedAssemblyException, FixedTileException,
+			TileAlreadyPresentException, TileWithoutNeighborException, OutOfBuildingAreaException, RemoteException {
+		List<TileSkeleton> tileList = validatePhaseAndGetTilesAsGfxElements(game);
+		if (tileList == null) return;
+
 		player.getShipBoard().forceSetTile(tileList.get(97 - 1), new Coordinates(8, 7)); //double cannon
 		player.getShipBoard().forceSetTile(tileList.get(7 - 1), new Coordinates(8, 8)); //battery
 
@@ -125,6 +132,21 @@ public class Cheats {
 		}
 
 		randomFillShipboard(player.getShipBoard(), game.getGameData().getCoveredTiles());
+
+		GameServer.getInstance().broadcastUpdate(game);
+	}
+
+	public static void integrityProblemShipboard(Game game, Player player) throws RemoteException, FixedTileException {
+		List<TileSkeleton> tileList = validatePhaseAndGetTilesAsGfxElements(game);
+		if (tileList == null) return;
+
+		player.getShipBoard().forceSetTile(tileList.get(3 - 1), new Coordinates(8, 7));
+		player.getShipBoard().forceSetTile(tileList.get(18 - 1), new Coordinates(7, 6));
+
+		tileList.get(136 - 1).rotateTile(Rotation.CLOCKWISE);
+		player.getShipBoard().forceSetTile(tileList.get(136 - 1), new Coordinates(8, 6));
+
+		player.getShipBoard().forceSetTile(tileList.get(11 - 1), new Coordinates(8, 8));
 
 		GameServer.getInstance().broadcastUpdate(game);
 	}

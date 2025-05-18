@@ -1,6 +1,7 @@
 package it.polimi.ingsw.util;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 public class Pair<T extends Serializable> implements Serializable {
 
@@ -18,5 +19,13 @@ public class Pair<T extends Serializable> implements Serializable {
 
     public T getSecond() {
         return second;
+    }
+
+    public boolean contains(T item) {
+        return first.equals(item) || second.equals(item);
+    }
+
+    public boolean isIn(Collection<T> items) {
+        return items.contains(first) && items.contains(second);
     }
 }

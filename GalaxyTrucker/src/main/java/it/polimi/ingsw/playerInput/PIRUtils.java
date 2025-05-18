@@ -22,6 +22,7 @@ import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
 import it.polimi.ingsw.shipboard.visitors.VisitorCalculatePowers;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.util.Util;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
@@ -246,13 +247,18 @@ public class PIRUtils {
 						.collect(Collectors.toSet()));
 			}
 
+			List<String> ansiColors = ANSI.getRandomColors(clustersToKeep.size(), false,
+					List.of(ANSI.WHITE, ANSI.BLACK, ANSI.RED));
+			int numOptions = clustersToKeep.size();
+			String[] options = new String[numOptions];
+			for (int i = 0; i < numOptions; i++) {
+				options[i] = clustersToKeep.get(i).toString(Util.getModularAt(ansiColors, i));
+			}
+
 			PIRMultipleChoice pirChoice = new PIRMultipleChoice(player, 30,
-					playerShip.getCLIRepresentation(coordCluster,
-									ANSI.getRandomColors(clustersToKeep.size(), false,
-											List.of(ANSI.WHITE, ANSI.RED, ANSI.GREEN)))
-							.merge(new CLIFrame("Choose one cluster to keep"), Direction.NORTH, 1)
-							.toString(),
-					clustersToKeep.stream().map(TileCluster::toString).toArray(String[]::new),
+					"Choose one cluster to keep",
+					playerShip.getCLIRepresentation(coordCluster, ansiColors),
+					options,
 					0);
 			integritySequence.addPlayerInputRequest(pirChoice);
 			int choice = pirHandler.setAndRunTurn(pirChoice, false);

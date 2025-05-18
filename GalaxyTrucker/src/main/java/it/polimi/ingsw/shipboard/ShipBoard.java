@@ -18,6 +18,7 @@ import it.polimi.ingsw.shipboard.visitors.*;
 import it.polimi.ingsw.shipboard.exceptions.*;
 import it.polimi.ingsw.util.BoardCoordinates;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.util.Util;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import it.polimi.ingsw.view.cli.CLIScreen;
@@ -668,10 +669,14 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		for (int i = 0; i < highlight.size(); i++) {
 			for (Map.Entry<Coordinates, TileSkeleton> entry : board.entrySet()) {
 				Coordinates c = entry.getKey();
-				tilesRepresentation = tilesRepresentation.merge(entry.getValue().getCLIRepresentation()
-								.paintForeground(highlight.get(i).contains(c) ? fgColor.get(i) : ANSI.RESET),
-						AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT,
-						(c.getRow() - minRow) * tileHeight, (c.getColumn() - minCol) * tileWidth);
+				if (highlight.get(i).contains(c)) {
+					tilesRepresentation = tilesRepresentation
+							.merge(entry.getValue().getCLIRepresentation()
+											.paintForeground(Util.getModularAt(fgColor, i)),
+									AnchorPoint.TOP_LEFT, AnchorPoint.TOP_LEFT,
+									(c.getRow() - minRow) * tileHeight,
+									(c.getColumn() - minCol) * tileWidth);
+				}
 			}
 		}
 

@@ -111,17 +111,17 @@ public class ANSI {
 	/**
 	 * Returns howMany different random colors. if background is True colors aare background colors
 	 */
-	public static List<String> getRandomColors(int howMany, boolean background, List<String> forbiddenColors) {
-		if (howMany < 1 || howMany > 6) return null;
+	public static List<String> getRandomColors(int targetQuantity, boolean background, List<String> forbiddenColors) {
+		if (targetQuantity < 1) targetQuantity = 1;
 
 		Set<String> baseColors = background ? new HashSet<>(BACKGROUND_SET) : new HashSet<>(FOREGROUND_SET);
 		forbiddenColors.forEach(baseColors::remove);
 
-		if (baseColors.size() < howMany) return null;
+		if (targetQuantity > baseColors.size()) targetQuantity = baseColors.size();
 
 		List<String> availableColors = new ArrayList<>(baseColors);
 		Collections.shuffle(availableColors);
 
-		return availableColors.subList(0, howMany);
+		return availableColors.subList(0, targetQuantity);
 	}
 }

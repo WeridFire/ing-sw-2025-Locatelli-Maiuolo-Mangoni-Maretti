@@ -454,6 +454,13 @@ public class RmiServer implements IServer {
 				}
 			}
 			case "randomship" -> Cheats.randomShipboard(pg.game, pg.player);
+			case "ipship" -> {
+                try {
+                    Cheats.integrityProblemShipboard(pg.game, pg.player);
+                } catch (FixedTileException e) {
+					client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
+                }
+            }
 			case "skip" -> Cheats.skipPhase(pg.game);
 			default -> client.updateClient(new ClientUpdate(pg.connectionUUID, "Cheat not found."));
 		}

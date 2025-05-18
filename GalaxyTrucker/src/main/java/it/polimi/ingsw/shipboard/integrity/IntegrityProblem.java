@@ -3,13 +3,11 @@ package it.polimi.ingsw.shipboard.integrity;
 import it.polimi.ingsw.shipboard.TileCluster;
 import it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
-import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.util.Pair;
 import it.polimi.ingsw.view.cli.ANSI;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Represents an integrity issue with a shipboard configuration.
@@ -76,34 +74,12 @@ public class IntegrityProblem {
         // add multiple clusters as clusters to keep -> only one will be kept: ok
         clustersToKeep.addAll(clusters);
 
-        /* check debug *
+        /* check debug */
         System.out.println("clusters to remove 1");
         for (TileCluster cluster : clustersToRemove) {
             System.out.println(cluster.toString(ANSI.RED));
         }
         System.out.println("clusters to keep 1");
-        for (TileCluster cluster : clustersToKeep) {
-            System.out.println(cluster.toString(ANSI.YELLOW));
-        } /**/
-
-        /* BFS tree search all the clusters for badly connected tiles (one way and the other)
-            add all the clusters as to keep -> only one will be kept: ok
-            note: with implementation that keeps intersection of clusters to keep, is ok to mask with
-            previously set clusters.
-         */
-        for (Pair<TileSkeleton> illegallyWeldedTile : illegallyWeldedTiles) {
-            clustersToKeep.add(exploreCluster(visitedTiles,
-                    illegallyWeldedTile.getFirst(), illegallyWeldedTile.getSecond()));
-            clustersToKeep.add(exploreCluster(visitedTiles,
-                    illegallyWeldedTile.getSecond(), illegallyWeldedTile.getFirst()));
-        }
-
-        /* check debug *
-        System.out.println("clusters to remove 2");
-        for (TileCluster cluster : clustersToRemove) {
-            System.out.println(cluster.toString(ANSI.RED));
-        }
-        System.out.println("clusters to keep 2");
         for (TileCluster cluster : clustersToKeep) {
             System.out.println(cluster.toString(ANSI.YELLOW));
         } /**/
@@ -125,7 +101,54 @@ public class IntegrityProblem {
             }
         }
 
-        /* check debug *
+        /* check debug */
+        System.out.println("clusters to remove 2");
+        for (TileCluster cluster : clustersToRemove) {
+            System.out.println(cluster.toString(ANSI.RED));
+        }
+        System.out.println("clusters to keep 2");
+        for (TileCluster cluster : clustersToKeep) {
+            System.out.println(cluster.toString(ANSI.YELLOW));
+        } /**/
+
+        /* BFS tree search all the remaining clusters for badly connected tiles (one way and the other) among those
+            in the same cluster and "split" it in the clusters to keep -> only one will be kept: ok
+            note: with implementation that keeps intersection of clusters to keep, is ok to mask with
+            previously set clusters.
+         */
+        Queue<TileCluster> oldClustersToKeep = new LinkedList<>(clustersToKeep);
+        clustersToKeep.clear();
+        boolean modified;
+        while (!oldClustersToKeep.isEmpty()) {
+            TileCluster processing = oldClustersToKeep.poll();
+            modified = false;
+
+            for (Pair<TileSkeleton> illegallyWeldedTilePair : illegallyWeldedTiles) {
+                if (illegallyWeldedTilePair.isIn(processing.getTiles())) {
+
+                    TileCluster c1 = new TileCluster(processing.getTiles());
+                    TileCluster c2 = new TileCluster(processing.getTiles());
+
+                    c1.getTiles().remove(illegallyWeldedTilePair.getSecond());
+                    c2.getTiles().remove(illegallyWeldedTilePair.getFirst());
+
+                    System.out.println("c1: " + c1.toString(ANSI.WHITE));
+                    System.out.println("c2: " + c2.toString(ANSI.WHITE));
+                    oldClustersToKeep.add(c1);
+                    oldClustersToKeep.add(c2);
+
+                    modified = true;
+                    break;
+                }
+            }
+
+            if (!modified) {
+                clustersToKeep.add(processing);
+            }
+        }
+        /**/
+
+        /* check debug */
         System.out.println("clusters to remove 3");
         for (TileCluster cluster : clustersToRemove) {
             System.out.println(cluster.toString(ANSI.RED));
@@ -135,59 +158,6 @@ public class IntegrityProblem {
             System.out.println(cluster.toString(ANSI.YELLOW));
         } /**/
 
-    }
-
-
-    /**
-     * Explores a connected cluster of tiles using Breadth-First Search (BFS).
-     *
-     * @param visitedTiles A map of coordinates to their corresponding tiles.
-     * @param startingTile The tile where exploration begins.
-     * @param tileToIgnore A tile to be ignored during exploration (can be null).
-     * @return The updated TileCluster containing all connected tiles.
-     * @throws RuntimeException If the tile's neighbors cannot be determined.
-     */
-    private static TileCluster exploreCluster(Map<Coordinates, TileSkeleton> visitedTiles,
-                                       TileSkeleton startingTile, TileSkeleton tileToIgnore) {
-
-        TileCluster cluster = new TileCluster();
-
-        // Use a queue to explore tiles iteratively (BFS)
-        Queue<TileSkeleton> queue = new LinkedList<>();
-        queue.add(startingTile);
-
-        while (!queue.isEmpty()) {
-            TileSkeleton tile = queue.poll();
-
-            // Skip if already processed
-            if (cluster.getTiles().contains(tile)) {
-                continue;
-            }
-
-            // Add the tile to the cluster
-            if (!cluster.hasMainTile()) {
-                try {
-                    cluster.addAsMainTile(tile);
-                } catch (TileAlreadyPresentException e) {
-                    throw new RuntimeException(e);  // should never happen -> runtime error
-                }
-            } else {
-                cluster.addTile(tile);
-            }
-
-            // Retrieve the coordinates of neighboring tiles
-            Set<Coordinates> neighborsLocations = tile.forceGetCoordinates().getNeighbors();
-
-            // Collect valid neighbors (tiles that exist and are not ignored)
-            for (Coordinates coord : neighborsLocations) {
-                TileSkeleton neighbor = visitedTiles.get(coord);
-                if (neighbor != null && neighbor != tileToIgnore && !cluster.getTiles().contains(neighbor)) {
-                    queue.add(neighbor);
-                }
-            }
-        }
-
-        return cluster;
     }
 
     /**
