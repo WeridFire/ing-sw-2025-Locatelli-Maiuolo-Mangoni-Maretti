@@ -11,9 +11,12 @@ import it.polimi.ingsw.network.GameClientMock;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.network.exceptions.AlreadyRunningServerException;
 import it.polimi.ingsw.shipboard.SideType;
+import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
+import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import it.polimi.ingsw.shipboard.tiles.BatteryComponentTile;
 import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.util.Coordinates;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -467,6 +470,7 @@ public class MegaTest {
         ).simulateCommand("draw");
         syncClient(1);
 
+        //Client beta picks tile 0
         clients[1].simulateCommand("discard").joinAll();
         clients[1].awaitConditionOnUpdate(gcm -> {
                     BatteryComponentTile tile0;
@@ -486,6 +490,69 @@ public class MegaTest {
                 }, "pick tile 0 [B2:1302]")
                 .simulateCommand("pick", "0");
         syncClient(1);
+
+        //Client Beta places tile under the main cabin
+        clients[1].awaitConditionOnUpdate(gcm -> {
+            BatteryComponentTile tile0;
+            Coordinates coord = new Coordinates(8, 7);
+            try{
+                tile0 = (BatteryComponentTile) gcm.getMockThis().getLinkedState().getLastUpdate()
+                        .getClientPlayer().getShipBoard().getTile(coord);
+            } catch (ClassCastException | OutOfBuildingAreaException | NoTileFoundException e) {
+                return false;
+            }
+            return (tile0.getTileId() == 0)
+                    && (tile0.getSide(Direction.EAST) == SideType.SINGLE)
+                    && (tile0.getSide(Direction.NORTH) == SideType.UNIVERSAL)
+                    && (tile0.getSide(Direction.WEST) == SideType.SMOOTH)
+                    && (tile0.getSide(Direction.SOUTH) == SideType.DOUBLE)
+                    && (tile0.getCapacity() == 2)
+                    && (tile0.getTextureName().equals("GT-new_tiles_16_for web.jpg"));
+
+        }, "place tile 0 at coordinates 8 7").simulateCommand("place", "8", "7");
+        syncClients( 1);
+
+        //Client beta picks tile 1
+        //Careful! all the id's for picking an uncovered tile shift once you pick a tile with a lower id
+        clients[1].awaitConditionOnUpdate(gcm -> {
+                    BatteryComponentTile tile0;
+                    try {
+                        tile0 = (BatteryComponentTile) gcm.getMockThis().getLinkedState().getLastUpdate()
+                                .getClientPlayer().getTileInHand();
+                    } catch (ClassCastException e) {
+                        return false;
+                    }
+                    return (tile0.getTileId() == 1)
+                            && (tile0.getSide(Direction.EAST) == SideType.DOUBLE)
+                            && (tile0.getSide(Direction.NORTH) == SideType.UNIVERSAL)
+                            && (tile0.getSide(Direction.WEST) == SideType.SMOOTH)
+                            && (tile0.getSide(Direction.SOUTH) == SideType.SMOOTH)
+                            && (tile0.getCapacity() == 2)
+                            && (tile0.getTextureName().equals("GT-new_tiles_16_for web2.jpg"));
+                }, "pick tile 1 [B2:2300]")
+                .simulateCommand("pick", "1");
+        syncClient(1);
+
+        //Client Beta places tile left of the main cabin
+        clients[1].awaitConditionOnUpdate(gcm -> {
+            BatteryComponentTile tile0;
+            Coordinates coord = new Coordinates(7, 6);
+            try{
+                tile0 = (BatteryComponentTile) gcm.getMockThis().getLinkedState().getLastUpdate()
+                        .getClientPlayer().getShipBoard().getTile(coord);
+            } catch (ClassCastException | OutOfBuildingAreaException | NoTileFoundException e) {
+                return false;
+            }
+            return (tile0.getTileId() == 1)
+                    && (tile0.getSide(Direction.EAST) == SideType.DOUBLE)
+                    && (tile0.getSide(Direction.NORTH) == SideType.UNIVERSAL)
+                    && (tile0.getSide(Direction.WEST) == SideType.SMOOTH)
+                    && (tile0.getSide(Direction.SOUTH) == SideType.SMOOTH)
+                    && (tile0.getCapacity() == 2)
+                    && (tile0.getTextureName().equals("GT-new_tiles_16_for web2.jpg"));
+
+        }, "place tile 1 at coordinates 7 6").simulateCommand("place", "7", "6");
+        syncClients( 1);
 
 
 

@@ -116,9 +116,4 @@ class ShipBoardTest {
         assertEquals(2, shipBoard1.getTiles().size(), "ShipBoard should contain both the main cabin and the new tile");
     }
 
-
-
-
-
-
 }
