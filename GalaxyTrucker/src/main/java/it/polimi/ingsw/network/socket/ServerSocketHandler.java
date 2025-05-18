@@ -171,6 +171,11 @@ public class ServerSocketHandler implements IServer {
 	}
 
 	@Override
+	public void spectatePlayerShipboard(IClient client, String username) throws RemoteException {
+		sendSocketMessage(SocketMessage.spectatePlayerShipboardMessage(username));
+	}
+
+	@Override
 	public void useCheat(IClient client, String cheatName) {
 		SocketMessage mess = SocketMessage.cheatMessage(cheatName);
 		sendSocketMessage(mess);
