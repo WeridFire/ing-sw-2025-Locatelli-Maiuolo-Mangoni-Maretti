@@ -9,16 +9,14 @@ import it.polimi.ingsw.game.exceptions.ColorAlreadyInUseException;
 import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
-import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
-import it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
-import it.polimi.ingsw.shipboard.exceptions.TileWithoutNeighborException;
+import it.polimi.ingsw.shipboard.exceptions.*;
 import it.polimi.ingsw.shipboard.tiles.CabinTile;
 import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.shipboard.tiles.Tile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.ANSI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,6 +32,7 @@ class ShipBoardTest {
     private Player player1;
     private ShipBoard shipBoard1;
     private List<TileSkeleton> tiles;
+    private MainCabinTile mainCabinTile;
 
     @BeforeEach
     void setup() throws PlayerAlreadyInGameException, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException, GameAlreadyRunningException, ColorAlreadyInUseException {
@@ -43,7 +42,8 @@ class ShipBoardTest {
         game1.addPlayer(player1.getUsername(), uuid1, MainCabinTile.Color.BLUE);
         shipBoard1 = new ShipBoard(GameLevel.TESTFLIGHT);
         player1.setShipBoard(shipBoard1);
-
+        mainCabinTile = new MainCabinTile(MainCabinTile.Color.RED);
+        shipBoard1.forceSetTile(mainCabinTile, new Coordinates(7, 7));
         tiles = TilesFactory.createPileTiles();
 
         // Initialize a ShipBoard
@@ -54,10 +54,10 @@ class ShipBoardTest {
     void testInitialization() {
         // Ensure the ShipBoard is properly initialized
         assertNotNull(player1.getShipBoard(), "ShipBoard should not be null after initialization");
-        assertEquals(0, shipBoard1.getTiles().size(), "ShipBoard should initially contain no tiles");
+        assertEquals(1, shipBoard1.getTiles().size(), "ShipBoard should initially contain one tile");
     }
 
-    //non va?
+    //manca il mainCabinTile?
     @Test
     void testAddTileToShipBoard() throws FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, OutOfBuildingAreaException, AlreadyEndedAssemblyException {
         CabinTile cabin = new CabinTile(Direction.sortedArray(
@@ -67,5 +67,58 @@ class ShipBoardTest {
         shipBoard1.setTile(cabin, coord);
         assertTrue(shipBoard1.getTiles().contains(cabin), "Tile should be present in the ShipBoard after being added");
     }
+
+    @Test
+    void testAddTileWithoutNeighborThrows() {
+        CabinTile cabin = new CabinTile(Direction.sortedArray(
+                SideType.SINGLE, SideType.DOUBLE, SideType.UNIVERSAL, SideType.UNIVERSAL).toArray(SideType[]::new));
+        Coordinates coord = new Coordinates(6, 6); //no neighbours
+        assertThrows(TileWithoutNeighborException.class, () -> {
+            shipBoard1.setTile(cabin, coord);
+        }, "Should throw TileWithoutNeighborException when adding a tile without a neighbor");
+    }
+
+    @Test
+    void testAddTileOutOfBuildingAreaThrows() {
+        CabinTile cabin = new CabinTile(Direction.sortedArray(
+                SideType.SINGLE, SideType.DOUBLE, SideType.UNIVERSAL, SideType.UNIVERSAL).toArray(SideType[]::new));
+        Coordinates coord = new Coordinates(5, 5); //no neighbours
+        assertThrows(OutOfBuildingAreaException.class, () -> {
+            shipBoard1.setTile(cabin, coord);
+        }, "Should throw TileWithoutNeighborException when adding a tile without a neighbor");
+    }
+
+    @Test
+    void testAlreadyPresentTileThrows() {
+        CabinTile cabin = new CabinTile(Direction.sortedArray(
+                SideType.SINGLE, SideType.DOUBLE, SideType.UNIVERSAL, SideType.UNIVERSAL).toArray(SideType[]::new));
+        Coordinates coord = new Coordinates(7, 7); //no neighbours
+        assertThrows(TileAlreadyPresentException.class, () -> {
+            shipBoard1.setTile(cabin, coord);
+        }, "Should throw TileWithoutNeighborException when adding a tile without a neighbor");
+    }
+
+    @Test
+    void testGetTileAtCoordinates() throws FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, OutOfBuildingAreaException, AlreadyEndedAssemblyException, NoTileFoundException {
+        CabinTile cabin = new CabinTile(Direction.sortedArray(
+                SideType.SINGLE, SideType.DOUBLE, SideType.UNIVERSAL, SideType.UNIVERSAL).toArray(SideType[]::new));
+        Coordinates coord = new Coordinates(8, 7);
+        shipBoard1.setTile(cabin, coord);
+        assertEquals(cabin, shipBoard1.getTile(coord), "Should return the correct tile at given coordinates");
+    }
+
+    @Test
+    void testGetTilesReturnsAllTiles() throws FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, OutOfBuildingAreaException, AlreadyEndedAssemblyException {
+        CabinTile cabin = new CabinTile(Direction.sortedArray(
+                SideType.SINGLE, SideType.DOUBLE, SideType.UNIVERSAL, SideType.UNIVERSAL).toArray(SideType[]::new));
+        Coordinates coord = new Coordinates(8, 7);
+        shipBoard1.setTile(cabin, coord);
+        assertEquals(2, shipBoard1.getTiles().size(), "ShipBoard should contain both the main cabin and the new tile");
+    }
+
+
+
+
+
 
 }
