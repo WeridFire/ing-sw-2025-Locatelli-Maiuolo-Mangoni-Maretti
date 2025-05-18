@@ -190,10 +190,21 @@ public class GameData implements Serializable {
      * Gets the first player in the game that matches the specified predicate.
      *
      * @param match a predicate to apply to the players to determine if it should be counted as "found".
+     * @param playerDefault a player as fallback if no player matches the predicate.
+     * @return The searched player, or {@code playerDefault} if no player matches the predicate.
+     */
+    public Player getPlayer(Predicate<Player> match, Player playerDefault) {
+        return players.stream().filter(match).findFirst().orElse(playerDefault);
+    }
+
+    /**
+     * Gets the first player in the game that matches the specified predicate.
+     *
+     * @param match a predicate to apply to the players to determine if it should be counted as "found".
      * @return The searched player, or {@code null} if no player matches the predicate.
      */
     public Player getPlayer(Predicate<Player> match) {
-        return players.stream().filter(match).findFirst().orElse(null);
+        return getPlayer(match, null);
     }
 
     /**
@@ -541,8 +552,7 @@ public class GameData implements Serializable {
                 // if it has integrity problems -> already updates with requests to solve integrity problem
                 if (!player.getShipBoard().getVisitorCheckIntegrity().getProblem(true).isProblem()) {
                     try {
-                        GameServer.getInstance().broadcastUpdateRefreshOnly(
-                                GamesHandler.getInstance().getGame(gameId), Set.of(player));
+                        GameServer.getInstance().broadcastUpdate(GamesHandler.getInstance().getGame(gameId));
                     } catch (RemoteException e) {
                         System.err.println("RemoteException while notifying end of assemble without integrity problem");
                     }

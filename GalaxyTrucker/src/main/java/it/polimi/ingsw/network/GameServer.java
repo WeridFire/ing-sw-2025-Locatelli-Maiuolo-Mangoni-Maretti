@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class GameServer{
@@ -165,28 +166,15 @@ public class GameServer{
         }
     }
 
-	public void broadcastUpdateAll() throws RemoteException {
-		for (Map.Entry<UUID, IClient> entry : clients.entrySet()) {
-			UUID uuid = entry.getKey();
-			IClient client = entry.getValue();
-			client.updateClient(new ClientUpdate(uuid));
-		}
-	}
-
 	/**
-	 * Updates all the players that are currently watching a specficic shipboard.
-	 * @param game The game this update should relate to
-	 * @param targetShipboard The shipboard's owner the players that need to update are spectating
-	 * @throws RemoteException
+	 * Broadcasts a {@link ClientUpdate} to all connected clients.
+	 * The {@code refreshCondition} predicate determines, for each client,
+	 * whether the client should refresh its view upon receiving the update.
+	 *
+	 * @param refreshCondition a predicate that takes the client's {@link UUID} and {@link IClient} instance,
+	 *                         returning {@code true} if the client should refresh its view
+	 * @throws RemoteException if a remote communication error occurs during client notification
 	 */
-	public void broadcastUpdateShipboardSpectators(Game game, Player targetShipboard) throws RemoteException{
-		Set<Player> playersToUpdate = game.getGameData().getPlayersInFlight()
-				.stream()
-				.filter((p) -> p.getSpectating().equals(targetShipboard.getUsername()))
-				.collect(Collectors.toSet());
-		broadcastUpdateRefreshOnly(game, playersToUpdate);
-	}
-
 	public void broadcastUpdateAllRefreshOnlyIf(BiPredicate<UUID, IClient> refreshCondition) throws RemoteException {
 		for (Map.Entry<UUID, IClient> entry : clients.entrySet()) {
 			UUID uuid = entry.getKey();
@@ -195,6 +183,14 @@ public class GameServer{
 		}
 	}
 
+	/**
+	 * Broadcasts a {@link ClientUpdate} to all connected players in the given game.
+	 * This notifies them of an update without explicitly requesting a view refresh:
+	 * all the clients will receive the update triggering a view refresh.
+	 *
+	 * @param game the game whose connected players will be updated
+	 * @throws RemoteException if a remote communication error occurs during client notification
+	 */
 	public void broadcastUpdate(Game game) throws RemoteException {
 		for (Player player: game.getGameData().getPlayers(Player::isConnected)){
 			IClient client = clients.get(player.getConnectionUUID());
@@ -205,15 +201,52 @@ public class GameServer{
 	}
 
 	/**
-	 * like broadcastUpdate but it specifies which clients should and which should NOT refresh their view
+	 * Broadcasts a {@link ClientUpdate} to all connected players in the given game,
+	 * determining which clients should refresh their view using the provided filter predicate.
+	 * <p>
+	 * Only clients corresponding to players that satisfy the predicate will trigger a view refresh.
+	 *
+	 * @param game the game whose players will be updated
+	 * @param filter a predicate determining which players' clients should refresh
+	 * @throws RemoteException if a remote communication error occurs during client notification
 	 */
-	public void broadcastUpdateRefreshOnly(Game game, Set<Player> playersToRefreshView) throws RemoteException {
+	public void broadcastUpdateRefreshOnlyIf(Game game, Predicate<Player> filter) throws RemoteException {
 		for (Player player: game.getGameData().getPlayers(Player::isConnected)){
 			IClient client = clients.get(player.getConnectionUUID());
 			if (client != null){
-				client.updateClient(new ClientUpdate(player.getConnectionUUID(), playersToRefreshView.contains(player)));
+				client.updateClient(new ClientUpdate(player.getConnectionUUID(), filter.test(player)));
 			}
 		}
+	}
+
+	/**
+	 * Broadcasts a {@link ClientUpdate} to all connected players in the given game,
+	 * specifying explicitly which clients should refresh their views.
+	 * <p>
+	 * Clients not included in {@code playersToRefreshView} will receive the update without triggering a view refresh.
+	 *
+	 * @param game the game whose players will be updated
+	 * @param playersToRefreshView the subset of players whose clients should refresh their view
+	 * @throws RemoteException if a remote communication error occurs during client notification
+	 */
+	public void broadcastUpdateRefreshOnly(Game game, Set<Player> playersToRefreshView) throws RemoteException {
+		broadcastUpdateRefreshOnlyIf(game, playersToRefreshView::contains);
+	}
+
+	/**
+	 * Broadcasts a {@link ClientUpdate} to all connected players in the given game,
+	 * and requests a view refresh for the shipboard's owner and any player currently spectating it.
+	 * <p>
+	 * A player is considered to be spectating a shipboard if their {@link Player#getSpectating()} matches
+	 * the {@link Player#getUsername()} of the specified {@code targetShipboard}.
+	 *
+	 * @param game the game in which the update should be broadcasted
+	 * @param targetShipboard the player whose shipboard is being spectated
+	 * @throws RemoteException if a remote communication error occurs during client notification
+	 */
+	public void broadcastUpdateShipboardSpectators(Game game, Player targetShipboard) throws RemoteException {
+		broadcastUpdateRefreshOnlyIf(game, p ->
+				p.equals(targetShipboard) || p.getSpectating().equals(targetShipboard.getUsername()));
 	}
 
 

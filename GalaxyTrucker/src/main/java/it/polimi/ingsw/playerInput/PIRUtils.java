@@ -302,13 +302,16 @@ public class PIRUtils {
 				return;
 			}
 
-			// notify end of integrity problem
-            try {
-				GameServer.getInstance().broadcastUpdateRefreshOnly(game, Set.of(player));
-            } catch (RemoteException e) {
-				System.err.println("RemoteException while broadcasting end of integrity problem");
-            }
+			notifyEndOfIntegrityProblem();
         }
+
+		private void notifyEndOfIntegrityProblem() {
+			try {
+				GameServer.getInstance().broadcastUpdateShipboardSpectators(game, player);
+			} catch (RemoteException e) {
+				System.err.println("RemoteException while broadcasting end of integrity problem");
+			}
+		}
 
 		@Override
 		public void update(IntegrityProblem integrityProblem) {
@@ -317,6 +320,7 @@ public class PIRUtils {
 					// destroy atomic sequence to continue with other PIRs for this player
 					pirHandler.destroyAtomicSequence(integritySequence);
 					integritySequence = null;
+					notifyEndOfIntegrityProblem();
 				}
 				return;
 			}

@@ -206,16 +206,17 @@ public class AssembleCLIScreen extends CLIScreen {
     public CLIFrame getCLIRepresentation() {
         final int maxWidth = 100;
         String spectatedPlayerUsername = AssembleState.getPlayer().getSpectating();
-        Player spectatedPlayer = AssembleState.getGameData().getPlayersInFlight()
-                .stream()
-                .filter((p) -> p.getUsername().equals(spectatedPlayerUsername))
-                .findFirst()
-                .orElse(AssembleState.getPlayer()); //default fallback to own shipboard in case something goes wrong
+        Player spectatedPlayer = AssembleState.getGameData().getPlayer(p ->
+                        p.getUsername().equals(spectatedPlayerUsername), AssembleState.getPlayer());
 
         // frame for shipboard
         CLIFrame frameShipboard = spectatedPlayer.getShipBoard().getCLIRepresentation()
                 .paintForeground(ANSI.BLACK)
-                .merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " YOUR SHIPBOARD " + ANSI.RESET),
+                .merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " "
+                                + (AssembleState.getPlayer().equals(spectatedPlayer)
+                                ? "YOUR"
+                                : spectatedPlayerUsername + "'s"
+                                ) + " SHIP " + ANSI.RESET),
                         Direction.NORTH, 1);
 
         // create content

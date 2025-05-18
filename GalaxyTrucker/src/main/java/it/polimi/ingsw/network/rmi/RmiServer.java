@@ -323,7 +323,7 @@ public class RmiServer implements IServer {
 			return;
 		}
 
-		GameServer.getInstance().broadcastUpdateRefreshOnly(pg.game, Set.of(pg.player));
+		GameServer.getInstance().broadcastUpdateShipboardSpectators(pg.game, pg.player);
 	}
 
 	@Override

@@ -81,7 +81,7 @@ public class Cheats {
 
 		player.getShipBoard().forceSetTile(tileList.get(133 - 1), new Coordinates(6, 8));
 
-		GameServer.getInstance().broadcastUpdate(game);
+		GameServer.getInstance().broadcastUpdateShipboardSpectators(game, player);
 
 	}
 
@@ -133,7 +133,7 @@ public class Cheats {
 
 		randomFillShipboard(player.getShipBoard(), game.getGameData().getCoveredTiles());
 
-		GameServer.getInstance().broadcastUpdate(game);
+		GameServer.getInstance().broadcastUpdateShipboardSpectators(game, player);
 	}
 
 	public static void integrityProblemShipboard(Game game, Player player) throws RemoteException, FixedTileException {
@@ -148,7 +148,7 @@ public class Cheats {
 
 		player.getShipBoard().forceSetTile(tileList.get(11 - 1), new Coordinates(8, 8));
 
-		GameServer.getInstance().broadcastUpdate(game);
+		GameServer.getInstance().broadcastUpdateShipboardSpectators(game, player);
 	}
 
 	public static void skipPhase(Game game){
