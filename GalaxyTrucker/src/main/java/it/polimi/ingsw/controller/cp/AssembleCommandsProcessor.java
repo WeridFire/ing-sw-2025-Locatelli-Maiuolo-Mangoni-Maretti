@@ -4,6 +4,7 @@ import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.network.GameClient;
+import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.util.Coordinates;
@@ -13,6 +14,9 @@ import it.polimi.ingsw.view.cli.ANSI;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
     public AssembleCommandsProcessor(GameClient gameClient) {
@@ -29,10 +33,26 @@ public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
         }
     }
 
+    private String getSpectatablePlayersUsernames(){
+        Set<String> playerUsernames = AssembleState.getGameData()
+                .getPlayersInFlight()
+                .stream()
+                .map(Player::getUsername)
+                .filter((u) -> !u.equals(AssembleState.getPlayer().getUsername()))
+                .collect(Collectors.toSet());
+        return String.join("|", playerUsernames);
+    }
+
     @Override
     public List<String> getAvailableCommands() {
         List<String> availableCommands = new ArrayList<>();
         TileSkeleton tileInHand = AssembleState.getTileInHand();
+
+        if(!Objects.equals(AssembleState.getPlayer().getSpectating(), AssembleState.getPlayer().getUsername())){
+            availableCommands.add("stop-spectating|Go back to your shipboard.");
+        }
+        availableCommands.add("spectate <" + getSpectatablePlayersUsernames() +"> |Spectate another player's shipboard.");
+
 
         if (!AssembleState.isEndedAssembly()) {
 
@@ -233,7 +253,21 @@ public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
                     view.showWarning("Invalid command. Use help to view available commands.");
                 }
                 return false;
-
+            case "stop-spectating":
+                return true;
+            case "spectate":
+                if(args.length != 1){
+                    view.showWarning("Specify one of the following usernames: <" + getSpectatablePlayersUsernames() + ">");
+                    return false;
+                }
+                if(AssembleState.getGameData().getPlayersInFlight()
+                        .stream()
+                        .map(Player::getUsername)
+                        .anyMatch(username -> username.equals(args[0]))){
+                    return true;
+                }
+                view.showWarning("Could not find a player with username " + args[0]);
+                return false;
             // refuses unavailable commands
             default: throw new CommandNotAllowedException(command, args);
         }
@@ -256,6 +290,8 @@ public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
                     (args.length == 0) ? null : Integer.parseInt(args[0]));
             case "showcg" -> server.showCardGroup(client, Integer.parseInt(args[0]));
             case "hidecg" -> server.hideCardGroup(client);
+            case "stop-spectating" -> server.spectatePlayerShipboard(client, AssembleState.getPlayer().getUsername());
+            case "spectate" -> server.spectatePlayerShipboard(client, args[0]);
         }
     }
 }
