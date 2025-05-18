@@ -266,7 +266,7 @@ public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
                         .anyMatch(username -> username.equals(args[0]))){
                     return true;
                 }
-                view.showWarning("Could not find a player with username " + args[0]);
+                view.showWarning("Could not find a player with username: " + args[0]);
                 return false;
             // refuses unavailable commands
             default: throw new CommandNotAllowedException(command, args);
