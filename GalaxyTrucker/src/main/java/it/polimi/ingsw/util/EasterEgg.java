@@ -106,7 +106,8 @@ public class EasterEgg {
             "{name} once implemented an HTTP server in a single printf call. It is now the heart of Apache webserver.",
             "{name} writes directly in binary. He then writes the source code as documentation for other programmers.",
             "{name} once shifted a bit so hard, it ended up on a different computer.",
-            "Q: What is {name}'s favorite Javascript framework? A: Knockout.js."
+            "Q: What is {name}'s favorite Javascript framework? A: Knockout.js.",
+            "Manuel Maiuolo is so bad at programming that this joke is hard-coded for him, and you can't use someone's nickname."
     );
 
     private static final Random RANDOM = new Random();
