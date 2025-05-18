@@ -9,6 +9,7 @@ import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.network.GameClient;
+import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.GameLevelStandards;
 
@@ -204,9 +205,15 @@ public class AssembleCLIScreen extends CLIScreen {
     @Override
     public CLIFrame getCLIRepresentation() {
         final int maxWidth = 100;
+        String spectatedPlayerUsername = AssembleState.getPlayer().getSpectating();
+        Player spectatedPlayer = AssembleState.getGameData().getPlayersInFlight()
+                .stream()
+                .filter((p) -> p.getUsername().equals(spectatedPlayerUsername))
+                .findFirst()
+                .orElse(AssembleState.getPlayer()); //default fallback to own shipboard in case something goes wrong
 
         // frame for shipboard
-        CLIFrame frameShipboard = AssembleState.getPlayer().getShipBoard().getCLIRepresentation()
+        CLIFrame frameShipboard = spectatedPlayer.getShipBoard().getCLIRepresentation()
                 .paintForeground(ANSI.BLACK)
                 .merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " YOUR SHIPBOARD " + ANSI.RESET),
                         Direction.NORTH, 1);
