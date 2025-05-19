@@ -141,7 +141,7 @@ public class GameServer{
 	}
 
 	public String getCompleteAddress() {
-		return getLocalIPAddress() + "[RMI:" + getRMIPort() + "|Socket:" + getSocketPort() + "]";
+		return getLocalIPAddress() + " [RMI :" + getRMIPort() + " | Socket :" + getSocketPort() + "]";
 	}
 
 	public static GameServer getInstance() {

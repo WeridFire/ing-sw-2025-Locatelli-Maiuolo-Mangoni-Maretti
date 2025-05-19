@@ -76,20 +76,12 @@ public enum Rotation {
         }
     }
 
-    public double toDouble() {
-        switch (this)  {
-            case COUNTERCLOCKWISE -> {
-                return -90;
-            }
-            case CLOCKWISE -> {
-                return 90;
-            }
-            case OPPOSITE -> {
-                return 180;
-            }
-            default -> {
-                return 0;
-            }
-        }
+    public double toDegrees() {
+        return switch (this)  {
+            case COUNTERCLOCKWISE -> -90;
+            case CLOCKWISE -> 90;
+            case OPPOSITE -> 180;
+            default -> 0;
+        };
     }
 }
