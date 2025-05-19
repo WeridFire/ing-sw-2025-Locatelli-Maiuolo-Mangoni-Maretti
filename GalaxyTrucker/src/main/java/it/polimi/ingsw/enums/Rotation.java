@@ -75,48 +75,21 @@ public enum Rotation {
             sides[direction.getRotated(this).getValue()] = oldSides[direction.getValue()];
         }
     }
-}
 
-
-/* above is special case of the following more generic rotation
-
-public enum Rotation {
-    NONE(0),
-    COUNTERCLOCKWISE(1),
-    OPPOSITE(Direction.TOTAL_DIRECTIONS / 2),
-    CLOCKWISE(Direction.TOTAL_DIRECTIONS - 1);
-
-    private static final Rotation[] VALUES = values();
-
-    private final int value;
-
-    Rotation(int value) {
-        this.value = value;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public Rotation reversed() {
-        return switch (this) {
-            case COUNTERCLOCKWISE -> CLOCKWISE;
-            case CLOCKWISE -> COUNTERCLOCKWISE;
-            default -> this;
-        };
-    }
-
-    public Rotation composedRotation(Rotation rotation) {
-        int composedValue = (value + rotation.value) % Direction.TOTAL_DIRECTIONS;
-        for (Rotation r : values()) {
-            if (r.value == composedValue) {
-                return r;
+    public double toDouble() {
+        switch (this)  {
+            case COUNTERCLOCKWISE -> {
+                return -90;
+            }
+            case CLOCKWISE -> {
+                return 90;
+            }
+            case OPPOSITE -> {
+                return 180;
+            }
+            default -> {
+                return 0;
             }
         }
-        throw new IllegalStateException("Invalid reversed rotation computation");
     }
-
-    // ...
 }
-
-*/

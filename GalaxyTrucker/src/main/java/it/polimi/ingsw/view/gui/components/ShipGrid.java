@@ -2,6 +2,7 @@ package it.polimi.ingsw.view.gui.components;
 
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.BoardCoordinates;
@@ -10,7 +11,8 @@ import it.polimi.ingsw.view.gui.UIs.AssembleUI;
 import it.polimi.ingsw.view.gui.helpers.WhichPane;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
-import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -33,6 +35,8 @@ public class ShipGrid extends GridPane {
     private int baseRow, baseCol; // Base offsets for mapping grid coordinates to ShipBoard coordinates
     private final Map<Coordinates, StackPane> gridCells = new HashMap<>();
     private final Map<StackPane, Coordinates> cellCoordinates = new HashMap<>();
+    private int visualRows; // Store visual rows
+    private int visualCols; // Store visual columns
 
     /**
      * Creates a new ship grid with specified dimensions, initializing cells
@@ -43,6 +47,8 @@ public class ShipGrid extends GridPane {
      */
     public ShipGrid(int rows, int cols) {
         super();
+        this.visualRows = rows;
+        this.visualCols = cols;
         initializeGridProperties(rows, cols);
         updateGridFromShipBoard();
     }
@@ -73,12 +79,19 @@ public class ShipGrid extends GridPane {
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 StackPane cell = createCell();
-                this.add(cell, c, r); // Add to GridPane
+                this.add(cell, c, r);
                 Coordinates logicalCoords = new Coordinates(r + baseRow, c + baseCol);
                 gridCells.put(logicalCoords, cell);
                 cellCoordinates.put(cell, logicalCoords);
             }
         }
+
+        // Set fixed size for the ShipGrid itself
+        double calculatedWidth = cols * CELL_SIZE;
+        double calculatedHeight = rows * CELL_SIZE;
+        this.setPrefSize(calculatedWidth, calculatedHeight);
+        this.setMinSize(calculatedWidth, calculatedHeight);
+        this.setMaxSize(calculatedWidth, calculatedHeight);
     }
 
     /**
@@ -96,7 +109,7 @@ public class ShipGrid extends GridPane {
             Coordinates logicalCoords = entry.getKey();
             StackPane cellPane = entry.getValue();
 
-            cellPane.getChildren().clear(); // Clear previous tile, if any
+            cellPane.getChildren().clear();
 
             if (tilesOnBoard.containsKey(logicalCoords)) {
                 TileSkeleton tileData = tilesOnBoard.get(logicalCoords);
@@ -117,32 +130,6 @@ public class ShipGrid extends GridPane {
     }
 
     /**
-     * If a tile placement attempt was not successful on the server-side
-     * (e.g., invalid placement), this method reverts the client-side changes:
-     * it discards the tile and clears it from the cell it was dropped onto.
-     *
-     * @param placementSuccessful A boolean indicating if the tile placement was successful.
-     * @param visualRow The visual row index of the cell where the tile was dropped.
-     * @param visualCol The visual column index of the cell where the tile was dropped.
-     */
-    public void revertCellIfPlaceFailed(boolean placementSuccessful, int visualRow, int visualCol) {
-        if (!placementSuccessful) {
-            Platform.runLater(() -> {
-                ClientManager.getInstance().simulateCommand("discard"); // Tell server to discard the tile in hand
-            });
-            if (AssembleUI.getIsBeeingDragged() != null) {
-                AssembleUI.getIsBeeingDragged().setPosition(WhichPane.DRAWN); // Reset tile's logical position
-            }
-            // Clear the tile from the visual cell
-            Coordinates logicalCoords = new Coordinates(visualRow + baseRow, visualCol + baseCol);
-            StackPane cellToClear = gridCells.get(logicalCoords);
-            if (cellToClear != null) {
-                cellToClear.getChildren().clear();
-            }
-        }
-    }
-
-    /**
      * Creates a single cell ({@link StackPane}) for the grid,
      * configuring its size, style, and drag-and-drop event handlers.
      * @return The created {@link StackPane} cell.
@@ -157,66 +144,59 @@ public class ShipGrid extends GridPane {
 
     /**
      * Configures drag-and-drop event handlers for a given grid cell.
-     * Handles drag over, entered, exited, and dropped events.
+     * Handles drag over, entered, exited, and released events.
      * @param cell The {@link StackPane} cell to configure.
      */
     private void configureDragHandlers(StackPane cell) {
-        cell.setOnDragOver(event -> {
-            if (event.getGestureSource() != cell && event.getDragboard().hasString()) {
-                event.acceptTransferModes(TransferMode.MOVE);
-            }
-            event.consume();
+
+        cell.setOnMouseDragEntered(event -> {
+            cell.setStyle(HIGHLIGHT_CELL_STYLE);
         });
 
-        cell.setOnDragEntered(event -> {
-            if (event.getGestureSource() != cell && event.getDragboard().hasString()) {
-                cell.setStyle(HIGHLIGHT_CELL_STYLE); // Highlight cell on drag enter
-            }
-            event.consume();
-        });
-
-        cell.setOnDragExited(event -> {
+        cell.setOnMouseDragExited((MouseDragEvent event) -> {
             Coordinates logicalCoords = cellCoordinates.get(cell);
             if (logicalCoords != null && BoardCoordinates.isOnBoard(LobbyState.getGameLevel(), logicalCoords)) {
                 cell.setStyle(SHIP_CELL_STYLE);
             } else {
                 cell.setStyle(DEFAULT_CELL_STYLE);
             }
-            event.consume();
         });
 
-        cell.setOnDragDropped(event -> {
-            Dragboard db = event.getDragboard();
-            boolean success = false;
-
-            if (db.hasString() && Objects.equals(db.getString(), "tile") && cell.getChildren().isEmpty()) {
-                DraggableTile draggedTile = AssembleUI.getIsBeeingDragged();
-                if (draggedTile != null) {
-                    cell.getChildren().add(draggedTile);
-                    draggedTile.setPosition(WhichPane.SHIPGRID);
-
-                    Integer colIndex = GridPane.getColumnIndex(cell);
-                    Integer rowIndex = GridPane.getRowIndex(cell);
-                    int visualCol = (colIndex == null) ? 0 : colIndex; // Visual column in the GridPane
-                    int visualRow = (rowIndex == null) ? 0 : rowIndex; // Visual row in the GridPane
-
-                    Platform.runLater(() -> {
-                        ShipBoard currentBoard = ClientManager.getInstance().getLastUpdate().getClientPlayer().getShipBoard();
-                        int tilesBeforePlace = (currentBoard != null && currentBoard.getTiles() != null) ? currentBoard.getTiles().size() : 0;
-
-                        ClientManager.getInstance().simulateCommand("place", Integer.toString(visualRow + baseRow), Integer.toString(visualCol + baseCol));
-
-                        currentBoard = ClientManager.getInstance().getLastUpdate().getClientPlayer().getShipBoard();
-                        int tileAfterPlace = currentBoard != null ? currentBoard.getTiles().size() : 0;
-
-                        if (tileAfterPlace == tilesBeforePlace) {
-                            ClientManager.getInstance().simulateCommand("discard");
-                        }
-                    });
-                    success = true;
-                }
+        cell.setOnMouseDragReleased((MouseDragEvent event) -> {
+            if (event.getButton() == MouseButton.SECONDARY) {
+                event.consume();
+                return;
             }
-            event.setDropCompleted(success);
+
+            DraggableTile draggedTile = AssembleUI.getIsBeeingDragged();
+
+            if (draggedTile != null && event.getGestureSource() == draggedTile && cell.getChildren().isEmpty()) {
+                cell.getChildren().add(draggedTile);
+
+                Integer colIndex = GridPane.getColumnIndex(cell);
+                Integer rowIndex = GridPane.getRowIndex(cell);
+                int visualCol = (colIndex == null) ? 0 : colIndex;
+                int visualRow = (rowIndex == null) ? 0 : rowIndex;
+
+                Platform.runLater(() -> {
+                    ShipBoard currentBoard = ClientManager.getInstance().getLastUpdate().getClientPlayer().getShipBoard();
+                    int tilesBeforePlace = (currentBoard != null && currentBoard.getTiles() != null) ? currentBoard.getTiles().size() : 0;
+
+                    ClientManager.getInstance().simulateCommand("place", Integer.toString(visualRow + baseRow), Integer.toString(visualCol + baseCol));
+
+                    ShipBoard updatedBoard = ClientManager.getInstance().getLastUpdate().getClientPlayer().getShipBoard();
+                    int tileAfterPlace = updatedBoard != null ? updatedBoard.getTiles().size() : 0;
+
+                    if (tileAfterPlace == tilesBeforePlace) {
+                        ClientManager.getInstance().simulateCommand("discard");
+                    }
+                });
+            }else {
+                Platform.runLater(() -> {
+                    ClientManager.getInstance().simulateCommand("discard");
+                });
+            }
+            AssembleUI.setIsBeeingDragged(null);
             event.consume();
         });
     }
