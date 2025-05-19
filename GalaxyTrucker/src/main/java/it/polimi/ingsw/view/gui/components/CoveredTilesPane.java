@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.gui.components;
 
 import it.polimi.ingsw.util.Default;
+import it.polimi.ingsw.view.gui.helpers.DragBehaviorHandler;
 import javafx.geometry.Insets;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -34,5 +35,7 @@ public class CoveredTilesPane extends Pane {
 
             this.getChildren().add(tile);
         }
+
+        DragBehaviorHandler.setGeneralDropBehavior(this);
     }
 }
