@@ -1,6 +1,7 @@
 package it.polimi.ingsw.shipboard.integrity;
 
 import it.polimi.ingsw.shipboard.TileCluster;
+import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
 import it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.Coordinates;
@@ -57,8 +58,7 @@ public class IntegrityProblem {
     }
 
 
-    public IntegrityProblem(Map<Coordinates, TileSkeleton> visitedTiles,
-                            List<TileCluster> clusters,
+    public IntegrityProblem(List<TileCluster> clusters,
                             Set<TileSkeleton> intrinsicallyWrongTiles,
                             List<Pair<TileSkeleton>> illegallyWeldedTiles,
                             Set<TileSkeleton> tilesWithHumans) {
@@ -73,16 +73,6 @@ public class IntegrityProblem {
 
         // add multiple clusters as clusters to keep -> only one will be kept: ok
         clustersToKeep.addAll(clusters);
-
-        /* check debug */
-        System.out.println("clusters to remove 1");
-        for (TileCluster cluster : clustersToRemove) {
-            System.out.println(cluster.toString(ANSI.RED));
-        }
-        System.out.println("clusters to keep 1");
-        for (TileCluster cluster : clustersToKeep) {
-            System.out.println(cluster.toString(ANSI.YELLOW));
-        } /**/
 
         // now, some of the cluster to keep may have no humans -> in that case, those clusters need to be removed
         Iterator<TileCluster> iterator = clustersToKeep.iterator();
@@ -101,16 +91,6 @@ public class IntegrityProblem {
             }
         }
 
-        /* check debug */
-        System.out.println("clusters to remove 2");
-        for (TileCluster cluster : clustersToRemove) {
-            System.out.println(cluster.toString(ANSI.RED));
-        }
-        System.out.println("clusters to keep 2");
-        for (TileCluster cluster : clustersToKeep) {
-            System.out.println(cluster.toString(ANSI.YELLOW));
-        } /**/
-
         /* BFS tree search all the remaining clusters for badly connected tiles (one way and the other) among those
             in the same cluster and "split" it in the clusters to keep -> only one will be kept: ok
             note: with implementation that keeps intersection of clusters to keep, is ok to mask with
@@ -126,14 +106,16 @@ public class IntegrityProblem {
             for (Pair<TileSkeleton> illegallyWeldedTilePair : illegallyWeldedTiles) {
                 if (illegallyWeldedTilePair.isIn(processing.getTiles())) {
 
-                    TileCluster c1 = new TileCluster(processing.getTiles());
-                    TileCluster c2 = new TileCluster(processing.getTiles());
+                    TileCluster c1, c2;
+                    try {
+                        c1 = processing.excluded(illegallyWeldedTilePair.getFirst(),
+                                illegallyWeldedTilePair.getSecond());
+                        c2 = processing.excluded(illegallyWeldedTilePair.getSecond(),
+                                illegallyWeldedTilePair.getFirst());
+                    } catch (NoTileFoundException e) {
+                        throw new RuntimeException(e);  // should never happen -> runtime exception
+                    }
 
-                    c1.getTiles().remove(illegallyWeldedTilePair.getSecond());
-                    c2.getTiles().remove(illegallyWeldedTilePair.getFirst());
-
-                    System.out.println("c1: " + c1.toString(ANSI.WHITE));
-                    System.out.println("c2: " + c2.toString(ANSI.WHITE));
                     oldClustersToKeep.add(c1);
                     oldClustersToKeep.add(c2);
 
@@ -146,17 +128,6 @@ public class IntegrityProblem {
                 clustersToKeep.add(processing);
             }
         }
-        /**/
-
-        /* check debug */
-        System.out.println("clusters to remove 3");
-        for (TileCluster cluster : clustersToRemove) {
-            System.out.println(cluster.toString(ANSI.RED));
-        }
-        System.out.println("clusters to keep 3");
-        for (TileCluster cluster : clustersToKeep) {
-            System.out.println(cluster.toString(ANSI.YELLOW));
-        } /**/
 
     }
 

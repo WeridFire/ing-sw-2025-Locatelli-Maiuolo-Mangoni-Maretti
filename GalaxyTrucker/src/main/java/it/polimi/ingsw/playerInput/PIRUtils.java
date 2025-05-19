@@ -241,7 +241,6 @@ public class PIRUtils {
 			// list tilecluster -> list set Coordinates
 			List<Set<Coordinates>> coordCluster = new ArrayList<>();
 			for (TileCluster cluster : clustersToKeep) {
-				System.out.println(cluster.toString(ANSI.GREEN));
 				coordCluster.add(cluster.getTiles().stream().
 						map(TileSkeleton::forceGetCoordinates)
 						.collect(Collectors.toSet()));

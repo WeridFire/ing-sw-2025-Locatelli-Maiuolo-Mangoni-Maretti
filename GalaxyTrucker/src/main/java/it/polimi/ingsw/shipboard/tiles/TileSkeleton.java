@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.shipboard.SideType;
+import it.polimi.ingsw.shipboard.integrity.IntegrityProblem;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotFixedTileException;
 import it.polimi.ingsw.util.Coordinates;
@@ -11,6 +12,7 @@ import it.polimi.ingsw.view.cli.CLIFrame;
 import it.polimi.ingsw.view.cli.ICLIPrintable;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Generic structure of a Tile.
@@ -20,7 +22,7 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
     private Rotation appliedRotation;
     private Coordinates fixedAt;
     private String cliSymbol = "?";
-    private int id;
+    private Integer id;
     private String textureName;
 
     /**
@@ -107,6 +109,14 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
     }
 
     /**
+     * @return {@code true} if this tile is currently placed somewhere (the function {@link #place(Coordinates)}
+     * has been called and the function {@link #unplace()} has not been called after it yet).
+     */
+    public boolean isPlaced() {
+        return fixedAt != null;
+    }
+
+    /**
      * Apply the specified rotation to the tile.
      * <p>
      * Sides are affected by this rotation.
@@ -171,7 +181,7 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
      *
      * @return the tile ID
      */
-    public int getTileId() {
+    public Integer getTileId() {
         return id;
     }
 
@@ -214,7 +224,22 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
 
     public boolean equals(TileSkeleton other) {
         if (other == null) return false;
-        return id == other.id;
+        boolean sameID = Objects.equals(id, other.id);
+        if (sameID && id != null) return true;
+        else {
+            return Arrays.equals(sides, other.sides)
+                    && Objects.equals(cliSymbol, other.cliSymbol);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        try {
+            return equals((TileSkeleton) o);
+        } catch (ClassCastException e) {
+            return false;
+        }
     }
 
     @Override

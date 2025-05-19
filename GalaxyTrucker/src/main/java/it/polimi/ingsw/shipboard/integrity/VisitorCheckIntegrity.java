@@ -144,7 +144,7 @@ public class VisitorCheckIntegrity implements TileVisitor {
     }
 
     public IntegrityProblem getProblem(boolean isAssemblePhase) {
-        return new IntegrityProblem(visitedTiles, clusters, intrinsicallyWrongTiles, illegallyWeldedTiles,
+        return new IntegrityProblem(clusters, intrinsicallyWrongTiles, illegallyWeldedTiles,
                 // if not assigned -> humans are not necessary to keep cluster, but main cabin is.
                 isAssemblePhase ? Set.of(mainCabin) : tilesWithHumans);
     }
