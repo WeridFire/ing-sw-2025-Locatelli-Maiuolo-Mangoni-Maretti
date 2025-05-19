@@ -20,7 +20,7 @@ public class WarPunishmentProjectile implements WarPunishment {
     public void apply(Player player, GameData gameData) {
         for(Projectile proj : projectiles){
 
-            game.getPIRHandler().setAndRunTurn(new PIRMultipleChoice(
+            gameData.getPIRHandler().setAndRunTurn(new PIRMultipleChoice(
                     player,
                     30,
                     "Do you want to roll the dice?",
@@ -30,11 +30,13 @@ public class WarPunishmentProjectile implements WarPunishment {
 
             proj.roll2D6();
             boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, gameData);
-            if(!defended){
+            if(!defended) {
                 try {
                     player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
                 } catch (NoTileFoundException | OutOfBuildingAreaException e) {
                     throw new RuntimeException(e);  // should never happen -> runtime exception
+                }
+            }
         }
     }
 }
