@@ -100,8 +100,8 @@ public class DraggableTile extends StackPane {
             clickOffset[0] = event.getSceneX() - this.getLayoutX();
             clickOffset[1] = event.getSceneY() - this.getLayoutY();
 
-            clickTileOffset[0] = event.getX() - DEFAULT_SIZE / 2;
-            clickTileOffset[1] = event.getY() - DEFAULT_SIZE / 2;
+            clickTileOffset[0] = event.getX();
+            clickTileOffset[1] = event.getY();
         });
 
         this.setOnMouseDragged(event -> {
@@ -109,8 +109,8 @@ public class DraggableTile extends StackPane {
             if (position == WhichPane.FLOATING) {
                 double newX = event.getSceneX() - clickOffset[0];
                 double newY = event.getSceneY() - clickOffset[1];
-                this.setLayoutX(newX + clickTileOffset[0]);
-                this.setLayoutY(newY + clickTileOffset[1]);
+                this.setLayoutX(newX + clickTileOffset[0] + 5);
+                this.setLayoutY(newY + clickTileOffset[1] + 5);
             }
         });
 
