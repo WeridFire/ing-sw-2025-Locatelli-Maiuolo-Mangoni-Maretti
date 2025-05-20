@@ -22,7 +22,7 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
     private Rotation appliedRotation;
     private Coordinates fixedAt;
     private String cliSymbol = "?";
-    private Integer id;
+    private int id;
     private String textureName;
 
     /**
@@ -181,7 +181,7 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
      *
      * @return the tile ID
      */
-    public Integer getTileId() {
+    public int getTileId() {
         return id;
     }
 
@@ -224,8 +224,8 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
 
     public boolean equals(TileSkeleton other) {
         if (other == null) return false;
-        boolean sameID = Objects.equals(id, other.id);
-        if (sameID && id != null) return true;
+        boolean sameID = (other.getTileId() == id);
+        if (sameID) return true;
         else {
             return Arrays.equals(sides, other.sides)
                     && Objects.equals(cliSymbol, other.cliSymbol);
