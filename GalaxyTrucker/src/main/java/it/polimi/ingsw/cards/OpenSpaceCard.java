@@ -34,9 +34,14 @@ public class OpenSpaceCard extends Card{
 	@Override
 	public void playEffect(GameData game) {
 		for(Player p : game.getPlayersInFlight()){
-			float steps = PIRUtils.runPlayerPowerTilesActivationInteraction(p, game, PowerType.THRUST);
-			//Here we just round, but know for sure that the thrusters tiles won't return numbers with decimals.
-			game.movePlayerForward(p, Math.round(steps));
+			// here we just cast to int, but know for sure that the thrusters tiles won't return numbers with decimals.
+			int steps = (int) PIRUtils.runPlayerPowerTilesActivationInteraction(p, game, PowerType.THRUST);
+			if (steps < 1) {
+				// exit flight if no thrust power is given
+				p.requestEndFlight();
+			} else {
+				game.movePlayerForward(p, steps);
+			}
 		}
 	}
 

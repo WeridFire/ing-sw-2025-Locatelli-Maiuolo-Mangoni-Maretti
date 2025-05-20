@@ -15,6 +15,7 @@ import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
 import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
+import it.polimi.ingsw.player.kpf.GetLappedKPF;
 import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
@@ -353,6 +354,12 @@ public class GameData implements Serializable {
             }
             playerToMove.setPosition(newPosition);
 
+        }
+
+        // send risk to get lapped if present
+        GetLappedKPF riskGetLapped = new GetLappedKPF(this);
+        if (riskGetLapped.test(playerToMove)) {
+            playerToMove.requestEndFlight(riskGetLapped);
         }
     }
 
