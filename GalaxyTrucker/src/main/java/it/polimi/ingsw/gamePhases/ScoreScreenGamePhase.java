@@ -18,23 +18,15 @@ import java.rmi.RemoteException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrintable, Serializable {
+public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrintable {
 
     public ScoreScreenGamePhase(GameData gameData) {
         super(GamePhaseType.ENDGAME, gameData);
     }
 
     @Override
-    public void playLoop() throws RemoteException, CantFindClientException, InterruptedException {
-
-    }
-
-    /**
-     * Starts a timer for a specific player, if applicable in this phase.
-     */
-    @Override
-    public void startTimer(Player p) throws TimerIsAlreadyRunningException, CommandNotAllowedException {
-        throw new CommandNotAllowedException("startTimer","No timer is allowed during the score screen phase.");
+    public boolean isExpired() {
+        return !gameData.getPlayers(Player::isConnected).isEmpty();
     }
 
     /**

@@ -33,9 +33,6 @@ import java.util.*;
  */
 public class Game {
 
-
-    private transient Thread gameThread;
-
     /**
      * Unique identifier for the game.
      */
@@ -61,15 +58,6 @@ public class Game {
     public Game(){
         id = UUID.randomUUID();
         loadGameData(new GameData(id));
-    }
-
-    public Thread getGameThread() {
-        return gameThread;
-    }
-
-    public void setGameThread(Thread gameThread) {
-        this.gameThread = gameThread;
-        gameThread.start();
     }
 
     /**
@@ -101,11 +89,29 @@ public class Game {
 
         LobbyGamePhase lobby = new LobbyGamePhase(gameData);
         getGameData().setCurrentGamePhase(lobby);
-        lobby.playLoop();
+    }
 
-        // call function to initialize all players stuff
+    private void initGame(){
+        //After the lobby phase has ended, we initialize the game.
         System.out.println(this + " Initialization");
-        initGame();
+
+        List<TileSkeleton> t = TilesFactory.createPileTiles();
+        Collections.shuffle(t);
+
+        //assign numeric progressive id to shuffled tiles
+        for (int i = 0; i < t.size(); i++) {
+            t.get(i).setTileId(i);
+        }
+
+        gameData.setCoveredTiles(t);
+
+        gameData.setDeck(Deck.random(gameData.getLevel()));
+
+        for (Player player : gameData.getPlayers()) {
+            ShipBoard shipBoard = ShipBoard.create(gameData.getLevel(), player.getColor());
+            shipBoard.attachIntegrityListener(new PIRUtils.ShipIntegrityListener(player, this));
+            player.setShipBoard(shipBoard);
+        }
     }
 
     private void playAssemble() throws RemoteException, InterruptedException {
@@ -131,7 +137,7 @@ public class Game {
         // notify all players about the new game state
         GameServer.getInstance().broadcastUpdate(this);
 
-        assemble.playLoop();
+        // TODO: assemble.playLoop();
         System.out.println(this + " Ended assemble phase");
         // if here can be because time ended: force all the players that haven't finished yet to end assembly
         for (Player player : getGameData().getPlayers()) {
@@ -189,7 +195,7 @@ public class Game {
             // notify all the players about the new adventure card
             notifyAdventureToPlayers(gameData.getPlayersInFlight().getFirst(), currentAdventureCard);
             // play the adventure
-            adventureGamePhase.playLoop();
+            // TODO: adventureGamePhase.playLoop();
 
             // end flight for players that requested it
             for (Player player : getGameData().getPlayers(Player::hasRequestedEndFlight)) {
@@ -218,7 +224,7 @@ public class Game {
         scoreScreenGamePhase = new ScoreScreenGamePhase(gameData);
         getGameData().setCurrentGamePhase(scoreScreenGamePhase);
         System.out.println(this + " Started scoring phase");
-        scoreScreenGamePhase.playLoop();
+        // TODO: scoreScreenGamePhase.playLoop();
         notifyScoresToPlayers(scoreScreenGamePhase);
 
         // TODO: end scoring phase
@@ -269,6 +275,14 @@ public class Game {
     public Player addPlayer(String username, UUID connectionUUID, MainCabinTile.Color desiredColor)
             throws PlayerAlreadyInGameException, GameAlreadyRunningException, ColorAlreadyInUseException {
 
+        Player existingDisconnectedPlayer = gameData.getPlayer(p ->
+                p.getUsername().equals(username) && !p.isConnected());
+        if (existingDisconnectedPlayer != null) {
+            existingDisconnectedPlayer.setConnectionUUID(connectionUUID);
+            return existingDisconnectedPlayer;
+        }
+        // else: not trying to reconnect -> create new player (if in valid state)
+
         GamePhaseType currentGamePhaseType = getGameData().getCurrentGamePhaseType();
         if (currentGamePhaseType == GamePhaseType.NONE || currentGamePhaseType == GamePhaseType.LOBBY) {
             if (gameData.getPlayer(p -> p.getColor().equals(desiredColor)) != null) {
@@ -279,36 +293,7 @@ public class Game {
             return newPlayer;
         }
 
-        Player existingDisconnectedPlayer = gameData.getPlayer(p ->
-                p.getUsername().equals(username) && !p.isConnected());
-        if (existingDisconnectedPlayer == null) {
-            throw new GameAlreadyRunningException("Attempted to join a game that has already started!");
-        } else {
-            existingDisconnectedPlayer.setConnectionUUID(connectionUUID);
-            return existingDisconnectedPlayer;
-        }
-    }
-
-    private void initGame(){
-        //After the lobby phase has ended, we initialize the game.
-
-        List<TileSkeleton> t = TilesFactory.createPileTiles();
-        Collections.shuffle(t);
-
-        //assign numeric progressive id to shuffled tiles
-        for (int i = 0; i < t.size(); i++) {
-            t.get(i).setTileId(i);
-        }
-
-        gameData.setCoveredTiles(t);
-
-        gameData.setDeck(Deck.random(gameData.getLevel()));
-
-        for (Player player : gameData.getPlayers()) {
-            ShipBoard shipBoard = ShipBoard.create(gameData.getLevel(), player.getColor());
-            shipBoard.attachIntegrityListener(new PIRUtils.ShipIntegrityListener(player, this));
-            player.setShipBoard(shipBoard);
-        }
+        throw new GameAlreadyRunningException("Attempted to join a game that has already started!");
     }
 
     public void testInitGame() {
@@ -351,9 +336,6 @@ public class Game {
      * Removes the list from the existing games list in the game handler.
      */
     public void stopGame(){
-        if(getGameThread() != null){
-            getGameThread().interrupt();
-        }
         GamesHandler.getInstance().getGames().remove(this);
     }
 

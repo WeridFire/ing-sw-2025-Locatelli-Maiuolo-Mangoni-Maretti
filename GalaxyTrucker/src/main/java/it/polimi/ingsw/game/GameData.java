@@ -3,6 +3,7 @@ package it.polimi.ingsw.game;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Deck;
+import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
@@ -65,6 +66,11 @@ public class GameData implements Serializable {
     private final UUID gameId;
 
     /**
+     * The related game of this game data
+     */
+    private transient Game game;
+
+    /**
      * The player whose turn it is.
      */
     private final PIRHandler pirHandler;
@@ -116,6 +122,21 @@ public class GameData implements Serializable {
         setLevel(GameLevel.TESTFLIGHT);
         setCurrentGamePhaseType(GamePhaseType.NONE);
         setRequiredPlayers(2);
+    }
+
+    private Game getGame() {
+        if (game == null) {
+            game = GamesHandler.getInstance().getGame(gameId);
+        }
+        return game;
+    }
+
+    public boolean isInitialized() {
+        if (currentGamePhaseType == GamePhaseType.NONE) return false;
+        else if (currentGamePhaseType == GamePhaseType.LOBBY) {
+            return !coveredTiles.isEmpty();
+        }
+        else return true;
     }
 
     /**
@@ -442,7 +463,7 @@ public class GameData implements Serializable {
      */
     public TileSkeleton getTileWithId(Integer id) throws ThatTileIdDoesNotExistsException {
         for (TileSkeleton t : getUncoveredTiles()) {
-            if (t.getTileId() == id) {
+            if (Objects.equals(t.getTileId(), id)) {
                 uncoveredTiles.remove(t);
                 return t;
             }
@@ -562,8 +583,11 @@ public class GameData implements Serializable {
         }
 
         // if here: no player left to finish assembly (<===> all players have a position on the route-board)
-        // thanks to precondition it's possible to cast the current game phase
-        ((AssembleGamePhase) getCurrentGamePhase()).notifyAllPlayersEndedAssembly();
+        try {
+            getCurrentGamePhase().command(null, "expire", null);
+        } catch (CommandNotAllowedException e) {
+            throw new RuntimeException(e);  // thanks to precondition, this should never happen -> runtime exception
+        }
     }
 
     public boolean isAssemblyTimerRunning() {

@@ -1,6 +1,8 @@
 package it.polimi.ingsw.gamePhases.exceptions;
 
-public class TimerIsAlreadyRunningException extends Exception {
+import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
+
+public class TimerIsAlreadyRunningException extends CommandNotAllowedException {
     public TimerIsAlreadyRunningException(String message) {
         super(message);
     }

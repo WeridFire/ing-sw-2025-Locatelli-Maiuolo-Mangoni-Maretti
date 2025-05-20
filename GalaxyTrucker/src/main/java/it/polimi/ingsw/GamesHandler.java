@@ -55,34 +55,21 @@ public class GamesHandler {
      *
      * @return the newly created {@code Game} instance
      */
-    public Game startGame() {
-        Game game = new Game();
-        return startGame(game);
+    private Game startGame() {
+        Game newGame = new Game();
+        games.add(newGame);
+        return newGame;
     }
 
-
     /**
-     * Creates a new game, adds it to the list, starts it on a separate thread, and returns it.
-     * @param game The game to start.
-     * @return The game object passed.
+     * Creates a new game from previous GameData, adds it to the list, and returns it.
+     *
+     * @return the newly created {@code Game} instance
      */
-    public Game startGame(Game game) {
-        //Instantiate a thread that handles that specific game.
-        Thread t = new Thread(() -> {
-            try {
-                game.gameLoop();
-            } catch (InterruptedException e) {
-                System.out.println("Interrupted game: " + game.getId());
-            }catch (RemoteException e) {
-                throw new RuntimeException(e);
-            }
-            finally {
-                // once the game has ended due to any circumstance, remove it from the games list
-                games.remove(game);
-            }
-        });
-        game.setGameThread(t); //setting it also starts it.
-        return game;
+    private Game startGame(GameData gameData) {
+        Game newGame = new Game(gameData);
+        games.add(newGame);
+        return newGame;
     }
 
     /**
@@ -115,7 +102,6 @@ public class GamesHandler {
             throw new PlayerAlreadyInGameException(username);
         }
         Game createdGame = startGame();
-        games.add(createdGame);
 
         try {
             createdGame.addPlayer(username, connectionUUID, desiredColor);
@@ -135,12 +121,12 @@ public class GamesHandler {
      */
     public Game resumeGame(GameData savedGameState, UUID connectionUUID) throws PlayerAlreadyInGameException,
             GameAlreadyRunningException {
-        Game createdGame = new Game(savedGameState);
-        if(games.stream().anyMatch((g) -> g.getId().equals(savedGameState.getGameId()))){
-            throw new GameAlreadyRunningException(createdGame.getId());
+        UUID alreadyRunningGameID = savedGameState.getGameId();
+        if(games.stream().anyMatch((g) -> g.getId().equals(alreadyRunningGameID))){
+            throw new GameAlreadyRunningException(alreadyRunningGameID);
         }
-        games.add(createdGame);
-        startGame(createdGame);
+
+        Game createdGame = startGame(savedGameState);
 
         try {
             createdGame.addPlayer(savedGameState.getGameLeader(), connectionUUID, null);

@@ -2,6 +2,7 @@ package it.polimi.ingsw.game;
 
 import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Deck;
+import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
@@ -80,14 +81,14 @@ class GameDataTest {
     @Test
     void testSetCurrentGamePhase() {
         PlayableGamePhase mockPhase = new PlayableGamePhase(GamePhaseType.ADVENTURE, gameData) {
-            @Override
-            public void playLoop() {}
 
-            /**
-             * Used to implement starting timer logic
-             */
             @Override
-            public void startTimer(Player p) throws TimerIsAlreadyRunningException {
+            public boolean isExpired() {
+                return false;
+            }
+
+            @Override
+            public void command(Player sender, String command, String[] args) throws CommandNotAllowedException {
 
             }
         };
@@ -146,7 +147,7 @@ class GameDataTest {
         }
 
         g.testInitGame();
-        gameData.setCurrentGamePhase(new AssembleGamePhase(gameId, gameData));
+        gameData.setCurrentGamePhase(new AssembleGamePhase(gameData, null));
 
         if(step == 0){
             stopAndSaveGame(gameData);

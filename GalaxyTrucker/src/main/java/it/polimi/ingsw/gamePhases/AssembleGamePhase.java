@@ -1,29 +1,24 @@
 package it.polimi.ingsw.gamePhases;
 
-import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
-import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.util.GameLevelStandards;
 
-
-import java.rmi.RemoteException;
-import java.util.UUID;
 
 public class AssembleGamePhase extends PlayableGamePhase {
 
     // TODO: reset timerMilliseconds = 60 * 1000L. This is for debug purposes
     private static final long timerMilliseconds = 5 * 1000L;  // 60 seconds
-    transient private final Object timerLock = new Object();
-    transient private Runnable onTimerSwitchCallback;
+    transient private final Runnable onTimerSwitchCallback;
 
     private final int totalTimerRotations;
     private int howManyTimerRotationsLeft;
-    private boolean timerRunning;
+    private long runningMillis = 0;
+    private boolean expired = false;
 
     /**
      * Constructs a new PlayableGamePhase as {@link GamePhaseType#ASSEMBLE}.
@@ -34,130 +29,99 @@ public class AssembleGamePhase extends PlayableGamePhase {
      */
     public AssembleGamePhase(GameData gameData, Runnable onTimerSwitchCallback) {
         super(GamePhaseType.ASSEMBLE, gameData);
+        this.onTimerSwitchCallback = onTimerSwitchCallback;
+
         totalTimerRotations = GameLevelStandards.getTimerSlotsCount(gameData.getLevel());
         howManyTimerRotationsLeft = totalTimerRotations;
-        setOnTimerSwitchCallback(onTimerSwitchCallback);
         setTimerRunning(false);
     }
 
-    /**
-     * Constructs a new PlayableGamePhase as {@link GamePhaseType#ASSEMBLE}.
-     * Every time a timer stops or gets resumed: does nothing.
-     *
-     * @param gameId        The unique identifier of the game.
-     * @param gameData      The game data.
-     */
-    public AssembleGamePhase(UUID gameId, GameData gameData) {
-        this(gameData, null);
-    }
-
     private void setTimerRunning(boolean running) {
-        timerRunning = running;
+        runningMillis = running ? timerMilliseconds : 0;
         // callback for timer ended or started
         if (onTimerSwitchCallback != null) {
             onTimerSwitchCallback.run();
         }
     }
 
-    public void playLoop() throws RemoteException, InterruptedException {
+    private boolean isWaitingAll() {
+        return totalTimerRotations == 0;
+    }
 
-        synchronized (gameData.getUnorderedPlayers()) {
-            if(gameData.getPlayers().isEmpty()){
-                GamesHandler gamesHandler = GamesHandler.getInstance();
-                gamesHandler.getGames().remove(gamesHandler.getGame(this.gameId));
-            }
-        }
-
-        if (gameData.getCurrentGamePhase() != this) {
-            throw new  RuntimeException("Trying to run a game phase which is not active on the game.");
-        }
-
-        while (howManyTimerRotationsLeft > 1) {
-            GameServer.getInstance().broadcastUpdate(GamesHandler.getInstance().getGame(gameId));
+    public void start() {
+        if (howManyTimerRotationsLeft > 1) {
             setTimerRunning(true);
-            Thread.sleep(timerMilliseconds);  // Wait for a full hourglass time
-            setTimerRunning(false);
-
-            // wait for a player to restart the timer
-            synchronized (timerLock) {
-                timerLock.wait();
-            }
-            howManyTimerRotationsLeft -= 1;
         }
+    }
 
-        // if the hourglass is in its stop place (keep this 'if' to not lose the TESTFLIGHT case)
-        if (howManyTimerRotationsLeft == 1) {
-
-            //check if there are any players left
-            synchronized (gameData.getUnorderedPlayers()) {
-                if(gameData.getPlayers().isEmpty()){
-                    GamesHandler gamesHandler = GamesHandler.getInstance();
-                    gamesHandler.getGames().remove(gamesHandler.getGame(this.gameId));
-                }
+    public void update(long deltaTimeMillis) {
+        // 2 behaviors: 1. waiting all...
+        if (isWaitingAll()) {
+            if (gameData.getPlayer(p -> p.getPosition() == null) == null) {
+                expired = true;
             }
-
-            setTimerRunning(true);  // run for the last time
-            // wait at most a total hourglass time (or get notified earlier by notifyAllPlayersEndedAssembly)
-            synchronized (timerLock) {
-                timerLock.wait(timerMilliseconds);
-            }
-            setTimerRunning(false);  // end for the last time
-            // if here can be because time ended: delegated to the caller to force all the players to end assembly
-            howManyTimerRotationsLeft = 0;
+            return;
         }
-        else if (howManyTimerRotationsLeft == 0) {  // TESTFLIGHT: forced to wait all the players
-            synchronized (timerLock) {
-                timerLock.wait();
+        // ... or 2. waiting the end of the last timer
+        if (isTimerRunning()) {
+            runningMillis -= deltaTimeMillis;
+            if (runningMillis <= 0) {
+                setTimerRunning(false);
             }
         }
-        // else: arrives from previous if and notifyAllPlayersEndedAssembly has been called -> finish assembly directly
+        if (howManyTimerRotationsLeft == 0) {
+            expired = true;
+        }
     }
 
     @Override
-    public void startTimer(Player p) throws TimerIsAlreadyRunningException, CommandNotAllowedException {
-        if (timerRunning) {
-            throw new TimerIsAlreadyRunningException("You must wait for the hourglass to finish before flipping it.");
-        }
-        if (gameData.getLevel() == GameLevel.TESTFLIGHT) {
-            throw new CommandNotAllowedException("start timer", "Time constraints are not present in a TESTFLIGHT game!");
-        }
-        // stop place is howManyTimerRotationsLeft == 1 -> last flip is howManyTimerRotationsLeft == 2
-        if (howManyTimerRotationsLeft == 2 && !p.getShipBoard().isEndedAssembly()) {
-            throw new CommandNotAllowedException("start timer",
-                    "You must have first finished assembling the ship before performing the last flip.");
-        }
-        synchronized (timerLock) {
-            timerLock.notifyAll();
+    public boolean isExpired() {
+        return expired;
+    }
+
+    private void toggleTimer() {
+        howManyTimerRotationsLeft -= 1;
+        if (howManyTimerRotationsLeft > 0) {
+            setTimerRunning(true);
         }
     }
 
     /**
-     * Notify that all the players in the game ended assembly
+     * {@inheritDoc}
+     * These are the possible commands:
+     * 1. "timer" -> to toggle timer. Needs {@code sender != null}, and to be the player that tried to flip the timer.
+     * 2. "expire" -> to end this phase forcefully.
      */
-    public void notifyAllPlayersEndedAssembly() {
-        // if all the players end assemble before the last timer reaches the end,
-        // there is no need to continue turning the timer -> immediate stop
-        howManyTimerRotationsLeft = 0;
-        // then, default behavior: end assemble
-        synchronized (timerLock) {
-            timerLock.notifyAll();
-        }
-    }
+    @Override
+    public void command(Player sender, String command, String[] args) throws CommandNotAllowedException {
+        switch (command) {
+            case "timer" -> {
+                if (isTimerRunning()) {
+                    throw new TimerIsAlreadyRunningException("You must wait for the hourglass to finish before flipping it.");
+                }
+                if (gameData.getLevel() == GameLevel.TESTFLIGHT) {
+                    throw new CommandNotAllowedException("start timer", "Time constraints are not present in a TESTFLIGHT game!");
+                }
+                // stop place is howManyTimerRotationsLeft == 1 -> last flip is howManyTimerRotationsLeft == 2
+                if (howManyTimerRotationsLeft == 2 && !sender.getShipBoard().isEndedAssembly()) {
+                    throw new CommandNotAllowedException("start timer",
+                            "You must have first finished assembling the ship before performing the last flip.");
+                }
+                // if here: ok to toggle timer
+                toggleTimer();
+            }
 
-    /**
-     * Sets the callback to be executed every time a timer runs out or starts.
-     * Needed when recreating this class from serialization since the runnable is not saved in serialization.
-     * @param onTimerSwitchCallback the callback function.
-     */
-    public void setOnTimerSwitchCallback(Runnable onTimerSwitchCallback) {
-        this.onTimerSwitchCallback = onTimerSwitchCallback;
+            case "expire" -> expired = true;
+
+            case null, default -> super.command(sender, command, args);
+        }
     }
 
     /**
      * @return {@code true} if the timer is running, otherwise {@code false} if the timer expired and can be flipped
      */
     public boolean isTimerRunning() {
-        return timerRunning;
+        return runningMillis > 0;
     }
 
     /**

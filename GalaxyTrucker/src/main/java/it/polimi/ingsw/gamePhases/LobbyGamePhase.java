@@ -23,20 +23,7 @@ public class LobbyGamePhase extends PlayableGamePhase{
 	}
 
 	@Override
-	public void playLoop() throws RemoteException, CantFindClientException, InterruptedException {
-		synchronized (gameData.getUnorderedPlayers()){
-			while (gameData.getPlayers().size() < gameData.getRequiredPlayers()){
-				gameData.getUnorderedPlayers().wait();
-				if(gameData.getPlayers().isEmpty()){
-					GamesHandler gamesHandler = GamesHandler.getInstance();
-					gamesHandler.getGames().remove(gamesHandler.getGame(this.gameId));
-				}
-			}
-		}
-	}
-
-	@Override
-	public void startTimer(Player p) throws TimerIsAlreadyRunningException, CommandNotAllowedException {
-
+	public boolean isExpired() {
+		return gameData.getPlayers(Player::isConnected).size() >= gameData.getRequiredPlayers();
 	}
 }

@@ -16,6 +16,7 @@ import it.polimi.ingsw.view.cli.ANSI;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Player implements Serializable {
@@ -440,7 +441,7 @@ public class Player implements Serializable {
             // if not found: search in the reserved tiles
             tile = null;
             for (int i = 0; i < reservedTiles.size(); i++) {  // first search in the reserved tiles
-                if (reservedTiles.get(i).getTileId() == id) {
+                if (Objects.equals(reservedTiles.get(i).getTileId(), id)) {
                     tile = reservedTiles.remove(i);
                     isTileInHandFromReserved = true;
                     break;

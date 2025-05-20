@@ -3,12 +3,9 @@ package it.polimi.ingsw.gamePhases;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
-import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
-import it.polimi.ingsw.network.exceptions.CantFindClientException;
 import it.polimi.ingsw.player.Player;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.util.UUID;
 
 /**
@@ -40,7 +37,6 @@ public abstract class PlayableGamePhase implements Serializable {
 
     /**
      * Gets the type of the game phase.
-     *
      * @return The game phase type.
      */
     public GamePhaseType getGamePhaseType() {
@@ -48,14 +44,22 @@ public abstract class PlayableGamePhase implements Serializable {
     }
 
     /**
-     * Defines the main gameplay loop for this phase.
-     * To be implemented by subclasses.
+     * Defines the condition to consider this game phase "expired": no longer running / available.
+     * Used to update the State Machine to the next state
+     * @return {@code true} if and only if this state is no longer available
      */
-    public abstract void playLoop() throws RemoteException, CantFindClientException, InterruptedException;
+    public abstract boolean isExpired();
+
+    public void start() { }
+    public void update(long deltaTimeMillis) { }
 
     /**
-     * Used to implement starting timer logic
-     * @param p The player who flipped the timer.
+     * Used to implement a generic command received by a player
+     * @param sender The player who sent the command
+     * @param command The command received by the game phase, to act on its own state
+     * @param args The command arguments to specify any other info in the parsing of the command
      * */
-    public abstract void startTimer(Player p) throws TimerIsAlreadyRunningException, CommandNotAllowedException;
+    public void command(Player sender, String command, String[] args) throws CommandNotAllowedException {
+        throw new CommandNotAllowedException("The command '"+command+"' is not allowed at this level of the game model");
+    }
 }

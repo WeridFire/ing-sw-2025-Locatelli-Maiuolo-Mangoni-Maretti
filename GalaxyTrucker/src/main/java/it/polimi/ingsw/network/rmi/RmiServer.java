@@ -270,8 +270,8 @@ public class RmiServer implements IServer {
 		// else: actually try to perform the action
 
 		try {
-			pg.game.getGameData().getCurrentGamePhase().startTimer(pg.player);
-		} catch (TimerIsAlreadyRunningException | CommandNotAllowedException e) {
+			pg.game.getGameData().getCurrentGamePhase().command(pg.player, "timer", null);
+		} catch (CommandNotAllowedException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 			return;
 		}

@@ -7,16 +7,16 @@ import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import java.util.UUID;
 
-public class AdventureGamePhase extends PlayableGamePhase{
+public class AdventureGamePhase extends PlayableGamePhase {
 
-    /**Card that determins the andventure*/
+    /** Card that determines the adventure */
     private final Card card;
 
     /**
      * Constructs a new PlayableGamePhase.
      *
      * @param gameData      The game data.
-     * @param card the adventure card to play in {@link #playLoop()}
+     * @param card the adventure card to play in this adventure game phase
      */
     public AdventureGamePhase(GameData gameData, Card card) {
         super(GamePhaseType.ADVENTURE, gameData);
@@ -24,19 +24,19 @@ public class AdventureGamePhase extends PlayableGamePhase{
     }
 
     @Override
-    public void playLoop() throws InterruptedException {
-        card.playEffect(gameData);
-        synchronized (gameData.getUnorderedPlayers()) {
-            if(gameData.getPlayers().isEmpty()){
-                GamesHandler gamesHandler = GamesHandler.getInstance();
-                gamesHandler.getGames().remove(gamesHandler.getGame(this.gameId));
-            }
+    public void start() {
+        try {
+            card.playEffect(gameData);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
-    public void startTimer(Player p) {
-
+    public boolean isExpired() {
+        return gameData.getPlayer(p -> gameData.getPIRHandler().isPlayerTurnActive(p)) == null;
     }
+
+
 
 }
