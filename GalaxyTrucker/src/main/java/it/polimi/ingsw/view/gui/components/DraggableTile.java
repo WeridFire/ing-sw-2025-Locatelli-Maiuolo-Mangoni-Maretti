@@ -5,6 +5,7 @@ import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.gui.UIs.AssembleUI;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
+import it.polimi.ingsw.view.gui.helpers.DragBehaviorHandler;
 import it.polimi.ingsw.view.gui.helpers.WhichPane;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
@@ -123,6 +124,8 @@ public class DraggableTile extends StackPane {
                 });
             }
         });
+
+        DragBehaviorHandler.setGeneralDropBehavior(this);
     }
 
     /**
