@@ -11,7 +11,7 @@ import java.util.List;
 
 public class DrawnTilesGrid extends GridPane {
 
-    private final int DEF_ROWS = 20, DEF_COLS = 13;
+    private final int DEF_ROWS = 20, DEF_COLS = 8;
 
     public DrawnTilesGrid() {
         updateTilesGrid();

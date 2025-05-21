@@ -80,19 +80,20 @@ public class DraggableTile extends StackPane {
      */
     private void configureDragBehavior() {
         this.setOnDragDetected(event -> {
-            if (event.getButton() != MouseButton.PRIMARY || position == WhichPane.SHIPGRID || AssembleUI.getIsBeeingDragged() != null) {
+            if (event.getButton() != MouseButton.PRIMARY || position == WhichPane.SHIPGRID) {
                 event.consume();
                 return;
             }
 
-            AssembleUI.setIsBeeingDragged(this);
             setPosition(WhichPane.FLOATING);
+            AssembleUI.setIsBeeingDragged(this);
 
             if (isCovered) {
                 ClientManager.getInstance().simulateCommand("draw");
                 this.setTile(AssembleState.getTileInHand());
             } else {
                 ClientManager.getInstance().simulateCommand("pick", Integer.toString(tile.getTileId()));
+                this.setTile(AssembleState.getTileInHand());
             }
 
             this.setViewOrder(-100);
