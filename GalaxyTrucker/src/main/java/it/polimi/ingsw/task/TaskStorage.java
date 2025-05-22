@@ -29,6 +29,7 @@ public class TaskStorage {
 		synchronized(pendingTasks){
 			pendingTasks.forEach((task)->{
 				if(task.checkCondition()){
+					task.finish();
 					pendingTasks.remove(task);
 					previousTasks.add(task);
 				}
