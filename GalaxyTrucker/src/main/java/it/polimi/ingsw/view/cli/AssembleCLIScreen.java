@@ -64,7 +64,7 @@ public class AssembleCLIScreen extends CLIScreen {
         return CLIFrame
                 .fromFramesGrid(frameUncoveredTilesGrid, uncoveredTileHorizontalSpacing, 1)
                 // add title
-                .merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " DRAWN AND DISCARDED TILES " + ANSI.RESET),
+                .merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " UNCOVERED AND DISCARDED TILES " + ANSI.RESET),
                         Direction.NORTH, 1);
     }
 

@@ -5,7 +5,6 @@ import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.components.*;
-import it.polimi.ingsw.view.gui.helpers.DragBehaviorHandler;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
@@ -18,18 +17,6 @@ import java.util.Optional;
  * This UI is intended to be displayed full screen, with its internal components having fixed sizes.
  */
 public class AssembleUI implements INodeRefreshableOnUpdateUI {
-
-    // Static
-    private static DraggableTile isBeeingDragged;
-
-    public static void setIsBeeingDragged(DraggableTile isBeeingDragged) {
-        AssembleUI.isBeeingDragged = isBeeingDragged;
-    }
-
-    public static DraggableTile getIsBeeingDragged() {
-        return isBeeingDragged;
-    }
-
 
     private static CardsGroup watchedCardsGroup;
 
@@ -48,7 +35,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
 
     private final GridPane mainGrid;
     private ScrollPane topScrollPane; // Changed to ScrollPane
-    private DrawnTilesGrid drawnTilesGrid; // Maintain a reference to DrawnTilesGrid
+    private UncoveredTilesGrid uncoveredTilesGrid; // Maintain a reference to DrawnTilesGrid
     private ShipGrid leftGrid;
     private CoveredTilesPane rightPane;
     private VBox topRightVBox;
@@ -64,7 +51,6 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     public AssembleUI() {
         mainGrid = new GridPane();
         mainGrid.setAlignment(Pos.CENTER);
-        DragBehaviorHandler.setGeneralDropBehavior(mainGrid);
 
         root = new StackPane();
 
@@ -94,8 +80,8 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
      * Creates the scrollable pane for displaying drawn tiles with a fixed height.
      */
     private ScrollPane createDrawnTilesScrollPane() {
-        drawnTilesGrid = new DrawnTilesGrid(); // Create the instance of DrawnTilesGrid
-        ScrollPane scrollPane = new ScrollPane(drawnTilesGrid); // Insert DrawnTilesGrid into the ScrollPane
+        uncoveredTilesGrid = new UncoveredTilesGrid(); // Create the instance of DrawnTilesGrid
+        ScrollPane scrollPane = new ScrollPane(uncoveredTilesGrid); // Insert DrawnTilesGrid into the ScrollPane
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
@@ -187,10 +173,10 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         Platform.runLater(() -> {
             updateOverlays();
 
-            if (drawnTilesGrid != null) {
-                drawnTilesGrid.updateTilesGrid();
+            if (uncoveredTilesGrid != null) {
+                uncoveredTilesGrid.update();
             }
-            leftGrid.updateGridFromShipBoard();
+            leftGrid.update();
         });
     }
 }
