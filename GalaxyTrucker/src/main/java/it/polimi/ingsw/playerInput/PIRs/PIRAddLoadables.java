@@ -55,8 +55,6 @@ public class PIRAddLoadables extends PIR {
 				availableCount.put(loadable, availableCount.get(loadable) - 1);
 			}
 		}
-
-
 	}
 
 	private Map<Coordinates, ContainerTile> getContainerTiles() {
