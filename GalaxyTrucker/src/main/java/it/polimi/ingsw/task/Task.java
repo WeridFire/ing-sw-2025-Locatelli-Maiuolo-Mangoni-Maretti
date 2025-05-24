@@ -38,6 +38,9 @@ public abstract class Task implements ICLIPrintable {
 	 */
 	private int expiration;
 
+	/**
+	 * The type of the current task.
+	 */
 	private TaskType taskType;
 
 
@@ -46,6 +49,12 @@ public abstract class Task implements ICLIPrintable {
 		this.duration = duration;
 		this.taskType = taskType;
 	}
+
+
+	/*
+	* Task Class Getters
+	* */
+
 
 	/**
 	 * Sets the gameID of the game associated to this task. This should be called only when finalizing the task and
@@ -56,16 +65,18 @@ public abstract class Task implements ICLIPrintable {
 		this.gameId = gameId;
 	}
 
-	protected void setExpiration(int currentEpoch){
-		this.expiration = currentEpoch + duration;
+	/**
+	 * Gets the current epoch timestamp, in seconds
+	 * @return the current epoch timestamp in seconds
+	 */
+	public static int getEpochTimestamp(){
+		return (int) (System.currentTimeMillis() / 1000);
 	}
 
-	protected void checkForTurn(String checkingPlayer) throws WrongPlayerTurnException {
-		if(!Objects.equals(this.player, player)){
-			throw new WrongPlayerTurnException(player, checkingPlayer, this.taskType);
-		}
-	}
-
+	/**
+	 * Returns a reference to the instance of the player this task is dedicated to.
+	 * @return The player instance.
+	 */
 	protected Player getPlayer(){
 		Game game = GamesHandler.getInstance().getGame(gameId);
 		return game
@@ -76,9 +87,67 @@ public abstract class Task implements ICLIPrintable {
 				null);
 	}
 
-	public static int getEpochTimestamp(){
-		return (int) (System.currentTimeMillis() / 1000);
+	/**
+	 * Gets the duration of the task, in seconds.
+	 * @return the duration of the task.
+	 */
+	public int getDuration(){
+		return this.duration;
 	}
+
+	/**
+	 * Gets the scheduled expiration epoch timestamp in seconds.
+	 * @return the scheduled expiration epoch.
+	 */
+	public int getExpiration(){
+		return this.expiration;
+	}
+
+	/**
+	 * Gets the type of the current task.
+	 * @return the type of the current task.
+	 */
+	public TaskType getTaskType(){
+		return this.taskType;
+	}
+
+	/**
+	 * Gets the ID of the game this task is linked to.
+	 * @return the UUID of the game.
+	 */
+	public UUID getGameId(){
+		return this.gameId;
+	}
+
+	/**
+	 * Gets the username of the player this task is dedicated to.
+	 * @return The username of the player.
+	 */
+	public String getUsername(){
+		return this.getUsername();
+	}
+
+	// UTILS FOR SPECIFIC TASKS
+
+	public abstract Set<Coordinates> getHighlightMask();
+
+	protected void checkForTileMask(Coordinates coordinate) throws TileNotAvailableException {
+		if(!getHighlightMask().contains(coordinate)){
+			throw new TileNotAvailableException(coordinate, taskType);
+		}
+	}
+
+	protected void checkForTurn(String checkingPlayer) throws WrongPlayerTurnException {
+		if(!Objects.equals(this.player, player)){
+			throw new WrongPlayerTurnException(player, checkingPlayer, this.taskType);
+		}
+	}
+
+	/**
+	 * This function gets called by the TaskStorage upon completion of a task.
+	 */
+	protected abstract void finish();
+
 
 	/**
 	 * Function that checks some task requirements for completion, and then returns if it is complete or not.
@@ -88,39 +157,10 @@ public abstract class Task implements ICLIPrintable {
 		return false;
 	}
 
-	public int getDuration(){
-		return this.duration;
-	}
-
-	public int getExpiration(){
-		return this.expiration;
-	}
-
-	public void finish(){
-		return;
-	}
-
-	public TaskType getTaskType(){
-		return this.taskType;
-	}
-
-	public UUID getGameId(){
-		return this.gameId;
-	}
-
-	public String getUsername(){
-		return this.getUsername();
-	}
-
-	// UTILS FOR SPECIFIC PIRS
-	public abstract Set<Coordinates> getHighlightMask();
 
 
-	protected void checkForTileMask(Coordinates coordinate) throws TileNotAvailableException {
-		if(!getHighlightMask().contains(coordinate)){
-			throw new TileNotAvailableException(coordinate, taskType);
-		}
-	}
+
+	//METHODS FOR SPECIFIC TASKS
 
 	public void makeChoice(Player player, int choice) throws WrongPlayerTurnException, InputNotSupportedException {
 		throw new InputNotSupportedException(getTaskType());
