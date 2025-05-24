@@ -205,7 +205,7 @@ public class Game {
         System.out.println(this + " Ended flight phase");
     }
 
-    private void playEndgame() throws RemoteException, InterruptedException {
+    public void playEndgame() throws RemoteException {
         // play end of the game only after adventures and when no other cards are in the deck
         if (getGameData().getCurrentGamePhaseType() != GamePhaseType.ADVENTURE
                 || getGameData().getDeck().getCurrentCard() != null) {
