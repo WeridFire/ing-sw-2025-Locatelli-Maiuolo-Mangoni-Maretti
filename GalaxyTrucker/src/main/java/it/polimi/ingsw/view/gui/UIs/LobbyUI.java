@@ -89,7 +89,7 @@ public class LobbyUI implements INodeRefreshableOnUpdateUI {
 
         if (game.getCurrentGamePhaseType().equals(GamePhaseType.ASSEMBLE)){
             Platform.runLater(() -> {
-                ClientManager.getInstance().updateScene(new AssembleUI());
+                ClientManager.getInstance().updateScene(AssembleUI.getInstance());
             });
             return;
         }

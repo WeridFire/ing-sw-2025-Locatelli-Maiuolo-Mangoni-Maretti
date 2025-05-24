@@ -2,15 +2,16 @@ package it.polimi.ingsw.view.gui.components;
 
 import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.cards.CardsGroup;
-import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.view.gui.UIs.AssembleUI;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -28,6 +29,7 @@ public class ShowDeckGrid extends StackPane {
                     .map(Card::getTextureName)
                     .collect(Collectors.toList())
         );
+        AssembleUI.setWatchedCardsGroup(cg);
     }
 
     public ShowDeckGrid(List<String> cardsFileNames) {
@@ -61,34 +63,36 @@ public class ShowDeckGrid extends StackPane {
         scrollPane.setStyle("-fx-background-color: transparent;");
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-        // Layout overlay
-        VBox container = new VBox(scrollPane);
-        container.setAlignment(Pos.CENTER);
-        container.setMaxWidth(500);
-        container.setMaxHeight(450);
-
-        this.setBehavior();
+        // close
+        VBox container = getVBox(scrollPane);
 
         // Aggiungi tutto allo StackPane
         this.getChildren().addAll(overlayBackground, container);
         show();
     }
 
-    public void setBehavior(){
-        this.setOnMousePressed(event -> {
-            Platform.runLater(() -> {
-                ClientManager.getInstance().simulateCommand("hidecg");
-            });
-            AssembleUI.setWatchedCardsGroup(null);
-            this.hide();
+    private static VBox getVBox(ScrollPane scrollPane) {
+        Button closeButton = new Button("Close");
+        closeButton.setOnMouseClicked(event -> {
+            if(AssembleUI.getWatchedCardsGroup() != null) {
+                Platform.runLater(() -> {
+                    ClientManager.getInstance().simulateCommand("hidecg");
+                });
+                AssembleUI.setWatchedCardsGroup(null);
+                AssembleUI.getInstance().clearDeckOverlay();
+            }
         });
+
+        // Layout overlay
+        VBox container = new VBox(10, scrollPane, closeButton);
+        container.setAlignment(Pos.CENTER);
+        container.setMaxWidth(500);
+        container.setMaxHeight(450);
+        return container;
     }
 
     public void show() {
         this.setVisible(true);
     }
 
-    public void hide() {
-        this.setVisible(false);
-    }
 }

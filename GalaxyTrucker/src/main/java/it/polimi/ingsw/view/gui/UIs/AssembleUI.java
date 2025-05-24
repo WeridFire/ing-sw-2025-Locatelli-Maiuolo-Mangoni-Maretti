@@ -27,6 +27,15 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         AssembleUI.watchedCardsGroup = watchedCardsGroup;
     }
 
+    public static AssembleUI instance;
+
+    public static AssembleUI getInstance() {
+        if(instance == null) {
+            instance = new AssembleUI();
+        }
+        return instance;
+    };
+
     // Define fixed dimensions for components
     private static final double TOP_SCROLL_PANE_HEIGHT = 250.0; // Fixed height for the scrollable area
     private static final double MAX_TOP_SCROLL_PANE_HEIGHT = 500.0;
@@ -142,12 +151,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         return decksAndTimerGrid;
     }
 
-    public void updateOverlays(){
-        if ((showDeckGrid != null) && !showDeckGrid.isVisible()){
-            root.getChildren().remove(showDeckGrid);
-            return;
-        }
-
+    public void showDeckOverlay(){
         Optional<CardsGroup> cg = AssembleState.getCardGroupInHand();
         if (cg.isPresent()) {
             showDeckGrid = new ShowDeckGrid(cg.get());
@@ -155,6 +159,15 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
             root.getChildren().add(showDeckGrid);
         }
     }
+
+    public void clearDeckOverlay(){
+        if ((showDeckGrid != null) && getWatchedCardsGroup()==null){
+            showDeckGrid.getChildren().clear();
+            root.getChildren().remove(showDeckGrid);
+        }
+    }
+
+
 
     /**
      * Returns the main layout for this UI.
@@ -171,8 +184,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     @Override
     public void refreshOnUpdate(ClientUpdate update) {
         Platform.runLater(() -> {
-            updateOverlays();
-
+            showDeckOverlay();
             if (uncoveredTilesGrid != null) {
                 uncoveredTilesGrid.update();
             }
