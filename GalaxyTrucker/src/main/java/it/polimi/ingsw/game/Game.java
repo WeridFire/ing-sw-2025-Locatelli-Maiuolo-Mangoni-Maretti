@@ -205,26 +205,7 @@ public class Game {
         System.out.println(this + " Ended flight phase");
     }
 
-    public void playEndgame() throws RemoteException {
-        // play end of the game only after adventures and when no other cards are in the deck
-        if (getGameData().getCurrentGamePhaseType() != GamePhaseType.ADVENTURE
-                || getGameData().getDeck().getCurrentCard() != null) {
-            return;
-        }
 
-        //********//
-        // SCORE SCREEN
-        ScoreScreenGamePhase scoreScreenGamePhase;
-        scoreScreenGamePhase = new ScoreScreenGamePhase(gameData);
-        getGameData().setCurrentGamePhase(scoreScreenGamePhase);
-        System.out.println(this + " Started scoring phase");
-        scoreScreenGamePhase.playLoop();
-        notifyScoresToPlayers(scoreScreenGamePhase);
-
-        // TODO: end scoring phase
-        // TODO: delete saved game state file to avoid memory issues
-        // TODO: take in consideration to turn back to lobby with all the players instead of deleting the current game
-    }
 
     /**
      * Starts and manages the game loop.
@@ -233,7 +214,7 @@ public class Game {
         playLobby();
         playAssemble();
         playFlight();
-        playEndgame();
+
     }
 
     /**
