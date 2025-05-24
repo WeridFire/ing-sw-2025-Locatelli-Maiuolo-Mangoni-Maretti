@@ -9,7 +9,6 @@ import it.polimi.ingsw.network.exceptions.CantFindClientException;
 import it.polimi.ingsw.player.Player;
 
 import java.rmi.RemoteException;
-import java.util.UUID;
 
 public class LobbyGamePhase extends PlayableGamePhase{
 
