@@ -7,7 +7,6 @@ import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
 import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
-import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.task.customTasks.TaskAddLoadables;
 import it.polimi.ingsw.task.customTasks.TaskMultipleChoice;
 import it.polimi.ingsw.view.cli.ANSI;
@@ -59,10 +58,23 @@ public class PlanetsCard extends Card {
 		}
 	}
 
-	public void registerAddLoadablesTask(GameData game, Player player, Planet planet){
+	public void AddLoadablesTask(GameData game, Player player, Planet planet){
 		game.getTaskStorage().addTask(new TaskAddLoadables(
 				player.getUsername(), 30, planet.getAvailableGoods(),
-				(player1) -> {} //upon having loaded items, there is nothing to do.
+				(currentPlayer) -> {
+					//IF we have gone through ALL players (so the current player is the last in order)
+					//Players leave the planet in reversed order.
+					//Storing beforehands the position in the flight is FUNDAMENTAL, as if you have an operation
+					//that makes the order change it might cause players to be processed twice.
+					boolean isLast = game.isLastPlayerInFlight(currentPlayer);
+					if(!isLast){
+						//If the player is not the last proceed to next one.
+						playTask(game, game.getNextPlayerInFlight(currentPlayer));
+					}else{
+						disembarkInReverse(game);
+						game.getDeck().drawNextCard();
+					}
+				} //upon having loaded items, there is nothing to do.
 		));
 	}
 
@@ -108,21 +120,8 @@ public class PlanetsCard extends Card {
 								throw new RuntimeException("Somehow a player choose to land " +
 															"on a planet that was already occupied");
 							}
-							registerAddLoadablesTask(game, player, planet);
+							AddLoadablesTask(game, player, planet);
 						}
-					}
-
-					//IF we have gone through ALL players (so the current player is the last in order)
-					//Players leave the planet in reversed order.
-					//Storing beforehands the position in the flight is FUNDAMENTAL, as if you have an operation
-					//that makes the order change it might cause players to be processed twice.
-					boolean isLast = game.isLastPlayerInFlight(currentPlayer);
-					if(!isLast){
-						//If the player is not the last proceed to next one.
-						playTask(game, game.getNextPlayerInFlight(currentPlayer));
-					}else{
-						disembarkInReverse(game);
-						game.getDeck().drawNextCard();
 					}
 				}
 				));
