@@ -14,6 +14,7 @@ import it.polimi.ingsw.shipboard.SideType;
 import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
 import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import it.polimi.ingsw.shipboard.tiles.BatteryComponentTile;
+import it.polimi.ingsw.shipboard.tiles.CannonTile;
 import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.Coordinates;
@@ -513,7 +514,6 @@ public class MegaTest {
         syncClients( 1);
 
         //Client beta picks tile 1
-        //Careful! all the id's for picking an uncovered tile shift once you pick a tile with a lower id
         clients[1].awaitConditionOnUpdate(gcm -> {
                     BatteryComponentTile tile0;
                     try {
@@ -531,6 +531,46 @@ public class MegaTest {
                             && (tile0.getTextureName().equals("GT-new_tiles_16_for web2.jpg"));
                 }, "pick tile 1 [B2:2300]")
                 .simulateCommand("pick", "1");
+        syncClient(1);
+
+        //Client beta rotates tile 1
+        clients[1].awaitConditionOnUpdate(gcm -> {
+                    BatteryComponentTile tile0;
+                    try {
+                        tile0 = (BatteryComponentTile) gcm.getMockThis().getLinkedState().getLastUpdate()
+                                .getClientPlayer().getTileInHand();
+                    } catch (ClassCastException e) {
+                        return false;
+                    }
+                    return (tile0.getTileId() == 1)
+                            && (tile0.getSide(Direction.EAST) == SideType.UNIVERSAL)
+                            && (tile0.getSide(Direction.NORTH) == SideType.SMOOTH)
+                            && (tile0.getSide(Direction.WEST) == SideType.SMOOTH)
+                            && (tile0.getSide(Direction.SOUTH) == SideType.DOUBLE)
+                            && (tile0.getCapacity() == 2)
+                            && (tile0.getTextureName().equals("GT-new_tiles_16_for web2.jpg"));
+                }, "rotate tile 1 clockwise [B2:2300]")
+                .simulateCommand("rotate", "R");
+        syncClient(1);
+
+        //Client beta rotates tile 1 again
+        clients[1].awaitConditionOnUpdate(gcm -> {
+                    BatteryComponentTile tile0;
+                    try {
+                        tile0 = (BatteryComponentTile) gcm.getMockThis().getLinkedState().getLastUpdate()
+                                .getClientPlayer().getTileInHand();
+                    } catch (ClassCastException e) {
+                        return false;
+                    }
+                    return (tile0.getTileId() == 1)
+                            && (tile0.getSide(Direction.EAST) == SideType.DOUBLE)
+                            && (tile0.getSide(Direction.NORTH) == SideType.UNIVERSAL)
+                            && (tile0.getSide(Direction.WEST) == SideType.SMOOTH)
+                            && (tile0.getSide(Direction.SOUTH) == SideType.SMOOTH)
+                            && (tile0.getCapacity() == 2)
+                            && (tile0.getTextureName().equals("GT-new_tiles_16_for web2.jpg"));
+                }, "rotate tile 1 counterclockwise [B2:2300]")
+                .simulateCommand("rotate", "L");
         syncClient(1);
 
         //Client Beta places tile left of the main cabin
@@ -554,7 +594,64 @@ public class MegaTest {
         }, "place tile 1 at coordinates 7 6").simulateCommand("place", "7", "6");
         syncClients( 1);
 
+        //Giving player beta a debug shipboard
+        clients[1].awaitConditionOnUpdate(gcm -> {
+                    int count;
 
+                    try {
+                        count = (int) gcm.getMockThis().getLinkedState().getLastUpdate()
+                                .getClientPlayer().getShipBoard().getBoard().size();
+                    } catch (ClassCastException e) {
+                        return false;
+                    }
+                    return (count == 18);
+                }, "load debug shipboard for player beta")
+                .simulateCommand("cheat", "shipboard");
+        syncClient(1);
+
+
+        //Giving player alpha a debug shipboard
+        clients[0].awaitConditionOnUpdate(gcm -> {
+                    int count;
+
+                    try {
+                        count = (int) gcm.getMockThis().getLinkedState().getLastUpdate()
+                                .getClientPlayer().getShipBoard().getBoard().size();
+                    } catch (ClassCastException e) {
+                        return false;
+                    }
+                    return (count == 18);
+                }, "load debug shipboard for player alpha")
+                .simulateCommand("cheat", "shipboard");
+        syncClient(0);
+
+        clients[0].awaitConditionOnUpdate(gcm -> {
+                    boolean end;
+
+                    try {
+                        end = (boolean) gcm.getMockThis().getLinkedState().getLastUpdate()
+                                .getClientPlayer().getShipBoard().isEndedAssembly();
+                    } catch (ClassCastException e) {
+                        return false;
+                    }
+                    return (end);
+                }, "alpha finishes assembling")
+                .simulateCommand("finish");
+        syncClient(0);
+
+        clients[1].awaitConditionOnUpdate(gcm -> {
+                    boolean end;
+
+                    try {
+                        end = (boolean) gcm.getMockThis().getLinkedState().getLastUpdate()
+                                .getClientPlayer().getShipBoard().isEndedAssembly();
+                    } catch (ClassCastException e) {
+                        return false;
+                    }
+                    return (end);
+                }, "beta finishes assembling")
+                .simulateCommand("finish");
+        syncClient(1);
 
 
 
