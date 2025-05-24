@@ -39,20 +39,19 @@ public class TaskMultipleChoice extends Task {
 
 	@Override
 	public boolean checkCondition() {
+
+		if(choiceSelectionCompleted){
+			return true;
+		}
 		if(getEpochTimestamp() > getExpiration()){
 			return true;
 		}
-		return choiceSelectionCompleted;
+
 	}
 
 	@Override
-	public void finish() {
-		Player player = GamesHandler.getInstance()
-				.getGame(
-						this.getGameId())
-						.getGameData()
-						.getPlayer((p) -> p.getUsername().equals(this.getUsername()
-				));
+	protected void finish() {
+		Player player = getPlayer();
 		this.onFinish.accept(player, this.choice);
 	}
 
