@@ -98,20 +98,18 @@ public class TaskAddLoadables extends Task {
 
 	@Override
 	public boolean checkCondition() {
+		if(floatingLoadables.isEmpty()){
+			return true;
+		}
+
 		if(getEpochTimestamp() > getExpiration()){
 			return true;
 		}
-		return floatingLoadables.isEmpty();
 	}
 
 	@Override
-	public void finish() {
-		Player player = GamesHandler.getInstance()
-				.getGame(
-						this.getGameId())
-						.getGameData()
-						.getPlayer((p) -> p.getUsername().equals(this.getUsername()
-				));
+	protected void finish() {
+		Player player = getPlayer();
 		this.onFinish.accept(player);
 	}
 
