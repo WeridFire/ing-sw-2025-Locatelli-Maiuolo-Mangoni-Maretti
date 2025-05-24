@@ -1,6 +1,5 @@
 package it.polimi.ingsw.view.gui.components;
 
-import it.polimi.ingsw.view.gui.UIs.AssembleUI;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
 import javafx.scene.control.Button;

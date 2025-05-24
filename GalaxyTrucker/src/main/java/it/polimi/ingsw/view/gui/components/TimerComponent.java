@@ -7,21 +7,37 @@ import javafx.util.Duration;
 
 public class TimerComponent extends Label {
 
-    private int seconds;
+    private static TimerComponent instance;
+
+    public static TimerComponent getInstance() {
+        if (instance == null) {
+            instance = new TimerComponent();
+        }
+        return instance;
+    }
+
+    private static final int START_SECONDS = 30;
+    private int secondsRemaining;
     private Timeline timeline;
+    private Runnable onTimerFinished;
 
     public TimerComponent() {
-        this.seconds = 0;
-        this.setText(formatTime(seconds));
+        this.secondsRemaining = START_SECONDS;
+        this.setText(formatTime(secondsRemaining));
 
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> updateTimer()));
         timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
     }
 
     private void updateTimer() {
-        seconds++;
-        this.setText(formatTime(seconds));
+        secondsRemaining--;
+        this.setText(formatTime(secondsRemaining));
+        if (secondsRemaining <= 0) {
+            timeline.stop();
+            if (onTimerFinished != null) {
+                onTimerFinished.run();
+            }
+        }
     }
 
     private String formatTime(int totalSeconds) {
@@ -31,8 +47,9 @@ public class TimerComponent extends Label {
     }
 
     public void reset() {
-        seconds = 0;
-        this.setText(formatTime(seconds));
+        secondsRemaining = START_SECONDS;
+        this.setText(formatTime(secondsRemaining));
+        stop();
     }
 
     public void stop() {
@@ -40,6 +57,19 @@ public class TimerComponent extends Label {
     }
 
     public void start() {
-        timeline.play();
+        reset(); // resetta prima di partire
+        timeline.playFromStart();
+    }
+
+    public void setOnTimerFinished(Runnable onTimerFinished) {
+        this.onTimerFinished = onTimerFinished;
+    }
+
+    public boolean isRunning() {
+        return secondsRemaining != START_SECONDS;
+    }
+
+    private void defaultBehavior(){
+
     }
 }

@@ -10,6 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 
+import java.sql.Time;
 import java.util.Optional;
 
 /**
@@ -143,6 +144,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         DecksComponent decksComponent = new DecksComponent();
         TimerComponent timerComponent = new TimerComponent();
 
+
         decksAndTimerGrid.getChildren().addAll(timerComponent, decksComponent);
 
         decksAndTimerGrid.setSpacing(20);
@@ -184,7 +186,16 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     @Override
     public void refreshOnUpdate(ClientUpdate update) {
         Platform.runLater(() -> {
+            if (AssembleState.getGameData().isAssemblyTimerRunning() != TimerComponent.getInstance().isRunning()) {
+                if (!AssembleState.getGameData().isAssemblyTimerRunning()) {
+                    TimerComponent.getInstance().reset();
+                }else{
+                    TimerComponent.getInstance().start();
+                }
+            }
+
             showDeckOverlay();
+
             if (uncoveredTilesGrid != null) {
                 uncoveredTilesGrid.update();
             }
