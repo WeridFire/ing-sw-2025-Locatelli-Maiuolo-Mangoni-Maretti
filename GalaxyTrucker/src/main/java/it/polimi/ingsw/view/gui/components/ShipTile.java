@@ -1,13 +1,17 @@
 package it.polimi.ingsw.view.gui.components;
 
 import it.polimi.ingsw.controller.states.AssembleState;
+import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.Default;
+import it.polimi.ingsw.view.gui.UIs.AssembleUI;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
+import it.polimi.ingsw.view.gui.helpers.DragDropManager;
 import it.polimi.ingsw.view.gui.helpers.Draggable;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
@@ -20,6 +24,7 @@ public class ShipTile extends Draggable {
     private TileSkeleton tile;
 
     public ShipTile(TileSkeleton tile) {
+        super(AssembleUI.getDragOverlay());
         initialize();
         setTile(tile);
     }
@@ -71,7 +76,7 @@ public class ShipTile extends Draggable {
 
     @Override
     protected boolean canBeDragged() {
-        return !isPlaced();
+        return super.canBeDragged() && !isPlaced();
     }
 
     @Override
@@ -82,6 +87,14 @@ public class ShipTile extends Draggable {
             ClientManager.getInstance().simulateCommand("pick", String.valueOf(tile.getTileId()));
         }
         setTile(AssembleState.getTileInHand());
+    }
+
+    @Override
+    protected void onKeyPressedWhileDragging(KeyCode code) {
+        switch (code) {
+            case A -> rotate(Rotation.COUNTERCLOCKWISE);
+            case D -> rotate(Rotation.CLOCKWISE);
+        }
     }
 
     @Override
@@ -99,5 +112,13 @@ public class ShipTile extends Draggable {
     @Override
     protected void fallbackDropHandler() {
         ClientManager.getInstance().simulateCommand("discard");
+    }
+
+    private void rotate(Rotation rotation) {
+        ClientManager.getInstance().simulateCommand("rotate", rotation.toString());
+        if (isDragging()) {
+            this.setRotate(this.getRotate() + rotation.toDegrees());
+            DragDropManager.updateSnapshot(getSnapshot());
+        }
     }
 }
