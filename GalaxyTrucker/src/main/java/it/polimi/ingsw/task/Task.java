@@ -1,13 +1,19 @@
 package it.polimi.ingsw.task;
 
+import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRType;
 import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
+import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
+import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
+import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
+import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.ICLIPrintable;
 
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Predicate;
 
 public abstract class Task implements ICLIPrintable {
@@ -35,8 +41,6 @@ public abstract class Task implements ICLIPrintable {
 	private TaskType taskType;
 
 
-
-
 	public Task(String player, int duration, TaskType taskType){
 		this.player = player;
 		this.duration = duration;
@@ -60,6 +64,16 @@ public abstract class Task implements ICLIPrintable {
 		if(!Objects.equals(this.player, player)){
 			throw new WrongPlayerTurnException(player, checkingPlayer, this.taskType);
 		}
+	}
+
+	protected Player getPlayer(){
+		Game game = GamesHandler.getInstance().getGame(gameId);
+		return game
+				.getGameData()
+				.getPlayer(
+						(p) -> p.getUsername()
+								.equals(getUsername()),
+				null);
 	}
 
 	public static int getEpochTimestamp(){
@@ -98,7 +112,21 @@ public abstract class Task implements ICLIPrintable {
 		return this.getUsername();
 	}
 
+	// UTILS FOR SPECIFIC PIRS
+	public abstract Set<Coordinates> getHighlightMask();
+
+
+	protected void checkForTileMask(Coordinates coordinate) throws TileNotAvailableException {
+		if(!getHighlightMask().contains(coordinate)){
+			throw new TileNotAvailableException(coordinate, taskType);
+		}
+	}
+
 	public void makeChoice(Player player, int choice) throws WrongPlayerTurnException, InputNotSupportedException {
+		throw new InputNotSupportedException(getTaskType());
+	}
+
+	public void addLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToAdd) throws WrongPlayerTurnException, TileNotAvailableException, UnsupportedLoadableItemException, TooMuchLoadException, InputNotSupportedException {
 		throw new InputNotSupportedException(getTaskType());
 	}
 
