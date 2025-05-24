@@ -37,9 +37,9 @@ public class AdventureGamePhase extends PlayableGamePhase{
         Card nextCard = gameData.getDeck().drawNextCard();
         if(nextCard != null){
             gameData.setCurrentGamePhase(new AdventureGamePhase(gameData, nextCard));
-            gameData.getCurrentGamePhase().playLoop();
         }else{
-            GamesHandler.getInstance().getGame(gameId).playEndgame();
+            gameData.setCurrentGamePhase(new ScoreScreenGamePhase(gameData));
         }
+        gameData.getCurrentGamePhase().playLoop();
     }
 }
