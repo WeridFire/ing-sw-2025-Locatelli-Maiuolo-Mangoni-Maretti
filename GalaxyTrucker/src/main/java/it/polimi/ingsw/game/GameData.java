@@ -22,13 +22,13 @@ import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.gamePhases.exceptions.AlreadyPickedPosition;
 import it.polimi.ingsw.shipboard.exceptions.ThatTileIdDoesNotExistsException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.task.TaskStorage;
 import it.polimi.ingsw.util.GameLevelStandards;
 
 import java.io.*;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * Represents the game data.
@@ -69,6 +69,8 @@ public class GameData implements Serializable {
      * The player whose turn it is.
      */
     private final PIRHandler pirHandler;
+
+    private final TaskStorage taskStorage;
 
     /**
      * Mapping of available cargo goods and their quantities.
@@ -114,6 +116,7 @@ public class GameData implements Serializable {
         uncoveredTiles = new ArrayList<>();
         deck = null;
         pirHandler = new PIRHandler();
+        taskStorage = new TaskStorage(this.gameId);
         setLevel(GameLevel.TESTFLIGHT);
         setCurrentGamePhaseType(GamePhaseType.NONE);
         setRequiredPlayers(2);
@@ -188,6 +191,30 @@ public class GameData implements Serializable {
     }
 
     /**
+     * Utility function for retrieving the position in the flight turn order of the player. The player must be in flight.
+     * @param player The player
+     * @return the position of the player
+     */
+    public int getPlayerFlightIndex(Player player) {
+        return getPlayersInFlight().indexOf(player);
+    }
+
+    public boolean isLastPlayerInFlight(Player player){
+        return getPlayerFlightIndex(player) == getPlayersInFlight().size() - 1;
+    }
+
+    public Player getNextPlayerInFlight(Player player){
+        if(isLastPlayerInFlight(player)){
+            throw new RuntimeException("Requested next player in flight," +
+                    "                       but the current player is already the last one.");
+        }
+        if(getPlayerFlightIndex(player) == -1){
+            throw new RuntimeException("Requested next player in flight but the current player is not in flight.");
+        }
+        return getPlayersInFlight().get(getPlayerFlightIndex(player)+1);
+    }
+
+    /**
      * Gets the first player in the game that matches the specified predicate.
      *
      * @param match a predicate to apply to the players to determine if it should be counted as "found".
@@ -224,6 +251,10 @@ public class GameData implements Serializable {
     @JsonIgnore
     public PIRHandler getPIRHandler() {
         return pirHandler;
+    }
+
+    public TaskStorage getTaskStorage() {
+        return taskStorage;
     }
 
     /**
