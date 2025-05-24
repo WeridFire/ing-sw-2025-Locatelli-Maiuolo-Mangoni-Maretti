@@ -175,11 +175,15 @@ public class GameServer{
 	 *                         returning {@code true} if the client should refresh its view
 	 * @throws RemoteException if a remote communication error occurs during client notification
 	 */
-	public void broadcastUpdateAllRefreshOnlyIf(BiPredicate<UUID, IClient> refreshCondition) throws RemoteException {
+	public void broadcastUpdateAllRefreshOnlyIf(BiPredicate<UUID, IClient> refreshCondition){
 		for (Map.Entry<UUID, IClient> entry : clients.entrySet()) {
 			UUID uuid = entry.getKey();
 			IClient client = entry.getValue();
-			client.updateClient(new ClientUpdate(uuid, refreshCondition.test(uuid, client)));
+			try {
+				client.updateClient(new ClientUpdate(uuid, refreshCondition.test(uuid, client)));
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -191,11 +195,15 @@ public class GameServer{
 	 * @param game the game whose connected players will be updated
 	 * @throws RemoteException if a remote communication error occurs during client notification
 	 */
-	public void broadcastUpdate(Game game) throws RemoteException {
+	public void broadcastUpdate(Game game) {
 		for (Player player: game.getGameData().getPlayers(Player::isConnected)){
 			IClient client = clients.get(player.getConnectionUUID());
 			if (client != null){
-				client.updateClient(new ClientUpdate(player.getConnectionUUID()));
+				try{
+					client.updateClient(new ClientUpdate(player.getConnectionUUID()));
+				}catch (RemoteException e){
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -210,11 +218,15 @@ public class GameServer{
 	 * @param filter a predicate determining which players' clients should refresh
 	 * @throws RemoteException if a remote communication error occurs during client notification
 	 */
-	public void broadcastUpdateRefreshOnlyIf(Game game, Predicate<Player> filter) throws RemoteException {
+	public void broadcastUpdateRefreshOnlyIf(Game game, Predicate<Player> filter) {
 		for (Player player: game.getGameData().getPlayers(Player::isConnected)){
 			IClient client = clients.get(player.getConnectionUUID());
 			if (client != null){
-				client.updateClient(new ClientUpdate(player.getConnectionUUID(), filter.test(player)));
+				try{
+					client.updateClient(new ClientUpdate(player.getConnectionUUID(), filter.test(player)));
+				}catch (RemoteException e){
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -229,7 +241,7 @@ public class GameServer{
 	 * @param playersToRefreshView the subset of players whose clients should refresh their view
 	 * @throws RemoteException if a remote communication error occurs during client notification
 	 */
-	public void broadcastUpdateRefreshOnly(Game game, Set<Player> playersToRefreshView) throws RemoteException {
+	public void broadcastUpdateRefreshOnly(Game game, Set<Player> playersToRefreshView) {
 		broadcastUpdateRefreshOnlyIf(game, playersToRefreshView::contains);
 	}
 
@@ -244,7 +256,7 @@ public class GameServer{
 	 * @param targetShipboard the player whose shipboard is being spectated
 	 * @throws RemoteException if a remote communication error occurs during client notification
 	 */
-	public void broadcastUpdateShipboardSpectators(Game game, Player targetShipboard) throws RemoteException {
+	public void broadcastUpdateShipboardSpectators(Game game, Player targetShipboard) {
 		broadcastUpdateRefreshOnlyIf(game, p ->
 				p.equals(targetShipboard) || p.getSpectating().equals(targetShipboard.getUsername()));
 	}
