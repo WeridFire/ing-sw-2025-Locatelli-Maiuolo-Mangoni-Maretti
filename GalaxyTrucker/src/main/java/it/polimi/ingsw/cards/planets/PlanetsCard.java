@@ -1,6 +1,5 @@
 package it.polimi.ingsw.cards.planets;
 
-import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.cards.exceptions.PlanetsCardException;
 import it.polimi.ingsw.enums.AnchorPoint;
@@ -9,6 +8,8 @@ import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
 import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
+import it.polimi.ingsw.task.customTasks.TaskAddLoadables;
+import it.polimi.ingsw.task.customTasks.TaskMultipleChoice;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
@@ -58,46 +59,14 @@ public class PlanetsCard extends Card {
 		}
 	}
 
-	/**
-	 * Iteratively asks each player if they want to land. Then in reverse order allows players to pickup their items
-	 * and move back in days.
-	 */
-	@Override
-	public void playEffect(GameData game) throws InterruptedException {
-		for (Player p : game.getPlayersInFlight()){
-			List<Planet> availablePlanets = Arrays.stream(planets)
-					.filter(planet -> planet.getCurrentPlayer() == null).toList();
-			List<String> planetsOption = new ArrayList<String>();
-			availablePlanets.forEach(planet -> planetsOption.add("Loot: " + planet.getAvailableGoods()));
-			planetsOption.addFirst("Don't land");
-			int choice = game.getPIRHandler().setAndRunTurn(
-					new PIRMultipleChoice(p, 30, "On what planet do you want to land? " +
-							"(-" + lostDays +" travel days)",
-							planetsOption.toArray(new String[0]), 0)
-			);
-			if(choice > 0){
-				Planet planet = availablePlanets.get(choice-1);
-				if(planet != null){
-					try {
-						planet.landPlayer(p);
-					} catch (PlanetsCardException e) {
-						throw new RuntimeException("Somehow a player choose to land on a planet that was already");
-					}
-				}
-			}
-		}
+	public void registerAddLoadablesTask(GameData game, Player player, Planet planet){
+		game.getTaskStorage().addTask(new TaskAddLoadables(
+				player.getUsername(), 30, planet.getAvailableGoods(),
+				(player1) -> {} //upon having loaded items, there is nothing to do.
+		));
+	}
 
-		//TODO: allow rearrrangement / discard of goods
-		game.getPIRHandler().broadcastPIR(game.getPlayersInFlight(),
-				(player, pirHandler) -> {
-                    try {
-                        addLoadablesInteraction(player, pirHandler);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-		);
-
+	public void disembarkInReverse(GameData game){
 		for(Player p : game.getPlayersInFlight().reversed()){
 			Planet landedPlanet = Arrays.stream(planets)
 					.filter(pl -> Objects.equals(pl.getCurrentPlayer(), p))
@@ -110,6 +79,58 @@ public class PlanetsCard extends Card {
 			}
 		}
 	}
+
+	@Override
+	public void playTask(GameData game, Player player){
+		List<Planet> availablePlanets = Arrays.stream(planets)
+				.filter(planet -> planet.getCurrentPlayer() == null).toList();
+		List<String> planetsOption = new ArrayList<String>();
+		availablePlanets.forEach(planet -> planetsOption.add("Loot: " + planet.getAvailableGoods()));
+		planetsOption.addFirst("Don't land");
+		//Ask current player their desired planet
+		game.getTaskStorage().addTask(new TaskMultipleChoice(player.getUsername(),
+				30,
+				"On what planet do you want to land? " + "(-" + lostDays +" travel days)",
+				null,
+				planetsOption.toArray(new String[0]),
+				0,
+				(currentPlayer, choice) -> {
+					//------------------------------
+					//AFTER CHOICE OF PLANET IS MADE
+					//------------------------------
+					if (choice > 0){
+						//The player LANDS and retrieves loadables IMMEDIATELY
+						Planet planet = availablePlanets.get(choice-1);
+						if(planet != null){
+							try {
+								planet.landPlayer(currentPlayer);
+							} catch (PlanetsCardException e) {
+								throw new RuntimeException("Somehow a player choose to land " +
+															"on a planet that was already occupied");
+							}
+							registerAddLoadablesTask(game, player, planet);
+						}
+					}
+
+					//IF we have gone through ALL players (so the current player is the last in order)
+					//Players leave the planet in reversed order.
+					//Storing beforehands the position in the flight is FUNDAMENTAL, as if you have an operation
+					//that makes the order change it might cause players to be processed twice.
+					boolean isLast = game.isLastPlayerInFlight(currentPlayer);
+					if(!isLast){
+						//If the player is not the last proceed to next one.
+						playTask(game, game.getNextPlayerInFlight(currentPlayer));
+					}else{
+						disembarkInReverse(game);
+						game.getDeck().drawNextCard();
+					}
+				}
+				));
+	}
+
+
+
+
 
 	/**
 	 * Generates a CLI representation of the implementing object.
