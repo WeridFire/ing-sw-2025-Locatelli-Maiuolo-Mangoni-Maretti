@@ -1,60 +1,70 @@
 package it.polimi.ingsw.view.gui.helpers;
 
-import javafx.scene.input.*;
-import javafx.scene.layout.StackPane;
-import javafx.scene.SnapshotParameters;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.transform.Transform;
+import javafx.scene.SnapshotParameters;
 
 public abstract class Draggable extends StackPane {
 
-    public Draggable() {
-        this.setOnDragDetected(this::onDragDetected);
-        this.setOnDragDone(this::onDragDone);
+    private final Pane dragOverlay;
+    private boolean dragging = false;
+
+    public Draggable(Pane dragOverlay) {
+        this.dragOverlay = dragOverlay;
+        this.setOnMousePressed(this::onMousePressed);
     }
 
-    private void onDragDetected(MouseEvent event) {
-        if (!canBeDragged() || !event.isPrimaryButtonDown()) return;
+    private void onMousePressed(MouseEvent event) {
+        if (!canBeDragged()) return;
 
-        // start drag and drop
         onBeginDrag();
-        Dragboard db = startDragAndDrop(TransferMode.MOVE);
-        ClipboardContent content = new ClipboardContent();
-        content.putString(getDragId());
-        db.setContent(content);
 
-        // snapshot as visual feedback
-        SnapshotParameters params = new SnapshotParameters();
-        params.setFill(Color.TRANSPARENT);  // semi-transparent
-        params.setTransform(Transform.scale(1.25, 1.25));
-        WritableImage snapshot = this.snapshot(params, null);
-        db.setDragView(snapshot, snapshot.getWidth() / 2, snapshot.getHeight() / 2);
-        // set original as invisible
         this.setVisible(false);
+        dragging = true;
 
-        this.setMouseTransparent(true);
+        DragDropManager.startDrag(this, getSnapshot(), dragOverlay, event);
         event.consume();
     }
 
-    private void onDragDone(DragEvent event) {
-        this.setMouseTransparent(false);
+    protected final WritableImage getSnapshot() {
+        boolean visible = this.isVisible();
+        this.setVisible(true);
+        // Create a transparent snapshot of the node
+        SnapshotParameters params = new SnapshotParameters();
+        params.setFill(Color.TRANSPARENT);
+        WritableImage snapshot = this.snapshot(params, null);
+        this.setVisible(visible);  // reset previous visibility
+        return snapshot;
+    }
 
-        onEndDrag();
+    protected final boolean isDragging() {
+        return dragging;
+    }
 
-        if (event.getTransferMode() == null) {
-            // none accepted the drop -> fallback
+    protected final void endDrag(boolean dropAccepted) {
+        if (!dragging) return;
+
+        this.setVisible(true);
+        dragging = false;
+
+        if (!dropAccepted) {
             fallbackDropHandler();
         }
 
-        event.consume();
+        onEndDrag();
     }
 
     protected abstract String getDragId();
 
-    protected boolean canBeDragged() { return true; }
+    protected boolean canBeDragged() { return !dragging; }
 
     protected void onBeginDrag() { }
+
+    protected void onKeyPressedWhileDragging(KeyCode code) { }
 
     protected void onEndDrag() { }
 

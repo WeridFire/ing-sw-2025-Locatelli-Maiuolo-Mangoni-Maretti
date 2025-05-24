@@ -7,6 +7,7 @@ import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.components.*;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 
@@ -41,6 +42,16 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     private static final double TOP_SCROLL_PANE_HEIGHT = 250.0; // Fixed height for the scrollable area
     private static final double MAX_TOP_SCROLL_PANE_HEIGHT = 500.0;
 
+    private static Pane dragOverlay;
+    public static Pane getDragOverlay() {
+        if (dragOverlay == null) {
+            dragOverlay = new Pane();
+            dragOverlay = new Pane(); // Transparent pane above everything
+            dragOverlay.setPickOnBounds(false); // Important: so it doesn't block mouse events
+        }
+        return dragOverlay;
+    }
+
     private final StackPane root;
 
     private final GridPane mainGrid;
@@ -65,7 +76,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         root = new StackPane();
 
         root.setAlignment(Pos.CENTER);
-        root.getChildren().add(mainGrid);
+        root.getChildren().addAll(mainGrid, getDragOverlay());
 
         // Initialize components
         leftGrid = createShipGrid();
