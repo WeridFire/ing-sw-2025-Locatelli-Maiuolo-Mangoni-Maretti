@@ -25,7 +25,7 @@ public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrint
     }
 
     @Override
-    public void playLoop() throws RemoteException, CantFindClientException, InterruptedException {
+    public void playLoop(){
 
     }
 
@@ -35,6 +35,11 @@ public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrint
     @Override
     public void startTimer(Player p) throws TimerIsAlreadyRunningException, CommandNotAllowedException {
         throw new CommandNotAllowedException("startTimer","No timer is allowed during the score screen phase.");
+    }
+
+    @Override
+    public void endPhase() {
+        //TODO: what happens after scorescreen?
     }
 
     /**
