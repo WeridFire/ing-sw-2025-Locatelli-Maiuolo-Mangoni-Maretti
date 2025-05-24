@@ -4,16 +4,16 @@ import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PIRType;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.task.Task;
 import it.polimi.ingsw.task.TaskType;
+import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import it.polimi.ingsw.view.cli.CLIScreen;
 
+import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Predicate;
 
 public class TaskMultipleChoice extends Task {
 
@@ -21,7 +21,7 @@ public class TaskMultipleChoice extends Task {
 	private final String[] possibleOptions;
 	private final String choiceMessage;
 	private final CLIFrame optionalFrame;
-	private boolean choiceMade;
+	private boolean choiceSelectionCompleted;
 	private final BiConsumer<Player, Integer> onFinish;
 
 
@@ -32,7 +32,7 @@ public class TaskMultipleChoice extends Task {
 		this.choiceMessage = message;
 		this.optionalFrame = toShow;
 		this.choice = defaultChoice;
-		this.choiceMade = false;
+		this.choiceSelectionCompleted = false;
 		this.onFinish = onFinish;
 	}
 
@@ -42,7 +42,7 @@ public class TaskMultipleChoice extends Task {
 		if(getEpochTimestamp() > getExpiration()){
 			return true;
 		}
-		return choiceMade;
+		return choiceSelectionCompleted;
 	}
 
 	@Override
@@ -57,10 +57,15 @@ public class TaskMultipleChoice extends Task {
 	}
 
 	@Override
+	public Set<Coordinates> getHighlightMask() {
+		return Set.of();
+	}
+
+	@Override
 	public void makeChoice(Player player, int choice) throws WrongPlayerTurnException {
 		checkForTurn(player.getUsername());
 		this.choice = choice;
-		choiceMade = true;
+		choiceSelectionCompleted = true;
 	}
 
 	@Override
