@@ -51,11 +51,13 @@ public abstract class PlayableGamePhase implements Serializable {
      * Defines the main gameplay loop for this phase.
      * To be implemented by subclasses.
      */
-    public abstract void playLoop() throws RemoteException, CantFindClientException, InterruptedException;
+    public abstract void playLoop() throws CantFindClientException;
 
     /**
      * Used to implement starting timer logic
      * @param p The player who flipped the timer.
      * */
     public abstract void startTimer(Player p) throws TimerIsAlreadyRunningException, CommandNotAllowedException;
+
+    public abstract void endPhase();
 }
