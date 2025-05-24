@@ -5,9 +5,11 @@ import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.components.*;
+import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 
@@ -153,10 +155,23 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         VBox decksAndTimerGrid = new VBox();
 
         DecksComponent decksComponent = new DecksComponent();
-        TimerComponent timerComponent = new TimerComponent();
+        TimerComponent timerComponent = TimerComponent.getInstance();
 
+        Button flipButton = new Button("Flip Timer");
+        flipButton.setOnMouseClicked(event -> {
+            Platform.runLater(() -> {
+                ClientManager.getInstance().simulateCommand("timerflip");
+            });
+        });
 
-        decksAndTimerGrid.getChildren().addAll(timerComponent, decksComponent);
+        Button finishButton = new Button("Finish Timer");
+        finishButton.setOnMouseClicked(event -> {
+            Platform.runLater(() -> {
+                ClientManager.getInstance().simulateCommand("finish");
+            });
+        });
+
+        decksAndTimerGrid.getChildren().addAll(timerComponent, decksComponent, flipButton, finishButton);
 
         decksAndTimerGrid.setSpacing(20);
         decksAndTimerGrid.setStyle("-fx-padding: 20;");
@@ -197,12 +212,8 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     @Override
     public void refreshOnUpdate(ClientUpdate update) {
         Platform.runLater(() -> {
-            if (AssembleState.getGameData().isAssemblyTimerRunning() != TimerComponent.getInstance().isRunning()) {
-                if (!AssembleState.getGameData().isAssemblyTimerRunning()) {
-                    TimerComponent.getInstance().reset();
-                }else{
-                    TimerComponent.getInstance().start();
-                }
+            if (AssembleState.getGameData().isAssemblyTimerRunning() && !TimerComponent.getInstance().isRunning()) {
+                TimerComponent.getInstance().start();
             }
 
             showDeckOverlay();

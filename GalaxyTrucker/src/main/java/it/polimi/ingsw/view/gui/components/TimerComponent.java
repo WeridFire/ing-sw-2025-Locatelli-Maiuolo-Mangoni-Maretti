@@ -20,6 +20,7 @@ public class TimerComponent extends Label {
     private int secondsRemaining;
     private Timeline timeline;
     private Runnable onTimerFinished;
+    private boolean isRunning = false;
 
     public TimerComponent() {
         this.secondsRemaining = START_SECONDS;
@@ -27,12 +28,14 @@ public class TimerComponent extends Label {
 
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> updateTimer()));
         timeline.setCycleCount(Timeline.INDEFINITE);
+        this.setOnTimerFinished(this::defaultBehavior);
     }
 
     private void updateTimer() {
         secondsRemaining--;
         this.setText(formatTime(secondsRemaining));
         if (secondsRemaining <= 0) {
+            isRunning = false;
             timeline.stop();
             if (onTimerFinished != null) {
                 onTimerFinished.run();
@@ -58,6 +61,7 @@ public class TimerComponent extends Label {
 
     public void start() {
         reset(); // resetta prima di partire
+        isRunning = true;
         timeline.playFromStart();
     }
 
@@ -66,10 +70,10 @@ public class TimerComponent extends Label {
     }
 
     public boolean isRunning() {
-        return secondsRemaining != START_SECONDS;
+        return isRunning;
     }
 
     private void defaultBehavior(){
-
+        //default timer behav?
     }
 }
