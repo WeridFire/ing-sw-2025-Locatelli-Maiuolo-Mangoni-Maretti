@@ -1,6 +1,7 @@
 package it.polimi.ingsw.gamePhases;
 
 import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
@@ -22,20 +23,17 @@ public class LobbyGamePhase extends PlayableGamePhase{
 	}
 
 	@Override
-	public void playLoop() throws RemoteException, CantFindClientException, InterruptedException {
-		synchronized (gameData.getUnorderedPlayers()){
-			while (gameData.getPlayers().size() < gameData.getRequiredPlayers()){
-				gameData.getUnorderedPlayers().wait();
-				if(gameData.getPlayers().isEmpty()){
-					GamesHandler gamesHandler = GamesHandler.getInstance();
-					gamesHandler.getGames().remove(gamesHandler.getGame(this.gameId));
-				}
-			}
-		}
+	public void playLoop(){
+
 	}
 
 	@Override
 	public void startTimer(Player p) throws TimerIsAlreadyRunningException, CommandNotAllowedException {
 
+	}
+
+	@Override
+	public void endPhase() {
+		//TODO: PROCEED TO ASSEMBLY
 	}
 }
