@@ -5,6 +5,7 @@ import it.polimi.ingsw.cards.DeckFactory;
 import it.polimi.ingsw.controller.states.State;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.network.GameClientMock;
@@ -534,27 +535,21 @@ public class MegaTest {
         syncClient(1);
 
         //Client beta rotates tile 1
-        clients[1].awaitConditionOnUpdate(gcm -> {
-                    BatteryComponentTile tile0;
+        clients[1].awaitConditionOnRefresh(gcm -> {
+                    Rotation rot;
                     try {
-                        tile0 = (BatteryComponentTile) gcm.getMockThis().getLinkedState().getLastUpdate()
-                                .getClientPlayer().getTileInHand();
+                        rot = gcm.getMockThis().getLinkedState().getLastUpdate()
+                                .getClientPlayer().getTileInHand().getAppliedRotation();
                     } catch (ClassCastException e) {
                         return false;
                     }
-                    return (tile0.getTileId() == 1)
-                            && (tile0.getSide(Direction.EAST) == SideType.UNIVERSAL)
-                            && (tile0.getSide(Direction.NORTH) == SideType.SMOOTH)
-                            && (tile0.getSide(Direction.WEST) == SideType.SMOOTH)
-                            && (tile0.getSide(Direction.SOUTH) == SideType.DOUBLE)
-                            && (tile0.getCapacity() == 2)
-                            && (tile0.getTextureName().equals("GT-new_tiles_16_for web2.jpg"));
+                    return (rot == Rotation.CLOCKWISE);
                 }, "rotate tile 1 clockwise [B2:2300]")
                 .simulateCommand("rotate", "R");
         syncClient(1);
 
         //Client beta rotates tile 1 again
-        clients[1].awaitConditionOnUpdate(gcm -> {
+        clients[1].awaitConditionOnRefresh(gcm -> {
                     BatteryComponentTile tile0;
                     try {
                         tile0 = (BatteryComponentTile) gcm.getMockThis().getLinkedState().getLastUpdate()
