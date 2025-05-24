@@ -5,7 +5,6 @@ import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
-import java.util.UUID;
 
 public class AdventureGamePhase extends PlayableGamePhase{
 
@@ -24,14 +23,8 @@ public class AdventureGamePhase extends PlayableGamePhase{
     }
 
     @Override
-    public void playLoop() throws InterruptedException {
-        card.playEffect(gameData);
-        synchronized (gameData.getUnorderedPlayers()) {
-            if(gameData.getPlayers().isEmpty()){
-                GamesHandler gamesHandler = GamesHandler.getInstance();
-                gamesHandler.getGames().remove(gamesHandler.getGame(this.gameId));
-            }
-        }
+    public void playLoop(){
+        card.playTask(gameData, gameData.getPlayersInFlight().getFirst());
     }
 
     @Override
@@ -39,4 +32,14 @@ public class AdventureGamePhase extends PlayableGamePhase{
 
     }
 
+    @Override
+    public void endPhase() {
+        Card nextCard = gameData.getDeck().drawNextCard();
+        if(nextCard != null){
+            gameData.setCurrentGamePhase(new AdventureGamePhase(gameData, nextCard));
+            gameData.getCurrentGamePhase().playLoop();
+        }else{
+            GamesHandler.getInstance().getGame(gameId).playEndgame();
+        }
+    }
 }
