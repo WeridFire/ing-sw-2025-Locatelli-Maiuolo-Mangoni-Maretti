@@ -1,6 +1,7 @@
 package it.polimi.ingsw.gamePhases;
 
 import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
@@ -59,7 +60,7 @@ public class AssembleGamePhase extends PlayableGamePhase {
         }
     }
 
-    public void playLoop() throws RemoteException, InterruptedException {
+    public void playLoop() throws InterruptedException {
 
         synchronized (gameData.getUnorderedPlayers()) {
             if(gameData.getPlayers().isEmpty()){
@@ -129,6 +130,13 @@ public class AssembleGamePhase extends PlayableGamePhase {
         synchronized (timerLock) {
             timerLock.notifyAll();
         }
+    }
+
+    @Override
+    public void endPhase() {
+        Card nextCard = gameData.getDeck().drawNextCard();
+        gameData.setCurrentGamePhase(new AdventureGamePhase(gameData, nextCard));
+        gameData.getCurrentGamePhase().playLoop();
     }
 
     /**
