@@ -82,6 +82,8 @@ public abstract class Card implements ICLIPrintable, Serializable {
      */
     public abstract void playTask(GameData game, Player player);
 
+    public abstract void proceedTaskLoop(GameData game, Player player);
+
     /**
      * @return The texture associated to this card.
      */
