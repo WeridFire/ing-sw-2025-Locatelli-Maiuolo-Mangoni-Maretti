@@ -66,14 +66,7 @@ public class PlanetsCard extends Card {
 					//Players leave the planet in reversed order.
 					//Storing beforehands the position in the flight is FUNDAMENTAL, as if you have an operation
 					//that makes the order change it might cause players to be processed twice.
-					boolean isLast = game.isLastPlayerInFlight(currentPlayer);
-					if(!isLast){
-						//If the player is not the last proceed to next one.
-						playTask(game, game.getNextPlayerInFlight(currentPlayer));
-					}else{
-						disembarkInReverse(game);
-						game.getDeck().drawNextCard();
-					}
+					proceedTaskLoop(game, currentPlayer);
 				} //upon having loaded items, there is nothing to do.
 		));
 	}
@@ -89,6 +82,18 @@ public class PlanetsCard extends Card {
 				landedPlanet.leavePlanet();
 				game.movePlayerBackward(p, lostDays);
 			}
+		}
+	}
+
+	@Override
+	public void proceedTaskLoop(GameData game, Player player){
+		boolean isLast = game.isLastPlayerInFlight(player);
+		if(!isLast){
+			//If the player is not the last proceed to next one.
+			playTask(game, game.getNextPlayerInFlight(player));
+		}else{
+			disembarkInReverse(game);
+			game.getCurrentGamePhase().endPhase();
 		}
 	}
 
@@ -122,6 +127,9 @@ public class PlanetsCard extends Card {
 							}
 							AddLoadablesTask(game, player, planet);
 						}
+					}else{
+						//IF the player DID NOT LAND we must still proceed with the loop!!
+						proceedTaskLoop(game, currentPlayer);
 					}
 				}
 				));
