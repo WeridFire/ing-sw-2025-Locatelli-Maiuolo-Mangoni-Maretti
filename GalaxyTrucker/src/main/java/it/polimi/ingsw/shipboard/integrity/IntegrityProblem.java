@@ -2,11 +2,8 @@ package it.polimi.ingsw.shipboard.integrity;
 
 import it.polimi.ingsw.shipboard.TileCluster;
 import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
-import it.polimi.ingsw.shipboard.exceptions.TileAlreadyPresentException;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
-import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.util.Pair;
-import it.polimi.ingsw.view.cli.ANSI;
 
 import java.util.*;
 
@@ -78,13 +75,7 @@ public class IntegrityProblem {
         Iterator<TileCluster> iterator = clustersToKeep.iterator();
         while (iterator.hasNext()) {
             TileCluster cluster = iterator.next();
-            boolean hasHuman = false;
-            for (TileSkeleton tile : cluster.getTiles()) {
-                if (tilesWithHumans.contains(tile)) {
-                    hasHuman = true;
-                    break;
-                }
-            }
+            boolean hasHuman = cluster.containsAny(tilesWithHumans);
             if (!hasHuman) {
                 iterator.remove();  // remove from clustersToKeep set
                 clustersToRemove.add(cluster);  // add to clustersToRemove
@@ -126,6 +117,30 @@ public class IntegrityProblem {
 
             if (!modified) {
                 clustersToKeep.add(processing);
+            }
+        }
+
+        /* to avoid the possibility of keeping a cluster without humans, remove all of those
+        * ---
+        * This is an edge case, keep this code snippet even if it seems redundant from a superficial overview.
+        * In particular: if a cluster
+        *  1. is in clustersToKeep because it contains humans in exactly one tile,
+        * AND
+        *  2. the humans tile is illegally welded to another
+        * THEN
+        * that cluster would have been split into two sub-clusters, one of which contains no humans.
+        * With this code snippet, we consider as a cluster to be kept only the valid sub-cluster (with humans) and
+        * the tiles in the invalid one that are not also in the valid sub-cluster are considered as a cluster
+        * to be removed.
+        */
+        iterator = clustersToKeep.iterator();
+        while (iterator.hasNext()) {
+            TileCluster cluster = iterator.next();
+            boolean hasHuman = cluster.containsAny(tilesWithHumans);
+            if (!hasHuman) {
+                iterator.remove();  // remove from clustersToKeep set
+                // add the tiles exclusively in this cluster into clustersToRemove
+                clustersToRemove.add(cluster.exclusive(clustersToKeep));
             }
         }
 

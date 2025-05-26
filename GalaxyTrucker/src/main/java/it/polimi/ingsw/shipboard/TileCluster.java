@@ -105,6 +105,33 @@ public class TileCluster implements Serializable {
         return tiles;
     }
 
+    public boolean containsAny(Collection<TileSkeleton> tiles) {
+        boolean found = false;
+        for (TileSkeleton tile : tiles) {
+            if (this.tiles.contains(tile)) {
+                found = true;
+                break;
+            }
+        }
+        return found;
+    }
+
+    public TileCluster exclusive(Collection<TileCluster> others) {
+        Set<TileSkeleton> otherTiles = new HashSet<>();
+        for (TileCluster other : others) {
+            otherTiles.addAll(other.getTiles());
+        }
+
+        TileCluster onlyInThis = new TileCluster();
+        for (TileSkeleton tile : tiles) {
+            if (!otherTiles.contains(tile)) {
+                onlyInThis.addTile(tile);
+            }
+        }
+
+        return onlyInThis;
+    }
+
     /**
      * Merge all the tiles from {@code otherCluster} in this cluster.
      * If this cluster does not have a main tile: the main tile becomes the {@code otherCluster}'s,

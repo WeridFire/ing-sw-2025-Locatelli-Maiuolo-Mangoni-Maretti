@@ -118,7 +118,8 @@ public class PIRMultipleChoice extends PIR {
 
 			for (int i = 0; i < possibleOptions.length; i++) {
 				optionsFrame = optionsFrame.merge(
-						new CLIFrame(ANSI.GREEN + "[" + i + "] " + ANSI.RESET + possibleOptions[i]),
+						new CLIFrame(ANSI.GREEN + "[" + i + "] " + ANSI.RESET + possibleOptions[i])
+								.wrap(containerColumns - 2, 1, AnchorPoint.CENTER),
 						Direction.SOUTH, 1
 				);
 			}

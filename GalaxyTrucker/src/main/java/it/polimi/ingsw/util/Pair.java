@@ -9,6 +9,9 @@ public class Pair<T extends Serializable> implements Serializable {
     private final T second;
 
     public Pair(T first, T second) {
+        if (first == null || second == null) {
+            throw new NullPointerException();
+        }
         this.first = first;
         this.second = second;
     }
