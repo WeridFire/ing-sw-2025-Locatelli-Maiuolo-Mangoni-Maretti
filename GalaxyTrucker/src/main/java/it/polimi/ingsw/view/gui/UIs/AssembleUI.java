@@ -41,7 +41,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     };
 
     // Define fixed dimensions for components
-    private static final double TOP_SCROLL_PANE_HEIGHT = 250.0; // Fixed height for the scrollable area
+    private static final double TOP_SCROLL_PANE_HEIGHT = 200.0; // Fixed height for the scrollable area
     private static final double MAX_TOP_SCROLL_PANE_HEIGHT = 500.0;
 
     private static Pane dragOverlay;

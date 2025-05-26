@@ -1,47 +1,99 @@
 package it.polimi.ingsw.view.gui.components;
 
+import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.gui.helpers.Asset;
+import it.polimi.ingsw.view.gui.helpers.AssetHandler;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
+import javafx.geometry.Pos;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Represents the grid where players assemble their spaceship by placing tiles.
- * It handles drag-and-drop operations for tiles and updates its display
- * based on the current state of the player's {@link ShipBoard}.
+ * Represents the display area for a player's spaceship, consisting of a background image
+ * and a movable grid of cells for placing tiles.
+ * It updates its display based on the current state of the player's {@link ShipBoard}.
  */
-public class ShipGrid extends GridPane {
-    public static final double CELL_SIZE = 100;
+public class ShipGrid extends StackPane {
+    public static final double CELL_SIZE = 80;
     public static final double TILE_SIZE = CELL_SIZE * 0.9;
     public static final double TILE_BORDER_SIZE = TILE_SIZE * 0.025;
 
-    private final Map<Coordinates, ShipCell> grid = new HashMap<>();
+    private final Map<Coordinates, ShipCell> gridCells = new HashMap<>();
+    private final ImageView backgroundView;
+    private final GridPane cellGridPane;
 
     /**
-     * Creates a new ship grid with specified dimensions, initializing cells
-     * and setting up base coordinates based on the current game level.
+     * Creates a new ship grid display.
+     * The grid consists of a background image and a cell grid for tiles.
+     * The cell grid's dimensions are specified by rows and columns.
      *
-     * @param rows Number of rows in the visual grid.
-     * @param cols Number of columns in the visual grid.
+     * @param rows Number of rows in the cell grid.
+     * @param cols Number of columns in the cell grid.
      */
     public ShipGrid(int rows, int cols) {
         super();
-        initialize(rows, cols);
-        update();
+
+        // 1. Setup Background
+        Image bgImage = AssetHandler.loadRawImage(Asset.SHIP.toString());
+        this.backgroundView = new ImageView();
+
+        if (bgImage != null) {
+            this.backgroundView.setImage(bgImage);
+            this.backgroundView.setPreserveRatio(true);
+
+            // Set StackPane's preferred size to the background image's native size.
+            double imgWidth = CELL_SIZE * cols + 60;
+            double imgHeight =  CELL_SIZE * rows + 60;
+            this.setPrefSize(imgWidth, imgHeight);
+
+            // Configure ImageView to fit these dimensions.
+            this.backgroundView.setFitWidth(imgWidth);
+            this.backgroundView.setFitHeight(imgHeight);
+        } else {
+            // Fallback size if image loading fails
+            this.setPrefSize(cols * CELL_SIZE + 200, rows * CELL_SIZE + 200); // Default padding
+        }
+
+        // 2. Setup Cell Grid
+        this.cellGridPane = new GridPane();
+        initializeCellGridPane(rows, cols);
+
+        // Add children to StackPane: background first, then cell grid
+        this.getChildren().addAll(this.backgroundView, this.cellGridPane);
+
+        // Align cellGridPane to top-left for predictable translation offsets
+        StackPane.setAlignment(this.cellGridPane, Pos.CENTER);
+
+        update(); // Populate cells with initial data
     }
 
     /**
-     * Initializes the grid properties, including cell creation and base coordinate calculation.
-     * @param rows The number of rows for the grid.
-     * @param cols The number of columns for the grid.
+     * Sets the position of the cell grid relative to the top-left corner of the background.
+     *
+     * @param offsetX The horizontal offset.
+     * @param offsetY The vertical offset.
      */
-    private void initialize(int rows, int cols) {
+    public void setCellGridOffset(double offsetX, double offsetY) {
+        this.cellGridPane.setTranslateX(offsetX);
+        this.cellGridPane.setTranslateY(offsetY);
+    }
+
+    /**
+     * Initializes the cellGridPane properties, including cell creation and base coordinate calculation.
+     * @param rows The number of rows for the cell grid.
+     * @param cols The number of columns for the cell grid.
+     */
+    private void initializeCellGridPane(int rows, int cols) {
         // determine baseRow and baseCol based on GameLevel
         GameLevel gameLevel = LobbyState.getGameLevel();
 
@@ -64,17 +116,17 @@ public class ShipGrid extends GridPane {
             for (int c = 0; c < cols; c++) {
                 Coordinates logicalCoords = new Coordinates(r + baseRow, c + baseCol);
                 ShipCell cell = new ShipCell(logicalCoords, gameLevel);
-                grid.put(logicalCoords, cell);
-                this.add(cell, c, r);
+                gridCells.put(logicalCoords, cell);
+                this.cellGridPane.add(cell, c, r);
             }
         }
 
-        // set fixed size for the ShipGrid itself
+        // set fixed size for the cellGridPane itself
         double calculatedWidth = cols * CELL_SIZE;
         double calculatedHeight = rows * CELL_SIZE;
-        this.setPrefSize(calculatedWidth, calculatedHeight);
-        this.setMinSize(calculatedWidth, calculatedHeight);
-        this.setMaxSize(calculatedWidth, calculatedHeight);
+        this.cellGridPane.setPrefSize(calculatedWidth, calculatedHeight);
+        this.cellGridPane.setMinSize(calculatedWidth, calculatedHeight);
+        this.cellGridPane.setMaxSize(calculatedWidth, calculatedHeight);
     }
 
     /**
@@ -88,7 +140,7 @@ public class ShipGrid extends GridPane {
 
         Map<Coordinates, TileSkeleton> tilesOnBoard = shipBoard.getTilesOnBoard();
 
-        for (Map.Entry<Coordinates, ShipCell> entry : grid.entrySet()) {
+        for (Map.Entry<Coordinates, ShipCell> entry : gridCells.entrySet()) {
             Coordinates logicalCoords = entry.getKey();
             ShipCell cell = entry.getValue();
             cell.setTile(tilesOnBoard.get(logicalCoords));
@@ -97,6 +149,6 @@ public class ShipGrid extends GridPane {
     }
 
     private void updateNeighbors(Coordinates coordinates, ShipCell cell) {
-        cell.setHasNeighbor(coordinates.getNeighbors().stream().map(grid::get).toList());
+        cell.setHasNeighbor(coordinates.getNeighbors().stream().map(gridCells::get).toList());
     }
 }

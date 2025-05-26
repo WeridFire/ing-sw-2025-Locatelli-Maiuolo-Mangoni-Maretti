@@ -10,9 +10,9 @@ import it.polimi.ingsw.view.gui.managers.ClientManager;
 import java.util.Collection;
 
 public class ShipCell extends DropSlot {
-    private static final String SHIP_CELL_STYLE = "-fx-background-color: lightblue; -fx-border-color: blue;";
-    private static final String SPACE_CELL_STYLE = "-fx-background-color: lightgray; -fx-border-color: darkgray;";
-    private static final String HIGHLIGHT_CELL_STYLE = "-fx-background-color: #ffffe0; -fx-border-color: #ffeb3b"; // Light yellow for highlight
+    private static final String SHIP_CELL_STYLE = "";//"-fx-background-color: rgba(173, 216, 230, 0.5); -fx-border-color: blue;"; // lightblue semi-trasparente
+    private static final String SPACE_CELL_STYLE = "";//"-fx-background-color: rgba(211, 211, 211, 0.5); -fx-border-color: darkgray;"; // lightgray semi-trasparente
+    private static final String HIGHLIGHT_CELL_STYLE = "-fx-background-color: rgba(255, 255, 224, 0.5); -fx-border-color: #ffeb3b;"; // light yellow semi-trasparente
 
     private final String DEFAULT_CELL_STYLE;
 
