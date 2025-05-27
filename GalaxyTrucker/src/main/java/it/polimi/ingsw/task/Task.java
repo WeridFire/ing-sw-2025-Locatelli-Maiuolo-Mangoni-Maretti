@@ -123,13 +123,15 @@ public abstract class Task implements ICLIPrintable {
 	 * Gets the username of the player this task is dedicated to.
 	 * @return The username of the player.
 	 */
-	public String getUsername(){
+	private String getUsername(){
 		return this.getUsername();
 	}
 
 	// UTILS FOR SPECIFIC TASKS
 
-	public abstract Set<Coordinates> getHighlightMask();
+	public Set<Coordinates> getHighlightMask(){
+		return Set.of();
+	}
 
 	protected void checkForTileMask(Coordinates coordinate) throws TileNotAvailableException {
 		if(!getHighlightMask().contains(coordinate)){
@@ -156,20 +158,6 @@ public abstract class Task implements ICLIPrintable {
 	public boolean checkCondition(){
 		return false;
 	}
-
-
-
-
-	//METHODS FOR SPECIFIC TASKS
-
-	public void makeChoice(Player player, int choice) throws WrongPlayerTurnException, InputNotSupportedException {
-		throw new InputNotSupportedException(getTaskType());
-	}
-
-	public void addLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToAdd) throws WrongPlayerTurnException, TileNotAvailableException, UnsupportedLoadableItemException, TooMuchLoadException, InputNotSupportedException {
-		throw new InputNotSupportedException(getTaskType());
-	}
-
 
 
 }
