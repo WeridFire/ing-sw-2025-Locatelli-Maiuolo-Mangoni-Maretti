@@ -1,11 +1,9 @@
 package it.polimi.ingsw.view.gui.UIs;
 
+import it.polimi.ingsw.view.gui.managers.ClientManager;
+import it.polimi.ingsw.view.gui.utils.AlertUtils;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
 import java.util.function.BiConsumer;
@@ -20,6 +18,11 @@ public class LoginUI {
         Label promptLabel = new Label("Enter your username:");
         usernameField = new TextField();
         usernameField.setPromptText("Username");
+        // avoid spaces in the username
+        usernameField.setTextFormatter(new TextFormatter<>(change -> {
+            if (change.getText().equals(" ")) change.setText("");
+            return change;
+        }));
 
         rmiCheckBox = new CheckBox("Use RMI");
 
@@ -30,8 +33,7 @@ public class LoginUI {
             if (!username.isEmpty()) {
                 onLoginAttempt.accept(username, useRmi);
             } else {
-                Alert alert = new Alert(Alert.AlertType.WARNING, "Please enter a valid username.");
-                alert.showAndWait();
+                AlertUtils.showWarning("Empty Username", "Please enter a valid username.");
             }
         });
 

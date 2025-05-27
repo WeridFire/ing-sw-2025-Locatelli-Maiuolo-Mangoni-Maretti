@@ -1,18 +1,20 @@
 package it.polimi.ingsw.view.gui.managers;
 
 import it.polimi.ingsw.controller.states.CommonState;
-import it.polimi.ingsw.controller.states.MenuState;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
-import it.polimi.ingsw.controller.states.State;
+import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.View;
 import it.polimi.ingsw.view.gui.UIs.*;
 import it.polimi.ingsw.view.gui.utils.AlertUtils;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -182,15 +184,27 @@ public class ClientManager {
      * @param username the username of the current client
      */
     private void createOrJoinGame(String username) {
+        // ---- create ----
+        // color combobox
+        ComboBox<MainCabinTile.Color> colorBox = new ComboBox<>(
+                FXCollections.observableArrayList(MainCabinTile.Color.values()));
+        colorBox.setPromptText("Color on Create");
+        colorBox.setValue(MainCabinTile.Color.BLUE);
+        // button
+        Button createGameButton = new Button("Create Game");
+        createGameButton.setOnAction(_ -> handleCreateGame(username, colorBox.getValue()));
+        // merge color combobox and create button
+        HBox createControls = new HBox(10, colorBox, createGameButton);
+        createControls.setAlignment(Pos.CENTER);
 
-        Button createButton = new Button("Create Game");
-        createButton.setOnAction(_ -> handleCreateGame(username));
-
+        // ---- join ----
         Button joinButton = new Button("Join Game");
         joinButton.setOnAction(_ -> handleJoinGame(username));
 
-        VBox gameLayout = new VBox(15, createButton, joinButton);
+        // ---- layout ----
+        VBox gameLayout = new VBox(15, createControls, joinButton);
         gameLayout.setAlignment(Pos.CENTER);
+
         updateScene(gameLayout);
         primaryStage.setTitle("Join or Create Game");
         primaryStage.setOnCloseRequest(event -> {
@@ -210,9 +224,8 @@ public class ClientManager {
      *
      * @param username the username of the client creating the game
      */
-    public void handleCreateGame(String username) {
-        simulateCommand("create", username);
-
+    public void handleCreateGame(String username, MainCabinTile.Color color) {
+        simulateCommand("create", username, "--color", color.toString());
         updateScene(new LobbyUI(username));
     }
 
@@ -222,14 +235,7 @@ public class ClientManager {
      * @param username the username of the client attempting to join
      */
     public void handleJoinGame(String username) {
-        simulateCommand("ping");  // to fetch currently available games
-
-        JoinGameUI joinGameUI = new JoinGameUI(uuid -> {
-            System.out.println("Trying to join game with UUID: " + uuid);
-            simulateCommand("join", uuid, username);
-        }, MenuState.getActiveGamesUUID());
-
-        updateScene(joinGameUI);
+        updateScene(new JoinGameUI(username));
     }
 
 
