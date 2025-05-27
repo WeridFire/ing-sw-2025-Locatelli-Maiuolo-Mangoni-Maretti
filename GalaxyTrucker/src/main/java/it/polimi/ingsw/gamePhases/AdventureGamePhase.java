@@ -24,7 +24,7 @@ public class AdventureGamePhase extends PlayableGamePhase{
 
     @Override
     public void playLoop(){
-        card.playTask(gameData, gameData.getPlayersInFlight().getFirst());
+        card.startCardBehaviour(gameData);
     }
 
     @Override
