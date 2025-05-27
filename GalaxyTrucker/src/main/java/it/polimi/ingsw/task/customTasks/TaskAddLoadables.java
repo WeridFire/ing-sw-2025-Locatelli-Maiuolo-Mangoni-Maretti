@@ -69,7 +69,7 @@ public class TaskAddLoadables extends Task {
 				);
 	}
 
-	@Override
+
 	public void addLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToAdd) throws WrongPlayerTurnException, TileNotAvailableException, UnsupportedLoadableItemException, TooMuchLoadException {
 		checkForTurn(player.getUsername());
 		for(Coordinates c : cargoToAdd.keySet()){
@@ -98,13 +98,13 @@ public class TaskAddLoadables extends Task {
 
 	@Override
 	public boolean checkCondition() {
-		if(floatingLoadables.isEmpty()){
-			return true;
-		}
-
 		if(getEpochTimestamp() > getExpiration()){
 			return true;
 		}
+		if(floatingLoadables.isEmpty()){
+			return true;
+		}
+		return false;
 	}
 
 	@Override
