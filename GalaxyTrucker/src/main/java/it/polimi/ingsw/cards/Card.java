@@ -76,13 +76,7 @@ public abstract class Card implements ICLIPrintable, Serializable {
         setLevel(GameLevel.fromInteger(level));
     }
 
-    /**
-     * Generic function to apply the effect of the card on the game.
-     * @param game The game data, to access and modify the game.
-     */
-    public abstract void playTask(GameData game, Player player);
-
-    public abstract void proceedTaskLoop(GameData game, Player player);
+    public abstract void startCardBehaviour(GameData game);
 
     /**
      * @return The texture associated to this card.
