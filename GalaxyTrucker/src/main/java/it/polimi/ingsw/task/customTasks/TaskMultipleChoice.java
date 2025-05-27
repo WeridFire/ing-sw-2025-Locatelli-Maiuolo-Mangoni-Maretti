@@ -6,6 +6,7 @@ import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.task.Task;
+import it.polimi.ingsw.task.TaskStorage;
 import it.polimi.ingsw.task.TaskType;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.ANSI;
@@ -25,12 +26,12 @@ public class TaskMultipleChoice extends Task {
 	private final BiConsumer<Player, Integer> onFinish;
 
 
-	public TaskMultipleChoice(String currentPlayer, int cooldown, String message, CLIFrame toShow,
+	public TaskMultipleChoice(String currentPlayer, int cooldown, String message,
 							  String[] possibleOptions, int defaultChoice, BiConsumer<Player, Integer> onFinish) {
 		super(currentPlayer, cooldown, TaskType.CHOICE);
 		this.possibleOptions = possibleOptions;
 		this.choiceMessage = message;
-		this.optionalFrame = toShow;
+		this.optionalFrame = null;
 		this.choice = defaultChoice;
 		this.choiceSelectionCompleted = false;
 		this.onFinish = onFinish;
@@ -39,13 +40,13 @@ public class TaskMultipleChoice extends Task {
 
 	@Override
 	public boolean checkCondition() {
-
-		if(choiceSelectionCompleted){
-			return true;
-		}
 		if(getEpochTimestamp() > getExpiration()){
 			return true;
 		}
+		if(choiceSelectionCompleted){
+			return true;
+		}
+		return false;
 
 	}
 
@@ -60,11 +61,14 @@ public class TaskMultipleChoice extends Task {
 		return Set.of();
 	}
 
-	@Override
 	public void makeChoice(Player player, int choice) throws WrongPlayerTurnException {
 		checkForTurn(player.getUsername());
 		this.choice = choice;
 		choiceSelectionCompleted = true;
+	}
+
+	public int getChoice() {
+		return this.choice;
 	}
 
 	@Override
