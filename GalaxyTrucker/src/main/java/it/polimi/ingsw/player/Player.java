@@ -65,7 +65,7 @@ public class Player implements Serializable {
      * true if the tile in hand has been picked from reserved tiles
      * (can not discard and count as lost if not placed before end of assembly)
      */
-    private boolean isTileInHandFromReserved;
+    private boolean tileInHandFromReserved;
 
     /**
      * The player's space credits
@@ -120,7 +120,7 @@ public class Player implements Serializable {
 
         cardGroupInHand = null;
         tileInHand = null;
-        isTileInHandFromReserved = false;
+        tileInHandFromReserved = false;
 
         credits = 0;
         position = null;
@@ -163,6 +163,13 @@ public class Player implements Serializable {
     }
 
     /**
+     * @return {@code true} if the tile in hand has been picked from reserved tiles, {@code false} otherwise
+     */
+    public boolean isTileInHandFromReserved() {
+        return tileInHandFromReserved;
+    }
+
+    /**
      * @param tileToHold tile to be held by the player
      * @throws AlreadyHaveTileInHandException if already have tile in hand
      * @throws TileCanNotDisappearException if {@code tileToHold == null}: it would make the tile disappear from
@@ -183,7 +190,7 @@ public class Player implements Serializable {
      */
     private void removeTileFromHand() {
         tileInHand = null;
-        isTileInHandFromReserved = false;
+        tileInHandFromReserved = false;
     }
 
     /**
@@ -373,7 +380,7 @@ public class Player implements Serializable {
         if (tileInHand == null){
             throw new NoTileInHandException();
         }
-        if (isTileInHandFromReserved) {
+        if (tileInHandFromReserved) {
             throw new ReservedTileException("It's not possible to discard a reserved tile.");
         }
 
@@ -442,7 +449,7 @@ public class Player implements Serializable {
             for (int i = 0; i < reservedTiles.size(); i++) {  // first search in the reserved tiles
                 if (reservedTiles.get(i).getTileId() == id) {
                     tile = reservedTiles.remove(i);
-                    isTileInHandFromReserved = true;
+                    tileInHandFromReserved = true;
                     break;
                 }
             }
@@ -485,7 +492,7 @@ public class Player implements Serializable {
         }
 
         // if tile in hand is reserved: add to the list of lost tiles
-        if ((tileInHand != null) && isTileInHandFromReserved) {
+        if ((tileInHand != null) && tileInHandFromReserved) {
             setLostTile(tileInHand);
         }
         removeTileFromHand();

@@ -8,9 +8,7 @@ import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.gui.helpers.Asset;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
-import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.geometry.Pos;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -25,12 +23,23 @@ import java.util.Map;
  */
 public class ShipGrid extends StackPane {
     public static final double CELL_SIZE = 80;
-    public static final double TILE_SIZE = CELL_SIZE * 0.9;
-    public static final double TILE_BORDER_SIZE = TILE_SIZE * 0.025;
+
+    public static final double TILE_SIZE = CELL_SIZE * 0.95;
+    public static final double TILE_BORDER_PERCENTAGE = 0.05;
+
+    public static final double PIXEL_REAL_TO_SCALED = CELL_SIZE / 120.0;  // do NOT modify this!
 
     private final Map<Coordinates, ShipCell> gridCells = new HashMap<>();
-    private final ImageView backgroundView;
     private final GridPane cellGridPane;
+    private final int offsetX;
+    private final int offsetY;
+    private final int gapX;
+    private final int gapY;
+
+    private final ShipCell[] reserveSlots;
+    private final GridPane reserveSlotsPane;
+    private final int reserveOffsetX;
+    private final int reserveOffsetY;
 
     /**
      * Creates a new ship grid display.
@@ -41,51 +50,61 @@ public class ShipGrid extends StackPane {
      * @param cols Number of columns in the cell grid.
      */
     public ShipGrid(int rows, int cols) {
-        super();
-
-        // 1. Setup Background
-        Image bgImage = AssetHandler.loadRawImage(Asset.SHIP.toString());
-        this.backgroundView = new ImageView();
-
-        if (bgImage != null) {
-            this.backgroundView.setImage(bgImage);
-            this.backgroundView.setPreserveRatio(true);
-
-            // Set StackPane's preferred size to the background image's native size.
-            double imgWidth = CELL_SIZE * cols + 60;
-            double imgHeight =  CELL_SIZE * rows + 60;
-            this.setPrefSize(imgWidth, imgHeight);
-
-            // Configure ImageView to fit these dimensions.
-            this.backgroundView.setFitWidth(imgWidth);
-            this.backgroundView.setFitHeight(imgHeight);
-        } else {
-            // Fallback size if image loading fails
-            this.setPrefSize(cols * CELL_SIZE + 200, rows * CELL_SIZE + 200); // Default padding
+        GameLevel level = LobbyState.getGameLevel();
+        switch (level) {
+            case TESTFLIGHT, ONE -> {
+                offsetX = 37;
+                offsetY = 31;
+                gapX = 4;
+                gapY = 4;
+                reserveOffsetX = 673;
+                reserveOffsetY = 22;
+            }
+            case TWO -> {
+                offsetX = 37;
+                offsetY = 31;
+                gapX = 4;
+                gapY = 4;
+                reserveOffsetX = 672;
+                reserveOffsetY = 22;
+            }
+            default -> {
+                offsetX = offsetY = gapX = gapY = reserveOffsetX = reserveOffsetY = 0;
+            }
         }
 
+        // 1. Setup Background
+        ImageView backgroundView = new ImageView();
+        backgroundView.setImage(AssetHandler.loadRawImage(Asset.SHIP.toString()));
+        backgroundView.setPreserveRatio(true);
+        // Set StackPane's preferred size to the background image's native size.
+        double imgWidth = calculateWidth(cols);
+        double imgHeight = calculateHeight(rows);
+        this.setPrefSize(imgWidth, imgHeight);
+        // Configure ImageView to fit these dimensions.
+        backgroundView.setFitWidth(imgWidth);
+        backgroundView.setFitHeight(imgHeight);
+
         // 2. Setup Cell Grid
-        this.cellGridPane = new GridPane();
-        initializeCellGridPane(rows, cols);
+        cellGridPane = new GridPane();
+        initializeCellGridPane(rows, cols, level);
+
+        // 3. create slots for reserved tiles
+        reserveSlots = new ShipCell[2];
+        reserveSlotsPane = new GridPane();
+        initializeReserveSlots();
 
         // Add children to StackPane: background first, then cell grid
-        this.getChildren().addAll(this.backgroundView, this.cellGridPane);
-
-        // Align cellGridPane to top-left for predictable translation offsets
-        StackPane.setAlignment(this.cellGridPane, Pos.CENTER);
+        this.getChildren().addAll(backgroundView, cellGridPane, reserveSlotsPane);
 
         update(); // Populate cells with initial data
     }
 
-    /**
-     * Sets the position of the cell grid relative to the top-left corner of the background.
-     *
-     * @param offsetX The horizontal offset.
-     * @param offsetY The vertical offset.
-     */
-    public void setCellGridOffset(double offsetX, double offsetY) {
-        this.cellGridPane.setTranslateX(offsetX);
-        this.cellGridPane.setTranslateY(offsetY);
+    private double calculateWidth(int cols) {
+        return CELL_SIZE * cols + (cols * gapX + offsetX * 2) * PIXEL_REAL_TO_SCALED;
+    }
+    private double calculateHeight(int rows) {
+        return CELL_SIZE * rows + (rows * gapY + offsetY * 2) * PIXEL_REAL_TO_SCALED;
     }
 
     /**
@@ -93,40 +112,48 @@ public class ShipGrid extends StackPane {
      * @param rows The number of rows for the cell grid.
      * @param cols The number of columns for the cell grid.
      */
-    private void initializeCellGridPane(int rows, int cols) {
+    private void initializeCellGridPane(int rows, int cols, GameLevel level) {
         // determine baseRow and baseCol based on GameLevel
-        GameLevel gameLevel = LobbyState.getGameLevel();
-
         // these are offsets to align visual grid coordinates with the logical ShipBoard coordinates
         int baseRow = 0, baseCol = 0;
-        switch (gameLevel) {
-            case TESTFLIGHT, ONE:
+        switch (level) {
+            case TESTFLIGHT, ONE -> {
                 baseRow = 5;
                 baseCol = 4;
-                break;
-            case TWO:
+            }
+            case TWO -> {
                 baseRow = 4;
                 baseCol = 3;
-                break;
-            default: break;  // should never happen
+            }
         }
 
         // create all the cells
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 Coordinates logicalCoords = new Coordinates(r + baseRow, c + baseCol);
-                ShipCell cell = new ShipCell(logicalCoords, gameLevel);
+                ShipCell cell = new ShipCell(logicalCoords, level);
                 gridCells.put(logicalCoords, cell);
-                this.cellGridPane.add(cell, c, r);
+                cellGridPane.add(cell, c, r);
             }
         }
 
-        // set fixed size for the cellGridPane itself
-        double calculatedWidth = cols * CELL_SIZE;
-        double calculatedHeight = rows * CELL_SIZE;
-        this.cellGridPane.setPrefSize(calculatedWidth, calculatedHeight);
-        this.cellGridPane.setMinSize(calculatedWidth, calculatedHeight);
-        this.cellGridPane.setMaxSize(calculatedWidth, calculatedHeight);
+        // align cellGridPane to top-left for predictable translation offsets
+        StackPane.setAlignment(cellGridPane, Pos.TOP_LEFT);
+        cellGridPane.setTranslateX(offsetX * PIXEL_REAL_TO_SCALED);
+        cellGridPane.setTranslateY(offsetY * PIXEL_REAL_TO_SCALED);
+        cellGridPane.setHgap(gapX * PIXEL_REAL_TO_SCALED);
+        cellGridPane.setVgap(gapY * PIXEL_REAL_TO_SCALED);
+    }
+
+    private void initializeReserveSlots() {
+        StackPane.setAlignment(reserveSlotsPane, Pos.TOP_LEFT);
+        reserveSlotsPane.setTranslateX(reserveOffsetX * PIXEL_REAL_TO_SCALED);
+        reserveSlotsPane.setTranslateY(reserveOffsetY * PIXEL_REAL_TO_SCALED);
+        reserveSlotsPane.setHgap(gapX * PIXEL_REAL_TO_SCALED);
+        for (int i = 0; i < reserveSlots.length; i++) {
+            reserveSlots[i] = ShipCell.reserveSlot();
+            reserveSlotsPane.add(reserveSlots[i], i, 0);
+        }
     }
 
     /**
@@ -135,16 +162,22 @@ public class ShipGrid extends StackPane {
      * Cell styles are also updated to reflect valid placement areas.
      */
     public void update() {
-        ShipBoard shipBoard = ClientManager.getInstance().getLastUpdate().getClientPlayer().getShipBoard();
+        ShipBoard shipBoard = AssembleState.getShipBoard();
         if (shipBoard == null) return;  // guard against null shipboard
 
+        // tiles in ship
         Map<Coordinates, TileSkeleton> tilesOnBoard = shipBoard.getTilesOnBoard();
-
         for (Map.Entry<Coordinates, ShipCell> entry : gridCells.entrySet()) {
             Coordinates logicalCoords = entry.getKey();
             ShipCell cell = entry.getValue();
             cell.setTile(tilesOnBoard.get(logicalCoords));
             updateNeighbors(logicalCoords, cell);
+        }
+
+        // reserved tiles
+        TileSkeleton[] reservedTiles = AssembleState.getReservedTiles();
+        for (int i = 0; i < reserveSlots.length; i++) {
+            reserveSlots[i].setTile((i < reservedTiles.length) ? reservedTiles[i] : null);
         }
     }
 

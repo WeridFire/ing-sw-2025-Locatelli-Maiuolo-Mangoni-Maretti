@@ -14,6 +14,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 public class ShipTile extends Draggable {
     public static final String BASE_ID = "TILE";
@@ -39,6 +40,9 @@ public class ShipTile extends Draggable {
             this.setRotate(tile.getAppliedRotation().toDegrees());
         }
     }
+    public TileSkeleton getTile() {
+        return tile;
+    }
 
     /**
      * Initializes the visual properties and drag behavior of the tile.
@@ -50,28 +54,36 @@ public class ShipTile extends Draggable {
             BACK_IMAGE = AssetHandler.loadRawImage(Default.BACK_TILE_PATH);
         }
 
+        // size preparation
+        double imageSize = ShipGrid.TILE_SIZE * (1 - ShipGrid.TILE_BORDER_PERCENTAGE);
+        double borderSize = ShipGrid.TILE_SIZE * ShipGrid.TILE_BORDER_PERCENTAGE * 0.5;
+
         // image view size and default content
         imageView = new ImageView(BACK_IMAGE);
         imageView.setPreserveRatio(true);
-        imageView.setFitWidth(ShipGrid.TILE_SIZE);
-        imageView.setFitHeight(ShipGrid.TILE_SIZE);
+        imageView.setFitWidth(imageSize);
+        imageView.setFitHeight(imageSize);
+
         // image view border
-        this.setBorder(new Border(new BorderStroke(Color.WHITE,
-                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(ShipGrid.TILE_BORDER_SIZE))));
-        // image view attached to this tile
-        this.getChildren().add(imageView);
+        Rectangle border = new Rectangle(imageSize + borderSize, imageSize + borderSize);
+        border.setFill(Color.WHITE);  // to avoid small transparent gap issue between image and border
+        border.setStroke(Color.WHITE);
+        border.setStrokeWidth(borderSize);
+
+        // image view attached to this tile, over the border
+        this.getChildren().addAll(border, imageView);
     }
 
     public boolean isCovered() {
         return tile == null;
     }
 
-    public boolean isUncovered() {
-        return !isCovered() && !tile.isPlaced();
-    }
-
     public boolean isPlaced() {
         return !isCovered() && tile.isPlaced();
+    }
+
+    public boolean isReserved() {
+        return AssembleState.isTileReserved(tile);
     }
 
     @Override
@@ -98,7 +110,7 @@ public class ShipTile extends Draggable {
     }
 
     @Override
-    protected void onEndDrag() {
+    protected void onEndDrag(boolean dropAccepted) {
         Pane parent = (Pane) this.getParent();
         if (parent == null) return;
         parent.getChildren().remove(this);
@@ -111,6 +123,11 @@ public class ShipTile extends Draggable {
 
     @Override
     protected void fallbackDropHandler() {
+        if (isReserved()) {
+            ClientManager.getInstance().simulateCommand("reserve");
+            return;
+        }
+        // else: is valid to discard it
         ClientManager.getInstance().simulateCommand("discard");
     }
 

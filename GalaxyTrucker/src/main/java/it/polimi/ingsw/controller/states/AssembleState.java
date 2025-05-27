@@ -64,4 +64,14 @@ public class AssembleState extends CommonState {
     public static List<Boolean> listOfAvailableCardGroups() {
         return getGameData().getDeck().getGroupsAvailability();
     }
+
+    public static TileSkeleton[] getReservedTiles() {
+        return getPlayer().getReservedTiles().toArray(new TileSkeleton[0]);
+    }
+
+    public static boolean isTileReserved(TileSkeleton tile) {
+        if (tile == null) return false;
+        else return getPlayer().getReservedTiles().contains(tile)
+                || (getPlayer().isTileInHandFromReserved() && tile.equals(getPlayer().getTileInHand()));
+    }
 }

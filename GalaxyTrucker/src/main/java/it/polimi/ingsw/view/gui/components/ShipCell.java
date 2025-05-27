@@ -21,7 +21,22 @@ public class ShipCell extends DropSlot {
     private boolean occupied;
     private boolean hasNeighbor;
 
+    private final boolean isReserveSlot;
+
+    private ShipCell() {
+        isReserveSlot = true;
+        DEFAULT_CELL_STYLE = "";
+        logicalRow = logicalColumn = null;
+        occupied = false;
+        // simulate all validity condition
+        isOnBoard = true;
+        hasNeighbor = true;
+
+        setPrefSize(ShipGrid.CELL_SIZE, ShipGrid.CELL_SIZE);
+    }
+
     public ShipCell(Coordinates coordinates, GameLevel level) {
+        isReserveSlot = false;
         logicalRow = String.valueOf(coordinates.getRow());
         logicalColumn = String.valueOf(coordinates.getColumn());
 
@@ -35,6 +50,10 @@ public class ShipCell extends DropSlot {
         hasNeighbor = false;
     }
 
+    public static ShipCell reserveSlot() {
+        return new ShipCell();
+    }
+
     public void setTile(TileSkeleton tileOnCell) {
         getChildren().clear();
         occupied = tileOnCell != null;
@@ -44,6 +63,7 @@ public class ShipCell extends DropSlot {
     }
 
     public void setHasNeighbor(Collection<ShipCell> neighbors) {
+        if (isReserveSlot) return;
         for (ShipCell neighbor : neighbors) {
             if (neighbor != null && neighbor.occupied) {
                 hasNeighbor = true;
@@ -53,7 +73,7 @@ public class ShipCell extends DropSlot {
     }
 
     private boolean canAcceptTile() {
-        return !occupied && isOnBoard && hasNeighbor;
+        return !occupied && ((isReserveSlot) || (isOnBoard && hasNeighbor));
     }
 
     @Override
@@ -63,7 +83,11 @@ public class ShipCell extends DropSlot {
 
     @Override
     protected void acceptDrop(String dragId) {
-        ClientManager.getInstance().simulateCommand("place", logicalRow, logicalColumn);
+        if (isReserveSlot) {
+            ClientManager.getInstance().simulateCommand("reserve");
+        } else {
+            ClientManager.getInstance().simulateCommand("place", logicalRow, logicalColumn);
+        }
         occupied = true;
     }
 
