@@ -55,7 +55,7 @@ public abstract class Draggable extends StackPane {
             fallbackDropHandler();
         }
 
-        onEndDrag();
+        onEndDrag(dropAccepted);
     }
 
     protected abstract String getDragId();
@@ -66,7 +66,7 @@ public abstract class Draggable extends StackPane {
 
     protected void onKeyPressedWhileDragging(KeyCode code) { }
 
-    protected void onEndDrag() { }
+    protected void onEndDrag(boolean dropAccepted) { }
 
     protected void fallbackDropHandler() { }
 }

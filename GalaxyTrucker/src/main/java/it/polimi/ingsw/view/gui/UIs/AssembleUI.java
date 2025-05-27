@@ -8,12 +8,10 @@ import it.polimi.ingsw.view.gui.components.*;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 
-import java.sql.Time;
 import java.util.Optional;
 
 /**
@@ -47,7 +45,6 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     private static Pane dragOverlay;
     public static Pane getDragOverlay() {
         if (dragOverlay == null) {
-            dragOverlay = new Pane();
             dragOverlay = new Pane(); // Transparent pane above everything
             dragOverlay.setPickOnBounds(false); // Important: so it doesn't block mouse events
         }
@@ -125,22 +122,17 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
      * Creates the ship grid. ShipGrid is responsible for its own fixed dimensions.
      */
     private ShipGrid createShipGrid() {
-        int rows, cols;
-        cols = switch (LobbyState.getGameLevel()) {
+        int rows = 0, cols = 0;
+        switch (LobbyState.getGameLevel()) {
             case TESTFLIGHT, ONE -> {
                 rows = 5;
-                yield 7;
+                cols = 7;
             }
             case TWO -> {
                 rows = 6;
-                yield 9;
+                cols = 9;
             }
-            // Add a default case to avoid errors if GameLevel is unexpected
-            default -> {
-                rows = 5; // Default values
-                yield 7;
-            }
-        };
+        }
         return new ShipGrid(rows, cols);
     }
 

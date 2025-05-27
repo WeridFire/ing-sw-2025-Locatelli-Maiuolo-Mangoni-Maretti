@@ -5,6 +5,7 @@ import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import it.polimi.ingsw.view.gui.utils.AlertUtils;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -29,7 +30,7 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
         gameUUIDField = new TextField();
         gameUUIDField.setPromptText("Game UUID");
         gameUUIDField.textProperty().addListener((obs, oldText, newText) -> {
-            refreshColorsAvailability(MenuState.getAvailableColorsForGame(UUID.fromString(newText)));
+            refreshColorsAvailability(getAvailableColors());
         });
 
         Label activeGamesLabel = new Label("Active Games:");
@@ -101,15 +102,13 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
         activeGamesList.getItems().setAll(activeGames);
     }
 
-    private void refreshColorsAvailability(MainCabinTile.Color[] availableColors) {
-        Set<MainCabinTile.Color> setAvailableColors = new HashSet<>(List.of(availableColors));
-
+    private void refreshColorsAvailability(Set<MainCabinTile.Color> availableColors) {
         Toggle selectedToggle = colorToggleGroup.getSelectedToggle();
 
         // keep enabled only the available colors
         for (Toggle toggle : colorToggleGroup.getToggles()) {
             MainCabinTile.Color color = (MainCabinTile.Color) toggle.getUserData();
-            boolean isAvailable = setAvailableColors.contains(color);
+            boolean isAvailable = availableColors.contains(color);
             ((Node) toggle).setDisable(!isAvailable);
         }
 
@@ -124,13 +123,27 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
         }
     }
 
+    private Set<MainCabinTile.Color> getAvailableColors() {
+        MainCabinTile.Color[] availableColors;
+        try {
+            UUID uuid = UUID.fromString(gameUUIDField.getText());
+            availableColors = MenuState.getAvailableColorsForGame(uuid);
+        } catch (IllegalArgumentException e) {
+            // invalid uuid -> all colors "available" for no game
+            availableColors = MainCabinTile.Color.values();
+        }
+        return new HashSet<>(List.of(availableColors));
+    }
+
     public VBox getLayout() {
         return layout;
     }
 
     @Override
     public void refreshOnUpdate(ClientUpdate update) {
-        refreshActiveGamesList(MenuState.getActiveGamesUUID());
-        refreshColorsAvailability(MenuState.getAvailableColorsForGame(UUID.fromString(gameUUIDField.getText())));
+        Platform.runLater(() -> {
+            refreshActiveGamesList(MenuState.getActiveGamesUUID());
+            refreshColorsAvailability(getAvailableColors());
+        });
     }
 }
