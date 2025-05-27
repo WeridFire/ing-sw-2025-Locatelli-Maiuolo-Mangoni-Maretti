@@ -7,6 +7,9 @@ import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.playerInput.PIRs.PIRRemoveLoadables;
 import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.task.Task;
+import it.polimi.ingsw.task.customTasks.TaskRemoveLoadables;
+import it.polimi.ingsw.task.customTasks.TaskYesNoChoice;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
@@ -45,28 +48,62 @@ public class AbandonedShipCard extends Card{
 		this.sellPrice = sellPrice;
 	}
 
-	/**
-	 * Iterates through each player, checking if they can take the ship. If they can (and want), removes crew from their
-	 * ship and awards the credits.
-	 */
+
 	@Override
-	public void playEffect(GameData game) {
-		for(Player p : game.getPlayersInFlight()){
-			if(p.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().countAll(LoadableType.CREW_SET) >= requiredCrew){
-				boolean result = game.getPIRHandler().setAndRunTurn(
-						new PIRYesNoChoice(p, 30, "Do you want to take the ship? " +
-								"You will lose " + requiredCrew + " crew " +
-								"and " + lostDays + " travel days, but you will receive " +
-								sellPrice + " credits.", false)
-				);
-				if(result){ //meaning they accepted to do it
-					game.getPIRHandler().setAndRunTurn(
-							new PIRRemoveLoadables(p, 30, LoadableType.CREW_SET, requiredCrew)
-					);
-					game.movePlayerBackward(p, lostDays);
-					break;
+	public void startCardBehaviour(GameData game) {
+		playTask(game,  game.getPlayersInFlight().getFirst());
+	}
+
+	public void runRemoveCrewTask(GameData game, Player player) {
+		game.getTaskStorage().addTask(new TaskRemoveLoadables(
+				player, 30, LoadableType.CREW_SET, requiredCrew,
+				(p) -> {
+					/**
+					 * ON INTERACTION END
+					 */
+					game.movePlayerBackward(player, lostDays);
+					game.getCurrentGamePhase().endPhase();
 				}
-			}
+		));
+	};
+
+
+
+	/**
+	 * Given the current player, checks if they can take the ship. If they can (and want), removes crew from their
+	 * ship and awards the credits. Then proceeds to the next player, if the ship hasnt been taken.
+	 */
+	public void playTask(GameData game, Player player) {
+		if(player == null){
+			//The previous player was the last one. We end the gamephase.
+			game.getCurrentGamePhase().endPhase();
+			return;
+		}
+
+
+		if(player.getShipBoard()
+				.getVisitorCalculateCargoInfo()
+				.getCrewInfo()
+				.countAll(LoadableType.CREW_SET) >= requiredCrew){
+			game.getTaskStorage().addTask(
+					new TaskYesNoChoice(player.getUsername(), 30, "Do you want to take the ship? " +
+							"You will lose " + requiredCrew + " crew " +
+							"and " + lostDays + " travel days, but you will receive " +
+							sellPrice + " credits.", false,
+							(p, choice) -> {
+								/**
+								 * EXECUTED ON END OF CHOICE
+								 */
+								if(TaskYesNoChoice.isChoiceYes(choice)){
+									runRemoveCrewTask(game, p);
+								}else{
+									playTask(game, game.getNextPlayerInFlight(player));
+								}
+							}
+						)
+			);
+		}else{
+			playTask(game, game.getNextPlayerInFlight(player));
 		}
 	}
 
