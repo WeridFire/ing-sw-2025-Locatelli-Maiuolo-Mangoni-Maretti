@@ -203,10 +203,14 @@ public class GameData implements Serializable {
         return getPlayerFlightIndex(player) == getPlayersInFlight().size() - 1;
     }
 
+    /**
+     * Gets the next player in flight order. RETURNS NULL if there is no other player.
+     * @param player the current player, the one before the next one you will get.
+     * @return The next player in the flight order. Null of the previous player was the last one.
+     */
     public Player getNextPlayerInFlight(Player player){
         if(isLastPlayerInFlight(player)){
-            throw new RuntimeException("Requested next player in flight," +
-                    "                       but the current player is already the last one.");
+            return null;
         }
         if(getPlayerFlightIndex(player) == -1){
             throw new RuntimeException("Requested next player in flight but the current player is not in flight.");
@@ -589,11 +593,7 @@ public class GameData implements Serializable {
                 // notify only this player about its end of assemble, and if it has no integrity problems
                 // if it has integrity problems -> already updates with requests to solve integrity problem
                 if (!player.getShipBoard().getVisitorCheckIntegrity().getProblem(true).isProblem()) {
-                    try {
-                        GameServer.getInstance().broadcastUpdate(GamesHandler.getInstance().getGame(gameId));
-                    } catch (RemoteException e) {
-                        System.err.println("RemoteException while notifying end of assemble without integrity problem");
-                    }
+                    GameServer.getInstance().broadcastUpdate(GamesHandler.getInstance().getGame(gameId));
                 }
                 return;
             }
