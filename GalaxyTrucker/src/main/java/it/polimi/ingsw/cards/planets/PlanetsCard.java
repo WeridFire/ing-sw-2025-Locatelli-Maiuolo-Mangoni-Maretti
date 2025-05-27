@@ -5,8 +5,6 @@ import it.polimi.ingsw.cards.exceptions.PlanetsCardException;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
-import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.task.customTasks.TaskAddLoadables;
 import it.polimi.ingsw.task.customTasks.TaskMultipleChoice;
 import it.polimi.ingsw.view.cli.ANSI;
@@ -33,6 +31,11 @@ public class PlanetsCard extends Card {
 		this.lostDays = lostDays;
 	}
 
+	@Override
+	public void startCardBehaviour(GameData game) {
+		playTask(game, game.getPlayersInFlight().getFirst());
+	}
+
 	/**
 	 * Gets, given an index, the corresponding planet.
 	 * @param i the index of the planet.
@@ -46,19 +49,8 @@ public class PlanetsCard extends Card {
 		return planets[i];
 	}
 
-	/**
-	 * Controls the addLoadable interaction with the player.
-	 * */
-	public void addLoadablesInteraction(Player p, PIRHandler pirHandler) throws InterruptedException {
-		for (Planet planet: planets){
-			if (planet.getCurrentPlayer() != null && planet.getCurrentPlayer().equals(p)){
-				PIRAddLoadables pirAddLoadables = new PIRAddLoadables(p, 30, planet.getAvailableGoods());
-				pirHandler.setAndRunTurn(pirAddLoadables);
-			}
-		}
-	}
 
-	public void AddLoadablesTask(GameData game, Player player, Planet planet){
+	public void runAddLoadablesTask(GameData game, Player player, Planet planet){
 		game.getTaskStorage().addTask(new TaskAddLoadables(
 				player.getUsername(), 30, planet.getAvailableGoods(),
 				(currentPlayer) -> {
@@ -66,8 +58,8 @@ public class PlanetsCard extends Card {
 					//Players leave the planet in reversed order.
 					//Storing beforehands the position in the flight is FUNDAMENTAL, as if you have an operation
 					//that makes the order change it might cause players to be processed twice.
-					proceedTaskLoop(game, currentPlayer);
-				} //upon having loaded items, there is nothing to do.
+					playTask(game, game.getNextPlayerInFlight(currentPlayer));
+				}
 		));
 	}
 
@@ -85,20 +77,14 @@ public class PlanetsCard extends Card {
 		}
 	}
 
-	@Override
-	public void proceedTaskLoop(GameData game, Player player){
-		boolean isLast = game.isLastPlayerInFlight(player);
-		if(!isLast){
-			//If the player is not the last proceed to next one.
-			playTask(game, game.getNextPlayerInFlight(player));
-		}else{
+
+	public void playTask(GameData game, Player player){
+		if(player == null){
 			disembarkInReverse(game);
 			game.getCurrentGamePhase().endPhase();
+			return;
 		}
-	}
 
-	@Override
-	public void playTask(GameData game, Player player){
 		List<Planet> availablePlanets = Arrays.stream(planets)
 				.filter(planet -> planet.getCurrentPlayer() == null).toList();
 		List<String> planetsOption = new ArrayList<String>();
@@ -108,7 +94,6 @@ public class PlanetsCard extends Card {
 		game.getTaskStorage().addTask(new TaskMultipleChoice(player.getUsername(),
 				30,
 				"On what planet do you want to land? " + "(-" + lostDays +" travel days)",
-				null,
 				planetsOption.toArray(new String[0]),
 				0,
 				(currentPlayer, choice) -> {
@@ -125,11 +110,13 @@ public class PlanetsCard extends Card {
 								throw new RuntimeException("Somehow a player choose to land " +
 															"on a planet that was already occupied");
 							}
-							AddLoadablesTask(game, player, planet);
+							runAddLoadablesTask(game, player, planet);
 						}
 					}else{
 						//IF the player DID NOT LAND we must still proceed with the loop!!
-						proceedTaskLoop(game, currentPlayer);
+						//If the next player in flight is null, it is handled in the start of playTask.
+						playTask(game, game.getNextPlayerInFlight(player));
+						//CHIUSA
 					}
 				}
 				));
