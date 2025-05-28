@@ -45,29 +45,54 @@ public class AbandonedStationCard extends Card{
 		this.requiredCrew = requiredCrew;
 	}
 
-	/**
-	 * Iterates through each player, looking for the first one that can (and wants) to take over the station.
-	 * @param game The game data associated with the request.
-	 */
 	@Override
-	public void playEffect(GameData game) {
-		for(Player p : game.getPlayersInFlight()){
-			if(p.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().countAll(LoadableType.CREW_SET) >= requiredCrew){
-				boolean result = game.getPIRHandler().setAndRunTurn(
-						new PIRYesNoChoice(p, 30, "Do you want to loot the station? " +
-								"You will lose " + lostDays + " travel days, but you will receive the " +
-								"following loot: " + Arrays.toString(availableCargo)
-								, false)
-				);
-				if(result){ //meaning they accepted to do it
-					game.getPIRHandler().setAndRunTurn(
-							new PIRAddLoadables(p, 30, List.of(availableCargo))
-					);
-					game.movePlayerBackward(p, lostDays);
-					break;
-				}
-			}
+	public void startCardBehaviour(GameData game) {
+		playTask(game,game.getPlayersInFlight().getFirst());
+
+	}
+
+	public void playTask(GameData game, Player player) {
+		if (player == null) {
+			//The previous player was the last one. We end the gamephase.
+			game.getCurrentGamePhase().endPhase();
+			return;
 		}
+
+		if(player.getShipBoard()
+				.getVisitorCalculateCargoInfo()
+				.getCrewInfo()
+				.countAll(LoadableType.CREW_SET) >= requiredCrew){
+			game.getTaskStorage().addTask(
+					new TaskYesNoChoice(player.getUsername(), 30, "Do you want to loot the station?" +
+							"you will lose " + lostDays + " travel days, but you will receive the station's loot: " + Arrays.toString(availableCargo),
+							false, (currentPlayer, choice) -> {
+						if(TaskYesNoChoice.isChoiceYes(choice)){
+							addLoadablesTask(game, currentPlayer);
+						}
+						else {
+							playTask(game, game.getNextPlayerInFlight(player));
+						}
+					})
+			);
+		}
+		else
+		{
+			playTask(game, game.getNextPlayerInFlight(player));
+		}
+
+	}
+
+	public void addLoadablesTask(GameData game, Player player) {
+		game.getTaskStorage().addTask(new TaskAddLoadables(
+				player.getUsername(), 30, List.of(availableCargo),
+				(p) -> {
+					//move player back
+					game.movePlayerBackward(player, lostDays);
+
+					//end card effect
+					game.getCurrentGamePhase().endPhase();
+				}
+		));
 	}
 
 	/**
