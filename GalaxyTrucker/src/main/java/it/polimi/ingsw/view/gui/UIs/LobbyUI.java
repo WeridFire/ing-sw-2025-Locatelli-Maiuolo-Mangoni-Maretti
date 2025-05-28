@@ -3,9 +3,9 @@ package it.polimi.ingsw.view.gui.UIs;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
-import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
+import it.polimi.ingsw.view.gui.utils.AlertUtils;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
@@ -86,6 +86,11 @@ public class LobbyUI implements INodeRefreshableOnUpdateUI {
     @Override
     public void refreshOnUpdate(ClientUpdate update) {
         GameData game = update.getCurrentGame();
+        if (game == null) {
+            AlertUtils.showError("Game Not Found",
+                    "The current game was not found, please restart the application");
+            return;
+        }
 
         if (game.getCurrentGamePhaseType().equals(GamePhaseType.ASSEMBLE)){
             Platform.runLater(() -> {

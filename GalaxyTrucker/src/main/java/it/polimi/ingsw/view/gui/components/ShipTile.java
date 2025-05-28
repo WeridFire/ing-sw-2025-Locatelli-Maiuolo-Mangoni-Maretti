@@ -51,7 +51,7 @@ public class ShipTile extends Draggable {
     private void initialize() {
         // prepare back image for all if not prepared yet
         if (BACK_IMAGE == null) {
-            BACK_IMAGE = AssetHandler.loadRawImage(Default.BACK_TILE_PATH);
+            BACK_IMAGE = AssetHandler.loadRawImage(Default.PATH_BACK_TILE);
         }
 
         // size preparation
@@ -88,7 +88,9 @@ public class ShipTile extends Draggable {
 
     @Override
     protected boolean canBeDragged() {
-        return super.canBeDragged() && !isPlaced();
+        return super.canBeDragged() && !isPlaced()
+                && !AssembleState.isEndedAssembly()
+                && !AssembleState.isSpectatingOther();
     }
 
     @Override

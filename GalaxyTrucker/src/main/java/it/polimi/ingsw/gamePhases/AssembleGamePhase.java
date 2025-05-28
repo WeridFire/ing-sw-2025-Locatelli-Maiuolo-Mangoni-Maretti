@@ -8,6 +8,7 @@ import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.util.GameLevelStandards;
 
 
@@ -16,8 +17,7 @@ import java.util.UUID;
 
 public class AssembleGamePhase extends PlayableGamePhase {
 
-    // TODO: reset timerMilliseconds = 60 * 1000L. This is for debug purposes
-    private static final long timerMilliseconds = 5 * 1000L;  // 60 seconds
+    private static final long timerMilliseconds = Default.HOURGLASS_SECONDS * 1000L;
     transient private final Object timerLock = new Object();
     transient private Runnable onTimerSwitchCallback;
 
@@ -163,7 +163,7 @@ public class AssembleGamePhase extends PlayableGamePhase {
     /**
      * @return how many times the timer has already been restarted, if present; {@code null} otherwise.
      */
-    public Integer getAssemblyTimerSlotIndex() {
+    public Integer getTimerSlotIndex() {
         if (totalTimerRotations > 0) {
             return totalTimerRotations - howManyTimerRotationsLeft;
         } else {

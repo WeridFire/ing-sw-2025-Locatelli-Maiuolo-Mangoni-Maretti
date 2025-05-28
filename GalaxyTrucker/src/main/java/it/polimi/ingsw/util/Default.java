@@ -18,9 +18,12 @@ public class Default {
     public static boolean USE_GUI = false;
 
     //GUI
-    public static final String BACK_TILE_PATH = "GT-new_tiles_16_for web157.jpg";
+    public static final String PATH_BACK_TILE = "GT-new_tiles_16_for web157.jpg";
+    public static final String PATH_BACK_CARD_I = "GT-cards_I_IT_0121.jpg";
+    public static final String PATH_BACK_CARD_II = "GT-cards_II_IT_0121.jpg";
 
     //GENRAL
     public static final int TOTAL_TILES_NUMBER = TilesFactory.createPileTiles().size();
+    public static final int HOURGLASS_SECONDS = 10;  // TODO: reset HOURGLASS_SECONDS = 90. This is for debug purposes
 
 }

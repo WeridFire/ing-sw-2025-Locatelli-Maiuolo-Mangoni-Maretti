@@ -28,7 +28,7 @@ public class DeckFactory {
 								Projectile.createLightCannonFire(Direction.SOUTH)
 						}
 				))
-		}, "GT-cards_I_IT_0116", 0));
+		}, "GT-cards_I_IT_0116.jpg", 0));
 		deckPool.add(new PlanetsCard(new Planet[]{
 				new Planet(List.of(new LoadableType[]{
 						LoadableType.RED_GOODS,

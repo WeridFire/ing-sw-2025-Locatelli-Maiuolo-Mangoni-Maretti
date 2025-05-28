@@ -44,21 +44,15 @@ public enum Asset {
     public String toString() {
         GameLevel level = LobbyState.getGameLevel();
 
-        if (level.equals(GameLevel.TESTFLIGHT)) {
-            return switch (this) {
+        return switch (level) {
+            case TESTFLIGHT, ONE -> switch (this) {
                 case SHIP -> "cardboard-1.jpg";
                 case BOARD -> "cardboard-3.png";
             };
-        } else if (level.equals(GameLevel.ONE)) {
-            return switch (this) {
+            case TWO -> switch (this) {
                 case SHIP -> "cardboard-1b.jpg";
                 case BOARD -> "cardboard-5.png";
             };
-        } else {
-            return switch (this) {
-                case SHIP -> "cardboard-2.jpg";
-                case BOARD -> "cardboard-4.png";
-            };
-        }
+        };
     }
 }

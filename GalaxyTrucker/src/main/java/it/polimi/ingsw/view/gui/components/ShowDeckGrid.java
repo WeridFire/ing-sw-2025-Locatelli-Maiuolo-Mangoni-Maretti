@@ -2,7 +2,6 @@ package it.polimi.ingsw.view.gui.components;
 
 import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.cards.CardsGroup;
-import it.polimi.ingsw.view.gui.UIs.AssembleUI;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
@@ -11,7 +10,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -20,6 +18,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ShowDeckGrid extends StackPane {
+    private static final double CARD_WIDTH = 165;
+    private static final double CARD_HEIGHT = 254;
 
     private GridPane imageGrid;
 
@@ -29,7 +29,6 @@ public class ShowDeckGrid extends StackPane {
                     .map(Card::getTextureName)
                     .collect(Collectors.toList())
         );
-        AssembleUI.setWatchedCardsGroup(cg);
     }
 
     public ShowDeckGrid(List<String> cardsFileNames) {
@@ -47,8 +46,8 @@ public class ShowDeckGrid extends StackPane {
         int cols = 4;
         for (int i = 0; i < cardsFileNames.size(); i++) {
             ImageView imageView = AssetHandler.loadImage(cardsFileNames.get(i));
-            imageView.setFitWidth(100);
-            imageView.setFitHeight(150);
+            imageView.setFitWidth(CARD_WIDTH);
+            imageView.setFitHeight(CARD_HEIGHT);
             imageView.setPreserveRatio(true);
 
             int row = i / cols;
@@ -57,36 +56,35 @@ public class ShowDeckGrid extends StackPane {
         }
 
         // ScrollPane che contiene la griglia
+        /*
         ScrollPane scrollPane = new ScrollPane(imageGrid);
         scrollPane.setFitToWidth(true);
         scrollPane.setMaxHeight(400);
         scrollPane.setStyle("-fx-background-color: transparent;");
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
+         */
+
         // close
-        VBox container = getVBox(scrollPane);
+        VBox container = getVBox(imageGrid);
 
         // Aggiungi tutto allo StackPane
         this.getChildren().addAll(overlayBackground, container);
         show();
     }
 
-    private static VBox getVBox(ScrollPane scrollPane) {
+    private static VBox getVBox(Pane imagesPane) {
         Button closeButton = new Button("Close");
         closeButton.setOnMouseClicked(event -> {
-            if(AssembleUI.getWatchedCardsGroup() != null) {
-                Platform.runLater(() -> {
-                    ClientManager.getInstance().simulateCommand("hidecg");
-                });
-                AssembleUI.setWatchedCardsGroup(null);
-                AssembleUI.getInstance().clearDeckOverlay();
-            }
+            Platform.runLater(() -> {
+                ClientManager.getInstance().simulateCommand("hidecg");
+            });
         });
 
         // Layout overlay
-        VBox container = new VBox(10, scrollPane, closeButton);
+        VBox container = new VBox(10, imagesPane, closeButton);
         container.setAlignment(Pos.CENTER);
-        container.setMaxWidth(500);
+        container.setMaxWidth(CARD_WIDTH * 3 + 40);
         container.setMaxHeight(450);
         return container;
     }

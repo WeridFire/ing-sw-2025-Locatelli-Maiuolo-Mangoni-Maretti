@@ -52,16 +52,8 @@ public class AdventureCLIScreen extends CLIScreen{
      */
     @Override
     public CLIFrame getCLIRepresentation() {
-
-        String spectatedPlayerUsername = AssembleState.getPlayer().getSpectating();
-        Player spectatedPlayer = AssembleState.getGameData().getPlayersInFlight()
-                .stream()
-                .filter((p) -> p.getUsername().equals(spectatedPlayerUsername))
-                .findFirst()
-                .orElse(AssembleState.getPlayer()); //default fallback to own shipboard in case something goes wrong
-
         // frame for shipboard
-        CLIFrame frameShipboard = spectatedPlayer.getShipBoard().getCLIRepresentation();
+        CLIFrame frameShipboard = AssembleState.getSpectatedShipBoard().getCLIRepresentation();
 
         GameData gameData = CommonState.getGameData();
 

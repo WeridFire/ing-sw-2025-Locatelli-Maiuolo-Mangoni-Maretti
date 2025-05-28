@@ -123,11 +123,11 @@ public class AssembleCLIScreen extends CLIScreen {
     private CLIFrame getCLIRTimerInfo() {
         // frame for timer info
         CLIFrame result = new CLIFrame();
-        Integer timerSlot = AssembleState.getGameData().getAssemblyTimerSlotIndex();
+        Integer timerSlot = AssembleState.getTimerSlotIndex();
 
         if (timerSlot != null) {
             // words info
-            boolean isTimerRunning = AssembleState.getGameData().isAssemblyTimerRunning();
+            boolean isTimerRunning = AssembleState.isTimerRunning();
             result = result.merge(new CLIFrame(ANSI.BLACK + "The timer is"), Direction.SOUTH);
             if (!isTimerRunning) {
                 result = result.merge(new CLIFrame(ANSI.RED + "NOT"), Direction.SOUTH);
@@ -205,17 +205,15 @@ public class AssembleCLIScreen extends CLIScreen {
     @Override
     public CLIFrame getCLIRepresentation() {
         final int maxWidth = 100;
-        String spectatedPlayerUsername = AssembleState.getPlayer().getSpectating();
-        Player spectatedPlayer = AssembleState.getGameData().getPlayer(p ->
-                        p.getUsername().equals(spectatedPlayerUsername), AssembleState.getPlayer());
+        Player spectatedPlayer = AssembleState.getSpectatedPlayer();
 
         // frame for shipboard
         CLIFrame frameShipboard = spectatedPlayer.getShipBoard().getCLIRepresentation()
                 .paintForeground(ANSI.BLACK)
                 .merge(new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " "
-                                + (AssembleState.getPlayer().equals(spectatedPlayer)
-                                ? "YOUR"
-                                : spectatedPlayerUsername + "'s"
+                                + (AssembleState.isSpectatingOther()
+                                ? spectatedPlayer.getUsername() + "'s"
+                                : "YOUR"
                                 ) + " SHIP " + ANSI.RESET),
                         Direction.NORTH, 1);
 

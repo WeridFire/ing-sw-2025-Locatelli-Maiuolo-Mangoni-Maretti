@@ -2,6 +2,9 @@ package it.polimi.ingsw.controller.states;
 
 import it.polimi.ingsw.cards.CardsGroup;
 import it.polimi.ingsw.cards.exceptions.CardsGroupException;
+import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.gamePhases.AssembleGamePhase;
+import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
@@ -22,13 +25,26 @@ public class AssembleState extends CommonState {
         }
     }
 
-    public static ShipBoard getShipBoard() {
-        return getLastUpdate().getClientPlayer().getShipBoard();
-    }
-
     public static TileSkeleton getTileInHand() {
         updateTileInHand();
         return tileInHand;
+    }
+
+    public static boolean isSpectatingOther() {
+        return !getPlayer().getSpectating().equals(getPlayer().getUsername());
+    }
+    public static Player getSpectatedPlayer() {
+        String spectatedPlayerUsername = getPlayer().getSpectating();
+        return getGameData().getPlayer(p ->
+                p.getUsername().equals(spectatedPlayerUsername), getPlayer());
+    }
+
+    public static ShipBoard getSpectatedShipBoard() {
+        return getSpectatedPlayer().getShipBoard();
+    }
+
+    public static TileSkeleton[] getSpectatedReservedTiles() {
+        return getSpectatedPlayer().getReservedTiles().toArray(new TileSkeleton[0]);
     }
 
     public static boolean isEndedAssembly() {
@@ -65,13 +81,25 @@ public class AssembleState extends CommonState {
         return getGameData().getDeck().getGroupsAvailability();
     }
 
-    public static TileSkeleton[] getReservedTiles() {
-        return getPlayer().getReservedTiles().toArray(new TileSkeleton[0]);
-    }
-
     public static boolean isTileReserved(TileSkeleton tile) {
         if (tile == null) return false;
-        else return getPlayer().getReservedTiles().contains(tile)
+        return getPlayer().getReservedTiles().contains(tile)
                 || (getPlayer().isTileInHandFromReserved() && tile.equals(getPlayer().getTileInHand()));
+    }
+
+    public static boolean isTimerRunning() {
+        if (getGameData().getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE) {
+            return false;
+        }
+        // else: in assemble can cast current game phase
+        return ((AssembleGamePhase) getGameData().getCurrentGamePhase()).isTimerRunning();
+    }
+
+    public static Integer getTimerSlotIndex() {
+        if (getGameData().getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE) {
+            return null;
+        }
+        // else: in assemble can cast current game phase
+        return ((AssembleGamePhase) getGameData().getCurrentGamePhase()).getTimerSlotIndex();
     }
 }

@@ -111,6 +111,10 @@ public class ClientManager {
 
         try {
             latch.await();  // blocks until refresh happens
+            String error = getLastUpdate().popError();
+            if (error != null) {
+                view.showError("Server Error", error);
+            }
         } catch (InterruptedException e) {
             view.showError("Interrupted Exception", e.getMessage());
         }

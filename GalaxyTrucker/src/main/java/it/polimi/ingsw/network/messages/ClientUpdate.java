@@ -143,6 +143,12 @@ public class ClientUpdate implements Serializable {
 		return error;
 	}
 
+	public String popError() {
+		String e = error;
+		error = null;
+		return e;
+	}
+
 
 	public static void saveDebugUpdate(Object lastUpdate) {
 

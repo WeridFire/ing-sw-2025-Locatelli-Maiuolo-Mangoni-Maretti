@@ -573,22 +573,6 @@ public class GameData implements Serializable {
         ((AssembleGamePhase) getCurrentGamePhase()).notifyAllPlayersEndedAssembly();
     }
 
-    public boolean isAssemblyTimerRunning() {
-        if (getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE) {
-            return false;
-        }
-        // else: in assemble can cast current game phase
-        return ((AssembleGamePhase) getCurrentGamePhase()).isTimerRunning();
-    }
-
-    public Integer getAssemblyTimerSlotIndex() {
-        if (getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE) {
-            return null;
-        }
-        // else: in assemble can cast current game phase
-        return ((AssembleGamePhase) getCurrentGamePhase()).getAssemblyTimerSlotIndex();
-    }
-
     /**
      * Serializes the object instance into an UTF-8 encoded string.
      * @return

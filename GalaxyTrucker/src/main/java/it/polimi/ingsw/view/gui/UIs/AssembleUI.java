@@ -20,15 +20,6 @@ import java.util.Optional;
  */
 public class AssembleUI implements INodeRefreshableOnUpdateUI {
 
-    private static CardsGroup watchedCardsGroup;
-
-    public static CardsGroup getWatchedCardsGroup() {
-        return watchedCardsGroup;
-    }
-    public static void setWatchedCardsGroup(CardsGroup watchedCardsGroup) {
-        AssembleUI.watchedCardsGroup = watchedCardsGroup;
-    }
-
     public static AssembleUI instance;
 
     public static AssembleUI getInstance() {
@@ -36,7 +27,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
             instance = new AssembleUI();
         }
         return instance;
-    };
+    }
 
     // Define fixed dimensions for components
     private static final double TOP_SCROLL_PANE_HEIGHT = 200.0; // Fixed height for the scrollable area
@@ -89,7 +80,6 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         topScrollPane.setMinWidth(calculatedTopScrollPaneWidth);
         topScrollPane.setMaxWidth(calculatedTopScrollPaneWidth);
 
-
         mainGrid.add(topScrollPane, 0, 0);
         mainGrid.add(leftGrid, 0, 1);
         mainGrid.add(rightPane, 1, 1);
@@ -122,18 +112,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
      * Creates the ship grid. ShipGrid is responsible for its own fixed dimensions.
      */
     private ShipGrid createShipGrid() {
-        int rows = 0, cols = 0;
-        switch (LobbyState.getGameLevel()) {
-            case TESTFLIGHT, ONE -> {
-                rows = 5;
-                cols = 7;
-            }
-            case TWO -> {
-                rows = 6;
-                cols = 9;
-            }
-        }
-        return new ShipGrid(rows, cols);
+        return new ShipGrid(LobbyState.getGameLevel());
     }
 
     /**
@@ -156,7 +135,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
             });
         });
 
-        Button finishButton = new Button("Finish Timer");
+        Button finishButton = new Button("Finish Assembling");
         finishButton.setOnMouseClicked(event -> {
             Platform.runLater(() -> {
                 ClientManager.getInstance().simulateCommand("finish");
@@ -168,26 +147,26 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         decksAndTimerGrid.setSpacing(20);
         decksAndTimerGrid.setStyle("-fx-padding: 20;");
 
+        // start timer
+        timerComponent.start();
+
         return decksAndTimerGrid;
     }
 
-    public void showDeckOverlay(){
-        Optional<CardsGroup> cg = AssembleState.getCardGroupInHand();
-        if (cg.isPresent()) {
-            showDeckGrid = new ShowDeckGrid(cg.get());
-            showDeckGrid.setViewOrder(-1000);
-            root.getChildren().add(showDeckGrid);
+    private void refreshDeckOverlay(){
+        Optional<CardsGroup> cardsGroup = AssembleState.getCardGroupInHand();
+        if (cardsGroup.isPresent() == (showDeckGrid == null)) {
+            cardsGroup.ifPresentOrElse(cg -> {
+                showDeckGrid = new ShowDeckGrid(cg);
+                showDeckGrid.setViewOrder(-1000);
+                root.getChildren().add(showDeckGrid);
+            }, () -> {
+                showDeckGrid.getChildren().clear();
+                root.getChildren().remove(showDeckGrid);
+                showDeckGrid = null;
+            });
         }
     }
-
-    public void clearDeckOverlay(){
-        if ((showDeckGrid != null) && getWatchedCardsGroup()==null){
-            showDeckGrid.getChildren().clear();
-            root.getChildren().remove(showDeckGrid);
-        }
-    }
-
-
 
     /**
      * Returns the main layout for this UI.
@@ -204,11 +183,11 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     @Override
     public void refreshOnUpdate(ClientUpdate update) {
         Platform.runLater(() -> {
-            if (AssembleState.getGameData().isAssemblyTimerRunning() && !TimerComponent.getInstance().isRunning()) {
+            if (AssembleState.isTimerRunning() && !TimerComponent.getInstance().isRunning()) {
                 TimerComponent.getInstance().start();
             }
 
-            showDeckOverlay();
+            refreshDeckOverlay();
 
             if (uncoveredTilesGrid != null) {
                 uncoveredTilesGrid.update();

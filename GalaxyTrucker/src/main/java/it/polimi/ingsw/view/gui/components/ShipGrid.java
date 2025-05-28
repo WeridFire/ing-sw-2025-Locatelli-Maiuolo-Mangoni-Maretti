@@ -43,16 +43,17 @@ public class ShipGrid extends StackPane {
 
     /**
      * Creates a new ship grid display.
-     * The grid consists of a background image and a cell grid for tiles.
-     * The cell grid's dimensions are specified by rows and columns.
+     * The grid consists of a background image, a cell grid for tiles and two slots for reserved tiles.
+     * All the information are retrieved thanks to the played game level.
      *
-     * @param rows Number of rows in the cell grid.
-     * @param cols Number of columns in the cell grid.
+     * @param level The game level to create shipboard grid for.
      */
-    public ShipGrid(int rows, int cols) {
-        GameLevel level = LobbyState.getGameLevel();
+    public ShipGrid(GameLevel level) {
+        int rows, cols;
         switch (level) {
             case TESTFLIGHT, ONE -> {
+                rows = 5;
+                cols = 7;
                 offsetX = 37;
                 offsetY = 31;
                 gapX = 4;
@@ -61,6 +62,8 @@ public class ShipGrid extends StackPane {
                 reserveOffsetY = 22;
             }
             case TWO -> {
+                rows = 5;
+                cols = 7;
                 offsetX = 37;
                 offsetY = 31;
                 gapX = 4;
@@ -69,7 +72,11 @@ public class ShipGrid extends StackPane {
                 reserveOffsetY = 22;
             }
             default -> {
-                offsetX = offsetY = gapX = gapY = reserveOffsetX = reserveOffsetY = 0;
+                rows = cols
+                        = offsetX = offsetY
+                        = gapX = gapY
+                        = reserveOffsetX = reserveOffsetY
+                        = 0;
             }
         }
 
@@ -117,13 +124,9 @@ public class ShipGrid extends StackPane {
         // these are offsets to align visual grid coordinates with the logical ShipBoard coordinates
         int baseRow = 0, baseCol = 0;
         switch (level) {
-            case TESTFLIGHT, ONE -> {
+            case TESTFLIGHT, ONE, TWO -> {
                 baseRow = 5;
                 baseCol = 4;
-            }
-            case TWO -> {
-                baseRow = 4;
-                baseCol = 3;
             }
         }
 
@@ -158,11 +161,11 @@ public class ShipGrid extends StackPane {
 
     /**
      * Updates the visual representation of the grid based on the current state of the {@link ShipBoard}.
-     * It clears existing tiles and re-populates cells with tiles from the ShipBoard.
+     * It clears existing tiles and re-populates cells with tiles from the spectated ShipBoard.
      * Cell styles are also updated to reflect valid placement areas.
      */
     public void update() {
-        ShipBoard shipBoard = AssembleState.getShipBoard();
+        ShipBoard shipBoard = AssembleState.getSpectatedShipBoard();
         if (shipBoard == null) return;  // guard against null shipboard
 
         // tiles in ship
@@ -175,7 +178,7 @@ public class ShipGrid extends StackPane {
         }
 
         // reserved tiles
-        TileSkeleton[] reservedTiles = AssembleState.getReservedTiles();
+        TileSkeleton[] reservedTiles = AssembleState.getSpectatedReservedTiles();
         for (int i = 0; i < reserveSlots.length; i++) {
             reserveSlots[i].setTile((i < reservedTiles.length) ? reservedTiles[i] : null);
         }

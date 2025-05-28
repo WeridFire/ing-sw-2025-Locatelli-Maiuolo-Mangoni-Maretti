@@ -84,12 +84,7 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
 
                 clientManager.simulateCommand("join", uuid, username,
                         "--color", colorToggleGroup.getSelectedToggle().getUserData().toString());
-                String error = clientManager.getLastUpdate().getError();
-                if (error == null) {
-                    clientManager.updateScene(new LobbyUI(clientManager.getUsername()));
-                } else {
-                    AlertUtils.showError("Join Error", error);
-                }
+                clientManager.updateScene(new LobbyUI(clientManager.getUsername()));
 
             } else {
                 AlertUtils.showWarning("Empty UUID", "Please enter a valid game UUID.");
