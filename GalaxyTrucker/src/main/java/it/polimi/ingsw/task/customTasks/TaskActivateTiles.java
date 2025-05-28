@@ -24,7 +24,7 @@ public class TaskActivateTiles extends Task {
 
 	private final PowerType powerType;
 	private final Set<Coordinates> activatedTiles = new HashSet<>();
-	private final BiConsumer<Player, Set<Coordinates>> onFinish;
+	private BiConsumer<Player, Set<Coordinates>> onFinish;
 	private boolean hasCompletedTask;
 
 
@@ -170,5 +170,9 @@ public class TaskActivateTiles extends Task {
 
 		// Merge the content into the screen centered
 		return screenFrame.merge(frame, AnchorPoint.CENTER, AnchorPoint.CENTER);
+	}
+
+    public void setOnFinish(BiConsumer<Player, Set<Coordinates>> onFinish) {
+		this.onFinish = onFinish;
 	}
 }
