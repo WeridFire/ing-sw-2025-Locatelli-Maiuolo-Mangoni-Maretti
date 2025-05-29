@@ -24,11 +24,26 @@ public class StarDustCard extends Card{
 		super("STARDUST", textureName, level);
 	}
 
+	@Override
+	public void startCardBehaviour(GameData game){
+		playTask(game, game.getPlayersInFlight().getLast());
+	}
+
+	public void playTask(GameData game, Player player){
+		if(player == null){
+			//Processed all players. next phase
+			game.getCurrentGamePhase().endPhase();
+			return;
+		}
+		game.movePlayerBackward(player, countExposedConnectors(player));
+		playTask(game, game.getPreviousPlayerInFlight(player));
+	}
+
 	/**
 	 * Iterates each player in reverse, counts how many connectors each one has, and moves accordingly.
 	 *
 	 */
-	@Override
+	//@Override
 	public void playEffect(GameData game) {
 		for(Player p : game.getPlayersInFlight().reversed()){
 			int exposedConnectors = countExposedConnectors(p);
