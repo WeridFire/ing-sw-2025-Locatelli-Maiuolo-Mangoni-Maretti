@@ -43,6 +43,7 @@ public class MeteorSwarmCard extends Card {
 	/**
 	 * Iterates through each meteor. For each meteor, hits all the victims in the same way.
 	 */
+	//TODO: task that hits players
 	@Override
 	public void playEffect(GameData game) throws InterruptedException {
 		Random random = new Random();
@@ -73,6 +74,8 @@ public class MeteorSwarmCard extends Card {
 		}
 	}
 
+
+
 	public String[] dicesString(int dice1, int dice2){
 		String[] diceLines = {
 				"The ancients have rolled the dice of fate",
@@ -82,7 +85,22 @@ public class MeteorSwarmCard extends Card {
 				"Eternity has spoken in the language of dice",
 				"From the heavens, the roll echoes through time",
 				"The celestial hand has sealed your fate",
-				"In the great halls beyond, the dice have fallen"
+				"In the great halls beyond, the dice have fallen",
+				"The ancient sigmas have spoken, and no one is safe from them",
+				"BAZINGA",
+				"Holy moly, someone just rolled the dies",
+				"subemelaradio, esquececanzon",
+				"9/11 was an inside job",
+				"If he's invincible why can I see him?",
+				"That was fantastic! wait... say that again",
+				"Protocol 3, protect the pilot",
+				"Oh, man, I don't wanna die to this song.",
+				"AND DEY SAY Chivalry is dead",
+				"Jarvis, stroke it a lil",
+				"Jarvis, nuke that family of four",
+				"Jarvis, increase the gender pay gap",
+				"A really big fucking hole, coming right up",
+				"Sybau Prof. Sanpietro, sincerely"
 		};
 
 		int index = ThreadLocalRandom.current().nextInt(diceLines.length);
