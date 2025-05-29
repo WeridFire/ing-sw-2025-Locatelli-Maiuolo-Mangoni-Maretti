@@ -89,7 +89,6 @@ public class SmugglersCard extends EnemyCard {
 				LoadableType.GOODS_SET,
 				punishCargo,
 				(p) -> {
-
 				}
 		));
 	}

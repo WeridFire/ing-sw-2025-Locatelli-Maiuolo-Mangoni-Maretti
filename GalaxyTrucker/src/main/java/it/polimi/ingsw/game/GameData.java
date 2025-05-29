@@ -203,6 +203,10 @@ public class GameData implements Serializable {
         return getPlayerFlightIndex(player) == getPlayersInFlight().size() - 1;
     }
 
+    public boolean isFirstPlayerInFlight(Player player){
+        return getPlayerFlightIndex(player) == 0;
+    }
+
     /**
      * Gets the next player in flight order. RETURNS NULL if there is no other player.
      * @param player the current player, the one before the next one you will get.
@@ -216,6 +220,22 @@ public class GameData implements Serializable {
             throw new RuntimeException("Requested next player in flight but the current player is not in flight.");
         }
         return getPlayersInFlight().get(getPlayerFlightIndex(player)+1);
+    }
+
+    /**
+     * Gets the previous player in flight order. RETURNS NULL if there is no other player.
+     * Used for epidemic card
+     * @param player the current player, the one after the one you will get.
+     * @return The previous player in the flight order. Null if the parameter player was the first one.
+     */
+    public Player getPreviousPlayerInFlight(Player player){
+        if(isFirstPlayerInFlight(player)){
+            return null;
+        }
+        if(getPlayerFlightIndex(player) == -1){
+            throw new RuntimeException("Requested next player in flight but the current player is not in flight.");
+        }
+        return getPlayersInFlight().get(getPlayerFlightIndex(player)-1);
     }
 
     /**
