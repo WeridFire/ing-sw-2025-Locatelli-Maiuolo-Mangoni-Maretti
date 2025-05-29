@@ -52,7 +52,7 @@ public class EpidemicCard extends Card{
 
 	@Override
 	public void startCardBehaviour(GameData game){
-		playTask(game, game.getPlayersInFlight().getLast());
+		playTask(game, game.getPlayersInFlight().getFirst());
 	}
 
 	public void playTask(GameData game, Player player){
@@ -61,8 +61,13 @@ public class EpidemicCard extends Card{
 			game.getCurrentGamePhase().endPhase();
 			return;
 		}
-		game.movePlayerBackward(player, player.getShipBoard().getExposedConnectorsCount());
-		playTask(game, game.getPreviousPlayerInFlight(player));
+		VisitorEpidemic visitor = new VisitorEpidemic();
+		player.getShipBoard().getTilesOnBoard().values().forEach(tile -> {
+			tile.accept(visitor);
+		});
+		visitor.applyEpidemicEffect(player.getShipBoard().getTilesOnBoard());
+		playTask(game, game.getNextPlayerInFlight(player));
+
 	}
 
 	/**
