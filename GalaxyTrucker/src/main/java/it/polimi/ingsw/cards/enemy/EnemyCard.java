@@ -57,6 +57,18 @@ public abstract class EnemyCard extends Card {
     public abstract void applyPunishment(Player player, GameData game) ;
 
     /**
+     * New method using tasks
+     * @param player player on which the method is currently acting upon
+     */
+    public abstract void applyPunishmentTask(Player player, GameData game);
+
+    /**
+     * New method using tasks
+     * @param player player that is getting the loot
+     */
+     public abstract void givePrizeTask(Player player, GameData game);
+
+    /**
      *
      * @return this enemy firepower
      */
@@ -127,7 +139,7 @@ public abstract class EnemyCard extends Card {
                 totalFirePower += powerInfo.getBonus(totalFirePower);
 
                 if(totalFirePower > firePower){
-                    givePrize(player, game);
+                    givePrizeTask(player, game);
                     game.getCurrentGamePhase().endPhase();
                 }
                 else if(totalFirePower == firePower)
@@ -136,7 +148,8 @@ public abstract class EnemyCard extends Card {
                 }
                 else
                 {
-                    applyPunishment(player, game);
+                    //TODO: punishment pirati
+                    applyPunishmentTask(player, game);
                     playTask(game, game.getNextPlayerInFlight(player));
                 }
 

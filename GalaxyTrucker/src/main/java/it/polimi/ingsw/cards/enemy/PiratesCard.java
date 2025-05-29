@@ -9,9 +9,9 @@ import it.polimi.ingsw.playerInput.PIRUtils;
 import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
 import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
+import it.polimi.ingsw.task.customTasks.TaskYesNoChoice;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
-import it.polimi.ingsw.view.cli.CLIScreen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +37,29 @@ public class PiratesCard extends EnemyCard{
 
 	}
 
+    /**
+     * New givePrize method using tasks
+     * @param player the player who's getting the prize
+     * @param gameData current game data
+     */
+    @Override
+    public void givePrizeTask(Player player, GameData gameData)
+    {
+        gameData.getTaskStorage().addTask(new TaskYesNoChoice(
+                player.getUsername(),
+                30,
+                "You will receive " + prizeBounty +" credits, but you will lose "
+                        + getLostDays() + " days.",
+                false,
+                (p, choice) -> {
+                    if(TaskYesNoChoice.isChoiceYes(choice)){
+                        player.addCredits(prizeBounty);
+                        gameData.movePlayerBackward(player, getLostDays());
+                    }
+                }
+        ));
+    }
+
     @Override
     public void givePrize(Player player, GameData gameData) {
         PIRYesNoChoice pirYesOrNoChoice = new PIRYesNoChoice(player,
@@ -49,6 +72,11 @@ public class PiratesCard extends EnemyCard{
             player.addCredits(prizeBounty);
             gameData.movePlayerBackward(player, getLostDays());
         }
+    }
+
+    //TODO: implementare questo dopo il task che colpisce il giocatore
+    @Override
+    public void applyPunishmentTask(Player player, GameData game){
     }
 
     @Override

@@ -8,6 +8,9 @@ import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
 import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.task.customTasks.TaskAddLoadables;
+import it.polimi.ingsw.task.customTasks.TaskRemoveLoadables;
+import it.polimi.ingsw.task.customTasks.TaskYesNoChoice;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
@@ -38,6 +41,31 @@ public class SmugglersCard extends EnemyCard {
 	}
 
 	@Override
+	public void givePrizeTask(Player player, GameData game){
+		game.getTaskStorage().addTask(new TaskYesNoChoice(
+				player.getUsername(),
+				30,
+				"You will receive the following goods: " + prizeGoods + " but you will lose " + getLostDays() + " travel days.",
+				false,
+				(p, choice) -> {
+					if(TaskYesNoChoice.isChoiceYes(choice)){
+						addLoadablesTask(player, game);
+					}
+				}
+		));
+	}
+
+	public void addLoadablesTask(Player player, GameData game){
+		game.getTaskStorage().addTask(new TaskAddLoadables(
+				player.getUsername(),
+				30,
+				List.of(prizeGoods),
+				(p) -> {
+				}
+		));
+	}
+
+	@Override
 	public void givePrize(Player player, GameData game) {
 		PIRYesNoChoice pirYesOrNoChoice = new PIRYesNoChoice(player,
 				30,
@@ -49,6 +77,21 @@ public class SmugglersCard extends EnemyCard {
 			game.getPIRHandler().setAndRunTurn(pirAddLoadables);
 			game.movePlayerBackward(player, getLostDays());
 		}
+	}
+
+
+
+	@Override
+	public void applyPunishmentTask(Player player, GameData game){
+		game.getTaskStorage().addTask(new TaskRemoveLoadables(
+				player,
+				30,
+				LoadableType.GOODS_SET,
+				punishCargo,
+				(p) -> {
+
+				}
+		));
 	}
 
 	@Override

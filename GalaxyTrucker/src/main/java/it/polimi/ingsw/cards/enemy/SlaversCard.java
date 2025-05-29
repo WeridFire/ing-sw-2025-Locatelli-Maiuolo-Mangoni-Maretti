@@ -6,6 +6,8 @@ import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRRemoveLoadables;
 import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.task.customTasks.TaskRemoveLoadables;
+import it.polimi.ingsw.task.customTasks.TaskYesNoChoice;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
@@ -55,6 +57,24 @@ public class SlaversCard extends EnemyCard {
 		}
 	}
 
+	@Override
+	public void givePrizeTask(Player player, GameData game){
+
+		game.getTaskStorage().addTask(new TaskYesNoChoice(
+				player.getUsername(),
+				30,
+				"You will receive " + prizeBounty +" credits, but you will lose "
+						+ getLostDays() + " days.",
+				false,
+				(p, choice) -> {
+					if(TaskYesNoChoice.isChoiceYes(choice)){
+						player.addCredits(prizeBounty);
+						game.movePlayerBackward(player, getLostDays());
+					}
+				}
+		));
+	}
+
 	/**
 	 *
 	 * @param player player on which the method is currently acting upon
@@ -63,6 +83,24 @@ public class SlaversCard extends EnemyCard {
 	public void applyPunishment(Player player, GameData game) {
 		PIRRemoveLoadables pirRemoveLoadables = new PIRRemoveLoadables(player, 30, LoadableType.CREW_SET, punishCrewAmount);
 		game.getPIRHandler().setAndRunTurn(pirRemoveLoadables);
+	}
+
+	/**
+	 * New method for applying punishment using tasks
+	 * @param player player on which the method is currently acting upon
+	 * @param game the gamedata
+	 */
+	@Override
+	public void applyPunishmentTask(Player player, GameData game) {
+		game.getTaskStorage().addTask(new TaskRemoveLoadables(
+				player,
+				30,
+				LoadableType.CREW_SET,
+				punishCrewAmount,
+				(p) -> {
+
+				}
+		));
 	}
 
 	/**
