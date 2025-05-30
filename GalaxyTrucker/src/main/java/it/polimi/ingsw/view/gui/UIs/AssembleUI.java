@@ -3,11 +3,14 @@ package it.polimi.ingsw.view.gui.UIs;
 import it.polimi.ingsw.cards.CardsGroup;
 import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.LobbyState;
+import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.network.messages.ClientUpdate;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.gui.components.*;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
@@ -51,6 +54,8 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     private CoveredTilesPane rightPane;
     private VBox topRightVBox;
 
+    private BoardComponent boardComponent; // Field for BoardUI
+
     // Overlays
     private ShowDeckGrid showDeckGrid;
 
@@ -64,9 +69,8 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         mainGrid.setAlignment(Pos.CENTER);
 
         root = new StackPane();
-
         root.setAlignment(Pos.CENTER);
-        root.getChildren().addAll(mainGrid, getDragOverlay());
+        setAssembleLayout();
 
         // Initialize components
         leftGrid = createShipGrid();
@@ -84,6 +88,11 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         mainGrid.add(leftGrid, 0, 1);
         mainGrid.add(rightPane, 1, 1);
         mainGrid.add(topRightVBox, 1, 0);
+    }
+
+    public void setAssembleLayout(){
+        root.getChildren().clear();
+        root.getChildren().addAll(mainGrid, getDragOverlay());
     }
 
     /**
@@ -142,15 +151,43 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
             });
         });
 
-        decksAndTimerGrid.getChildren().addAll(timerComponent, decksComponent, flipButton, finishButton);
+        Button boardButton = getBoardButton();
+
+        decksAndTimerGrid.getChildren().addAll(timerComponent, decksComponent, flipButton, finishButton, boardButton);
 
         decksAndTimerGrid.setSpacing(20);
         decksAndTimerGrid.setStyle("-fx-padding: 20;");
 
         // start timer
-        timerComponent.start();
+        if (AssembleState.isTimerRunning()) {
+            timerComponent.start();
+        }
 
         return decksAndTimerGrid;
+    }
+
+    private Button getBoardButton() {
+        Button boardButton = new Button("Board");
+        boardButton.setOnMouseClicked(event -> {
+            boardComponent = new BoardComponent(
+                    Default.BOARD_ELLIPSE_RX,
+                    Default.BOARD_ELLIPSE_RY,
+                    LobbyState.getGameLevel() == GameLevel.TESTFLIGHT ?
+                            Default.ELLIPSE_TESTFLIGHT_STEPS : Default.ELLIPSE_ONE_STEPS
+            );
+
+            boardComponent.setPrefSize(getRoot().getWidth(), getRoot().getHeight());
+            boardComponent.setStyle("-fx-border-color: lightgray; -fx-border-width: 1;");
+            boardComponent.addPlayers();
+            if (boardComponent != null) {
+                // Replace the content of the root StackPane with the BoardComponent
+                root.getChildren().clear();
+                root.getChildren().add(boardComponent);
+                // Ensure the BoardComponent fills the StackPane
+                StackPane.setAlignment(boardComponent, Pos.CENTER);
+            }
+        });
+        return boardButton;
     }
 
     private void refreshDeckOverlay(){
@@ -185,6 +222,8 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         Platform.runLater(() -> {
             if (AssembleState.isTimerRunning() && !TimerComponent.getInstance().isRunning()) {
                 TimerComponent.getInstance().start();
+            } else if (!AssembleState.isTimerRunning() && TimerComponent.getInstance().isRunning()) {
+                TimerComponent.getInstance().stop();
             }
 
             refreshDeckOverlay();
