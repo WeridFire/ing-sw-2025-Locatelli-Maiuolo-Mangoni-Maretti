@@ -49,7 +49,9 @@ public class SmugglersCard extends EnemyCard {
 				false,
 				(p, choice) -> {
 					if(TaskYesNoChoice.isChoiceYes(choice)){
-						addLoadablesTask(player, game);
+						addLoadablesTask(p, game);
+					}else{
+						game.getCurrentGamePhase().endPhase();
 					}
 				}
 		));
@@ -61,42 +63,22 @@ public class SmugglersCard extends EnemyCard {
 				30,
 				List.of(prizeGoods),
 				(p) -> {
+					game.movePlayerBackward(p, getLostDays());
+					game.getCurrentGamePhase().endPhase();
 				}
 		));
 	}
-
-	@Override
-	public void givePrize(Player player, GameData game) {
-		PIRYesNoChoice pirYesOrNoChoice = new PIRYesNoChoice(player,
-				30,
-				"You will receive the following goods: " + prizeGoods + " but you will lose " + getLostDays() + " travel days.",
-				true);
-		boolean wantToAccept = game.getPIRHandler().setAndRunTurn(pirYesOrNoChoice);
-		if(wantToAccept){
-			PIRAddLoadables pirAddLoadables = new PIRAddLoadables(player, 30, Arrays.stream(prizeGoods).toList());
-			game.getPIRHandler().setAndRunTurn(pirAddLoadables);
-			game.movePlayerBackward(player, getLostDays());
-		}
-	}
-
 
 
 	@Override
 	public void applyPunishmentTask(Player player, GameData game){
-		game.getTaskStorage().addTask(new TaskRemoveLoadables(
-				player,
-				30,
-				LoadableType.GOODS_SET,
-				punishCargo,
-				(p) -> {
-				}
-		));
+		player.getShipBoard().loseBestGoods(this.punishCargo);
+		/**
+		 * Proceed to next player
+		 */
+		super.playTask(game, game.getNextPlayerInFlight(player));
 	}
 
-	@Override
-	public void applyPunishment(Player player, GameData game) {
-		player.getShipBoard().loseBestGoods(this.punishCargo);
-	}
 
 	/**
 	 * Generates a CLI representation of the implementing object.

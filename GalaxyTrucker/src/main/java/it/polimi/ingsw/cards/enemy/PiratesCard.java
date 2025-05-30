@@ -53,33 +53,22 @@ public class PiratesCard extends EnemyCard{
                 false,
                 (p, choice) -> {
                     if(TaskYesNoChoice.isChoiceYes(choice)){
-                        player.addCredits(prizeBounty);
-                        gameData.movePlayerBackward(player, getLostDays());
+                        p.addCredits(prizeBounty);
+                        gameData.movePlayerBackward(p, getLostDays());
                     }
+                    gameData.getCurrentGamePhase().endPhase();
                 }
         ));
     }
 
-    @Override
-    public void givePrize(Player player, GameData gameData) {
-        PIRYesNoChoice pirYesOrNoChoice = new PIRYesNoChoice(player,
-                                    30,
-                                "You will receive " + prizeBounty +" credits, but you will lose "
-                                             + getLostDays() + " days.",
-                                true);
-        boolean wantToAccept = gameData.getPIRHandler().setAndRunTurn(pirYesOrNoChoice);
-        if(wantToAccept){
-            player.addCredits(prizeBounty);
-            gameData.movePlayerBackward(player, getLostDays());
-        }
-    }
 
     //TODO: implementare questo dopo il task che colpisce il giocatore
     @Override
     public void applyPunishmentTask(Player player, GameData game){
+        //each leaf of the code branch must call super.playTask(game, game.getNextPlayerInFlight(p))
     }
 
-    @Override
+
     public void applyPunishment(Player player, GameData game) {
         for(Projectile proj : punishHits){
 
