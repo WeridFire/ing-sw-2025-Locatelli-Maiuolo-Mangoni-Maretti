@@ -31,12 +31,10 @@ public class EpidemicCard extends Card{
 		super("EPIDEMIC", textureName, level);
 	}
 
-	/**
-	 * For each player, iterates on all the tiles present in the shipboard. Then for each one it applies the check of
-	 * looking for adjacent tiles, to kill the passengers.
-	 */
-	//@Override
-	public void playEffect(GameData game) {
+
+
+	@Override
+	public void startCardBehaviour(GameData game){
 		VisitorEpidemic visitor = new VisitorEpidemic();
 
 		for (Player p : game.getPlayersInFlight()) {
@@ -48,26 +46,6 @@ public class EpidemicCard extends Card{
 
 			visitor.applyEpidemicEffect(board);
 		}
-	}
-
-	@Override
-	public void startCardBehaviour(GameData game){
-		playTask(game, game.getPlayersInFlight().getFirst());
-	}
-
-	public void playTask(GameData game, Player player){
-		if(player == null){
-			//Processed all players. next phase
-			game.getCurrentGamePhase().endPhase();
-			return;
-		}
-		VisitorEpidemic visitor = new VisitorEpidemic();
-		player.getShipBoard().getTilesOnBoard().values().forEach(tile -> {
-			tile.accept(visitor);
-		});
-		visitor.applyEpidemicEffect(player.getShipBoard().getTilesOnBoard());
-		playTask(game, game.getNextPlayerInFlight(player));
-
 	}
 
 	/**
