@@ -21,6 +21,17 @@ import java.util.*;
 import static it.polimi.ingsw.view.cli.CLIScreen.getScreenFrame;
 
 public class OpenSpaceCard extends Card{
+
+
+	private Player[] playersFlightOrder;
+
+	private Player getPlayer(int i){
+		if (i >= playersFlightOrder.length){
+			return null;
+		}
+		return playersFlightOrder[i];
+	}
+
 	/**
 	 * Instances a card.
 	 *
@@ -29,90 +40,82 @@ public class OpenSpaceCard extends Card{
 	 */
 	public OpenSpaceCard(String textureName, int level) {
 		super("OPEN SPACE", textureName, level);
+
 	}
 
-
-	/**
-	 * Iterates each player, requires how many thrust power they wanna use, and moves accordingly.
-	 */
-	//@Override
-	public void playEffect(GameData game) {
-		for(Player p : game.getPlayersInFlight()){
-			// here we just cast to int, but know for sure that the thrusters tiles won't return numbers with decimals.
-			int steps = (int) PIRUtils.runPlayerPowerTilesActivationInteraction(p, game, PowerType.THRUST);
-			if (steps < 1) {
-				// exit flight if no thrust power is given
-				p.requestEndFlight();
-			} else {
-				game.movePlayerForward(p, steps);
-			}
-		}
-	}
 
 	@Override
 	public void startCardBehaviour(GameData game) {
-		playTask(game,  game.getPlayersInFlight().getFirst());
+		this.playersFlightOrder = game.getPlayersInFlight().toArray(new Player[0]);
+		playTask(game,  0);
 	}
 
-	public void playTask(GameData game, Player player) {
+	public void movePlayerAndPlayNextTask(GameData game, int playerIdx, float activatedPower){
+		Player player = getPlayer(playerIdx);
+		if(player != null){
+			//this condition should always be satisfied
+
+
+			VisitorCalculatePowers.CalculatorPowerInfo powerInfo = player
+					.getShipBoard()
+					.getVisitorCalculatePowers()
+					.getInfoPower(PowerType.THRUST);
+
+			float totalFirePower = powerInfo.getBasePower() + activatedPower;
+			totalFirePower += powerInfo.getBonus(totalFirePower);
+			int steps = Math.round(totalFirePower);
+			game.movePlayerForward(player, steps);
+			playTask(game, playerIdx+1);
+		}
+
+
+	}
+
+	public void playTask(GameData game, int playerIdx) {
+		Player player = getPlayer(playerIdx);
+		/**
+		 * The flight order might change during the actual performance of the turn. Therefore we must first save in
+		 * an unmodifiable array the order of the flight at the start of the card, and then process it.
+		 */
+
 		if(player == null){
 			//The previous player was the last one. We end the gamephase.
 			game.getCurrentGamePhase().endPhase();
 			return;
 		}
 
-		TaskActivateTiles task = new TaskActivateTiles(
+		game.getTaskStorage().addTask(new TaskActivateTiles(
 				player.getUsername(),
 				30,
 				PowerType.THRUST,
 				(p, coordinatesSet) -> {
+					int batteriesAmount = coordinatesSet.size();
+					if(batteriesAmount <= 0f){
+						/**
+						 * No extra power, proceed.
+						 */
+						movePlayerAndPlayNextTask(game, playerIdx, 0f);
+						return;
+					}else{
+						game.getTaskStorage().addTask(new TaskRemoveLoadables(
+								p,
+								30,
+								Set.of(LoadableType.BATTERY),
+								batteriesAmount,
+								(p1) -> {
+									VisitorCalculatePowers.CalculatorPowerInfo powerInfo = player
+											.getShipBoard()
+											.getVisitorCalculatePowers()
+											.getInfoPower(PowerType.THRUST);
+									float activatedPower = (float) powerInfo.getLocationsToActivate().entrySet().stream()
+											.filter(entry -> coordinatesSet.contains(entry.getKey()))
+											.mapToDouble(Map.Entry::getValue)
+											.sum();
+									movePlayerAndPlayNextTask(game, playerIdx, activatedPower);
+								}));
+					}
 				}
-		);
-
-		task.setOnFinish((p, coordinatesSet) -> {
-			//After player has chosen which tiles to activate
-			try {
-
-				//activate tiles
-				task.activateTiles(p, coordinatesSet);
-
-				//remove batteries
-				game.getTaskStorage().addTask(new TaskRemoveLoadables(
-						p,
-						30,
-						Set.of(LoadableType.BATTERY),
-						coordinatesSet.size(),
-						(p1) -> {
-
-						}
-				));
-
-				//calculate total power (previously done by PIRs)
-				//moved it here since facing an enemy is the only instance of the game
-				//where it's needed to calculate the thrust
-				VisitorCalculatePowers.CalculatorPowerInfo powerInfo = player.getShipBoard().getVisitorCalculatePowers().getInfoPower(PowerType.THRUST);
-
-				//activated firepower
-				int totalThrustPower = (int) powerInfo.getLocationsToActivate().entrySet().stream()
-						.filter(entry -> coordinatesSet.contains(entry.getKey()))
-						.mapToDouble(Map.Entry::getValue)
-						.sum();
-
-				//add base firepower
-				totalThrustPower += (int) powerInfo.getBasePower();
-
-				//add bonus if purple alien is present
-				totalThrustPower += (int) powerInfo.getBonus(totalThrustPower);
-
-				game.movePlayerForward(player, totalThrustPower);
-
-			} catch (WrongPlayerTurnException | NotEnoughItemsException | TileNotAvailableException e) {
-				throw new RuntimeException(e);
-			}
-		});
-
-		game.getTaskStorage().addTask(task);
-		playTask(game, game.getNextPlayerInFlight(player));
+		));
 	}
 
 	/**
