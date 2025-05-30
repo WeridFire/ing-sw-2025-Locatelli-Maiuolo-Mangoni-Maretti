@@ -14,6 +14,7 @@ import java.util.UUID;
 import static it.polimi.ingsw.view.cli.CLIScreen.getScreenFrame;
 
 public class StarDustCard extends Card{
+
 	/**
 	 * Instances a card.
 	 *
@@ -26,34 +27,12 @@ public class StarDustCard extends Card{
 
 	@Override
 	public void startCardBehaviour(GameData game){
-		playTask(game, game.getPlayersInFlight().getLast());
-	}
-
-	public void playTask(GameData game, Player player){
-		if(player == null){
-			//Processed all players. next phase
-			game.getCurrentGamePhase().endPhase();
-			return;
-		}
-		game.movePlayerBackward(player, countExposedConnectors(player));
-		playTask(game, game.getPreviousPlayerInFlight(player));
-	}
-
-	/**
-	 * Iterates each player in reverse, counts how many connectors each one has, and moves accordingly.
-	 *
-	 */
-	//@Override
-	public void playEffect(GameData game) {
-		for(Player p : game.getPlayersInFlight().reversed()){
-			int exposedConnectors = countExposedConnectors(p);
+		game.getPlayersInFlight().reversed().forEach((p) -> {
+			int exposedConnectors = p.getShipBoard().getExposedConnectorsCount();
 			game.movePlayerBackward(p, exposedConnectors);
-		}
+		});
 	}
 
-	public int countExposedConnectors(Player player) {
-		return player.getShipBoard().getExposedConnectorsCount();
-	}
 
 	/**
 	 * Generates a CLI representation of the implementing object.
