@@ -10,6 +10,7 @@ import it.polimi.ingsw.playerInput.PIRUtils;
 import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
 import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
+import it.polimi.ingsw.task.customTasks.TaskDelay;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
@@ -29,6 +30,8 @@ public class MeteorSwarmCard extends Card {
 	 */
 	private final Projectile[] meteors;
 
+
+
 	/**
 	 * Instances a card.
 	 * @param meteors The list of meteors that will hit the players.
@@ -40,41 +43,55 @@ public class MeteorSwarmCard extends Card {
 		this.meteors = meteors;
 	}
 
-	/**
-	 * Iterates through each meteor. For each meteor, hits all the victims in the same way.
-	 */
-	//TODO: task that hits players
+
 	@Override
-	public void playEffect(GameData game) throws InterruptedException {
+	public void startCardBehaviour(GameData game) {
 		Random random = new Random();
+		int tmpDice1 = random.nextInt(6) + 1;
+		int tmpDice2 = random.nextInt(6) + 1;
+		//Restart the cycle with next meteor.
 
-		for(Projectile proj : meteors){
-			int dice1 = random.nextInt(6) + 1;
-			int dice2 = random.nextInt(6) + 1;
-
-			String[] dicesString = dicesString(dice1, dice2);
-
-			game.getPIRHandler().broadcastPIR(game.getPlayersInFlight(), (player, pirHandler) -> {
-				PIRDelay pirDelay = new PIRDelay(player, 6,
-                        Arrays.toString(dicesString),
-						getCLIRepresentation());
-				pirHandler.setAndRunTurn(pirDelay);
-			});
-
-			for(Player player : game.getPlayersInFlight()){
-				boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, game);
-				if(!defended){
-                    try {
-                        player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
-                    } catch (NoTileFoundException | OutOfBuildingAreaException e) {
-						throw new RuntimeException(e);  // should never happen -> runtime exception
-                    }
-                }
-			}
-		}
+		String[] dicesString = dicesString(tmpDice1, tmpDice2);
+		game.getTaskStorage().addTask(new TaskDelay(
+				null,
+				6,
+				Arrays.toString(dicesString),
+				getCLIRepresentation(),
+				(p) -> {
+					hitPlayerWithMeteor(game, game.getPlayersInFlight().getFirst(),
+							0, tmpDice1, tmpDice2);
+				}));
 	}
 
+	public void hitPlayerWithMeteor(GameData game, Player player, int meteorIdx, int dice1, int dice2){
+		if(meteorIdx >= meteors.length){
+			game.getCurrentGamePhase().endPhase();
+			return;
+		}
 
+		if(player == null){
+			Random random = new Random();
+			int tmpDice1 = random.nextInt(6) + 1;
+			int tmpDice2 = random.nextInt(6) + 1;
+			//Restart the cycle with next meteor.
+
+			String[] dicesString = dicesString(tmpDice1, tmpDice2);
+			game.getTaskStorage().addTask(new TaskDelay(
+					null,
+					6,
+					Arrays.toString(dicesString),
+					getCLIRepresentation(),
+					(p) -> {
+						//first player, next meteor
+						hitPlayerWithMeteor(game, game.getPlayersInFlight().getFirst(), meteorIdx+1, tmpDice1, tmpDice2);
+				}));
+			return;
+		}
+
+		//TODO: RUN INTERACTION FOR DEFENDING
+		// THEN CALL hitPlayerWithMeteor(game, nextPlayer, meteorIdx, dice1, dice2) (same meteor, next index)
+
+	}
 
 	public String[] dicesString(int dice1, int dice2){
 		String[] diceLines = {
