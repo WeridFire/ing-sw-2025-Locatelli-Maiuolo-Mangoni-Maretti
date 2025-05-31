@@ -70,7 +70,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
 
         root = new StackPane();
         root.setAlignment(Pos.CENTER);
-        setAssembleLayout();
+        root.getChildren().addAll(mainGrid, getDragOverlay());
 
         // Initialize components
         leftGrid = createShipGrid();
@@ -91,8 +91,15 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     }
 
     public void setAssembleLayout(){
-        root.getChildren().clear();
-        root.getChildren().addAll(mainGrid, getDragOverlay());
+        for (Node node : mainGrid.getChildren()) {
+            node.setVisible(true);
+        }
+    }
+
+    public void hideAssembleLayout(){
+        for (Node node : mainGrid.getChildren()) {
+            node.setVisible(false);
+        }
     }
 
     /**
@@ -134,7 +141,11 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     private VBox createDecksAndTimerGrid(){
         VBox decksAndTimerGrid = new VBox();
 
-        DecksComponent decksComponent = new DecksComponent();
+        DecksComponent decksComponent = null;
+        if (LobbyState.getGameLevel() != GameLevel.TESTFLIGHT){
+            decksComponent = new DecksComponent();
+        }
+
         TimerComponent timerComponent = TimerComponent.getInstance();
 
         Button flipButton = new Button("Flip Timer");
@@ -169,23 +180,23 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     private Button getBoardButton() {
         Button boardButton = new Button("Board");
         boardButton.setOnMouseClicked(event -> {
-            boardComponent = new BoardComponent(
-                    Default.BOARD_ELLIPSE_RX,
-                    Default.BOARD_ELLIPSE_RY,
-                    LobbyState.getGameLevel() == GameLevel.TESTFLIGHT ?
-                            Default.ELLIPSE_TESTFLIGHT_STEPS : Default.ELLIPSE_ONE_STEPS
-            );
-
-            boardComponent.setPrefSize(getRoot().getWidth(), getRoot().getHeight());
-            boardComponent.setStyle("-fx-border-color: lightgray; -fx-border-width: 1;");
-            boardComponent.addPlayers();
-            if (boardComponent != null) {
-                // Replace the content of the root StackPane with the BoardComponent
-                root.getChildren().clear();
+            if (boardComponent == null) {
+                boardComponent = new BoardComponent(
+                        Default.BOARD_ELLIPSE_RX,
+                        Default.BOARD_ELLIPSE_RY,
+                        LobbyState.getGameLevel() == GameLevel.TESTFLIGHT ?
+                                Default.ELLIPSE_TESTFLIGHT_STEPS : Default.ELLIPSE_ONE_STEPS
+                );
+                boardComponent.setPrefSize(getRoot().getWidth(), getRoot().getHeight());
+                boardComponent.setStyle("-fx-border-color: lightgray; -fx-border-width: 1;");
+                boardComponent.addPlayers();
+                this.hideAssembleLayout();
                 root.getChildren().add(boardComponent);
-                // Ensure the BoardComponent fills the StackPane
                 StackPane.setAlignment(boardComponent, Pos.CENTER);
+            }else{
+                boardComponent.setVisible(true);
             }
+
         });
         return boardButton;
     }

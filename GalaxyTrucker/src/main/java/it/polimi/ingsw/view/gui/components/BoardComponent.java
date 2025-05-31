@@ -97,8 +97,11 @@ public class BoardComponent extends VBox {
 
         boardDisplayPane = new StackPane();
 
-        Button backButton = new Button("Action Button");
-        backButton.setOnAction(e -> AssembleUI.getInstance().setAssembleLayout());
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> {
+            AssembleUI.getInstance().getRoot().getChildren().remove(this);
+            AssembleUI.getInstance().setAssembleLayout();
+        });
 
         this.getChildren().addAll(boardDisplayPane, backButton);
         this.setSpacing(200);
