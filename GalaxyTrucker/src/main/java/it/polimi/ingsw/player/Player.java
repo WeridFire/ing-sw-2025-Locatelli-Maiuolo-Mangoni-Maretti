@@ -193,7 +193,7 @@ public class Player implements Serializable {
      * e.g. the caller may want to remove the coordinates associated internally to the tile.
      * @param lostTile the tile lost during flight.
      */
-    public void setLostTile(TileSkeleton lostTile) {
+    public void addLostTile(TileSkeleton lostTile) {
         lostTiles.add(lostTile);
     }
 
@@ -486,12 +486,12 @@ public class Player implements Serializable {
 
         // if tile in hand is reserved: add to the list of lost tiles
         if ((tileInHand != null) && isTileInHandFromReserved) {
-            setLostTile(tileInHand);
+            addLostTile(tileInHand);
         }
         removeTileFromHand();
         // all the reserved tiles in lost tiles
         for (TileSkeleton reservedTile : reservedTiles) {
-            setLostTile(reservedTile);
+            addLostTile(reservedTile);
         }
         reservedTiles.clear();
         // clears card group in hand reference
