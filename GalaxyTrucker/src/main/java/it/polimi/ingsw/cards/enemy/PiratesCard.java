@@ -98,14 +98,17 @@ public class PiratesCard extends EnemyCard{
                             (pl, defended) -> {
                                 //After projectile interactions are performed (whether the player wants to defend or no)
                                 if(!defended){
-									try {
-                                        //TODO: integrity checks in here
-										player.getShipBoard().hit(
-                                                currentProjectile.getDirection(),
-                                                currentProjectile.getCoord());
-									} catch (NoTileFoundException | OutOfBuildingAreaException e) {
-										throw new RuntimeException(e);
-									}
+                                    //we pre-calculate the next player because the hit may change the order of players
+                                    //in flight (for example player gets killed out of the flight)
+                                    Player nextPlayer = game.getNextPlayerInFlight(pl);
+                                    player.getShipBoard().hit(
+                                            currentProjectile.getDirection(),
+                                            currentProjectile.getCoord(),
+                                            pl,
+                                            (p1) -> {
+                                                this.playTask(game, nextPlayer);
+                                            }
+                                    );
 								}else{
                                     this.playTask(game, game.getNextPlayerInFlight(pl));
                                 }
