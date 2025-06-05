@@ -26,15 +26,20 @@ public class TaskMultipleChoice extends Task {
 	private final BiConsumer<Player, Integer> onFinish;
 
 
-	public TaskMultipleChoice(String currentPlayer, int cooldown, String message,
+	public TaskMultipleChoice(String currentPlayer, int cooldown, String message, CLIFrame toShow,
 							  String[] possibleOptions, int defaultChoice, BiConsumer<Player, Integer> onFinish) {
 		super(currentPlayer, cooldown, TaskType.CHOICE);
 		this.possibleOptions = possibleOptions;
 		this.choiceMessage = message;
-		this.optionalFrame = null;
+		this.optionalFrame = toShow;
 		this.choice = defaultChoice;
 		this.choiceSelectionCompleted = false;
 		this.onFinish = onFinish;
+	}
+
+	public TaskMultipleChoice(String currentPlayer, int cooldown, String message,
+							  String[] possibleOptions, int defaultChoice, BiConsumer<Player, Integer> onFinish) {
+		this(currentPlayer, cooldown, message, null, possibleOptions, defaultChoice, onFinish);
 	}
 
 
