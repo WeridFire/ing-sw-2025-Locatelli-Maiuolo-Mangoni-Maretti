@@ -13,6 +13,7 @@ import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.LobbyGamePhase;
 import it.polimi.ingsw.gamePhases.ScoreScreenGamePhase;
 import it.polimi.ingsw.gamePhases.exceptions.IllegalStartingPositionIndexException;
+import it.polimi.ingsw.integrity.ShipIntegrityListener;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
@@ -120,11 +121,7 @@ public class Game {
 
         AssembleGamePhase assemble = new AssembleGamePhase(gameData, () -> {
             // notify all players about the new game state with an expired timer
-            try {
-                GameServer.getInstance().broadcastUpdate(this);
-            } catch (RemoteException e) {
-                // ignore exception since there is no other way to notify the players
-            }
+            GameServer.getInstance().broadcastUpdate(this);
         });
         getGameData().setCurrentGamePhase(assemble);
 
@@ -287,7 +284,7 @@ public class Game {
 
         for (Player player : gameData.getPlayers()) {
             ShipBoard shipBoard = ShipBoard.create(gameData.getLevel(), player.getColor());
-            shipBoard.attachIntegrityListener(new PIRUtils.ShipIntegrityListener(player, this));
+            shipBoard.attachIntegrityListener(new ShipIntegrityListener(player, this));
             player.setShipBoard(shipBoard);
         }
     }
