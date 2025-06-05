@@ -26,6 +26,7 @@ import it.polimi.ingsw.view.cli.ICLIPrintable;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class ShipBoard implements ICLIPrintable, Serializable {
 
@@ -98,14 +99,14 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 * <p>
 	 * This method recomputes all cargo, powers, shielded sides, and structural integrity
 	 * by resetting and reapplying visitors to each tile.
-	 * If any integrity problem is detected, registered listeners are notified.
+	 * Returns the current integrity problem for the shipboard (which may also be not problematic)
 	 * <p>
 	 * Typically called after initialization or after structural modifications such as removing tiles.
 	 */
-	public void validateStructure() {
+	public IntegrityProblem validateStructure() {
 		countExposedConnectors = null;
 		resetVisitors();
-		notifyIntegrityListeners(visitorCheckIntegrity.getProblem(!filled));
+		return visitorCheckIntegrity.getProblem(!filled);
 	}
 
 	@JsonIgnore
@@ -156,10 +157,9 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 *
 	 * @param integrityProblem the integrity problem that occurred; must not be {@code null}
 	 */
-	private void notifyIntegrityListeners(IntegrityProblem integrityProblem) {
-		for (IShipIntegrityListener listener : integrityListeners) {
-			listener.update(integrityProblem);
-		}
+	private void notifyIntegrityListeners(IntegrityProblem integrityProblem, Consumer<Player> postCheck) {
+		//TODO: swap integrityListeners with a single listener instead of a list.
+		integrityListeners.getFirst().update(integrityProblem, postCheck);
 	}
 
 
@@ -352,7 +352,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 * @throws OutOfBuildingAreaException If the specified coordinates are outside the valid building area.
 	 * @throws NoTileFoundException If there is no tile at the given coordinates.
 	 */
-	private void removeTile(Coordinates coordinates) throws OutOfBuildingAreaException, NoTileFoundException {
+	private IntegrityProblem removeTile(Coordinates coordinates) throws OutOfBuildingAreaException, NoTileFoundException {
 		// Check if the coordinates are within the valid board area
 		if (!BoardCoordinates.isOnBoard(level, coordinates)) {
 			throw new OutOfBuildingAreaException(level, coordinates);
@@ -365,7 +365,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 
 		// Remove the tile and revalidate structure
 		board.remove(coordinates);
-		validateStructure();
+		return validateStructure();
 	}
 
     /**
@@ -412,13 +412,22 @@ public class ShipBoard implements ICLIPrintable, Serializable {
      * @throws OutOfBuildingAreaException If the given coordinate value does not represent
      * a valid row or column for the board.
      */
-    public void hit(Direction direction, int coordinate) throws NoTileFoundException, OutOfBuildingAreaException {
+    public void hit(Direction direction, int coordinate, Player player, Consumer<Player> postHit)  {
         Coordinates coordinates = getFirstTileLocation(direction, coordinate);
         if (coordinates == null) {
-            throw new NoTileFoundException("Attempt to hit the shipboard from non-valid direction (" +
+            throw new RuntimeException("Attempt to hit the shipboard from non-valid direction (" +
                     direction + ") & coordinate (" + coordinate + ")");
         } else {
-            removeTile(coordinates);
+
+			IntegrityProblem p = null;
+			try {
+				p = removeTile(coordinates);
+			} catch (OutOfBuildingAreaException | NoTileFoundException e) {
+				throw new RuntimeException(e);
+			}
+			if(p.isProblem()){
+				notifyIntegrityListeners(p, postHit);
+			}
         }
     }
 
