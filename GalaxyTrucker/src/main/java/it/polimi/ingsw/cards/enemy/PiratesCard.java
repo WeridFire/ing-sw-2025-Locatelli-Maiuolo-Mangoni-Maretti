@@ -3,12 +3,14 @@ package it.polimi.ingsw.cards.enemy;
 import it.polimi.ingsw.cards.projectile.Projectile;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.integrity.PlayerProjectileDefendUtils;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.playerInput.PIRUtils;
 import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
 import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
+import it.polimi.ingsw.task.customTasks.TaskMultipleChoice;
 import it.polimi.ingsw.task.customTasks.TaskYesNoChoice;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
@@ -65,31 +67,52 @@ public class PiratesCard extends EnemyCard{
     //TODO: implementare questo dopo il task che colpisce il giocatore
     @Override
     public void applyPunishmentTask(Player player, GameData game){
+        handleProjectile(player, game, 0);
         //each leaf of the code branch must call super.playTask(game, game.getNextPlayerInFlight(p))
     }
 
 
-    public void applyPunishment(Player player, GameData game) {
-        for(Projectile proj : punishHits){
-
-            game.getPIRHandler().setAndRunTurn(new PIRMultipleChoice(
-                    player,
-                    30,
-                    "Do you want to roll the dice?",
-					new String[]{"Yes"},
-                    0
-            ));
-
-            proj.roll2D6();
-            boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, game);
-            if(!defended){
-                try {
-                    player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
-                } catch (NoTileFoundException | OutOfBuildingAreaException e) {
-                    throw new RuntimeException(e);  // should never happen -> runtime exception
-                }
-            }
+    public void handleProjectile(Player player, GameData game, int projIdx){
+        Projectile proj = null;
+        if(projIdx >= 0 && projIdx < punishHits.length){
+            proj = punishHits[projIdx];
         }
+        if(proj == null){
+            //We have finished all the hits of the player. Proceed to next.
+            this.playTask(game, game.getNextPlayerInFlight(player));
+            return;
+        }
+        Projectile currentProjectile = proj;
+        game.getTaskStorage().addTask(new TaskMultipleChoice(
+                player.getUsername(),
+                30,
+                "Do you want to roll the dice?",
+                new String[]{"Yes"},
+                0,
+                (p, c) -> {
+                    currentProjectile.roll2D6();
+                    PlayerProjectileDefendUtils.runPlayerProjectileDefendRequest(
+                            player,
+                            currentProjectile,
+                            game,
+                            (pl, defended) -> {
+                                //After projectile interactions are performed (whether the player wants to defend or no)
+                                if(!defended){
+									try {
+                                        //TODO: integrity checks in here
+										player.getShipBoard().hit(
+                                                currentProjectile.getDirection(),
+                                                currentProjectile.getCoord());
+									} catch (NoTileFoundException | OutOfBuildingAreaException e) {
+										throw new RuntimeException(e);
+									}
+								}else{
+                                    this.playTask(game, game.getNextPlayerInFlight(pl));
+                                }
+                            }
+                    );
+                }
+        ));
     }
 
     /**
