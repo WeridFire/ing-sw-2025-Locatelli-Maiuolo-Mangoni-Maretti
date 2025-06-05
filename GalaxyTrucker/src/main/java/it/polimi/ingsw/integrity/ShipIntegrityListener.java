@@ -4,10 +4,6 @@ import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PIRs.PIRAtomicSequence;
-import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
-import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
-import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.TileCluster;
 import it.polimi.ingsw.shipboard.integrity.IShipIntegrityListener;
@@ -50,7 +46,14 @@ public class ShipIntegrityListener implements IShipIntegrityListener {
 		player.addLostTile(lostTile);
 	}
 
-	private void manageIntegrityProblemClustersToRemove(Set<TileCluster> clustersToRemove, BiConsumer<Player, Boolean> afterChoice) {
+	/**
+	 * This method notifies the player about the clusters that CANNOT be saved. All the clusters in this list
+	 * will be removed without any choice by the player. The only task used in here is to let the player know about
+	 * these clusters.
+	 * @param clustersToRemove The clusters that have to be removed
+	 * @param afterChoice What to do after the task is finished.
+	 */
+	private void notifyNonSaveableClusters(Set<TileCluster> clustersToRemove, BiConsumer<Player, Boolean> afterChoice) {
 		Set<Coordinates> maskTilesToRemove = clustersToRemove.stream()
 				.flatMap(cluster -> cluster.getTiles().stream())
 				.map(TileSkeleton::forceGetCoordinates)
@@ -77,7 +80,13 @@ public class ShipIntegrityListener implements IShipIntegrityListener {
 		);
 	}
 
-	private void manageIntegrityProblemClustersToKeep(List<TileCluster> clustersToKeep, BiConsumer<Player, Boolean> afterChoice) {
+	/**
+	 * This method notifies the player abut the clusters that may be saved. In this case, a choice is set for the player,
+	 * which will select which cluster to maintain.
+	 * @param clustersToKeep The clusters to choose to keep
+	 * @param afterChoice What to do after the choce.
+	 */
+	private void selectClustersToSave(List<TileCluster> clustersToKeep, BiConsumer<Player, Boolean> afterChoice) {
 		// different behavior based on clustersToKeep size
 		// if 0 -> end of flight
 		// if >= 2 -> player need to chose which one to keep
@@ -142,8 +151,6 @@ public class ShipIntegrityListener implements IShipIntegrityListener {
 	}
 
 	private void manageIntegrityProblem(IntegrityProblem integrityProblem, Consumer<Player> postCheck) {
-
-
 		game.getGameData().getTaskStorage().addTask(
 				new TaskDelay(
 						player.getUsername(),
@@ -151,31 +158,39 @@ public class ShipIntegrityListener implements IShipIntegrityListener {
 				"Unfortunately, your Ship has some integrity problems...",
 						null,
 						(p) -> {
-							manageIntegrityProblemClustersToRemove(
+							notifyNonSaveableClusters(
 									integrityProblem.getClustersToRemove(),
 									(p1, revalidate) -> {
 										if(revalidate){
+											//it means that the ship has to be re-validated.
+											// The operation has to start
+											//from scratch with the new integrity problem. We do not
+											//proceed handling the current integrity problem because
+											//it will probably be shadowed by the new one.
 											IntegrityProblem pb = playerShip.validateStructure();
 											this.update(pb, postCheck);
 											return;
 										}
 
-										manageIntegrityProblemClustersToKeep(
+										selectClustersToSave(
 												integrityProblem.getClustersToKeep(),
 												(p2, revalidate1) -> {
 													if(revalidate1){
+														//it means that the ship has to be re-validated.
+														// The operation has to start
+														//from scratch with the new integrity problem. We do not
+														//proceed handling the current integrity problem because
+														//it will probably be shadowed by the new one.
 														IntegrityProblem pb = playerShip.validateStructure();
 														this.update(pb, postCheck);
 														return;
 													}
 													notifyEndOfIntegrityProblem(postCheck);
-
 												}
 										);
 									}
 							);
 						}));
-
 	}
 
 	private void notifyEndOfIntegrityProblem(Consumer<Player> postCheck) {
@@ -189,8 +204,6 @@ public class ShipIntegrityListener implements IShipIntegrityListener {
 			postCheck.accept(player);
 			return;
 		}
-
-
 		if (playerShip == null) {
 			playerShip = player.getShipBoard();
 		}
