@@ -141,11 +141,6 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     private VBox createDecksAndTimerGrid(){
         VBox decksAndTimerGrid = new VBox();
 
-        DecksComponent decksComponent = null;
-        if (LobbyState.getGameLevel() != GameLevel.TESTFLIGHT){
-            decksComponent = new DecksComponent();
-        }
-
         TimerComponent timerComponent = TimerComponent.getInstance();
 
         Button flipButton = new Button("Flip Timer");
@@ -164,7 +159,12 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
 
         Button boardButton = getBoardButton();
 
-        decksAndTimerGrid.getChildren().addAll(timerComponent, decksComponent, flipButton, finishButton, boardButton);
+        decksAndTimerGrid.getChildren().addAll(timerComponent, flipButton, finishButton, boardButton);
+
+        if (LobbyState.getGameLevel() != GameLevel.TESTFLIGHT){
+            DecksComponent decksComponent = new DecksComponent();
+            decksAndTimerGrid.getChildren().add(decksComponent);
+        }
 
         decksAndTimerGrid.setSpacing(20);
         decksAndTimerGrid.setStyle("-fx-padding: 20;");
