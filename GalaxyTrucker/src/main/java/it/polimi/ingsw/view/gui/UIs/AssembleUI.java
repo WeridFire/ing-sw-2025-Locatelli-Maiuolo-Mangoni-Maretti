@@ -194,6 +194,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
                 root.getChildren().add(boardComponent);
                 StackPane.setAlignment(boardComponent, Pos.CENTER);
             }else{
+                boardComponent.addPlayers();
                 boardComponent.setVisible(true);
             }
 

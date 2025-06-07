@@ -152,7 +152,7 @@ public class BoardComponent extends VBox {
      */
     private void updateEllipseParametersAndPositions() {
         if (boardDisplayPane.getWidth() > 0 && boardDisplayPane.getHeight() > 0) {
-            this.ellipseCenterX = boardDisplayPane.getWidth() / 2 - 5;
+            this.ellipseCenterX = boardDisplayPane.getWidth() / 2 - 30;
             this.ellipseCenterY = boardDisplayPane.getHeight() / 2;
             calculateEllipseStepPositions();
             drawOrUpdateEllipseVisuals();
@@ -295,7 +295,7 @@ public class BoardComponent extends VBox {
         if (ellipseRx > 1e-6 || ellipseRy > 1e-6) {
             visualEllipse = new Ellipse(ellipseCenterX, ellipseCenterY, ellipseRx, ellipseRy);
             visualEllipse.setFill(null);
-            // visualEllipse.setStroke(Color.DIMGRAY); // Optional: Visual cue for the ellipse path
+            // visualEllipse.setStroke(Color.DIMGRAY);
             // visualEllipse.setStrokeWidth(0.7);
             boardDisplayPane.getChildren().add(0, visualEllipse);
         } else {
@@ -454,15 +454,15 @@ public class BoardComponent extends VBox {
      * Ships are distributed around the ellipse.
      */
     public void addPlayers() {
-        int i = 0;
         int SHIP_WIDTH = 20;
         int SHIP_HEIGHT = 20;
         if (LobbyState.getGameData() != null && LobbyState.getGameData().getPlayers() != null) {
             for (Player p : LobbyState.getGameData().getPlayers()) {
                 Rectangle r = new Rectangle(SHIP_WIDTH, SHIP_HEIGHT);
                 r.setFill(Paint.valueOf(p.getColor().toString()));
-                addShapeToEllipse(r, i % numberOfEllipseSteps, p);
-                i += 1;
+                if(p.getPosition() != null) {
+                    addShapeToEllipse(r, (p.getPosition()+11) % numberOfEllipseSteps, p);
+                }
             }
         } else {
             System.err.println("GameData or Players list is null, cannot add player shapes.");
