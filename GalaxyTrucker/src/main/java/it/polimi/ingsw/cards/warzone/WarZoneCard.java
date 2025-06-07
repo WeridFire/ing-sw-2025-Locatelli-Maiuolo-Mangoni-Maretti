@@ -23,18 +23,38 @@ public class WarZoneCard extends Card {
 		this.warLevels = warLevels;
 	}
 
-	/**
-	 * Iterates each single war level. For each one selects the worst player. Punishes that player.
-	 */
 	@Override
-	public void playEffect(GameData game) {
-		for(WarLevel wl : warLevels){
-			Player p = wl.getWorstPlayer(game);
-			if(p != null){
-				wl.applyPunishment(p, game);
-			}
-		}
+	public void startCardBehaviour(GameData game) {
+		playWarZonePunishment(game, 0);
 	}
+
+
+	public void playWarZonePunishment(GameData game, int idx){
+		WarLevel wl = null;
+		if(idx >= 0 && idx < warLevels.length){
+			wl = warLevels[idx];
+		}
+		if(wl == null){
+			//we have finished all the war zones.
+			game.getCurrentGamePhase().endPhase();
+			return;
+		}
+		WarLevel finalWarLevel = wl;
+		finalWarLevel.getWorstPlayer(
+				game,
+				(worstPlayer) -> {
+					finalWarLevel.applyPunishment(
+							worstPlayer,
+							game,
+							(p) -> {
+								//proceed with the next warzone punishment.
+								playWarZonePunishment(game, idx+1);
+							});
+				}
+			);
+
+	}
+
 
 	/**
 	 * Generates a CLI representation of the implementing object.
