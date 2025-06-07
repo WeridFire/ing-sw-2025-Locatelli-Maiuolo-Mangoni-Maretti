@@ -76,7 +76,7 @@ public class SlaversCard extends EnemyCard {
 				LoadableType.CREW_SET,
 				punishCrewAmount,
 				(p) -> {
-					super.playTask(game, game.getNextPlayerInFlight(p));
+					playTask(game, game.getNextPlayerInFlight(p));
 				}
 		));
 	}
