@@ -2,6 +2,11 @@ package it.polimi.ingsw.cards.warzone;
 
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.task.customTasks.TaskRemoveLoadables;
+
+import java.util.Set;
+import java.util.function.Consumer;
 
 public class WarPunishmentCrewDeath implements WarPunishment {
 
@@ -12,7 +17,15 @@ public class WarPunishmentCrewDeath implements WarPunishment {
     }
 
     @Override
-    public void apply(Player player, GameData gameData) {
-        // TODO: implement method so that it asks the player where they wants their crew to be removed.
+    public void apply(Player player, GameData gameData, Consumer<Player> onFinish) {
+        gameData.getTaskStorage().addTask(
+                new TaskRemoveLoadables(
+                        player,
+                        30,
+                        LoadableType.CREW_SET,
+                        crewAmount,
+						onFinish
+                )
+        );
     }
 }
