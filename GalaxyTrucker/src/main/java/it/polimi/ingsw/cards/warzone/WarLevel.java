@@ -4,6 +4,7 @@ import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 
 import java.io.Serializable;
+import java.util.function.Consumer;
 
 public class WarLevel implements Serializable {
 
@@ -32,16 +33,15 @@ public class WarLevel implements Serializable {
 	 * of the instance
 	 * @return
 	 */
-	public Player getWorstPlayer(GameData game) {
-		return game.getPlayersInFlight().stream()
-				.min(warCriteria).orElse(null);
+	public void getWorstPlayer(GameData game, Consumer<Player> onSelected) {
+		warCriteria.computeCriteria(game, onSelected);
 	}
 
 	/**
 	 * Applies the punishment associated to this war level to a player.
 	 * @param p
 	 */
-	public void applyPunishment(Player p, GameData game) {
-		warPunishment.apply(p, game);
+	public void applyPunishment(Player p, GameData game, Consumer<Player> onFinish) {
+		warPunishment.apply(p, game, onFinish);
 	}
 }
