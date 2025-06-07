@@ -63,12 +63,9 @@ public class PiratesCard extends EnemyCard{
         ));
     }
 
-
-    //TODO: implementare questo dopo il task che colpisce il giocatore
     @Override
     public void applyPunishmentTask(Player player, GameData game){
         handleProjectile(player, game, 0);
-        //each leaf of the code branch must call super.playTask(game, game.getNextPlayerInFlight(p))
     }
 
 
@@ -92,25 +89,29 @@ public class PiratesCard extends EnemyCard{
                 (p, c) -> {
                     currentProjectile.roll2D6();
                     PlayerProjectileDefendUtils.runPlayerProjectileDefendRequest(
-                            player,
+                            p,
                             currentProjectile,
                             game,
                             (pl, defended) -> {
                                 //After projectile interactions are performed (whether the player wants to defend or no)
                                 if(!defended){
-                                    //we pre-calculate the next player because the hit may change the order of players
-                                    //in flight (for example player gets killed out of the flight)
                                     Player nextPlayer = game.getNextPlayerInFlight(pl);
                                     player.getShipBoard().hit(
                                             currentProjectile.getDirection(),
                                             currentProjectile.getCoord(),
                                             pl,
                                             (p1) -> {
-                                                this.playTask(game, nextPlayer);
+                                                if(!p1.isEndedFlight()){
+                                                    //player survived, continue hits.
+                                                    this.handleProjectile(p1, game, projIdx+1);
+                                                }else{
+                                                    //player died. Go to next player
+                                                    this.playTask(game, nextPlayer);
+                                                }
                                             }
                                     );
 								}else{
-                                    this.playTask(game, game.getNextPlayerInFlight(pl));
+                                    this.handleProjectile(pl, game, projIdx+1);
                                 }
                             }
                     );
