@@ -23,6 +23,10 @@ import java.util.Optional;
  */
 public class AssembleUI implements INodeRefreshableOnUpdateUI {
 
+    public enum AssemblePane {
+        PLAYER_BOARD, SHARED_BOARD
+    }
+
     public static AssembleUI instance;
 
     public static AssembleUI getInstance() {
@@ -64,42 +68,43 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
      * Creates a new assembly UI with all required components.
      * The UI is designed for full-screen display with fixed-size internal areas.
      */
-    public AssembleUI() {
+    private AssembleUI() {
+        // main grid for player own board
         mainGrid = new GridPane();
         mainGrid.setAlignment(Pos.CENTER);
-
-        root = new StackPane();
-        root.setAlignment(Pos.CENTER);
-        root.getChildren().addAll(mainGrid, getDragOverlay());
-
         // Initialize components
         leftGrid = createShipGrid();
         rightPane = createCoveredTilesPane();
         topScrollPane = createDrawnTilesScrollPane();
         topRightVBox = createDecksAndTimerGrid();
-
+        // set equal width
         double calculatedTopScrollPaneWidth = leftGrid.getPrefWidth();
-
         topScrollPane.setPrefWidth(calculatedTopScrollPaneWidth);
         topScrollPane.setMinWidth(calculatedTopScrollPaneWidth);
         topScrollPane.setMaxWidth(calculatedTopScrollPaneWidth);
-
+        // add elements to main grid
         mainGrid.add(topScrollPane, 0, 0);
         mainGrid.add(leftGrid, 0, 1);
         mainGrid.add(rightPane, 1, 1);
         mainGrid.add(topRightVBox, 1, 0);
+
+        // board component for shared board
+        boardComponent = BoardComponent.create(LobbyState.getGameLevel());
+        boardComponent.setStyle("-fx-border-color: lightgray; -fx-border-width: 1;");
+        boardComponent.addPlayers();
+
+        // this scene root
+        root = new StackPane();
+        root.setAlignment(Pos.CENTER);
+        root.getChildren().addAll(mainGrid, boardComponent, getDragOverlay());
+
+        // set starting view
+        setAssembleLayout(AssemblePane.PLAYER_BOARD);
     }
 
-    public void setAssembleLayout(){
-        for (Node node : mainGrid.getChildren()) {
-            node.setVisible(true);
-        }
-    }
-
-    public void hideAssembleLayout(){
-        for (Node node : mainGrid.getChildren()) {
-            node.setVisible(false);
-        }
+    public void setAssembleLayout(AssemblePane paneToShow){
+        mainGrid.setVisible(paneToShow == AssemblePane.PLAYER_BOARD);
+        boardComponent.setVisible(paneToShow == AssemblePane.SHARED_BOARD);
     }
 
     /**
@@ -180,24 +185,8 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     private Button getBoardButton() {
         Button boardButton = new Button("Board");
         boardButton.setOnMouseClicked(event -> {
-            if (boardComponent == null) {
-                boardComponent = new BoardComponent(
-                        Default.BOARD_ELLIPSE_RX,
-                        Default.BOARD_ELLIPSE_RY,
-                        LobbyState.getGameLevel() == GameLevel.TESTFLIGHT ?
-                                Default.ELLIPSE_TESTFLIGHT_STEPS : Default.ELLIPSE_ONE_STEPS
-                );
-                boardComponent.setPrefSize(getRoot().getWidth(), getRoot().getHeight());
-                boardComponent.setStyle("-fx-border-color: lightgray; -fx-border-width: 1;");
-                boardComponent.addPlayers();
-                this.hideAssembleLayout();
-                root.getChildren().add(boardComponent);
-                StackPane.setAlignment(boardComponent, Pos.CENTER);
-            }else{
-                boardComponent.addPlayers();
-                boardComponent.setVisible(true);
-            }
-
+            boardComponent.addPlayers();
+            setAssembleLayout(AssemblePane.SHARED_BOARD);
         });
         return boardButton;
     }
@@ -234,8 +223,6 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         Platform.runLater(() -> {
             if (AssembleState.isTimerRunning() && !TimerComponent.getInstance().isRunning()) {
                 TimerComponent.getInstance().start();
-            } else if (!AssembleState.isTimerRunning() && TimerComponent.getInstance().isRunning()) {
-                TimerComponent.getInstance().stop();
             }
 
             refreshDeckOverlay();

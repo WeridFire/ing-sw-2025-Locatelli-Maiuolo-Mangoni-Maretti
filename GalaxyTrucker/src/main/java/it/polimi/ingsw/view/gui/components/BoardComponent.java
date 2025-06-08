@@ -1,7 +1,10 @@
 package it.polimi.ingsw.view.gui.components;
 
 import it.polimi.ingsw.controller.states.LobbyState;
+import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.util.GameLevelStandards;
+import it.polimi.ingsw.util.Util;
 import it.polimi.ingsw.view.gui.UIs.AssembleUI;
 import it.polimi.ingsw.view.gui.helpers.Asset;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
@@ -21,6 +24,7 @@ import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents the main game board component in the GUI.
@@ -47,6 +51,10 @@ public class BoardComponent extends VBox {
      */
     private final double ellipseRy;
     /**
+     * The starting phase to build the positions in the board.
+     */
+    private final double phi;
+    /**
      * The x-coordinate of the center of the ellipse.
      */
     private double ellipseCenterX;
@@ -58,6 +66,10 @@ public class BoardComponent extends VBox {
      * The total number of discrete steps or positions along the ellipse.
      */
     private final int numberOfEllipseSteps;
+    /**
+     * The starting position of the first player in this FlightBoard
+     */
+    private final int inverseDeltaPlayerPos;
     /**
      * The default duration for ship movement animations.
      */
@@ -83,24 +95,26 @@ public class BoardComponent extends VBox {
      * @param ellipseRx The horizontal radius of the ellipse. Must be non-negative.
      * @param ellipseRy The vertical radius of the ellipse. Must be non-negative.
      * @param numberOfSteps The number of discrete steps along the ellipse. Must be positive.
+     * @param inverseDeltaPlayerPos The starting position of the first player on the board.
      * @throws IllegalArgumentException if numberOfSteps is not positive.
      */
-    public BoardComponent(double ellipseRx, double ellipseRy, int numberOfSteps) {
+    private BoardComponent(double ellipseRx, double ellipseRy, double phi, int numberOfSteps, int inverseDeltaPlayerPos) {
         super();
 
         this.ellipseRx = Math.abs(ellipseRx);
         this.ellipseRy = Math.abs(ellipseRy);
+        this.phi = phi;
         if (numberOfSteps <= 0) {
-            throw new IllegalArgumentException("Il numero di step deve essere positivo.");
+            throw new IllegalArgumentException("The number of steps must be greater than 0");
         }
         this.numberOfEllipseSteps = numberOfSteps;
+        this.inverseDeltaPlayerPos = inverseDeltaPlayerPos;
 
         boardDisplayPane = new StackPane();
 
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> {
-            AssembleUI.getInstance().getRoot().getChildren().remove(this);
-            AssembleUI.getInstance().setAssembleLayout();
+            AssembleUI.getInstance().setAssembleLayout(AssembleUI.AssemblePane.PLAYER_BOARD);
         });
 
         this.getChildren().addAll(boardDisplayPane, backButton);
@@ -118,6 +132,30 @@ public class BoardComponent extends VBox {
         }
     }
 
+    public static BoardComponent create(GameLevel gameLevel) {
+        double phi = 0;
+        double rx = 0, ry = 0;
+        int steps = 1;
+        switch (gameLevel) {
+            case TESTFLIGHT, ONE:
+                rx = 285;
+                ry = 150;
+                // first position at (144, 178) from center
+                phi = Math.atan2(178 / ry, 144 / rx);
+                steps = 18;
+                break;
+            case TWO:
+                rx = 285;
+                ry = 160;
+                // first position at (205, 191) from center
+                phi = Math.atan2(191 / ry, 205 / rx);
+                steps = 24;
+                break;
+        }
+        return new BoardComponent(rx, ry, phi, steps,
+                GameLevelStandards.getFlightBoardParkingLots(gameLevel).getFirst());
+    }
+
     /**
      * Sets the background image for the board display pane.
      * The image is loaded using {@link AssetHandler} and configured to fit the pane.
@@ -125,7 +163,7 @@ public class BoardComponent extends VBox {
     private void setBackgroundImage() {
         Image image = AssetHandler.loadRawImage(Asset.BOARD.toString());
         BackgroundSize backgroundSize = new BackgroundSize(
-                100, 100, true, true, true, false);
+                100, 100, true, true, true, false);  // TODO: adjust here for resize issue
         BackgroundImage backgroundImage = new BackgroundImage(
                 image,
                 BackgroundRepeat.NO_REPEAT,
@@ -152,7 +190,7 @@ public class BoardComponent extends VBox {
      */
     private void updateEllipseParametersAndPositions() {
         if (boardDisplayPane.getWidth() > 0 && boardDisplayPane.getHeight() > 0) {
-            this.ellipseCenterX = boardDisplayPane.getWidth() / 2 - 30;
+            this.ellipseCenterX = boardDisplayPane.getWidth() / 2 - 6;
             this.ellipseCenterY = boardDisplayPane.getHeight() / 2;
             calculateEllipseStepPositions();
             drawOrUpdateEllipseVisuals();
@@ -213,16 +251,16 @@ public class BoardComponent extends VBox {
         double[] cumulativeArcLengths = new double[SAMPLES + 1];
 
         sampledPoints[0] = new Point2D(
-                ellipseCenterX + ellipseRx * Math.cos(0),
-                ellipseCenterY + ellipseRy * Math.sin(0)
+                ellipseCenterX + ellipseRx * Math.cos(phi),
+                ellipseCenterY - ellipseRy * Math.sin(phi)
         );
         cumulativeArcLengths[0] = 0;
 
         for (int i = 1; i <= SAMPLES; i++) {
-            double angle = i * deltaAngle;
+            double angle = phi + i * deltaAngle;
             sampledPoints[i] = new Point2D(
                     ellipseCenterX + ellipseRx * Math.cos(angle),
-                    ellipseCenterY + ellipseRy * Math.sin(angle)
+                    ellipseCenterY - ellipseRy * Math.sin(angle)
             );
             cumulativeArcLengths[i] = cumulativeArcLengths[i-1] + sampledPoints[i-1].distance(sampledPoints[i]);
         }
@@ -232,10 +270,10 @@ public class BoardComponent extends VBox {
         if (totalPerimeter < 1e-9 && (ellipseRx > 1e-6 || ellipseRy > 1e-6)) {
             // Fallback to equi-angular distribution if perimeter calculation failed
             for (int i = 0; i < numberOfEllipseSteps; i++) {
-                double angle = (2 * Math.PI / numberOfEllipseSteps) * i;
+                double angle = phi + (2 * Math.PI / numberOfEllipseSteps) * i;
                 this.ellipseStepPositions.add(new Point2D(
                         ellipseCenterX + ellipseRx * Math.cos(angle),
-                        ellipseCenterY + ellipseRy * Math.sin(angle)
+                        ellipseCenterY - ellipseRy * Math.sin(angle)
                 ));
             }
             return;
@@ -337,12 +375,11 @@ public class BoardComponent extends VBox {
      * The ship is associated with a {@link Player}.
      *
      * @param shape The JavaFX Shape representing the ship.
-     * @param initialStepIndex The initial step index on the ellipse for this ship.
      * @param player The player associated with this ship.
      * @return The created {@link Ship} object, or null if ellipse positions are not calculated.
      * @throws IllegalArgumentException if initialStepIndex is invalid.
      */
-    private Ship addShapeToEllipse(Shape shape, int initialStepIndex, Player player) {
+    private Ship addShapeToEllipse(Shape shape, Player player) {
         if (ellipseStepPositions == null || ellipseStepPositions.isEmpty()) {
             System.err.println("Ellipse positions not calculated. Ship cannot be added. Ensure the component is visible and has dimensions.");
             if (boardDisplayPane.getWidth() > 0 && boardDisplayPane.getHeight() > 0) {
@@ -353,9 +390,8 @@ public class BoardComponent extends VBox {
                 return null;
             }
         }
-        if (initialStepIndex < 0 || initialStepIndex >= numberOfEllipseSteps) {
-            throw new IllegalArgumentException("Invalid initial step index: " + initialStepIndex + " for " + numberOfEllipseSteps + " steps.");
-        }
+
+        int initialStepIndex = Util.getModular(inverseDeltaPlayerPos - player.getPosition(), numberOfEllipseSteps);
 
         Ship ship = new Ship(shape, initialStepIndex, player);
         Point2D initialPos = ellipseStepPositions.get(initialStepIndex);
@@ -456,13 +492,18 @@ public class BoardComponent extends VBox {
     public void addPlayers() {
         int SHIP_WIDTH = 20;
         int SHIP_HEIGHT = 20;
+        /* DEBUG
+        for (int i = 0; i < numberOfEllipseSteps; i++) {
+            Rectangle r = new Rectangle(SHIP_WIDTH, SHIP_HEIGHT);
+            r.setFill(i == 0 ? Color.RED : Color.GRAY);
+            addShapeToEllipse(r, i, null);
+        }
+        */
         if (LobbyState.getGameData() != null && LobbyState.getGameData().getPlayers() != null) {
-            for (Player p : LobbyState.getGameData().getPlayers()) {
+            for (Player p : LobbyState.getGameData().getPlayers(p -> Objects.nonNull(p.getPosition()))) {
                 Rectangle r = new Rectangle(SHIP_WIDTH, SHIP_HEIGHT);
                 r.setFill(Paint.valueOf(p.getColor().toString()));
-                if(p.getPosition() != null) {
-                    addShapeToEllipse(r, (p.getPosition()+11) % numberOfEllipseSteps, p);
-                }
+                addShapeToEllipse(r, p);
             }
         } else {
             System.err.println("GameData or Players list is null, cannot add player shapes.");

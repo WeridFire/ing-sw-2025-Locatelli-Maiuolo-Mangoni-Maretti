@@ -22,11 +22,6 @@ public class Default {
     public static final String PATH_BACK_CARD_I = "GT-cards_I_IT_0121.jpg";
     public static final String PATH_BACK_CARD_II = "GT-cards_II_IT_0121.jpg";
 
-    public static final double BOARD_ELLIPSE_RX = 305;
-    public static final double BOARD_ELLIPSE_RY = 160;
-    public static final int ELLIPSE_TESTFLIGHT_STEPS = 18;
-    public static final int ELLIPSE_ONE_STEPS = 24;
-
     //GENRAL
     public static final int TOTAL_TILES_NUMBER = TilesFactory.createPileTiles().size();
     public static final int HOURGLASS_SECONDS = 10;  // TODO: reset HOURGLASS_SECONDS = 90. This is for debug purposes

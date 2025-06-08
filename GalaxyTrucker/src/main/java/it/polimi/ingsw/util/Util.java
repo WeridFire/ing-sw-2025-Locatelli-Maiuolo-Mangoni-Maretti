@@ -8,6 +8,26 @@ import java.util.*;
 public class Util {
 
     /**
+     * Calculate an index using modular indexing.
+     * <p>
+     * The index wraps around {@code module}, allowing access with negative or out-of-bounds indices.
+     *
+     * @param index The modular index (can be negative or {@code >= module}).
+     * @param module The maximum number to have (exclusive).
+     * @return The {@code index} module {@code module}.
+     */
+    public static int getModular(int index, int module) {
+        int times;
+        if (index < 0) {
+            times = ((-index) / module) + 1;
+        } else {
+            times = -index / module;
+        }
+        index += times * module;
+        return index;
+    }
+
+    /**
      * Retrieves an element from the given list using modular indexing.
      * <p>
      * The index wraps around the list size, allowing access with negative or out-of-bounds indices.
@@ -22,14 +42,6 @@ public class Util {
         if (list == null || list.isEmpty()) {
             throw new IllegalArgumentException("The list is null or empty");
         }
-        int total = list.size();
-        int times;
-        if (index < 0) {
-            times = ((-index) / total) + 1;
-        } else {
-            times = -index / total;
-        }
-        index += times * total;
-        return list.get(index);
+        return list.get(getModular(index, list.size()));
     }
 }
