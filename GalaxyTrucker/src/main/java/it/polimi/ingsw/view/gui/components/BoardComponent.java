@@ -113,7 +113,7 @@ public class BoardComponent extends VBox {
         boardDisplayPane = new StackPane();
 
         Button backButton = new Button("Back");
-        backButton.setOnAction(e -> {
+        backButton.setOnMouseClicked(e -> {
             AssembleUI.getInstance().setAssembleLayout(AssembleUI.AssemblePane.PLAYER_BOARD);
         });
 
@@ -499,8 +499,11 @@ public class BoardComponent extends VBox {
             addShapeToEllipse(r, i, null);
         }
         */
+
+        clearAllShapes();
+
         if (LobbyState.getGameData() != null && LobbyState.getGameData().getPlayers() != null) {
-            for (Player p : LobbyState.getGameData().getPlayers(p -> Objects.nonNull(p.getPosition()))) {
+            for (Player p : LobbyState.getGameData().getPlayers(player -> Objects.nonNull(player.getPosition()))) { // Lambda corrected
                 Rectangle r = new Rectangle(SHIP_WIDTH, SHIP_HEIGHT);
                 r.setFill(Paint.valueOf(p.getColor().toString()));
                 addShapeToEllipse(r, p);

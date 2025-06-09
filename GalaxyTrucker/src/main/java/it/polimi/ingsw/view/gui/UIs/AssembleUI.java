@@ -5,12 +5,10 @@ import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.network.messages.ClientUpdate;
-import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.gui.components.*;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
@@ -91,7 +89,6 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         // board component for shared board
         boardComponent = BoardComponent.create(LobbyState.getGameLevel());
         boardComponent.setStyle("-fx-border-color: lightgray; -fx-border-width: 1;");
-        boardComponent.addPlayers();
 
         // this scene root
         root = new StackPane();
@@ -103,8 +100,22 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     }
 
     public void setAssembleLayout(AssemblePane paneToShow){
+        System.out.println("Switching to: " + paneToShow);
+        System.out.println("MainGrid visible before: " + mainGrid.isVisible());
+        System.out.println("BoardComponent visible before: " + boardComponent.isVisible());
+
         mainGrid.setVisible(paneToShow == AssemblePane.PLAYER_BOARD);
         boardComponent.setVisible(paneToShow == AssemblePane.SHARED_BOARD);
+
+        System.out.println("MainGrid visible after: " + mainGrid.isVisible());
+        System.out.println("BoardComponent visible after: " + boardComponent.isVisible());
+
+        // Verifica anche i children del root
+        System.out.println("Root children count: " + root.getChildren().size());
+        for (int i = 0; i < root.getChildren().size(); i++) {
+            System.out.println("Child " + i + ": " + root.getChildren().get(i).getClass().getSimpleName() +
+                    " - Visible: " + root.getChildren().get(i).isVisible());
+        }
     }
 
     /**
@@ -185,8 +196,8 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     private Button getBoardButton() {
         Button boardButton = new Button("Board");
         boardButton.setOnMouseClicked(event -> {
-            boardComponent.addPlayers();
             setAssembleLayout(AssemblePane.SHARED_BOARD);
+            boardComponent.addPlayers();
         });
         return boardButton;
     }
