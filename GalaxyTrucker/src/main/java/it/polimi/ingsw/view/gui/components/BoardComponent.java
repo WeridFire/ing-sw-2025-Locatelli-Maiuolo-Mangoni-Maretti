@@ -2,6 +2,7 @@ package it.polimi.ingsw.view.gui.components;
 
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.util.GameLevelStandards;
 import it.polimi.ingsw.util.Util;
@@ -112,12 +113,16 @@ public class BoardComponent extends VBox {
 
         boardDisplayPane = new StackPane();
 
-        Button backButton = new Button("Back");
-        backButton.setOnMouseClicked(e -> {
-            AssembleUI.getInstance().setAssembleLayout(AssembleUI.AssemblePane.PLAYER_BOARD);
-        });
+        if (LobbyState.getGameData().getCurrentGamePhaseType() == GamePhaseType.ASSEMBLE) {
+            Button backButton = new Button("Back");
+            backButton.setOnMouseClicked(e -> {
+                AssembleUI.getInstance().setAssembleLayout(AssembleUI.AssemblePane.PLAYER_BOARD);
+            });
+            this.getChildren().addAll(boardDisplayPane, backButton);
+        }else{
+            this.getChildren().addAll(boardDisplayPane);
+        }
 
-        this.getChildren().addAll(boardDisplayPane, backButton);
         this.setSpacing(200);
         this.setAlignment(Pos.CENTER);
         VBox.setVgrow(boardDisplayPane, Priority.ALWAYS);

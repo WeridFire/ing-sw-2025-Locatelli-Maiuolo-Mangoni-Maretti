@@ -4,6 +4,8 @@ import it.polimi.ingsw.cards.CardsGroup;
 import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.enums.GamePhaseType; // Import GamePhaseType
+import it.polimi.ingsw.game.GameData; // Import GameData
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.components.*;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
@@ -228,11 +230,21 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     /**
      * Updates the UI based on client updates.
      * Recreates the drawn tiles scroll pane, ensuring its fixed size is maintained.
+     * Transitions to AdventureUI if the game phase changes to ADVENTURE.
      */
     @Override
     public void refreshOnUpdate(ClientUpdate update) {
+        GameData gameData = update.getCurrentGame();
+
+        if (gameData != null && gameData.getCurrentGamePhaseType() == GamePhaseType.ADVENTURE) {
+            Platform.runLater(() -> {
+                ClientManager.getInstance().updateScene(new AdventureUI());
+            });
+            return; // Scene is changing, no need to update AssembleUI components
+        }
+
         Platform.runLater(() -> {
-            if (AssembleState.isTimerRunning() && !TimerComponent.getInstance().isRunning()) {
+            if (AssembleState.isTimerRunning() && TimerComponent.getInstance() != null && !TimerComponent.getInstance().isRunning()) {
                 TimerComponent.getInstance().start();
             }
 
@@ -241,7 +253,9 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
             if (uncoveredTilesGrid != null) {
                 uncoveredTilesGrid.update();
             }
-            leftGrid.update();
+            if (leftGrid != null) {
+                leftGrid.update();
+            }
         });
     }
 }
