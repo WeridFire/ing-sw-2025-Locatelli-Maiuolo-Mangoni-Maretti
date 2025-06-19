@@ -111,8 +111,9 @@ public class ViewMock extends GUIView {
 
     private boolean isPIRActive(GameData gameData) {
         return gameData != null &&
-                gameData.getPIRHandler() != null &&
-                gameData.getPIRHandler().getPlayerPIR(getPlayer()) != null;
+                gameData.getTaskStorage() != null &&
+                gameData.getTaskStorage().getPendingTask() != null &&
+                gameData.getTaskStorage().getPendingTask().getPlayer().equals(getPlayer());
     }
 
     private boolean isCurrentPhase(GameData gameData, GamePhaseType gamePhaseType) {
