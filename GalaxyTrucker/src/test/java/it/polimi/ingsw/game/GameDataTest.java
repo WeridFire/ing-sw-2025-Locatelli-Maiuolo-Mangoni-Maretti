@@ -51,7 +51,7 @@ class GameDataTest {
         assertTrue(gameData.getPlayers().isEmpty());
         assertEquals(2, gameData.getRequiredPlayers());
         assertNull(gameData.getGameLeader());
-        assertNotNull(gameData.getPIRHandler());
+        assertNotNull(gameData.getTaskStorage());
         assertTrue(gameData.getCoveredTiles().isEmpty());
         assertNull(gameData.getDeck());
     }

@@ -5,8 +5,6 @@ import it.polimi.ingsw.enums.ProtectionType;
 import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PIRs.PIRRemoveLoadables;
-import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;

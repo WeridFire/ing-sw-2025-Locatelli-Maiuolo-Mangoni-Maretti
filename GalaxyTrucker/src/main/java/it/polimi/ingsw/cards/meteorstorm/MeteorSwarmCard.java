@@ -1,17 +1,11 @@
 package it.polimi.ingsw.cards.meteorstorm;
 
-import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.cards.projectile.Projectile;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PIRUtils;
-import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
-import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
-import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import it.polimi.ingsw.task.customTasks.TaskDelay;
-import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 

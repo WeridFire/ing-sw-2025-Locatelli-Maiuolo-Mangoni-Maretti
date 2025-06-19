@@ -16,7 +16,6 @@ import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
 import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
 import it.polimi.ingsw.player.kpf.GetLappedKPF;
-import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.gamePhases.exceptions.AlreadyPickedPosition;
@@ -26,7 +25,6 @@ import it.polimi.ingsw.task.TaskStorage;
 import it.polimi.ingsw.util.GameLevelStandards;
 
 import java.io.*;
-import java.rmi.RemoteException;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -65,10 +63,6 @@ public class GameData implements Serializable {
      */
     private final UUID gameId;
 
-    /**
-     * The player whose turn it is.
-     */
-    private final PIRHandler pirHandler;
 
     private final TaskStorage taskStorage;
 
@@ -115,7 +109,6 @@ public class GameData implements Serializable {
         coveredTiles = new ArrayList<>();
         uncoveredTiles = new ArrayList<>();
         deck = null;
-        pirHandler = new PIRHandler();
         taskStorage = new TaskStorage(this.gameId);
         setLevel(GameLevel.TESTFLIGHT);
         setCurrentGamePhaseType(GamePhaseType.NONE);
@@ -273,13 +266,10 @@ public class GameData implements Serializable {
      * @return The current turn player.
      */
     @JsonIgnore
-    public PIRHandler getPIRHandler() {
-        return pirHandler;
-    }
-
     public TaskStorage getTaskStorage() {
         return taskStorage;
     }
+
 
     /**
      * Gets the list of game deck.

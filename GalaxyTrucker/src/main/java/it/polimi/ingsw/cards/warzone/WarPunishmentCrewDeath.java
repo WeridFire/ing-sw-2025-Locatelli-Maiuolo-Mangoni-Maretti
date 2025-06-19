@@ -5,7 +5,6 @@ import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.task.customTasks.TaskRemoveLoadables;
 
-import java.util.Set;
 import java.util.function.Consumer;
 
 public class WarPunishmentCrewDeath implements WarPunishment {

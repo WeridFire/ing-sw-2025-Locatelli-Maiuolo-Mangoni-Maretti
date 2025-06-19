@@ -1,21 +1,15 @@
 package it.polimi.ingsw.cards.enemy;
 
-import it.polimi.ingsw.cards.planets.Planet;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
-import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
-import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.task.customTasks.TaskAddLoadables;
-import it.polimi.ingsw.task.customTasks.TaskRemoveLoadables;
 import it.polimi.ingsw.task.customTasks.TaskYesNoChoice;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static it.polimi.ingsw.view.cli.CLIScreen.getScreenFrame;

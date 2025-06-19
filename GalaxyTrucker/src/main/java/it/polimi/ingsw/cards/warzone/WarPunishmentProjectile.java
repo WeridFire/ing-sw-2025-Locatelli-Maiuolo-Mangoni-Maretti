@@ -6,8 +6,6 @@ import it.polimi.ingsw.integrity.PlayerProjectileDefendUtils;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRUtils;
 import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
-import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
-import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
 import it.polimi.ingsw.task.customTasks.TaskMultipleChoice;
 
 import java.util.function.Consumer;

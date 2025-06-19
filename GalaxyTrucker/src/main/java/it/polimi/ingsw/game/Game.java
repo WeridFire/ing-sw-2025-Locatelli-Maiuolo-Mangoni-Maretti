@@ -18,8 +18,6 @@ import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
 import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
-import it.polimi.ingsw.playerInput.PIRUtils;
-import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.gamePhases.exceptions.AlreadyPickedPosition;
@@ -148,7 +146,7 @@ public class Game {
         fillUpShipboards();
         System.out.println(this + " Filled all the shipboards");
 
-        gameData.getPIRHandler().joinEndTurn(gameData.getPlayers());
+        gameData.getTaskStorage().joinEndTurn(gameData.getPlayers());
 
         gameData.saveGameState();
     }
@@ -298,7 +296,7 @@ public class Game {
      * through multiple PIRs choice, in parallel on new threads. Will return once everyone has filled up their
      */
     private void fillUpShipboards() throws InterruptedException {
-        gameData.getPIRHandler().broadcastPIR(gameData.getPlayers(), (player, pirHandler) ->
+        gameData.getTaskStorage().broadcastPIR(gameData.getPlayers(), (player, pirHandler) ->
                 player.getShipBoard().fill(player, pirHandler));
     }
 
@@ -308,7 +306,7 @@ public class Game {
      */
     private void notifyAdventureToPlayers(Player leader, Card card) throws InterruptedException {
         String leaderName = leader.toColoredString("[", "]");
-        gameData.getPIRHandler().broadcastPIR(gameData.getPlayers(), (player, pirHandler) -> {
+        gameData.getTaskStorage().broadcastPIR(gameData.getPlayers(), (player, pirHandler) -> {
             PIRDelay pirDelay = new PIRDelay(player, 6,
                     "The leader " + leaderName + " has drawn a new Adventure Card:",
                     card.getCLIRepresentation());
@@ -317,7 +315,7 @@ public class Game {
     }
 
     private void notifyScoresToPlayers(ScoreScreenGamePhase scoreScreen) throws InterruptedException {
-        gameData.getPIRHandler().broadcastPIR(gameData.getPlayers(), (player, pirHandler) -> {
+        gameData.getTaskStorage().broadcastPIR(gameData.getPlayers(), (player, pirHandler) -> {
             PIRDelay pirDelay = new PIRDelay(player, 6,
                     "GG to all, match is over", scoreScreen.getCLIRepresentation());
             pirHandler.setAndRunTurn(pirDelay);
