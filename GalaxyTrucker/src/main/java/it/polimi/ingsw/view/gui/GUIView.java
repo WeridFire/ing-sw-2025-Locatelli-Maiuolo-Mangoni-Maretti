@@ -110,7 +110,7 @@ public class GUIView extends View {
             processors.push(new AdventureCommandsProcessor(gameClient));
         }
 
-        if (PIRState.isPIRActive()) {
+        if (PIRState.isTaskActive()) {
             processors.push(new PIRCommandsProcessor(gameClient));
         }
 
