@@ -4,9 +4,11 @@ import it.polimi.ingsw.controller.cp.PIRCommandsProcessor;
 import it.polimi.ingsw.controller.states.PIRState;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.network.GameClient;
-import it.polimi.ingsw.playerInput.PIRType;
-import it.polimi.ingsw.playerInput.PIRs.*;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.task.Task;
+import it.polimi.ingsw.task.TaskType;
+import it.polimi.ingsw.task.customTasks.TaskAddLoadables;
+import it.polimi.ingsw.task.customTasks.TaskRemoveLoadables;
 
 import java.util.*;
 
@@ -18,18 +20,18 @@ public class PIRCLIScreen extends CLIScreen {
 
 	@Override
 	protected boolean switchConditions() {
-		return PIRState.isPIRActive();
+		return PIRState.isTaskActive();
 	}
 
 	@Override
 	public CLIFrame getCLIRepresentation() {
-		PIR activePIR = PIRState.getActivePIR();
+		Task pendingTask = PIRState.getGameData().getTaskStorage().getPendingTask();
 
-		if (activePIR == null) {
+		if (pendingTask == null) {
 			return new CLIFrame();
 		}
 
-		CLIFrame baseFrame = activePIR.getCLIRepresentation();
+		CLIFrame baseFrame = pendingTask.getCLIRepresentation();
 
 	/*
 	THE SECTION BELOW IS SPECIFIC WITH THE ADD / REMOVE CARGO SCREEN.
@@ -37,9 +39,9 @@ public class PIRCLIScreen extends CLIScreen {
 	it needs to compute the "locally" allocated or removed cargo vs the total cargo
 	to be handled, and show it dynamically. This part is simply put on top of the add or remove cargo screen.
 	*/
-		if (activePIR.getPIRType() == PIRType.ADD_CARGO) {
+		if (pendingTask.getTaskType() == TaskType.ADD_CARGO) {
 
-			PIRAddLoadables pirAdd = (PIRAddLoadables) activePIR;
+			TaskAddLoadables pirAdd = PIRState.getGameData().getTaskStorage().getCurrentTaskAddLoadables();
 			List<LoadableType> floatingLoadables = new ArrayList<>(pirAdd.getFloatingLoadables());
 
 			for (List<LoadableType> allocated : PIRState.getLocalCargo().values()) {
@@ -60,9 +62,9 @@ public class PIRCLIScreen extends CLIScreen {
 
 			baseFrame = cargoHeader.merge(baseFrame, Direction.SOUTH, 2);
 
-		} else if (activePIR.getPIRType() == PIRType.REMOVE_CARGO) {
+		} else if (pendingTask.getTaskType() == TaskType.REMOVE_CARGO) {
 
-			PIRRemoveLoadables pirRemove = (PIRRemoveLoadables) activePIR;
+			TaskRemoveLoadables pirRemove = PIRState.getGameData().getTaskStorage().getCurrentTaskRemoveLoadables();
 
 			int currentCargo = pirRemove.getCargoAmount();
 			int target = currentCargo - pirRemove.getAmountToRemove();

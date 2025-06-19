@@ -34,6 +34,13 @@ import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
+import it.polimi.ingsw.task.Task;
+import it.polimi.ingsw.task.customTasks.TaskActivateTiles;
+import it.polimi.ingsw.task.customTasks.TaskAddLoadables;
+import it.polimi.ingsw.task.customTasks.TaskMultipleChoice;
+import it.polimi.ingsw.task.customTasks.TaskRemoveLoadables;
+import it.polimi.ingsw.task.exceptions.TileNotAvailableException;
+import it.polimi.ingsw.task.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.rmi.RemoteException;
@@ -162,13 +169,12 @@ public class RmiServer implements IServer {
 		// else: actually try to perform the action
 
 		try {
-			PIR activePIR = pg.game.getGameData().getPIRHandler().getPlayerPIR(pg.player);
-			if(activePIR != null){
-				activePIR.activateTiles(pg.player, tilesToActivate);
+			TaskActivateTiles pendingTask = pg.game.getGameData().getTaskStorage().getCurrentTaskActivateTiles();
+			if(pendingTask != null){
+				pendingTask.activateTiles(pg.player, tilesToActivate);
 			}
 			client.updateClient(new ClientUpdate(pg.connectionUUID));
-		} catch (WrongPlayerTurnException | InputNotSupportedException | NotEnoughItemsException |
-				 TileNotAvailableException e) {
+		} catch (NotEnoughItemsException | WrongPlayerTurnException | TileNotAvailableException e){
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 		}
 	}
@@ -180,12 +186,12 @@ public class RmiServer implements IServer {
 		// else: actually try to perform the action
 
 		try {
-			PIR activePIR = pg.game.getGameData().getPIRHandler().getPlayerPIR(pg.player);
-			if(activePIR != null){
-				activePIR.addLoadables(pg.player, cargoToAdd);
+			TaskAddLoadables pendingTask = pg.game.getGameData().getTaskStorage().getCurrentTaskAddLoadables()
+			if(pendingTask != null){
+				pendingTask.addLoadables(pg.player, cargoToAdd);
 			}
 			client.updateClient(new ClientUpdate(pg.connectionUUID));
-		} catch (InputNotSupportedException | WrongPlayerTurnException | TileNotAvailableException |
+		} catch (WrongPlayerTurnException | TileNotAvailableException |
 				 UnsupportedLoadableItemException | TooMuchLoadException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 		}
@@ -198,7 +204,7 @@ public class RmiServer implements IServer {
 		// else: actually try to perform the action
 
 		try {
-			PIRHandler handler = pg.game.getGameData().getPIRHandler();
+			PIRHandler handler = pg.game.getGameData().getTaskStorage();
 			handler.endTurn(pg.player);
 			// note: join interaction and not join turn to allow the ended pir to be in an atomic sequence
 			handler.joinEndInteraction(pg.player);
@@ -214,12 +220,12 @@ public class RmiServer implements IServer {
 		if (pg == null) return;
 
 		try {
-			PIR activePIR = pg.game.getGameData().getPIRHandler().getPlayerPIR(pg.player);
-			if(activePIR != null){
-				activePIR.removeLoadables(pg.player, cargoToAdd);
+			TaskRemoveLoadables pendingTask = pg.game.getGameData().getTaskStorage().getCurrentTaskRemoveLoadables();
+			if(pendingTask != null){
+				pendingTask.removeLoadables(pg.player, cargoToAdd);
 			}
 			client.updateClient(new ClientUpdate(pg.connectionUUID));
-		} catch (InputNotSupportedException | WrongPlayerTurnException | TileNotAvailableException |
+		} catch (WrongPlayerTurnException | TileNotAvailableException |
 				 UnsupportedLoadableItemException | NotEnoughItemsException e) {
 			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 		}
@@ -230,11 +236,11 @@ public class RmiServer implements IServer {
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
 		if (pg == null) return;
 
-		PIR activePIR = pg.game.getGameData().getPIRHandler().getPlayerPIR(pg.player);
-		if(activePIR != null){
+		TaskMultipleChoice pendingTask = pg.game.getGameData().getTaskStorage().getCurrentTaskMultipleChoice();
+		if(pendingTask != null){
 			try {
-				activePIR.makeChoice(pg.player, selection);
-			} catch (WrongPlayerTurnException | InputNotSupportedException e) {
+				pendingTask.makeChoice(pg.player, selection);
+			} catch (WrongPlayerTurnException e) {
 				client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 				return;
 			}
