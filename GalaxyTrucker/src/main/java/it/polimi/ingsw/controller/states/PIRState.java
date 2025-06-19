@@ -1,8 +1,8 @@
 package it.polimi.ingsw.controller.states;
 
-import it.polimi.ingsw.playerInput.PIRType;
-import it.polimi.ingsw.playerInput.PIRs.PIR;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.task.Task;
+import it.polimi.ingsw.task.TaskType;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.util.HashMap;
@@ -16,20 +16,17 @@ public class PIRState extends CommonState {
         return localCargo;
     }
 
-    public static boolean isPIRActive() {
+    public static boolean isTaskActive() {
         return getGameData() != null &&
-                getGameData().getPIRHandler() != null &&
-                getGameData().getPIRHandler().getPlayerPIR(getPlayer()) != null;
+                getGameData().getTaskStorage() != null &&
+                getGameData().getTaskStorage().getPendingTask() != null &&
+                getGameData().getTaskStorage().getPendingTask().getPlayer().equals(getPlayer());
     }
 
-    public static PIR getActivePIR() {
-        if (!isPIRActive()) return null;
-        return getGameData().getPIRHandler().getPlayerPIR(getPlayer());
-    }
 
-    public static PIRType getActivePIRType() {
-        PIR activePIR = getActivePIR();
-        return (activePIR == null) ? null : activePIR.getPIRType();
+    public static TaskType getActiveTaskType() {
+        Task pendingTask = getGameData().getTaskStorage().getPendingTask();
+        return (pendingTask == null) ? null : pendingTask.getTaskType();
     }
 
 }
