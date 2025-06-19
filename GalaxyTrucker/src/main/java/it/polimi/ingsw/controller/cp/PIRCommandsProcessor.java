@@ -3,12 +3,12 @@ package it.polimi.ingsw.controller.cp;
 import it.polimi.ingsw.controller.states.PIRState;
 import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.network.GameClient;
-import it.polimi.ingsw.playerInput.PIRType;
-import it.polimi.ingsw.playerInput.PIRs.PIRActivateTiles;
-import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
-import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
-import it.polimi.ingsw.playerInput.PIRs.PIRRemoveLoadables;
 import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.task.TaskType;
+import it.polimi.ingsw.task.customTasks.TaskActivateTiles;
+import it.polimi.ingsw.task.customTasks.TaskAddLoadables;
+import it.polimi.ingsw.task.customTasks.TaskMultipleChoice;
+import it.polimi.ingsw.task.customTasks.TaskRemoveLoadables;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.rmi.RemoteException;
@@ -24,11 +24,11 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
     @Override
     public List<String> getAvailableCommands() {
         List<String> availableCommands = new ArrayList<>();
-        if (!PIRState.isPIRActive()) {
+        if (!PIRState.isTaskActive()) {
             return availableCommands;
         }
 
-        switch (PIRState.getActivePIRType()) {
+        switch (PIRState.getActiveTaskType()) {
             case CHOICE -> availableCommands.add("choose <option_number>|Choose an option with the corresponding ID.");
             case ACTIVATE_TILE -> availableCommands.add("activate (row,col), (row,col), ...|Choose the coordinates of tiles to activate.");
             case ADD_CARGO -> {
@@ -48,10 +48,10 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
         return availableCommands;
     }
 
-    private boolean validateNonActivePIRType(PIRType pirType) {
-        PIRType activePIRType = PIRState.getActivePIRType();
-        if (activePIRType != pirType){
-            view.showWarning("This command is not available for a PIR of type " + activePIRType);
+    private boolean validateNonActivePIRType(TaskType pirType) {
+        TaskType activeTaskType = PIRState.getActiveTaskType();
+        if (activeTaskType != pirType){
+            view.showWarning("This command is not available for a Task of type " + activeTaskType);
             return true;
         } else {
             return false;
@@ -70,10 +70,10 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
     }
 
     private boolean validateChooseCommand(String[] args) {
-        if (validateNonActivePIRType(PIRType.CHOICE)) return false;
+        if (validateNonActivePIRType(TaskType.CHOICE)) return false;
 
-        PIRMultipleChoice pir = (PIRMultipleChoice) PIRState.getActivePIR();
-        if (pir == null) return false;
+        TaskMultipleChoice pendingTask = PIRState.getGameData().getTaskStorage().getCurrentTaskMultipleChoice();
+        if (pendingTask == null) return false;
         if (args.length != 1) {
             view.showWarning("Invalid argument. Specify the ID of the choice you'd like to make.");
             return false;
@@ -81,14 +81,14 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
 
         try {
             int choice = Integer.parseInt(args[0]);
-            if(choice < 0 || choice >= pir.getPossibleOptions().length){
+            if(choice < 0 || choice >= pendingTask.getPossibleOptions().length){
                 view.showWarning("Invalid integer. The integer should be one of the following options: " +
-                        formatOptionsWithIndices(pir.getPossibleOptions()));
+                        formatOptionsWithIndices(pendingTask.getPossibleOptions()));
                 return false;
             }
         } catch(NumberFormatException e) {
             view.showWarning("Invalid integer. The integer should be one of the following options: " +
-                    formatOptionsWithIndices(pir.getPossibleOptions()));
+                    formatOptionsWithIndices(pendingTask.getPossibleOptions()));
             return false;
         }
 
@@ -96,11 +96,11 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
     }
 
     private boolean validateActivateCommand(String[] args) {
-        if (validateNonActivePIRType(PIRType.ACTIVATE_TILE)) return false;
+        if (validateNonActivePIRType(TaskType.ACTIVATE_TILE)) return false;
 
-        PIRActivateTiles activatePir = (PIRActivateTiles) PIRState.getActivePIR();
-        if (activatePir == null) return false;
-        Set<Coordinates> highlightMask = activatePir.getHighlightMask();
+        TaskActivateTiles activateTask = PIRState.getGameData().getTaskStorage().getCurrentTaskActivateTiles();
+        if (activateTask == null) return false;
+        Set<Coordinates> highlightMask = activateTask.getHighlightMask();
 
         if (args.length == 0) {
             view.showWarning("Invalid input. Please specify coordinates in the format: (row,col), (row,col), ...");
@@ -150,12 +150,12 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
     }
 
     private boolean validateAllocateCommand(String[] args) {
-        if (validateNonActivePIRType(PIRType.ADD_CARGO)) return false;
+        if (validateNonActivePIRType(TaskType.ADD_CARGO)) return false;
 
-        PIRAddLoadables pirAdd = (PIRAddLoadables) PIRState.getActivePIR();
-        if (pirAdd == null) return false;
-        Set<Coordinates> pirHighlightMask = pirAdd.getHighlightMask();
-        List<LoadableType> floatingLoadables = pirAdd.getFloatingLoadables();
+        TaskAddLoadables addTask = PIRState.getGameData().getTaskStorage().getCurrentTaskAddLoadables();
+        if (addTask == null) return false;
+        Set<Coordinates> pirHighlightMask = addTask.getHighlightMask();
+        List<LoadableType> floatingLoadables = addTask.getFloatingLoadables();
 
         if (args.length != 3) {
             view.showWarning("Invalid arguments. Usage: allocate (row,col) <LoadableType> <amount>");
@@ -203,8 +203,8 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
     }
 
     private boolean validateConfirmCommand() {
-        if (validateNonActivePIRType(PIRType.ADD_CARGO)) return false;
-        if (validateNonActivePIRType(PIRType.REMOVE_CARGO)) return false;
+        if (validateNonActivePIRType(TaskType.ADD_CARGO)) return false;
+        if (validateNonActivePIRType(TaskType.REMOVE_CARGO)) return false;
 
         // Check if localCargo is empty
         if (PIRState.getLocalCargo().isEmpty()) {
@@ -217,8 +217,8 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
     private void executeConfirmCommand() throws RemoteException {
         Map<Coordinates, List<LoadableType>> localCargo = PIRState.getLocalCargo();
         // Submit to the server based on PIR type
-        PIRType activePIRType = PIRState.getActivePIRType();
-        if (activePIRType == PIRType.ADD_CARGO) {
+        TaskType activePIRType = PIRState.getActiveTaskType();
+        if (activePIRType == TaskType.ADD_CARGO) {
             server.pirAllocateLoadables(client, localCargo);
             view.showInfo("Loadables allocation confirmed and sent to server.");
         } else {  // PIRType.REMOVE_CARGO
@@ -230,13 +230,13 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
     }
 
     private boolean validateRemoveCommand(String[] args) {
-        if (validateNonActivePIRType(PIRType.REMOVE_CARGO)) return false;
+        if (validateNonActivePIRType(TaskType.REMOVE_CARGO)) return false;
 
-        PIRRemoveLoadables pirRemove = (PIRRemoveLoadables) PIRState.getActivePIR();
-        if (pirRemove == null) return false;
-        Set<Coordinates> removeHighlightMask = pirRemove.getHighlightMask();
-        Set<LoadableType> allowedCargo = pirRemove.getAllowedCargo();
-        int amountToRemove = pirRemove.getAmountToRemove();
+        TaskRemoveLoadables taskRemove = PIRState.getGameData().getTaskStorage().getCurrentTaskRemoveLoadables();
+        if (taskRemove == null) return false;
+        Set<Coordinates> removeHighlightMask = taskRemove.getHighlightMask();
+        Set<LoadableType> allowedCargo = taskRemove.getAllowedCargo();
+        int amountToRemove = taskRemove.getAmountToRemove();
 
         if (args.length != 3) {
             view.showWarning("Invalid arguments. Usage: remove (row,col) <LoadableType> <amount>");
@@ -379,7 +379,7 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
 
     @Override
     protected boolean validateCommand(String command, String[] args) throws CommandNotAllowedException {
-        if (PIRState.getActivePIRType() == PIRType.DELAY) {
+        if (PIRState.getActiveTaskType() == TaskType.DELAY) {
             return true;  // any input closes a delay
         }
         else {
@@ -398,7 +398,7 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
 
     @Override
     protected void performCommand(String command, String[] args) throws RemoteException {
-        if (PIRState.getActivePIRType() == PIRType.DELAY) {
+        if (PIRState.getActiveTaskType() == TaskType.DELAY) {
             executeEndTurnCommand();  // any input closes a delay
         }
         else {

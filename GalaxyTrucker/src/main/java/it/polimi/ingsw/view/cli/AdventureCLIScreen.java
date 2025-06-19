@@ -7,8 +7,8 @@ import it.polimi.ingsw.enums.*;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
 import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
+import it.polimi.ingsw.task.TaskStorage;
 import it.polimi.ingsw.util.GameLevelStandards;
 import it.polimi.ingsw.util.Util;
 
@@ -65,7 +65,7 @@ public class AdventureCLIScreen extends CLIScreen{
 
         GameData gameData = CommonState.getGameData();
 
-        CLIFrame boardFrame = getBoardFrame(gameData.getLevel(), gameData.getPlayers(), gameData.getPIRHandler());
+        CLIFrame boardFrame = getBoardFrame(gameData.getLevel(), gameData.getPlayers(), gameData.getTaskStorage());
 
         frameShipboard = frameShipboard.merge(boardFrame, Direction.NORTH, 2);
 
@@ -228,7 +228,7 @@ public class AdventureCLIScreen extends CLIScreen{
      * @param level The {@link GameLevel} to render the board for.
      * @param players The list of all the players in the game, also the ones not in flight,
      *                sorted from most to the least advanced position.
-     * @param pirHandler The pirHandler of the game to retrieve which player is currently resolving a turn.
+     * @param taskStorage The pirHandler of the game to retrieve which player is currently resolving a turn.
      *                   Can be {@code null}; in that case all the players are not considered resolving any turn.
      * @return A {@link CLIFrame} object containing the string representation of the board,
      *         ready for display in a command-line interface, with appropriate background color set.
@@ -236,7 +236,7 @@ public class AdventureCLIScreen extends CLIScreen{
      * @implNote the parameters can all be retrieved from gameData,
      * but they are split to keep this method independent of gameData
      */
-    public CLIFrame getBoardFrame(GameLevel level, List<Player> players, PIRHandler pirHandler) {
+    public CLIFrame getBoardFrame(GameLevel level, List<Player> players, TaskStorage taskStorage) {
         final String playerPlaceholderEmpty = "△";
         final String playerPlaceholderFilled = "▲";
 
@@ -257,7 +257,7 @@ public class AdventureCLIScreen extends CLIScreen{
             // retrieve element info
             Integer playerPos = player.getPosition();
             // set player in turn info
-            if (pirHandler != null && pirHandler.isPlayerTurnActive(player)) {
+            if (taskStorage != null && taskStorage.getPendingTask().getPlayer().equals(player)) {
                 playersInTurn.add(player);
             }
             // set player in/out-of flight info
