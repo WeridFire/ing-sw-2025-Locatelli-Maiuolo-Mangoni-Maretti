@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.polimi.ingsw.TilesFactory;
 import it.polimi.ingsw.enums.*;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
-import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.shipboard.integrity.IntegrityProblem;
 import it.polimi.ingsw.shipboard.integrity.IShipIntegrityListener;
 import it.polimi.ingsw.shipboard.integrity.VisitorCheckIntegrity;
