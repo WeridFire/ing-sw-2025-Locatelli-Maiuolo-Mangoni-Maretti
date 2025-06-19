@@ -4,14 +4,14 @@ import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
-import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.tiles.ContainerTile;
 import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.task.Task;
 import it.polimi.ingsw.task.TaskType;
+import it.polimi.ingsw.task.exceptions.TileNotAvailableException;
+import it.polimi.ingsw.task.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
@@ -70,7 +70,7 @@ public class TaskAddLoadables extends Task {
 	}
 
 
-	public void addLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToAdd) throws WrongPlayerTurnException, TileNotAvailableException, UnsupportedLoadableItemException, TooMuchLoadException {
+	public void addLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToAdd) throws UnsupportedLoadableItemException, TooMuchLoadException, TileNotAvailableException, WrongPlayerTurnException {
 		checkForTurn(player.getUsername());
 		for(Coordinates c : cargoToAdd.keySet()){
 			checkForTileMask(c);

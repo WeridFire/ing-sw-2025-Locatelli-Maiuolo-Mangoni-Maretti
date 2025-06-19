@@ -4,12 +4,12 @@ import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.PowerType;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
-import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.task.Task;
 import it.polimi.ingsw.task.TaskType;
+import it.polimi.ingsw.task.exceptions.TileNotAvailableException;
+import it.polimi.ingsw.task.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
@@ -65,7 +65,7 @@ public class TaskActivateTiles extends Task {
 	 * @throws NotEnoughItemsException If the player does not have enough batteries to activate the tiles.
 	 * @throws TileNotAvailableException If the tile is not supported for this action in this turn.
 	 */
-	public void activateTiles(Player player, Set<Coordinates> coordinates) throws WrongPlayerTurnException, NotEnoughItemsException, TileNotAvailableException {
+	public void activateTiles(Player player, Set<Coordinates> coordinates) throws NotEnoughItemsException, TileNotAvailableException, WrongPlayerTurnException {
 		checkForTurn(player.getUsername());
 		for(Coordinates c : coordinates){
 			checkForTileMask(c);

@@ -4,10 +4,10 @@ import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.task.Task;
 import it.polimi.ingsw.task.TaskStorage;
 import it.polimi.ingsw.task.TaskType;
+import it.polimi.ingsw.task.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
@@ -74,6 +74,10 @@ public class TaskMultipleChoice extends Task {
 
 	public int getChoice() {
 		return this.choice;
+	}
+
+	public String[] getPossibleOptions() {
+		return possibleOptions;
 	}
 
 	@Override

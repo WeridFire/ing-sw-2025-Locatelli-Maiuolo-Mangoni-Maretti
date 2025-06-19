@@ -3,14 +3,14 @@ package it.polimi.ingsw.task.customTasks;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
-import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.shipboard.tiles.ContainerTile;
 import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.task.Task;
 import it.polimi.ingsw.task.TaskType;
+import it.polimi.ingsw.task.exceptions.TileNotAvailableException;
+import it.polimi.ingsw.task.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
@@ -72,12 +72,10 @@ public class TaskRemoveLoadables extends Task {
 	 * check that the current turn and game state allow for this.
 	 * @param player The player that requested the action
 	 * @param cargoToRemove The list of tiles and the cargo to remove
-	 * @throws WrongPlayerTurnException The player that asked for the action is not the one the turn is for.
-	 * @throws TileNotAvailableException The tile requested is not supported for this operation.
 	 * @throws NotEnoughItemsException The tile requested does not have enough items.
 	 * @throws UnsupportedLoadableItemException The tile requested does not support the requested loadable.
 	 */
-	public void removeLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToRemove) throws WrongPlayerTurnException, TileNotAvailableException, NotEnoughItemsException, UnsupportedLoadableItemException {
+	public void removeLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToRemove) throws NotEnoughItemsException, UnsupportedLoadableItemException, TileNotAvailableException, WrongPlayerTurnException {
 		checkForTurn(player.getUsername());
 		for(Coordinates c : cargoToRemove.keySet()){
 			checkForTileMask(c);
