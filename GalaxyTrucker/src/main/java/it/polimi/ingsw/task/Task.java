@@ -3,13 +3,8 @@ package it.polimi.ingsw.task;
 import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PIRType;
-import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
-import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
-import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
-import it.polimi.ingsw.shipboard.LoadableType;
-import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
-import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
+import it.polimi.ingsw.task.exceptions.TileNotAvailableException;
+import it.polimi.ingsw.task.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.cli.ICLIPrintable;
 
@@ -77,7 +72,7 @@ public abstract class Task implements ICLIPrintable {
 	 * Returns a reference to the instance of the player this task is dedicated to.
 	 * @return The player instance.
 	 */
-	protected Player getPlayer(){
+	public Player getPlayer(){
 		Game game = GamesHandler.getInstance().getGame(gameId);
 		return game
 				.getGameData()
