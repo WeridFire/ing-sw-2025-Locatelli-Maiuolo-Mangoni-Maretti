@@ -214,6 +214,7 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
 
         return true;
     }
+
     private void executeConfirmCommand() throws RemoteException {
         Map<Coordinates, List<LoadableType>> localCargo = PIRState.getLocalCargo();
         // Submit to the server based on PIR type

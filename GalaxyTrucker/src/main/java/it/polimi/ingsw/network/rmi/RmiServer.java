@@ -226,6 +226,23 @@ public class RmiServer implements IServer {
 	}
 
 	@Override
+	public void pirRearrangeLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToRearrange) throws RemoteException {
+		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
+		if (pg == null) return;
+
+		try {
+			PIR activePIR = pg.game.getGameData().getPIRHandler().getPlayerPIR(pg.player);
+			if(activePIR != null){
+				activePIR.rearrangeLoadables(pg.player, cargoToRearrange);
+			}
+			client.updateClient(new ClientUpdate(pg.connectionUUID));
+		} catch (InputNotSupportedException | WrongPlayerTurnException | TileNotAvailableException |
+				 UnsupportedLoadableItemException | NotEnoughItemsException e) {
+			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
+		}
+	}
+
+	@Override
 	public void pirSelectMultipleChoice(IClient client, int selection) throws RemoteException {
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
 		if (pg == null) return;

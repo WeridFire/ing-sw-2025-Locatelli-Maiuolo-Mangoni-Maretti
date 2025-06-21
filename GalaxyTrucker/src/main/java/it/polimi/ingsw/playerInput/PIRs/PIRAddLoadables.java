@@ -92,7 +92,7 @@ public class PIRAddLoadables extends PIR {
 
 	/**
 	 * This method allows the player to load items onto the shipboard. It will do all the due check to make sure the
-	 * loading is allowed. If the player loads too much items, the partial list of items (up until the method throwing
+	 * loading is allowed. If the player loads too many items, the partial list of items (up until the method throwing
 	 * error) will still be allocated, and removed from the floatingLoadables list, and the turn will not end. The player
 	 * will then be able to finish allocation of the items that are left, or just terminate the turn. If the player
 	 * allocates every item (or a subset of every item) correctly, the game will auto-end the turn assuming the player

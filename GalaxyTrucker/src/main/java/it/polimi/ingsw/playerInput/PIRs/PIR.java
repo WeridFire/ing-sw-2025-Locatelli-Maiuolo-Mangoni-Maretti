@@ -104,9 +104,15 @@ public abstract class PIR implements ICLIPrintable, Serializable {
 		throw new InputNotSupportedException(getPIRType());
 	}
 
+	public void rearrangeLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToRearrange) throws InputNotSupportedException, WrongPlayerTurnException, TileNotAvailableException, NotEnoughItemsException, UnsupportedLoadableItemException {
+		throw new InputNotSupportedException(getPIRType());
+	}
+
 	public void makeChoice(Player player, int choice) throws WrongPlayerTurnException, InputNotSupportedException {
 		throw new InputNotSupportedException(getPIRType());
 	}
+
+
 
 	@Override
 	public String toString() {
