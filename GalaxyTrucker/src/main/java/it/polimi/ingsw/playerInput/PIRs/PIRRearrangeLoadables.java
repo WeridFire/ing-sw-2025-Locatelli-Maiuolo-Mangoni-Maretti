@@ -77,7 +77,7 @@ public class PIRRearrangeLoadables extends PIR{
     }
 
     @Override
-    public void rearrangeLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToRemove) throws WrongPlayerTurnException, TileNotAvailableException, UnsupportedLoadableItemException {
+    public void rearrangeLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToRemove) throws WrongPlayerTurnException, TileNotAvailableException, UnsupportedLoadableItemException, NotEnoughItemsException {
         checkForTurn(player);
         for(Coordinates c : cargoToRemove.keySet()){
             checkForTileMask(c);
