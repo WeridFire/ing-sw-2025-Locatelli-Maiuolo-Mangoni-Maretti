@@ -18,7 +18,8 @@ public class MenuCommandsProcessor extends PhaseCommandsProcessor {
     public List<String> getAvailableCommands() {
         return List.of("refresh|Refresh the game list.",
                 "join|Join an existing game.",
-                "create|Create a new game.");
+                "create|Create a new game.",
+                "resume|Resume a paused game.");
     }
 
     private MainCabinTile.Color lastOptionsColor = null;
@@ -88,6 +89,20 @@ public class MenuCommandsProcessor extends PhaseCommandsProcessor {
                 // check color validity
                 return validateLastOptionsColor(MenuState.getAvailableColorsForGame(uuid), lastOptionsColorString);
 
+            case "resume":
+                if (cmdWithOptionColorArgsLength != 1) {
+                    view.showWarning("Usage: resume <uuid>");
+                    return false;
+                }
+                UUID resumeUuid;
+                try {
+                    uuid = UUID.fromString(args[0]);
+                } catch (IllegalArgumentException e) {
+                    view.showError("Invalid UUID: [" + args[0] + "]. Please enter a valid game UUID.");
+                    return false;
+                }
+                return true;
+
             case "create" :
                 // check username presence
                 if (cmdWithOptionColorArgsLength != 1) {
@@ -114,6 +129,7 @@ public class MenuCommandsProcessor extends PhaseCommandsProcessor {
             case "create" -> server.createGame(client,
                     args[0],
                     lastOptionsColor);
+            case "resume" -> server.resumeGame(client, UUID.fromString(args[0]));
         }
     }
 }
