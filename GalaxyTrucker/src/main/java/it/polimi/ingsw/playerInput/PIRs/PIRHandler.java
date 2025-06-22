@@ -106,11 +106,16 @@ public class PIRHandler implements Serializable {
 		// notify players about the newly set pir
 		try {
 			Game game = GamesHandler.getInstance().findGameByClientUUID(pir.getCurrentPlayer().getConnectionUUID());
-			if (refreshAllPlayers) {
-				GameServer.getInstance().broadcastUpdate(game);
-			} else {
-				GameServer.getInstance().broadcastUpdateRefreshOnly(game, Set.of(pir.getCurrentPlayer()));
+			if(game != null){
+				//TODO: find a cleaner way to do this. Currently sometimes game is null because the player associated
+				// to the pir is not connected.
+				if (refreshAllPlayers) {
+					GameServer.getInstance().broadcastUpdate(game);
+				} else {
+					GameServer.getInstance().broadcastUpdateRefreshOnly(game, Set.of(pir.getCurrentPlayer()));
+				}
 			}
+
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
