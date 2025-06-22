@@ -30,6 +30,7 @@ public interface IServer extends Remote {
 	void pirForceEndTurn(IClient client) throws RemoteException;
 	void pirRemoveLoadables(IClient client,  Map<Coordinates, List<LoadableType>> cargoToRemove) throws RemoteException;
 	void pirSelectMultipleChoice(IClient client, int selection) throws RemoteException;
+	void pirRearrangeLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToRearrange) throws RemoteException;
 
 	// Lobby phase
 	void updateGameSettings(IClient client, GameLevel level, int minPlayers) throws RemoteException;

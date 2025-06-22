@@ -216,6 +216,13 @@ public class PIRHandler implements Serializable {
 		return setAndRunTurn(choice, standardRunRefreshAll);
 	}
 
+	public int[] setAndRunTurn(PIRRearrangeLoadables loadablesQuantities, boolean refreshAllPlayers){
+		setAndRunGenericTurn(loadablesQuantities, refreshAllPlayers);
+		int[] quantities = loadablesQuantities.getQuantities();
+		removePIR(loadablesQuantities.getCurrentPlayer());
+		return quantities;
+	}
+
 	/**
 	 * Blocking function that will create a new PIR for the operation of
 	 * removing loadables from the player's shipboard. Doesn't return anything,

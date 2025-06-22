@@ -6,9 +6,8 @@ import it.polimi.ingsw.cards.exceptions.PlanetsCardException;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
-import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
-import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
+import it.polimi.ingsw.playerInput.PIRs.*;
+import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
@@ -81,13 +80,38 @@ public class PlanetsCard extends Card {
 					try {
 						planet.landPlayer(p);
 					} catch (PlanetsCardException e) {
-						throw new RuntimeException("Somehow a player choose to land on a planet that was already");
+						throw new RuntimeException("Somehow a player choose to land on a planet that was already occupied");
 					}
+				}
+				boolean result = game.getPIRHandler().setAndRunTurn(
+						new PIRYesNoChoice(p, 30, "Do you want to rearrange the goods already on your ship?", false)
+				);
+				if(result){
+					int[] quantities = game.getPIRHandler().setAndRunTurn(
+						new PIRRearrangeLoadables(p, 30, LoadableType.CARGO_SET), false
+					);
+
+					List<LoadableType> toAdd = new ArrayList<>();
+					for (int i = 0; i < quantities[0]; i++) {
+						toAdd.add(LoadableType.RED_GOODS);
+					}
+					for (int i = 0; i < quantities[1]; i++) {
+						toAdd.add(LoadableType.YELLOW_GOODS);
+					}
+					for (int i = 0; i < quantities[2]; i++) {
+						toAdd.add(LoadableType.GREEN_GOODS);
+					}
+					for (int i = 0; i < quantities[3]; i++) {
+						toAdd.add(LoadableType.BLUE_GOODS);
+					}
+
+					//assuming you can decide when to stop loading items
+					game.getPIRHandler().setAndRunTurn(
+							new PIRAddLoadables(p, 30, toAdd)
+					);
 				}
 			}
 		}
-
-		//TODO: allow rearrrangement / discard of goods
 		game.getPIRHandler().broadcastPIR(game.getPlayersInFlight(),
 				(player, pirHandler) -> {
                     try {

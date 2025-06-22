@@ -104,6 +104,7 @@ public class ClientSocketHandler implements IClient {
 										(Map<Coordinates, List<LoadableType>>) message.getArgs().getFirst());
 							}
 						}
+						case PIR_REARRANGE_LOADABLES -> getServer().pirRearrangeLoadables(this, (Map<Coordinates, List<LoadableType>>) message.getArgs().getFirst());
 						case PIR_SELECT_MULTIPLE_CHOICE -> getServer().pirSelectMultipleChoice(this,
 								(Integer) message.getArgs().getFirst());
 						case PIR_FORCE_END_TURN -> getServer().pirForceEndTurn(this);

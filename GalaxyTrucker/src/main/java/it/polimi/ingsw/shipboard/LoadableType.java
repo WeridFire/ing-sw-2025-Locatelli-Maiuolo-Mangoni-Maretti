@@ -31,7 +31,7 @@ public enum LoadableType {
 
     /** An unmodifiable set containing humans and aliens. */
     public static final Set<LoadableType> CREW_SET = Set.of(HUMAN, PURPLE_ALIEN, BROWN_ALIEN);
-
+    public static final Set<LoadableType> CARGO_SET = Set.of(RED_GOODS, YELLOW_GOODS, GREEN_GOODS, BLUE_GOODS);
     /**
      * Retrieves the required capacity for storing this item.
      *
