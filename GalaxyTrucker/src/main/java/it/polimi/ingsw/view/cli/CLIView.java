@@ -1,8 +1,8 @@
 package it.polimi.ingsw.view.cli;
 
-import it.polimi.ingsw.controller.cp.ICommandsProcessor;
+import it.polimi.ingsw.controller.commandsProcessors.ICommandsProcessor;
 import it.polimi.ingsw.enums.AnchorPoint;
-import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
+import it.polimi.ingsw.controller.commandsProcessors.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.View;
