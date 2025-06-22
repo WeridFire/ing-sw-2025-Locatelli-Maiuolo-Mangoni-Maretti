@@ -53,10 +53,6 @@ public class SocketClient implements IClient {
 	public void runVirtualServer() throws IOException {
 		String line;
 		while ((line = input.readLine()) != null) {
-			if(line.equals("server_ping")){
-				//handle server pings differently.
-				continue;
-			}
 			ClientUpdate clientUpdate = null;
 			try {
 				byte[] serialized = Base64.getDecoder().decode(line);
