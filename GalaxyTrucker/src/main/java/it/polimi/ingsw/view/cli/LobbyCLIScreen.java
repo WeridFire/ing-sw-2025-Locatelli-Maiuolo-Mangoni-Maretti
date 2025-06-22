@@ -24,6 +24,20 @@ public class LobbyCLIScreen extends CLIScreen {
 		return CommonState.isCurrentPhase(GamePhaseType.LOBBY);
 	}
 
+	private String getPlayerDisplayInfo(Player player, boolean isLobbyLeader) {
+		String prefix, suffix;
+		if (player.isConnected()) {
+			prefix = ANSI.GREEN;
+			suffix = ANSI.RESET;
+		} else {
+			prefix = ANSI.YELLOW;
+			suffix = " [disconnected]" + ANSI.RESET;
+		}
+		return prefix +
+				(isLobbyLeader ? " * " : " - ")
+				+ player.getUsername() + suffix;
+	}
+
 	@Override
 	public CLIFrame getCLIRepresentation() {
 		// Screen border with white background (and default foreground)
@@ -36,12 +50,9 @@ public class LobbyCLIScreen extends CLIScreen {
 		CLIFrame title = new CLIFrame(new String[]{
 				ANSI.WHITE + "LOBBY INFO" + ANSI.RESET
 		});
-		lobbyInfoFrame = lobbyInfoFrame.merge(title, AnchorPoint.TOP, AnchorPoint.CENTER, 1, 0);
+		lobbyInfoFrame = lobbyInfoFrame.merge(title, AnchorPoint.TOP, AnchorPoint.TOP, 1, 0);
 
 		GameData currentGame = LobbyState.getGameData();
-		List<String> lobbyMembers = currentGame.getPlayers().stream()
-				.map(Player::getUsername)
-				.toList();
 
 		String lobbyID = currentGame.getGameId().toString();
 		String requiredPlayers = String.valueOf(currentGame.getRequiredPlayers());
@@ -64,23 +75,24 @@ public class LobbyCLIScreen extends CLIScreen {
 				.collect(Collectors.joining(ANSI.YELLOW + " | " + ANSI.RESET));
 		lobbyInfoLines.add(ANSI.BLACK + "Flight Level: " + ANSI.RESET + levelsDisplay);
 
-		CLIFrame gameInfoBG = getScreenFrame(8, 60, ANSI.BACKGROUND_WHITE);
+		CLIFrame gameInfoBG = getScreenFrame(7, 60, ANSI.BACKGROUND_WHITE);
 		CLIFrame gameInfoBlock = new CLIFrame(lobbyInfoLines.toArray(new String[0]));
 		gameInfoBlock = gameInfoBG.merge(gameInfoBlock, AnchorPoint.CENTER, AnchorPoint.CENTER);
 		// Merge the game info block into the lobby info frame (with some vertical offset)
-		lobbyInfoFrame = lobbyInfoFrame.merge(gameInfoBlock, AnchorPoint.TOP, AnchorPoint.CENTER, 8, 0);
+		lobbyInfoFrame = lobbyInfoFrame.merge(gameInfoBlock, AnchorPoint.TOP, AnchorPoint.TOP, 3, 0);
 
 		// Build the lobby members block
 		List<String> membersLines = new ArrayList<>();
 		membersLines.add("");
-		membersLines.add(ANSI.CYAN + "Lobby Members:" + ANSI.RESET);
-		lobbyMembers.forEach(member ->
-				membersLines.add(ANSI.GREEN + " - " + member + ANSI.RESET)
-		);
+		membersLines.add(ANSI.CYAN + "Lobby Members" + ANSI.RESET);
+		currentGame.getPlayers().forEach(player -> membersLines.add(getPlayerDisplayInfo(player,
+				Objects.equals(LobbyState.getGameData().getGameLeader(), player.getUsername()))));
+		membersLines.add("");
 
-		CLIFrame membersFrame = new CLIFrame(membersLines.toArray(new String[0]));
+		CLIFrame membersFrame = getScreenFrame(membersLines.size(), 30, ANSI.BACKGROUND_WHITE)
+				.merge(new CLIFrame(membersLines.toArray(new String[0])), AnchorPoint.CENTER, AnchorPoint.CENTER);
 		// Merge lobby members block in the center of the lobby info frame
-		lobbyInfoFrame = lobbyInfoFrame.merge(membersFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 4, 0);
+		lobbyInfoFrame = lobbyInfoFrame.merge(membersFrame, AnchorPoint.BOTTOM, AnchorPoint.BOTTOM, -1, 0);
 
 		// Merge the lobby info frame into the screen border
 		CLIFrame res = screenBorder.merge(lobbyInfoFrame, AnchorPoint.CENTER, AnchorPoint.CENTER, 0, 0);

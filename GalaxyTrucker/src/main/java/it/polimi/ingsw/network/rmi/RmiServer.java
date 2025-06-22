@@ -131,8 +131,7 @@ public class RmiServer implements IServer {
 				throw new GameNotFoundException(gameId);
 			}
 			game.addPlayer(username, connectionUUID, desiredColor);
-            //notify everyone that a new player has joined -> refreshes their view
-            GameServer.getInstance().broadcastUpdate(game);
+			GameServer.getInstance().broadcastUpdateAllRefreshMenuAndGame(gameId);
         } catch (PlayerAlreadyInGameException | GameNotFoundException | GameAlreadyRunningException
 				 | ColorAlreadyInUseException e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
@@ -144,9 +143,9 @@ public class RmiServer implements IServer {
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
 		if(pg == null) return;
 		pg.game.disconnectPlayer(pg.player);
-		//We update both the game (that may now no longer exist aswell) and the player that disconnected.
-		GameServer.getInstance().broadcastUpdate(pg.game);
-		client.updateClient(new ClientUpdate(gameServer.getUUIDbyConnection(client)));
+		// update both the game (that may now no longer exist aswell)
+		// and the player that disconnected (since it will be in main menu)
+		GameServer.getInstance().broadcastUpdateAllRefreshMenuAndGame(pg.game.getId());
 	}
 
 	@Override
