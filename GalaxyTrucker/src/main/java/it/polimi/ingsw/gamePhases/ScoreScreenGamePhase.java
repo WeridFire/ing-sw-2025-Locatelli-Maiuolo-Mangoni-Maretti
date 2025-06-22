@@ -26,7 +26,7 @@ public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrint
 
     @Override
     public void playLoop() throws RemoteException, CantFindClientException, InterruptedException {
-
+        // TODO full loop for score game phase.
     }
 
     /**
