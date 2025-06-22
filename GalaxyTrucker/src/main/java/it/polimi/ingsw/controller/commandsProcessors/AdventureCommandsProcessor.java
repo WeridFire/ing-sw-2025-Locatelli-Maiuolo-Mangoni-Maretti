@@ -1,8 +1,8 @@
-package it.polimi.ingsw.controller.cp;
+package it.polimi.ingsw.controller.commandsProcessors;
 
 import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.CommonState;
-import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
+import it.polimi.ingsw.controller.commandsProcessors.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.player.Player;
 

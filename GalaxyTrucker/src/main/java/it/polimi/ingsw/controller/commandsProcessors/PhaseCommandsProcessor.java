@@ -1,6 +1,6 @@
-package it.polimi.ingsw.controller.cp;
+package it.polimi.ingsw.controller.commandsProcessors;
 
-import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
+import it.polimi.ingsw.controller.commandsProcessors.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;

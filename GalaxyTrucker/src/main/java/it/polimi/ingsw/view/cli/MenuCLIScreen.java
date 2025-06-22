@@ -1,6 +1,6 @@
 package it.polimi.ingsw.view.cli;
 
-import it.polimi.ingsw.controller.cp.MenuCommandsProcessor;
+import it.polimi.ingsw.controller.commandsProcessors.MenuCommandsProcessor;
 import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.game.GameData;

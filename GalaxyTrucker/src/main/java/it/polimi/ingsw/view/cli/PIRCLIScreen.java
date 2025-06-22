@@ -1,6 +1,6 @@
 package it.polimi.ingsw.view.cli;
 
-import it.polimi.ingsw.controller.cp.PIRCommandsProcessor;
+import it.polimi.ingsw.controller.commandsProcessors.PIRCommandsProcessor;
 import it.polimi.ingsw.controller.states.PIRState;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.network.GameClient;

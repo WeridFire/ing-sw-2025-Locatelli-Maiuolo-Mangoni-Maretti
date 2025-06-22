@@ -1,7 +1,7 @@
-package it.polimi.ingsw.controller.cp;
+package it.polimi.ingsw.controller.commandsProcessors;
 
 import it.polimi.ingsw.controller.states.PIRState;
-import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
+import it.polimi.ingsw.controller.commandsProcessors.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.playerInput.PIRType;
 import it.polimi.ingsw.playerInput.PIRs.PIRActivateTiles;

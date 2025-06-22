@@ -441,6 +441,14 @@ public class GameData implements Serializable {
     }
 
     /**
+     * Sets the username of the leader. Used to update the lobby leader when the current leader disconnects.
+     * @param leader The new username of the leader.
+     */
+    public void setGameLeader(String leader) {
+        this.gameLeader = leader;
+    }
+
+    /**
      * Retrieves and removes a tile from the drawn tiles list based on its ID.
      *
      * @param id the ID of the tile to retrieve

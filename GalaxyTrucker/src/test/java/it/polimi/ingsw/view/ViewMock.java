@@ -1,6 +1,6 @@
 package it.polimi.ingsw.view;
 
-import it.polimi.ingsw.controller.cp.*;
+import it.polimi.ingsw.controller.commandsProcessors.*;
 import it.polimi.ingsw.controller.states.State;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;

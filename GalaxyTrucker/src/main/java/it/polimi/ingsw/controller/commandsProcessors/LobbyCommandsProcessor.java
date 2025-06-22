@@ -1,8 +1,8 @@
-package it.polimi.ingsw.controller.cp;
+package it.polimi.ingsw.controller.commandsProcessors;
 
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.enums.GameLevel;
-import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
+import it.polimi.ingsw.controller.commandsProcessors.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.network.GameClient;
 
 import java.rmi.RemoteException;

@@ -84,4 +84,9 @@ public class SocketClient implements IClient {
 		gameClient.updateClient(clientUpdate);
 	}
 
+	@Override
+	public void pingClient() throws RemoteException {
+
+	}
+
 }

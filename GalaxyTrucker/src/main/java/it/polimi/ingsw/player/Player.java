@@ -147,6 +147,9 @@ public class Player implements Serializable {
         this.connectionUUID = conn;
     }
 
+    /**
+     * Mark the connection of the player as null, causing the logic to consider the player as disconnected.
+     */
     public void disconnect() {
         this.connectionUUID = null;
     }

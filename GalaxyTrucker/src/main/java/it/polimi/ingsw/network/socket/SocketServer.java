@@ -1,11 +1,15 @@
 package it.polimi.ingsw.network.socket;
 
+import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.GameServer;
+import it.polimi.ingsw.player.Player;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.UUID;
 
 public class SocketServer {
@@ -36,7 +40,10 @@ public class SocketServer {
 
 			ClientSocketHandler handler = new ClientSocketHandler(
 																	new BufferedReader(socketRx),
-																	new PrintWriter(socketTx));
+																	new PrintWriter(socketTx),
+																	clientSocket
+			);
+
 			UUID connectionUUID = GameServer.getInstance().registerClient(handler);
 			System.out.println("Detected a new connection: " + connectionUUID);
 			//Confirm connection and send notify client with assigned UUID
@@ -44,6 +51,16 @@ public class SocketServer {
 			new Thread(() -> {
 				try {
 					handler.runVirtualView();
+				} catch(SocketException e) {
+					if(e.getMessage().equals("Connection reset")) {
+						//In here we don't handle the disconnection. Instead the GameServer thread will. We simply
+						//mark the socket as disconnected by closing it.
+						try {
+							handler.socket.close();
+						} catch (IOException ex) {
+							System.err.println("Error while closing a socket that disconnected: " + ex.getMessage());
+						}
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

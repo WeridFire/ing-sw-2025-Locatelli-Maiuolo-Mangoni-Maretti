@@ -125,6 +125,11 @@ public class GameClient implements IClient {
 		getLinkedState().setLastUpdate(clientUpdate);
 	}
 
+	@Override
+	public void pingClient() throws RemoteException {
+
+	}
+
 	public static void main(String[] args) throws IOException, NotBoundException {
 		boolean useRMI = (args.length > 0) ? Boolean.parseBoolean(args[0]) : Default.USE_RMI;
 		GameClient gameClient = GameClient.create(
@@ -150,6 +155,7 @@ public class GameClient implements IClient {
 		// connect the client to the server
 		gameClient.getServer().connect(gameClient.getClient());
         // run the view (blocking function)
+
 		gameClient.getView().run();
 	}
 }

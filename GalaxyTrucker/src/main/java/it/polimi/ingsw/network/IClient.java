@@ -9,5 +9,5 @@ public interface IClient extends Remote {
 
 	IServer getServer() throws RemoteException;
 	void updateClient(ClientUpdate clientUpdate) throws RemoteException;
-
+	void pingClient() throws RemoteException;
 }

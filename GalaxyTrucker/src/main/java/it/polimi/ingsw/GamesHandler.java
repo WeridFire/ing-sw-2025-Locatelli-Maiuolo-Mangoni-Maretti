@@ -156,13 +156,14 @@ public class GamesHandler {
         if(playerGame == null){
             return null;
         }
-        return playerGame.getGameData().getPlayer(player -> player.getConnectionUUID() == clientUUID);
+        return playerGame.getGameData().getPlayer(player -> player.isConnected() && player.getConnectionUUID() == clientUUID);
     }
 
     public Game findGameByClientUUID(UUID clientUUID) {
         return getGames().stream()
                 .filter(game ->
                         game.getGameData().getPlayer(p ->
+                                p.isConnected() &&
                                 p.getConnectionUUID().equals(clientUUID)) != null)
                 .findFirst().orElse(null);
     }

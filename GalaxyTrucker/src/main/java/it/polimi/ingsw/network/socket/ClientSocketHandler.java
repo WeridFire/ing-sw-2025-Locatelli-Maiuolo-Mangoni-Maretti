@@ -13,6 +13,8 @@ import it.polimi.ingsw.util.Coordinates;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.Socket;
+import java.rmi.RemoteException;
 import java.util.*;
 
 public class ClientSocketHandler implements IClient {
@@ -20,6 +22,7 @@ public class ClientSocketHandler implements IClient {
 	final GameServer gameServer;
 	final BufferedReader input;
 	final PrintWriter output;
+	final Socket socket;
 
 	/**
 	 * This adapter handles all socket connections on the server. It handles both INCOMING MESSAGES (parsing client-made
@@ -29,10 +32,11 @@ public class ClientSocketHandler implements IClient {
 	 * @param input The input buffer, for the incoming channel
 	 * @param output The output buffer, for the outgoing channel.
 	 */
-	public ClientSocketHandler(BufferedReader input, PrintWriter output) {
+	public ClientSocketHandler(BufferedReader input, PrintWriter output, Socket clientSocket) {
 		this.gameServer = GameServer.getInstance();
 		this.input = input;
 		this.output = output;
+		this.socket = clientSocket;
 	}
 
 	/**
@@ -136,5 +140,12 @@ public class ClientSocketHandler implements IClient {
 		String encodedMessage = Base64.getEncoder().encodeToString(clientUpdate.serialize());
 		output.println(encodedMessage);
 		output.flush();
+	}
+
+	@Override
+	public void pingClient() throws RemoteException {
+		if(socket.isClosed()){
+			throw new RemoteException("Socket is closed");
+		}
 	}
 }

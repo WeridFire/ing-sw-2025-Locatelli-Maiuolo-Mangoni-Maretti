@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network;
 
+import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.network.exceptions.AlreadyRunningServerException;
 import it.polimi.ingsw.network.messages.ClientUpdate;
@@ -32,7 +33,7 @@ public class GameServer{
 	private final int rmiPort;
 	private RmiServer rmiServer;
 	private final Map<UUID, IClient> clients = new HashMap<>();
-	private final ExecutorService executor = Executors.newFixedThreadPool(2);
+	private final ExecutorService executor = Executors.newFixedThreadPool(3);
 
 	private static GameServer instance;
 
@@ -86,6 +87,12 @@ public class GameServer{
 				e.printStackTrace();
 			}
 		});
+		executor.submit(() -> {
+			while (true) {
+				checkConnectedClients();
+				Thread.sleep(5000);
+			}
+		});
 	}
 
 	/**
@@ -98,6 +105,35 @@ public class GameServer{
 		this.clients.put(clientUUID, client);
 		return clientUUID;
 	}
+
+	public IClient getClient(UUID connectionUUID){
+		return this.clients.get(connectionUUID);
+	}
+
+
+	public void checkConnectedClients() {
+		List<UUID> markedToRemove = new ArrayList<>();
+
+		this.clients.forEach((uuid, client) -> {
+			try {
+				client.pingClient();
+			} catch (RemoteException e) {
+				System.out.println("Client " + uuid + " did not respond to ping. Marking as disconnected.");
+				Game g = GamesHandler.getInstance().findGameByClientUUID(uuid);
+				Player p = GamesHandler.getInstance().getPlayerByConnection(uuid);
+				if (g != null && p != null) {
+					g.disconnectPlayer(p);
+				}
+				markedToRemove.add(uuid);
+			}
+		});
+
+		// Remove clients that were marked for removal
+		for (UUID uuid : markedToRemove) {
+			this.clients.remove(uuid);
+		}
+	}
+
 
 	/**
 	 * A reference to the RMI server, on which server functions can be executed.
@@ -179,7 +215,11 @@ public class GameServer{
 		for (Map.Entry<UUID, IClient> entry : clients.entrySet()) {
 			UUID uuid = entry.getKey();
 			IClient client = entry.getValue();
-			client.updateClient(new ClientUpdate(uuid, refreshCondition.test(uuid, client)));
+			try{
+				client.updateClient(new ClientUpdate(uuid, refreshCondition.test(uuid, client)));
+			}catch(RemoteException e){
+				//The client is no longer connected. The cleanup thread from game server will discover it.
+			}
 		}
 	}
 
@@ -195,7 +235,11 @@ public class GameServer{
 		for (Player player: game.getGameData().getPlayers(Player::isConnected)){
 			IClient client = clients.get(player.getConnectionUUID());
 			if (client != null){
-				client.updateClient(new ClientUpdate(player.getConnectionUUID()));
+				try{
+					client.updateClient(new ClientUpdate(player.getConnectionUUID()));
+				}catch(RemoteException e){
+					//The client is no longer connected. The cleanup thread from game server will discover it.
+				}
 			}
 		}
 	}
@@ -214,7 +258,12 @@ public class GameServer{
 		for (Player player: game.getGameData().getPlayers(Player::isConnected)){
 			IClient client = clients.get(player.getConnectionUUID());
 			if (client != null){
-				client.updateClient(new ClientUpdate(player.getConnectionUUID(), filter.test(player)));
+				try{
+
+					client.updateClient(new ClientUpdate(player.getConnectionUUID(), filter.test(player)));
+				}catch(RemoteException e){
+					//The client is no longer connected. The cleanup thread from game server will discover it.
+				}
 			}
 		}
 	}

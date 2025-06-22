@@ -1,4 +1,4 @@
-package it.polimi.ingsw.controller.cp.exceptions;
+package it.polimi.ingsw.controller.commandsProcessors.exceptions;
 
 import java.util.Arrays;
 
