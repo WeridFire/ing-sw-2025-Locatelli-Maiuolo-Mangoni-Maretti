@@ -53,6 +53,10 @@ public class SocketClient implements IClient {
 	public void runVirtualServer() throws IOException {
 		String line;
 		while ((line = input.readLine()) != null) {
+			if(line.equals("server_ping")){
+				//handle server pings differently.
+				continue;
+			}
 			ClientUpdate clientUpdate = null;
 			try {
 				byte[] serialized = Base64.getDecoder().decode(line);
@@ -82,6 +86,11 @@ public class SocketClient implements IClient {
 		// the RMICLIENT does not exist!! There can only be either the RMI or the SOCKET, not BOTH! So we have to move
 		// The implementation of this function in the generic GameClient, and both the SOCKET and RMI will call it!
 		gameClient.updateClient(clientUpdate);
+	}
+
+	@Override
+	public void pingClient() throws RemoteException {
+
 	}
 
 }

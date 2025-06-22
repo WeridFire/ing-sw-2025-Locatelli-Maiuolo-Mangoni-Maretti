@@ -55,4 +55,9 @@ public class RmiClient extends UnicastRemoteObject implements IClient {
 		gameClient.updateClient(clientUpdate);
 	}
 
+	@Override
+	public void pingClient() throws RemoteException {
+		return;
+	}
+
 }
