@@ -6,6 +6,7 @@ import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
 import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
+import it.polimi.ingsw.playerInput.PIRs.PIRRearrangeLoadables;
 import it.polimi.ingsw.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.view.cli.ANSI;
@@ -45,6 +46,35 @@ public class SmugglersCard extends EnemyCard {
 				true);
 		boolean wantToAccept = game.getPIRHandler().setAndRunTurn(pirYesOrNoChoice);
 		if(wantToAccept){
+
+			boolean result = game.getPIRHandler().setAndRunTurn(
+					new PIRYesNoChoice(player, 30, "Do you want to rearrange the goods already on your ship?", false)
+			);
+			if(result) {
+				int[] quantities = game.getPIRHandler().setAndRunTurn(
+						new PIRRearrangeLoadables(player, 30, LoadableType.CARGO_SET), false
+				);
+
+				List<LoadableType> toAdd = new ArrayList<>();
+				for (int i = 0; i < quantities[0]; i++) {
+					toAdd.add(LoadableType.RED_GOODS);
+				}
+				for (int i = 0; i < quantities[1]; i++) {
+					toAdd.add(LoadableType.YELLOW_GOODS);
+				}
+				for (int i = 0; i < quantities[2]; i++) {
+					toAdd.add(LoadableType.GREEN_GOODS);
+				}
+				for (int i = 0; i < quantities[3]; i++) {
+					toAdd.add(LoadableType.BLUE_GOODS);
+				}
+
+				//assuming you can decide when to stop loading items
+				game.getPIRHandler().setAndRunTurn(
+						new PIRAddLoadables(player, 30, toAdd)
+				);
+			}
+
 			PIRAddLoadables pirAddLoadables = new PIRAddLoadables(player, 30, Arrays.stream(prizeGoods).toList());
 			game.getPIRHandler().setAndRunTurn(pirAddLoadables);
 			game.movePlayerBackward(player, getLostDays());

@@ -77,6 +77,16 @@ public class PIRRearrangeLoadables extends PIR{
         }
     }
 
+    /**
+     * Function used to remove loadables from the player's shipboard, storing them in an array, based on the player request. The function will
+     * check that the current turn and game state allow for this.
+     * @param player The player that requested the action
+     * @param cargoToRemove The list of tiles and the cargo to remove
+     * @throws WrongPlayerTurnException The player that asked for the action is not the one the turn is for.
+     * @throws TileNotAvailableException The tile requested is not supported for this operation.
+     * @throws NotEnoughItemsException The tile requested does not have enough items.
+     * @throws UnsupportedLoadableItemException The tile requested does not support the requested loadable.
+     */
     @Override
     public void rearrangeLoadables(Player player, Map<Coordinates, List<LoadableType>> cargoToRemove) throws WrongPlayerTurnException, TileNotAvailableException, UnsupportedLoadableItemException, NotEnoughItemsException {
         checkForTurn(player);
