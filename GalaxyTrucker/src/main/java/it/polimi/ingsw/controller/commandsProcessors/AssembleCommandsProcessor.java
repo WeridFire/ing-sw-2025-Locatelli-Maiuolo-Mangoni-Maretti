@@ -9,6 +9,7 @@ import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.util.EasterEgg;
+import it.polimi.ingsw.util.GameLevelStandards;
 import it.polimi.ingsw.view.cli.ANSI;
 
 import java.rmi.RemoteException;
@@ -51,7 +52,7 @@ public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
         if(!Objects.equals(AssembleState.getPlayer().getSpectating(), AssembleState.getPlayer().getUsername())){
             availableCommands.add("stop-spectating|Go back to your shipboard.");
         }
-        availableCommands.add("spectate <" + getSpectatablePlayersUsernames() +"> |Spectate another player's shipboard.");
+        availableCommands.add("spectate <" + getSpectatablePlayersUsernames() +">|Spectate another player's shipboard.");
 
 
         if (!AssembleState.isEndedAssembly()) {
@@ -71,12 +72,12 @@ public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
                     availableCommands.add("showcg <id>|Pick and show the card group with ID <id>.");
                 }
                 // or finish assembly
-                // TODO: only after all hourglass flips - 1
                 availableCommands.add("finish|Force end of assembly.");
             }
             else if (tileInHand != null) {
                 // can only act with the tile in hand
                 availableCommands.add("discard|Discard the tile you have in hand.");
+                availableCommands.add("reserve|Reserve the tile you have in hand.");
                 availableCommands.add("rotate <direction>|Rotate the tile you have in hand.");
                 availableCommands.add("place <row> <column>|Place the tile from your hand onto your shipboard.");
             }
@@ -243,18 +244,9 @@ public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
                 }
                 return true;
 
-            case "easteregg":  // only client side -> always return false, to avoid propagating to the server
-                if (AssembleState.isEndedAssembly() && args.length >= 1) {
-                    StringBuilder name = new StringBuilder(args[0]);
-                    for (int i = 1; i < args.length; i++) name.append(' ').append(args[i]);
-                    view.showInfo(ANSI.BACKGROUND_BLACK + ANSI.GREEN +
-                            EasterEgg.getRandomJoke(name.toString()) + ANSI.RESET);
-                } else {  // act like this command does not exist
-                    view.showWarning("Invalid command. Use help to view available commands.");
-                }
-                return false;
             case "stop-spectating":
                 return true;
+
             case "spectate":
                 if(args.length != 1){
                     view.showWarning("Specify one of the following usernames: <" + getSpectatablePlayersUsernames() + ">");
@@ -268,6 +260,18 @@ public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
                 }
                 view.showWarning("Could not find a player with username: " + args[0]);
                 return false;
+
+            case "easteregg":  // only client side -> always return false, to avoid propagating to the server
+                if (AssembleState.isEndedAssembly() && args.length >= 1) {
+                    StringBuilder name = new StringBuilder(args[0]);
+                    for (int i = 1; i < args.length; i++) name.append(' ').append(args[i]);
+                    view.showInfo(ANSI.BACKGROUND_BLACK + ANSI.GREEN +
+                            EasterEgg.getRandomJoke(name.toString()) + ANSI.RESET);
+                } else {  // act like this command does not exist
+                    view.showWarning("Invalid command. Use help to view available commands.");
+                }
+                return false;
+
             // refuses unavailable commands
             default: throw new CommandNotAllowedException(command, args);
         }

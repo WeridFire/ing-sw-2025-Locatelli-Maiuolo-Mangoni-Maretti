@@ -36,7 +36,7 @@ public class AdventureCommandsProcessor extends PhaseCommandsProcessor {
         if(!Objects.equals(AssembleState.getPlayer().getSpectating(), AssembleState.getPlayer().getUsername())){
             availableCommands.add("stop-spectating|Go back to your shipboard.");
         }
-        availableCommands.add("spectate <" + getSpectatablePlayersUsernames() +"> |Spectate another player's shipboard.");
+        availableCommands.add("spectate <" + getSpectatablePlayersUsernames() +">|Spectate another player's shipboard.");
 
 
         return availableCommands;
