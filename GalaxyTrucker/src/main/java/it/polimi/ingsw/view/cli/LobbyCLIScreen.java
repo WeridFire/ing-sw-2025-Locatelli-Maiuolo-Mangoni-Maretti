@@ -1,6 +1,6 @@
 package it.polimi.ingsw.view.cli;
 
-import it.polimi.ingsw.controller.cp.LobbyCommandsProcessor;
+import it.polimi.ingsw.controller.commandsProcessors.LobbyCommandsProcessor;
 import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.enums.AnchorPoint;

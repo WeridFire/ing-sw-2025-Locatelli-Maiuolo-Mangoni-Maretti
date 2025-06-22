@@ -1,6 +1,6 @@
-package it.polimi.ingsw.controller.cp;
+package it.polimi.ingsw.controller.commandsProcessors;
 
-import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
+import it.polimi.ingsw.controller.commandsProcessors.exceptions.CommandNotAllowedException;
 
 public interface ICommandsProcessor {
     /**

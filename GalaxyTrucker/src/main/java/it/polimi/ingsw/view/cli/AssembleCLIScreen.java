@@ -2,7 +2,7 @@ package it.polimi.ingsw.view.cli;
 
 import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.cards.CardsGroup;
-import it.polimi.ingsw.controller.cp.AssembleCommandsProcessor;
+import it.polimi.ingsw.controller.commandsProcessors.AssembleCommandsProcessor;
 import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.enums.AnchorPoint;

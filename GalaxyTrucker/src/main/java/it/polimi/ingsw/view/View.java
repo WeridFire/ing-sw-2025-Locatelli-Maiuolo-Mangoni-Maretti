@@ -1,7 +1,7 @@
 package it.polimi.ingsw.view;
 
-import it.polimi.ingsw.controller.cp.ICommandsProcessor;
-import it.polimi.ingsw.controller.cp.ViewCommandsProcessor;
+import it.polimi.ingsw.controller.commandsProcessors.ICommandsProcessor;
+import it.polimi.ingsw.controller.commandsProcessors.ViewCommandsProcessor;
 import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
