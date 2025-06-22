@@ -10,7 +10,7 @@ import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.game.exceptions.*;
 import it.polimi.ingsw.gamePhases.exceptions.AlreadyPickedPosition;
-import it.polimi.ingsw.controller.cp.exceptions.CommandNotAllowedException;
+import it.polimi.ingsw.controller.commandsProcessors.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.gamePhases.exceptions.IllegalStartingPositionIndexException;
 import it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTypeException;
 import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
@@ -113,9 +113,9 @@ public class RmiServer implements IServer {
 			System.out.println("Created new game: " + game.getId());
 			GameServer.getInstance().broadcastUpdateAllRefreshOnlyIf((clientUUID, clientInterface) -> {
 				// refresh only the clients that are not in a game yet, or this client
-				return (GamesHandler.getInstance().findGameByClientUUID(clientUUID) == null)
-						|| clientInterface.equals(client);
+				return (GamesHandler.getInstance().findGameByClientUUID(clientUUID) == null);
 			});
+			client.updateClient(new ClientUpdate(connectionUUID));
 		} catch (Exception e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
