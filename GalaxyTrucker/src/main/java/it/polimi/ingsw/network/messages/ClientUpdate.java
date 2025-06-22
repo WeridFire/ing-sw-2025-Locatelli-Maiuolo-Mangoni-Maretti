@@ -171,7 +171,7 @@ public class ClientUpdate implements Serializable {
 		if(getCurrentGame() == null){
 			return null;
 		}
-		return getCurrentGame().getPlayer(p -> p.getConnectionUUID().equals(getClientUUID()));
+		return getCurrentGame().getPlayer(p -> p.isConnected() && p.getConnectionUUID().equals(getClientUUID()));
 	}
 
 	/**
