@@ -27,6 +27,7 @@ import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents a game instance with a unique identifier, game data, and a timer.
@@ -212,12 +213,13 @@ public class Game {
             return;
         }
 
+        System.out.println(this + " Started scoring phase");
+
         //********//
         // SCORE SCREEN
         ScoreScreenGamePhase scoreScreenGamePhase;
         scoreScreenGamePhase = new ScoreScreenGamePhase(gameData);
         getGameData().setCurrentGamePhase(scoreScreenGamePhase);
-        System.out.println(this + " Started scoring phase");
         scoreScreenGamePhase.playLoop();
         notifyScoresToPlayers(scoreScreenGamePhase);
 
@@ -330,19 +332,26 @@ public class Game {
      */
     private void notifyAdventureToPlayers(Player leader, Card card) throws InterruptedException {
         String leaderName = leader.toColoredString("[", "]");
-        gameData.getPIRHandler().broadcastPIR(gameData.getPlayers(), (player, pirHandler) -> {
-            PIRDelay pirDelay = new PIRDelay(player, 6,
-                    "The leader " + leaderName + " has drawn a new Adventure Card:",
+        gameData.getPIRHandler().broadcastPIR(
+                gameData
+                        .getPlayers(Player::isConnected),
+                (player, pirHandler) -> {
+
+                    PIRDelay pirDelay = new PIRDelay(player, 6,
+                                        "The leader " + leaderName + " has drawn a new Adventure Card:",
                     card.getCLIRepresentation());
-            pirHandler.setAndRunTurn(pirDelay);
+                    pirHandler.setAndRunTurn(pirDelay);
         });
     }
 
     private void notifyScoresToPlayers(ScoreScreenGamePhase scoreScreen) throws InterruptedException {
-        gameData.getPIRHandler().broadcastPIR(gameData.getPlayers(), (player, pirHandler) -> {
-            PIRDelay pirDelay = new PIRDelay(player, 6,
-                    "GG to all, match is over", scoreScreen.getCLIRepresentation());
-            pirHandler.setAndRunTurn(pirDelay);
+        gameData.getPIRHandler().broadcastPIR(
+                gameData
+                        .getPlayers(Player::isConnected),
+                (player, pirHandler) -> {
+                        PIRDelay pirDelay = new PIRDelay(player, 6,
+                                    "GG to all, match is over", scoreScreen.getCLIRepresentation());
+                        pirHandler.setAndRunTurn(pirDelay);
         });
     }
 

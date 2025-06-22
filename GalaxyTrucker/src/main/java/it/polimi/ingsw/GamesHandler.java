@@ -127,11 +127,9 @@ public class GamesHandler {
 
 
     /**
-     * Command to start a new game. Makes the gamehandler basically "forcestart" the saved gamestate, and automatically
-     * connects the player that is resuming to it, as a leader.
-     * @param savedGameState The saved game state to load.
-     * @param connectionUUID The connection fo the player that sent the command.
-     * @return The newly game object.
+     * Command to resume an existing game. Takes as argument the game state and builds a game in the gamehandler. Then
+     * makes the player that wanted to resume it connect as the game leader.
+     * @return the created game object.
      */
     public Game resumeGame(GameData savedGameState, UUID connectionUUID) throws PlayerAlreadyInGameException,
             GameAlreadyRunningException {
@@ -140,13 +138,12 @@ public class GamesHandler {
             throw new GameAlreadyRunningException(createdGame.getId());
         }
         games.add(createdGame);
-        startGame(createdGame);
-
         try {
             createdGame.addPlayer(savedGameState.getGameLeader(), connectionUUID, null);
         } catch (ColorAlreadyInUseException e) {
             throw new RuntimeException(e);  // should never happen -> runtime exception
         }
+        startGame(createdGame);
 
         return createdGame;
     }

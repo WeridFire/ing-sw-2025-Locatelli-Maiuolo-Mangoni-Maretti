@@ -202,8 +202,6 @@ public class Deck implements Serializable {
 
     public Card drawNextCard(){
         currentCard = deck.isEmpty() ? null : deck.removeFirst();
-        System.out.println("Drawn card:" + ((currentCard == null) ? " none"
-                : "\n" + currentCard.getCLIRepresentation()));
         return currentCard;
     }
 
