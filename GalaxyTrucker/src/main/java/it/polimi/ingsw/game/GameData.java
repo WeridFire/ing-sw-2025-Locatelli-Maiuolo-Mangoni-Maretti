@@ -628,7 +628,7 @@ public class GameData implements Serializable {
             GameData game = (GameData) ois.readObject();
 
             // Reset connectionUUIDs for all players
-            game.players.forEach(p -> p.setConnectionUUID(null));
+            game.players.forEach(Player::disconnect);
 
             return game;
 

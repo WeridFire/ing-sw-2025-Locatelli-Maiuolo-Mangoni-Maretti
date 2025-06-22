@@ -137,8 +137,6 @@ public class GamesHandler {
         if(games.stream().anyMatch((g) -> g.getId().equals(savedGameState.getGameId()))){
             throw new GameAlreadyRunningException(createdGame.getId());
         }
-        // Mark all players as disconnected, since the new game won't have anyone connected.
-        savedGameState.getPlayers().forEach(Player::disconnect);
         games.add(createdGame);
         try {
             createdGame.addPlayer(savedGameState.getGameLeader(), connectionUUID, null);
