@@ -215,7 +215,11 @@ public class GameServer{
 		for (Map.Entry<UUID, IClient> entry : clients.entrySet()) {
 			UUID uuid = entry.getKey();
 			IClient client = entry.getValue();
-			client.updateClient(new ClientUpdate(uuid, refreshCondition.test(uuid, client)));
+			try{
+				client.updateClient(new ClientUpdate(uuid, refreshCondition.test(uuid, client)));
+			}catch(RemoteException e){
+				//The client is no longer connected. The cleanup thread from game server will discover it.
+			}
 		}
 	}
 
@@ -231,7 +235,11 @@ public class GameServer{
 		for (Player player: game.getGameData().getPlayers(Player::isConnected)){
 			IClient client = clients.get(player.getConnectionUUID());
 			if (client != null){
-				client.updateClient(new ClientUpdate(player.getConnectionUUID()));
+				try{
+					client.updateClient(new ClientUpdate(player.getConnectionUUID()));
+				}catch(RemoteException e){
+					//The client is no longer connected. The cleanup thread from game server will discover it.
+				}
 			}
 		}
 	}
@@ -250,7 +258,12 @@ public class GameServer{
 		for (Player player: game.getGameData().getPlayers(Player::isConnected)){
 			IClient client = clients.get(player.getConnectionUUID());
 			if (client != null){
-				client.updateClient(new ClientUpdate(player.getConnectionUUID(), filter.test(player)));
+				try{
+
+					client.updateClient(new ClientUpdate(player.getConnectionUUID(), filter.test(player)));
+				}catch(RemoteException e){
+					//The client is no longer connected. The cleanup thread from game server will discover it.
+				}
 			}
 		}
 	}

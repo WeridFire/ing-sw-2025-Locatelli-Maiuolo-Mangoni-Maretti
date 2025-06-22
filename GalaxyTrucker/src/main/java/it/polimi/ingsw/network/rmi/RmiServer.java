@@ -117,6 +117,7 @@ public class RmiServer implements IServer {
 			});
 			client.updateClient(new ClientUpdate(connectionUUID));
 		} catch (Exception e) {
+			e.printStackTrace();
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
 		}
 	}
