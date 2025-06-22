@@ -361,6 +361,11 @@ public class Game {
         if(gameData.getCurrentGamePhase().getGamePhaseType() == GamePhaseType.LOBBY){
             //If we are in lobby, just remove the player.
             gameData.getUnorderedPlayers().remove(player);
+            if(gameData.getGameLeader().equals(player.getUsername()) &&
+                !gameData.getPlayers().isEmpty()){
+                //The leader has quit. If there are more players, the first one in the list becomes the new leader.
+                gameData.setGameLeader(gameData.getPlayers().getFirst().getUsername());
+            }
         }else{
             player.disconnect();
         }
