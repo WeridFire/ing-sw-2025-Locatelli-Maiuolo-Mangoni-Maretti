@@ -2,6 +2,7 @@ package it.polimi.ingsw.cards.warzone;
 
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.view.cli.ANSI;
 
 public class WarPunishmentLoseFlightDays implements WarPunishment {
 
@@ -9,6 +10,11 @@ public class WarPunishmentLoseFlightDays implements WarPunishment {
 
     public WarPunishmentLoseFlightDays(int lostDays) {
         this.lostDays = lostDays;
+    }
+
+    @Override
+    public String getDetails() {
+        return "lose " + ANSI.BACKGROUND_BLACK + ANSI.RED + lostDays + " flight days" + ANSI.RESET;
     }
 
     @Override

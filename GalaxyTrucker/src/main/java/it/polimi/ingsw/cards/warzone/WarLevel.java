@@ -1,7 +1,10 @@
 package it.polimi.ingsw.cards.warzone;
 
+import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.view.cli.ANSI;
+import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.io.Serializable;
 
@@ -43,5 +46,15 @@ public class WarLevel implements Serializable {
 	 */
 	public void applyPunishment(Player p, GameData game) {
 		warPunishment.apply(p, game);
+	}
+
+	/**
+	 * Create the representation for this war level in a frame with wrapped in a max number of columns
+	 */
+	public CLIFrame getCLIRepresentation(int columnsLimit) {
+		return new CLIFrame(new String[] {
+				ANSI.BLACK + warCriteria.getName(),
+				ANSI.BLACK + "> " + warPunishment.getDetails() + ANSI.RESET
+		}).wrap(columnsLimit, 1, AnchorPoint.LEFT);
 	}
 }

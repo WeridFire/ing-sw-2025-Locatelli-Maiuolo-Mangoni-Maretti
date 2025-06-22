@@ -55,5 +55,6 @@ class WarZoneCardTest {
         void testGetCLIRepresentationNotNull() {
             CLIFrame frame = warZoneCard.getCLIRepresentation();
             assertNotNull(frame);
+            System.out.println(frame);
         }
 }

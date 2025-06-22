@@ -7,6 +7,7 @@ import it.polimi.ingsw.playerInput.PIRUtils;
 import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.shipboard.exceptions.NoTileFoundException;
 import it.polimi.ingsw.shipboard.exceptions.OutOfBuildingAreaException;
+import it.polimi.ingsw.view.cli.ANSI;
 
 public class WarPunishmentProjectile implements WarPunishment {
 
@@ -14,6 +15,15 @@ public class WarPunishmentProjectile implements WarPunishment {
 
     public WarPunishmentProjectile(Projectile[] projectiles) {
         this.projectiles = projectiles;
+    }
+
+    @Override
+    public String getDetails() {
+        StringBuilder details = new StringBuilder().append(ANSI.BACKGROUND_BLACK + ANSI.RED);
+        for (Projectile p: projectiles) {
+            details.append(p.toUnicodeString()).append("  ");
+        }
+        return details.toString().stripTrailing() + ANSI.RESET;
     }
 
     @Override

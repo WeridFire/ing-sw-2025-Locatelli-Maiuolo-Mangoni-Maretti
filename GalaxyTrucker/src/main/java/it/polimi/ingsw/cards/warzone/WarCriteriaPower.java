@@ -2,6 +2,7 @@ package it.polimi.ingsw.cards.warzone;
 
 import it.polimi.ingsw.enums.PowerType;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.view.cli.ANSI;
 
 public class WarCriteriaPower implements WarCriteria {
 
@@ -9,6 +10,13 @@ public class WarCriteriaPower implements WarCriteria {
 
     public WarCriteriaPower(PowerType powerType) {
         this.powerType = powerType;
+    }
+
+    @Override
+    public String getName() {
+        return "Weakest " + ANSI.BACKGROUND_BLACK + ANSI.RED + (powerType == PowerType.THRUST
+                ? "Engines"
+                : "Cannons") + ANSI.RESET;
     }
 
     @Override

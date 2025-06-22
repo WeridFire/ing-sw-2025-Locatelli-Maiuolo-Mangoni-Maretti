@@ -1,9 +1,16 @@
 package it.polimi.ingsw.cards.warzone;
 
 import it.polimi.ingsw.cards.Card;
+import it.polimi.ingsw.enums.AnchorPoint;
+import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
+import it.polimi.ingsw.view.cli.CLIScreen;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class WarZoneCard extends Card {
 
@@ -43,7 +50,27 @@ public class WarZoneCard extends Card {
 	 */
 	@Override
 	public CLIFrame getCLIRepresentation() {
-		// TODO
-		return super.getCLIRepresentation();
+		CLIFrame baseFrame = super.getCLIRepresentation();
+		int colsLimit = baseFrame.getColumns() - 2;  // - (1+1) for borders
+
+		int[] levelHeights = new int[warLevels.length];
+		int index = 0;
+		CLIFrame infoFrame = new CLIFrame();
+		for (WarLevel warLevel : warLevels) {
+			CLIFrame levelFrame = warLevel.getCLIRepresentation(colsLimit);
+			levelHeights[index] = levelFrame.getRows();
+			infoFrame = infoFrame.merge(levelFrame, AnchorPoint.BOTTOM_LEFT, AnchorPoint.TOP_LEFT, 1, 0);
+			index++;
+		}
+
+		CLIFrame containerFrame = CLIScreen.getScreenFrame(levelHeights, colsLimit);
+		ArrayList<String> containerLines = new ArrayList<>(List.of(containerFrame.getContentAsLines()));
+		containerLines.removeFirst();
+		containerLines.removeLast();
+
+		return baseFrame
+				.merge(new CLIFrame(containerLines.toArray(new String[0]))
+								.merge(infoFrame, AnchorPoint.TOP, AnchorPoint.TOP, -1, 0),
+						AnchorPoint.CENTER, AnchorPoint.CENTER);
 	}
 }
