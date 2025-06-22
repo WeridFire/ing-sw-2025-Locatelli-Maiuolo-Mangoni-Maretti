@@ -3,6 +3,7 @@ package it.polimi.ingsw.playerInput.PIRs;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PIRType;
 import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
 import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.shipboard.LoadableType;
@@ -27,7 +28,7 @@ public class PIRRearrangeLoadables extends PIR{
     private int[] quantities = new int[4];
 
     public PIRRearrangeLoadables(Player currentPlayer, int cooldown, Set<LoadableType> allowedCargo) {
-        super(currentPlayer, cooldown, it.polimi.ingsw.playerInput.PIRType.REMOVE_CARGO);
+        super(currentPlayer, cooldown, PIRType.REARRANGE_CARGO);
         this.allowedCargo = allowedCargo;
 
         this.amountToRemove = currentPlayer

@@ -91,6 +91,11 @@ public class ServerSocketHandler implements IServer {
 		sendSocketMessage(mess);
 	}
 
+	@Override
+	public void pirRearrangeLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToRearrange) {
+		SocketMessage mess = SocketMessage.pirRearrangeLoadables(cargoToRearrange);
+		sendSocketMessage(mess);
+	}
 
 	@Override
 	public void pirForceEndTurn(IClient client) {
