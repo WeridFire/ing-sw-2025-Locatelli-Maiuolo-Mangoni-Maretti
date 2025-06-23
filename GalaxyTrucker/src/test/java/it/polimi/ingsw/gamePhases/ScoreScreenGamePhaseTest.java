@@ -21,12 +21,10 @@ import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class ScoreScreenGamePhaseTest {
 
     private Player[] players;
-    private ScoreScreenGamePhase scoreScreenGamePhase;
+    private ScoreGamePhase scoreScreenGamePhase;
 
     public void setup(GameLevel gameLevel) throws
             GameAlreadyRunningException,
@@ -61,7 +59,7 @@ class ScoreScreenGamePhaseTest {
             players[i].getShipBoard().endAssembly();
         }
 
-        scoreScreenGamePhase = new ScoreScreenGamePhase(gd);
+        scoreScreenGamePhase = new ScoreGamePhase(gd);
     }
 
     private void printScores(Map<Player, Float> sortedScores) {
