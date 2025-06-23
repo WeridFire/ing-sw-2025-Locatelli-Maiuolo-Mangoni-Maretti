@@ -68,7 +68,7 @@ public class LobbyCLIScreen extends CLIScreen {
 		lobbyInfoLines.add(ANSI.BLACK + "Required Players: " + requiredPlayers + ANSI.RESET);
 
 		// Flight levels: highlight the current level in purple, others in white.
-		String levelsDisplay = Arrays.stream(GameLevel.values())
+		String levelsDisplay = GameLevel.LEVELS_TO_PLAY.stream()
 				.map(level -> level == currentLevel
 						? ANSI.BACKGROUND_YELLOW + ANSI.BLACK + level.toString() + ANSI.RESET
 						: ANSI.CYAN + level.toString() + ANSI.RESET)

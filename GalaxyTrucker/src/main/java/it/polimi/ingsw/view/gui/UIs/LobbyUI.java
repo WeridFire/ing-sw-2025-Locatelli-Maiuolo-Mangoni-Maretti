@@ -40,7 +40,7 @@ public class LobbyUI implements INodeRefreshableOnUpdateUI {
         playerCountBox.setValue(gameData.getRequiredPlayers());
 
         // ComboBox per livello di gioco
-        gameLevelBox = new ComboBox<>(FXCollections.observableArrayList(GameLevel.values()));
+        gameLevelBox = new ComboBox<>(FXCollections.observableArrayList(GameLevel.LEVELS_TO_PLAY));
         gameLevelBox.setPromptText("Select game level");
         gameLevelBox.setValue(gameData.getLevel());
 

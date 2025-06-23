@@ -43,9 +43,12 @@ public class LobbyCommandsProcessor extends PhaseCommandsProcessor {
                     switch (args[0].toLowerCase()) {
                         case "level":
                             try {
-                                GameLevel.valueOf(args[1].toUpperCase());
+                                if (!GameLevel.canBePlayed(GameLevel.valueOf(args[1].toUpperCase()))) {
+                                    throw new IllegalArgumentException();  // catch below
+                                }
                             } catch(IllegalArgumentException e) {
-                                view.showWarning("Available levels: " + Arrays.toString(GameLevel.values()));
+                                view.showWarning("Available levels: "
+                                        + Arrays.toString(GameLevel.LEVELS_TO_PLAY.toArray()));
                                 return false;
                             }
                             break;

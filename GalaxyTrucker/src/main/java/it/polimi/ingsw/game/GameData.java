@@ -128,9 +128,18 @@ public class GameData implements Serializable {
         return level;
     }
 
+    /**
+     * Sets the game level in the lobby.
+     * The value must be in {@link GameLevel#LEVELS_TO_PLAY}.
+     *
+     * @param level the desired game level
+     */
     public void setLevel(GameLevel level) {
+        if (!GameLevel.canBePlayed(level)) {
+            return;
+        }
         this.level = level;
-
+        // consequences
         startingPositions = GameLevelStandards.getFlightBoardParkingLots(level);
     }
 
