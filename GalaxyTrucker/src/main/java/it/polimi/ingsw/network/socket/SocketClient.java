@@ -8,6 +8,7 @@ import it.polimi.ingsw.network.IServer;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.net.SocketException;
 import java.rmi.RemoteException;
 import java.util.Base64;
 
@@ -52,16 +53,21 @@ public class SocketClient implements IClient {
 	 */
 	public void runVirtualServer() throws IOException {
 		String line;
-		while ((line = input.readLine()) != null) {
-			ClientUpdate clientUpdate = null;
-			try {
-				byte[] serialized = Base64.getDecoder().decode(line);
-				clientUpdate = ClientUpdate.deserialize(serialized);
-				updateClient(clientUpdate);
-			} catch (IOException  | ClassNotFoundException e) {
-				System.err.println("Error deserializing message: " + line);
-				e.printStackTrace();
+		try {
+			while ((line = input.readLine()) != null) {
+				ClientUpdate clientUpdate = null;
+				try {
+					byte[] serialized = Base64.getDecoder().decode(line);
+					clientUpdate = ClientUpdate.deserialize(serialized);
+					updateClient(clientUpdate);
+				} catch (IOException  | ClassNotFoundException e) {
+					System.err.println("Error deserializing message: " + line);
+					e.printStackTrace();
+				}
 			}
+		} catch (SocketException e) {
+			gameClient.getView().showError(e.getMessage(),
+					"The server abandoned you in deep space\n Please exit and connect to a new server instance");
 		}
 	}
 
