@@ -1,12 +1,12 @@
 package it.polimi.ingsw;
 
-import it.polimi.ingsw.game.Game;
-import it.polimi.ingsw.game.GameData;
-import it.polimi.ingsw.game.exceptions.ColorAlreadyInUseException;
-import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
-import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
-import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
+import it.polimi.ingsw.model.game.Game;
+import it.polimi.ingsw.model.game.GameData;
+import it.polimi.ingsw.model.game.exceptions.ColorAlreadyInUseException;
+import it.polimi.ingsw.model.game.exceptions.GameAlreadyRunningException;
+import it.polimi.ingsw.model.game.exceptions.PlayerAlreadyInGameException;
+import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 
 import java.io.File;
 import java.rmi.RemoteException;

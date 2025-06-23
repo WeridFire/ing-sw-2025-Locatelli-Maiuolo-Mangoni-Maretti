@@ -1,6 +1,6 @@
 package it.polimi.ingsw.controller.states;
 
-import it.polimi.ingsw.shipboard.integrity.IShipIntegrityListener;
+import it.polimi.ingsw.model.shipboard.integrity.IShipIntegrityListener;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.IView;
 

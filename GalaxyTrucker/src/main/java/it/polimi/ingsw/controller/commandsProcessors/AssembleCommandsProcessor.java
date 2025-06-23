@@ -4,12 +4,11 @@ import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.controller.commandsProcessors.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.network.GameClient;
-import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
-import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
+import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.model.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.util.EasterEgg;
-import it.polimi.ingsw.util.GameLevelStandards;
 import it.polimi.ingsw.view.cli.ANSI;
 
 import java.rmi.RemoteException;

@@ -2,11 +2,11 @@ package it.polimi.ingsw.network.messages;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.ingsw.GamesHandler;
-import it.polimi.ingsw.cards.Deck;
+import it.polimi.ingsw.model.cards.Deck;
 import it.polimi.ingsw.enums.GamePhaseType;
-import it.polimi.ingsw.game.Game;
-import it.polimi.ingsw.game.GameData;
-import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.model.game.Game;
+import it.polimi.ingsw.model.game.GameData;
+import it.polimi.ingsw.model.player.Player;
 
 import java.io.*;
 import java.util.*;

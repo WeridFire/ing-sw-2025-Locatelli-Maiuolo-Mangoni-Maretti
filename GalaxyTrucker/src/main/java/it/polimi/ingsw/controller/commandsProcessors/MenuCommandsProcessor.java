@@ -3,7 +3,7 @@ package it.polimi.ingsw.controller.commandsProcessors;
 import it.polimi.ingsw.controller.commandsProcessors.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.controller.states.MenuState;
 import it.polimi.ingsw.network.GameClient;
-import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
+import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.CommandOptionsParser;
 
 import java.rmi.RemoteException;

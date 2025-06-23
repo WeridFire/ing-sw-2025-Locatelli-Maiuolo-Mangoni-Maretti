@@ -5,9 +5,9 @@ import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
 import it.polimi.ingsw.network.messages.SocketMessage;
-import it.polimi.ingsw.player.kpf.KeepPlayerFlyingPredicate;
-import it.polimi.ingsw.shipboard.LoadableType;
-import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
+import it.polimi.ingsw.model.player.kpf.KeepPlayerFlyingPredicate;
+import it.polimi.ingsw.model.shipboard.LoadableType;
+import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.io.BufferedWriter;

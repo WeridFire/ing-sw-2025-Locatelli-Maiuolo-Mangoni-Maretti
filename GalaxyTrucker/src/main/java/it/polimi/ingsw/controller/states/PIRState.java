@@ -1,8 +1,8 @@
 package it.polimi.ingsw.controller.states;
 
-import it.polimi.ingsw.playerInput.PIRType;
-import it.polimi.ingsw.playerInput.PIRs.PIR;
-import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.model.playerInput.PIRType;
+import it.polimi.ingsw.model.playerInput.PIRs.PIR;
+import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.util.HashMap;

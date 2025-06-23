@@ -1,9 +1,9 @@
 package it.polimi.ingsw.util;
 
-import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.shipboard.LoadableType;
-import it.polimi.ingsw.shipboard.tiles.CargoHoldTile;
-import it.polimi.ingsw.shipboard.visitors.CalculatorCargoInfo;
+import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.shipboard.LoadableType;
+import it.polimi.ingsw.model.shipboard.tiles.CargoHoldTile;
+import it.polimi.ingsw.model.shipboard.visitors.CalculatorCargoInfo;
 
 import java.io.Serializable;
 

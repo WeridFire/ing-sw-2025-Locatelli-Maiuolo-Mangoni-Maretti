@@ -1,13 +1,12 @@
 package it.polimi.ingsw.controller.states;
 
-import it.polimi.ingsw.cards.CardsGroup;
-import it.polimi.ingsw.cards.exceptions.CardsGroupException;
+import it.polimi.ingsw.model.cards.CardsGroup;
+import it.polimi.ingsw.model.cards.exceptions.CardsGroupException;
 import it.polimi.ingsw.enums.GamePhaseType;
-import it.polimi.ingsw.gamePhases.AssembleGamePhase;
-import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.shipboard.ShipBoard;
-import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
-import it.polimi.ingsw.util.GameLevelStandards;
+import it.polimi.ingsw.model.gamePhases.AssembleGamePhase;
+import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.shipboard.ShipBoard;
+import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,12 +1,12 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.GamesHandler;
-import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.network.exceptions.AlreadyRunningServerException;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.rmi.RmiServer;
 import it.polimi.ingsw.network.socket.SocketServer;
-import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.util.Default;
 
 import java.io.IOException;
@@ -24,7 +24,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class GameServer{
 

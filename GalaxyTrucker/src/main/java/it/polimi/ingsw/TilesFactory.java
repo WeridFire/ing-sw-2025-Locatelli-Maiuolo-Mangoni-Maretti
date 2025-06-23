@@ -1,9 +1,9 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.enums.Direction;
-import it.polimi.ingsw.shipboard.LoadableType;
-import it.polimi.ingsw.shipboard.SideType;
-import it.polimi.ingsw.shipboard.tiles.*;
+import it.polimi.ingsw.model.shipboard.LoadableType;
+import it.polimi.ingsw.model.shipboard.SideType;
+import it.polimi.ingsw.model.shipboard.tiles.*;
 
 import java.util.*;
 import java.util.function.Function;

@@ -2,9 +2,9 @@ package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.Rotation;
-import it.polimi.ingsw.player.kpf.KeepPlayerFlyingPredicate;
-import it.polimi.ingsw.shipboard.LoadableType;
-import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
+import it.polimi.ingsw.model.player.kpf.KeepPlayerFlyingPredicate;
+import it.polimi.ingsw.model.shipboard.LoadableType;
+import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.rmi.Remote;

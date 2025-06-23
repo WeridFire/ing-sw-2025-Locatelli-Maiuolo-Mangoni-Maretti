@@ -6,9 +6,9 @@ import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
-import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.network.GameClient;
-import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.model.player.Player;
 
 import java.util.*;
 import java.util.stream.Collectors;

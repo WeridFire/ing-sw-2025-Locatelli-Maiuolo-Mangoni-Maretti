@@ -2,7 +2,7 @@ package it.polimi.ingsw.view.gui.UIs;
 
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
-import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import it.polimi.ingsw.view.gui.utils.AlertUtils;

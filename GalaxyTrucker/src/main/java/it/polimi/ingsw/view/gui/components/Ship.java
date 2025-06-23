@@ -1,6 +1,6 @@
 package it.polimi.ingsw.view.gui.components;
 
-import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.model.player.Player;
 import javafx.geometry.Pos;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Shape;

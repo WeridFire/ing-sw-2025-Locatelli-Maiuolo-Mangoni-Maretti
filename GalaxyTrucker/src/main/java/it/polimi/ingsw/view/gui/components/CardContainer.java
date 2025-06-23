@@ -1,9 +1,7 @@
 package it.polimi.ingsw.view.gui.components;
 
-import it.polimi.ingsw.cards.Card;
+import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
-import it.polimi.ingsw.view.gui.helpers.Path;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 

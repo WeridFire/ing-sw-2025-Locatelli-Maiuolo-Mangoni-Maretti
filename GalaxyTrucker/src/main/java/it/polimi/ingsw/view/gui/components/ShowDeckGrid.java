@@ -1,14 +1,13 @@
 package it.polimi.ingsw.view.gui.components;
 
-import it.polimi.ingsw.cards.Card;
-import it.polimi.ingsw.cards.CardsGroup;
+import it.polimi.ingsw.model.cards.Card;
+import it.polimi.ingsw.model.cards.CardsGroup;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;

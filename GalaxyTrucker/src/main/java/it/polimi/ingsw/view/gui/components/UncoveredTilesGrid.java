@@ -1,8 +1,8 @@
 package it.polimi.ingsw.view.gui.components;
 
 import it.polimi.ingsw.controller.states.AssembleState;
-import it.polimi.ingsw.game.GameData;
-import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.model.game.GameData;
+import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 import javafx.scene.layout.GridPane;
 
 import java.util.List;
