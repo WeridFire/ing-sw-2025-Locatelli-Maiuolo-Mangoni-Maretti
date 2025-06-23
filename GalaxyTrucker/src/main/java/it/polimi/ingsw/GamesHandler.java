@@ -8,6 +8,7 @@ import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
 
+import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -167,6 +168,22 @@ public class GamesHandler {
 
     public ArrayList<Game> getGames() {
         return games;
+    }
+
+    /**
+     * Deletes the saved game state file associated with the given UUID.
+     *
+     * @param gameId the UUID of the game to delete the state file for
+     * @return true if the file was successfully deleted; false if it did not exist or deletion failed
+     */
+    public static boolean deleteGameSave(UUID gameId) {
+        File file = new File("games", gameId.toString() + ".state");
+
+        if (!file.exists()) {
+            return false;
+        }
+
+        return file.delete();
     }
 
 }

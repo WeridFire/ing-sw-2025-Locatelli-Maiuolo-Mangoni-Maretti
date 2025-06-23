@@ -14,6 +14,7 @@ import it.polimi.ingsw.gamePhases.LobbyGamePhase;
 import it.polimi.ingsw.gamePhases.ScoreScreenGamePhase;
 import it.polimi.ingsw.gamePhases.exceptions.IllegalStartingPositionIndexException;
 import it.polimi.ingsw.network.GameServer;
+import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
 import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
@@ -187,8 +188,6 @@ public class Game {
             // create adventure
             adventureGamePhase = new AdventureGamePhase(gameData, currentAdventureCard);
             getGameData().setCurrentGamePhase(adventureGamePhase);
-            // notify all the players about the new adventure card
-            notifyAdventureToPlayers(gameData.getPlayersInFlight().getFirst(), currentAdventureCard);
             // play the adventure
             adventureGamePhase.playLoop();
 
@@ -206,7 +205,7 @@ public class Game {
         System.out.println(this + " Ended flight phase");
     }
 
-    private void playEndgame() throws RemoteException, InterruptedException {
+    private void playEndgame() throws InterruptedException {
         // play end of the game only after adventures and when no other cards are in the deck
         if (getGameData().getCurrentGamePhaseType() != GamePhaseType.ADVENTURE
                 || getGameData().getDeck().getCurrentCard() != null) {
@@ -217,15 +216,27 @@ public class Game {
 
         //********//
         // SCORE SCREEN
-        ScoreScreenGamePhase scoreScreenGamePhase;
-        scoreScreenGamePhase = new ScoreScreenGamePhase(gameData);
+        ScoreScreenGamePhase scoreScreenGamePhase = new ScoreScreenGamePhase(gameData);
         getGameData().setCurrentGamePhase(scoreScreenGamePhase);
         scoreScreenGamePhase.playLoop();
-        notifyScoresToPlayers(scoreScreenGamePhase);
 
-        // TODO: end scoring phase
-        // TODO: delete saved game state file to avoid memory issues
-        // TODO: take in consideration to turn back to lobby with all the players instead of deleting the current game
+        // Delete game save file to prevent the resuming of a finished game.
+        GamesHandler.deleteGameSave(getId());
+
+        // Disconnect all players. Notify of the disconnection.
+        getGameData().getPlayers(Player::isConnected).forEach((p) -> {
+            UUID connectionUUID = p.getConnectionUUID();
+            p.disconnect();
+			try {
+				GameServer.getInstance()
+                        .getClient(connectionUUID)
+                        .updateClient(new ClientUpdate(connectionUUID, true));
+			} catch (RemoteException e) {
+				// player may have disconnected, will let the gameserver discover it.
+			}
+		});
+
+        stopGame();
     }
 
     /**
@@ -270,8 +281,11 @@ public class Game {
      */
     public Player addPlayer(String username, UUID connectionUUID, MainCabinTile.Color desiredColor)
             throws PlayerAlreadyInGameException, GameAlreadyRunningException, ColorAlreadyInUseException {
-
         GamePhaseType currentGamePhaseType = getGameData().getCurrentGamePhaseType();
+        if(currentGamePhaseType == GamePhaseType.ENDGAME){
+            throw new GameAlreadyRunningException("Attempted to join a game that has already started.");
+        }
+
         if (currentGamePhaseType == GamePhaseType.NONE || currentGamePhaseType == GamePhaseType.LOBBY) {
             if (gameData.getPlayer(p -> p.getColor().equals(desiredColor)) != null) {
                 throw new ColorAlreadyInUseException(desiredColor);
@@ -324,35 +338,6 @@ public class Game {
     private void fillUpShipboards() throws InterruptedException {
         gameData.getPIRHandler().broadcastPIR(gameData.getPlayers(), (player, pirHandler) ->
                 player.getShipBoard().fill(player, pirHandler));
-    }
-
-    /**
-     * Blocking function that will wait for all the players to get notified about a new adventure card drawn
-     * by the leader. Will return once everyone has pressed [Enter] or the cooldown ended for all.
-     */
-    private void notifyAdventureToPlayers(Player leader, Card card) throws InterruptedException {
-        String leaderName = leader.toColoredString("[", "]");
-        gameData.getPIRHandler().broadcastPIR(
-                gameData
-                        .getPlayers(Player::isConnected),
-                (player, pirHandler) -> {
-
-                    PIRDelay pirDelay = new PIRDelay(player, 6,
-                                        "The leader " + leaderName + " has drawn a new Adventure Card:",
-                    card.getCLIRepresentation());
-                    pirHandler.setAndRunTurn(pirDelay);
-        });
-    }
-
-    private void notifyScoresToPlayers(ScoreScreenGamePhase scoreScreen) throws InterruptedException {
-        gameData.getPIRHandler().broadcastPIR(
-                gameData
-                        .getPlayers(Player::isConnected),
-                (player, pirHandler) -> {
-                        PIRDelay pirDelay = new PIRDelay(player, 6,
-                                    "GG to all, match is over", scoreScreen.getCLIRepresentation());
-                        pirHandler.setAndRunTurn(pirDelay);
-        });
     }
 
     /**
