@@ -11,7 +11,7 @@ import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.gamePhases.AdventureGamePhase;
 import it.polimi.ingsw.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.gamePhases.LobbyGamePhase;
-import it.polimi.ingsw.gamePhases.ScoreScreenGamePhase;
+import it.polimi.ingsw.gamePhases.ScoreGamePhase;
 import it.polimi.ingsw.gamePhases.exceptions.IllegalStartingPositionIndexException;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.network.messages.ClientUpdate;
@@ -19,7 +19,6 @@ import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.player.exceptions.NoShipboardException;
 import it.polimi.ingsw.player.exceptions.TooManyItemsInHandException;
 import it.polimi.ingsw.playerInput.PIRUtils;
-import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.shipboard.ShipBoard;
 import it.polimi.ingsw.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.gamePhases.exceptions.AlreadyPickedPosition;
@@ -28,7 +27,6 @@ import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
 
 import java.rmi.RemoteException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Represents a game instance with a unique identifier, game data, and a timer.
@@ -182,6 +180,7 @@ public class Game {
 
             // skip the rest if there are no players flying
             if(gameData.getPlayersInFlight().isEmpty()){
+                System.out.println(this + " Players flight list is empty. Ending flight phase.");
                 break;
             }
 
@@ -206,17 +205,20 @@ public class Game {
     }
 
     private void playEndgame() throws InterruptedException {
-        // play end of the game only after adventures and when no other cards are in the deck
-        if (getGameData().getCurrentGamePhaseType() != GamePhaseType.ADVENTURE
-                || getGameData().getDeck().getCurrentCard() != null) {
-            return;
+        if(!gameData.getPlayersInFlight().isEmpty()){
+            // play end of the game only after adventures and when no other cards are in the deck
+            if (getGameData().getCurrentGamePhaseType() != GamePhaseType.ADVENTURE
+                    || getGameData().getDeck().getCurrentCard() != null) {
+                return;
+            }
         }
+
 
         System.out.println(this + " Started scoring phase");
 
         //********//
         // SCORE SCREEN
-        ScoreScreenGamePhase scoreScreenGamePhase = new ScoreScreenGamePhase(gameData);
+        ScoreGamePhase scoreScreenGamePhase = new ScoreGamePhase(gameData);
         getGameData().setCurrentGamePhase(scoreScreenGamePhase);
         scoreScreenGamePhase.playLoop();
 
