@@ -169,7 +169,11 @@ public class CommandOptionsParser {
     public static HashMap<String, String> parse(String commandName, String[] args, List<OptionFinder> optionsFinder)
             throws IllegalFormatException {
         StringBuilder command = new StringBuilder(commandName);
-        for (String arg : args) command.append(' ').append(arg);
+        if (args != null) {
+            for (String arg : args) if (arg != null) {
+                command.append(' ').append(arg);
+            }
+        }
         return parse(command.toString(), optionsFinder);
     }
 
