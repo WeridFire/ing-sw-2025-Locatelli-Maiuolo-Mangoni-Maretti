@@ -44,8 +44,9 @@ public class PIRAllocateLoadablesTest {
 		toAdd.add(LoadableType.BLUE_GOODS);
 		toAdd.add(LoadableType.GREEN_GOODS);
 		toAdd.add(LoadableType.YELLOW_GOODS);
+		toAdd.add(LoadableType.GREEN_GOODS);
 
-		PIRAddLoadables pir = new PIRAddLoadables(player, 10, toAdd);
+		PIRAddLoadables pir = new PIRAddLoadables(player, 50, toAdd);
 
 		CLIFrame cliFrame = pir.getCLIRepresentation();
 

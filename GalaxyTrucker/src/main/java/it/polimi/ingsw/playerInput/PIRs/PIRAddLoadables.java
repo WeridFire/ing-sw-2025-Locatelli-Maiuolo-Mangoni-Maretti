@@ -138,8 +138,16 @@ public class PIRAddLoadables extends PIR {
 	@Override
 	public CLIFrame getCLIRepresentation() {
 		// Main header
-		CLIFrame frame = new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE + " PLAYER INPUT REQUEST — ALLOCATE CARGO " + ANSI.RESET)
-				.merge(new CLIFrame(""), Direction.SOUTH);
+		StringBuilder loadablesString = new StringBuilder();
+		floatingLoadables.forEach(l -> loadablesString.append(l.getUnicodeColoredString()));
+
+		CLIFrame frame = new CLIFrame(ANSI.BACKGROUND_BLUE + ANSI.WHITE
+				+ " PLAYER INPUT REQUEST — ALLOCATE CARGO " + ANSI.RESET)
+				.merge(new CLIFrame(new String[] {
+						"",
+						loadablesString.toString(),
+						"",
+				}), Direction.SOUTH);
 
 		// Fetch valid container tiles from highlight mask
 		Set<Coordinates> targetCoords = getHighlightMask();
@@ -172,7 +180,7 @@ public class PIRAddLoadables extends PIR {
 				Direction.SOUTH, 0
 		);
 		frame = frame.merge(
-				new CLIFrame(ANSI.WHITE + ">allocate (x, y) <LoadableType> <amount>" + ANSI.RESET),
+				new CLIFrame(ANSI.WHITE + ">allocate (x,y) <LoadableType> <amount>" + ANSI.RESET),
 				Direction.SOUTH, 0
 		);
 		frame = frame.merge(

@@ -49,7 +49,8 @@ public class GameClient implements IClient {
 	 * @param port The port on the host
 	 * @param useGUI {@code true} to use GUI, {@code false} to use TUI.
 	 *
-	 * @throws IOException Signals that some sort of I/O exception has occurred
+	 * @throws IOException Signals that some sort of I/O exception has occurred,
+	 * in particular can also be for ConnectException
 	 * @throws NotBoundException The RMI server is not present
 	 */
 	public static GameClient create(boolean useRMI, String host, Integer port, boolean useGUI)
@@ -130,16 +131,23 @@ public class GameClient implements IClient {
 
 	}
 
-	public static void main(String[] args) throws IOException, NotBoundException {
+	public static void main(String[] args) {
 		boolean useRMI = (args.length > 0) ? Boolean.parseBoolean(args[0]) : Default.USE_RMI;
-		GameClient gameClient = GameClient.create(
-				useRMI,
-				(args.length > 1) ? args[1] : Default.HOST,
-				(args.length > 2) ? Integer.parseInt(args[2]) : Default.PORT(useRMI),
-				(args.length > 3) ? Boolean.parseBoolean(args[3]) : Default.USE_GUI
-		);
+		try {
+			GameClient gameClient = GameClient.create(
+					useRMI,
+					(args.length > 1) ? args[1] : Default.HOST,
+					(args.length > 2) ? Integer.parseInt(args[2]) : Default.PORT(useRMI),
+					(args.length > 3) ? Boolean.parseBoolean(args[3]) : Default.USE_GUI
+			);
+			start(gameClient);  // running body
+		} catch (java.net.ConnectException | java.rmi.ConnectException e) {
+			System.err.println(e.getMessage() + "\n - The server is not available");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-		start(gameClient);
+		System.err.println("Client instance is closed. Please restart and connect to a running server instance.");
 	}
 
 	/**
