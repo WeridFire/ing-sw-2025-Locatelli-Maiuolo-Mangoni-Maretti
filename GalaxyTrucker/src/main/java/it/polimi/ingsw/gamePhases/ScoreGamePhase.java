@@ -6,7 +6,6 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.controller.commandsProcessors.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
-import it.polimi.ingsw.network.exceptions.CantFindClientException;
 import it.polimi.ingsw.player.Player;
 import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.util.ScoreCalculator;
@@ -15,13 +14,12 @@ import it.polimi.ingsw.view.cli.CLIFrame;
 import it.polimi.ingsw.view.cli.ICLIPrintable;
 import it.polimi.ingsw.util.GameLevelStandards;
 import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrintable, Serializable {
+public class ScoreGamePhase extends PlayableGamePhase implements ICLIPrintable, Serializable {
 
-    public ScoreScreenGamePhase(GameData gameData) {
+    public ScoreGamePhase(GameData gameData) {
         super(GamePhaseType.ENDGAME, gameData);
     }
 
