@@ -500,6 +500,31 @@ public class GameData implements Serializable {
     }
 
     /**
+     * Returns a list of indexes (0 is first) corresponding to currently available starting positions.
+     * <p>
+     * Each player in the game may occupy one of some predefined starting positions.
+     * This method checks which of those positions have already been taken and returns the
+     * indexes (relative to the {@code startingPositions} list) of those that are still unoccupied.
+     *
+     * @return a list of integer indexes representing available starting positions
+     */
+    public List<Integer> getAvailableStartingPositionIndexes() {
+        List<Integer> playersPositions = players.stream()
+                .map(Player::getPosition)
+                .filter(Objects::nonNull)
+                .toList();
+        int maxPos = players.size();
+        List<Integer> result = new ArrayList<>(maxPos);
+        // calculate all valid positions
+        for (int preferredPositionIndex = 0; preferredPositionIndex < maxPos; preferredPositionIndex++) {
+            if (!playersPositions.contains(startingPositions.get(preferredPositionIndex))) {
+                result.add(preferredPositionIndex);
+            }
+        }
+        return result;
+    }
+
+    /**
      * Ends the assembly phase for the given player, optionally forcing it.
      * <p>
      * This method processes the player's request to complete their ship assembly by assigning them a position
@@ -528,20 +553,9 @@ public class GameData implements Serializable {
             throw new IllegalArgumentException("Player '" + player.getUsername() + "' is not in this game");
         }
 
-        List<Integer> playersPositions = players.stream()
-                .map(Player::getPosition)
-                .filter(Objects::nonNull)
-                .toList();
-
         if (preferredPositionIndex == null) {
             // calculate first valid position as preferred
-            preferredPositionIndex = -1;
-            do {
-                preferredPositionIndex++;
-                if (preferredPositionIndex >= startingPositions.size()) {
-                    throw new IllegalStartingPositionIndexException(preferredPositionIndex);
-                }
-            } while (playersPositions.contains(startingPositions.get(preferredPositionIndex)));
+            preferredPositionIndex = getAvailableStartingPositionIndexes().getFirst();
         }
 
         // check if anyone is sitting on the preferred position already, or if it is not valid -> throw exception
@@ -549,7 +563,7 @@ public class GameData implements Serializable {
             throw new IllegalStartingPositionIndexException(preferredPositionIndex);
         }
         Integer preferredPosition = startingPositions.get(preferredPositionIndex);
-        if (playersPositions.contains(preferredPosition)) {
+        if (getPlayer(p -> Objects.equals(p.getPosition(), preferredPosition)) != null) {
             throw new AlreadyPickedPosition("Position at index " + preferredPositionIndex + " is already taken");
         }
 

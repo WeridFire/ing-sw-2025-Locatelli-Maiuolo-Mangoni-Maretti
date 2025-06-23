@@ -13,10 +13,7 @@ import it.polimi.ingsw.util.GameLevelStandards;
 import it.polimi.ingsw.view.cli.ANSI;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
@@ -205,12 +202,20 @@ public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
                     }
                     if (args.length == 1) {  // preferred position specified
                         Integer preferredPosition = validateInteger(args[0], "preferred position");
-                        if (preferredPosition == null) return false;
-                        // TODO: client side checks for finish, e.g. valid preferredPosition
+                        List<Integer> availablePositions = AssembleState.getFinishAvailableIndexes();
+                        if (preferredPosition == null) {
+                            // show tooltip about available positions
+                            view.showInfo("Available position indexes to finish: "
+                                    + Arrays.toString(availablePositions.toArray()));
+                            return false;
+                        }
+                        if (!availablePositions.contains(preferredPosition)) {
+                            view.showWarning("Position at index " + preferredPosition + " is already taken.");
+                        }
                     }
                 }
                 else {
-                    view.showWarning("Usage: finish [<starting position>: default->first free]");
+                    view.showWarning("Usage: finish [<starting position>: default->first free | ?]");
                     return false;
                 }
                 return true;

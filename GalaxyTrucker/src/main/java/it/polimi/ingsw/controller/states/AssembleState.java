@@ -88,6 +88,10 @@ public class AssembleState extends CommonState {
                 || (getPlayer().isTileInHandFromReserved() && tile.equals(getPlayer().getTileInHand()));
     }
 
+    public static List<Integer> getFinishAvailableIndexes() {
+        return getGameData().getAvailableStartingPositionIndexes();
+    }
+
     public static boolean isTimerRunning() {
         if (getGameData().getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE) {
             return false;
