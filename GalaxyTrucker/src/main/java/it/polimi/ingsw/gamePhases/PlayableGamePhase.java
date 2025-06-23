@@ -57,5 +57,10 @@ public abstract class PlayableGamePhase implements Serializable {
      * Used to implement starting timer logic
      * @param p The player who flipped the timer.
      * */
-    public abstract void startTimer(Player p) throws TimerIsAlreadyRunningException, CommandNotAllowedException;
+    public void startTimer(Player p) throws TimerIsAlreadyRunningException, CommandNotAllowedException {
+        throw new CommandNotAllowedException(
+                "startTimer",
+                "The timer is not available for an phase of type " + getGamePhaseType()
+        );
+    }
 }

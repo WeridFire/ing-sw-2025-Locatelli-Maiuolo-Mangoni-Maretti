@@ -5,6 +5,8 @@ import it.polimi.ingsw.cards.Card;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.game.GameData;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
+
 import java.util.UUID;
 
 public class AdventureGamePhase extends PlayableGamePhase{
@@ -25,6 +27,7 @@ public class AdventureGamePhase extends PlayableGamePhase{
 
     @Override
     public void playLoop() throws InterruptedException {
+        notifyAdventureToPlayers();
         card.playEffect(gameData);
         synchronized (gameData.getUnorderedPlayers()) {
             if(gameData.getPlayers().isEmpty()){
@@ -34,9 +37,26 @@ public class AdventureGamePhase extends PlayableGamePhase{
         }
     }
 
-    @Override
-    public void startTimer(Player p) {
+    /**
+     * Blocking function that will wait for all the players to get notified about a new adventure card drawn
+     * by the leader. Will return once everyone has pressed [Enter] or the cooldown ended for all.
+     */
+    private void notifyAdventureToPlayers() throws InterruptedException {
+        Player leader = gameData.getPlayersInFlight().getFirst();
+        if(leader == null){
+            return;
+        }
+        String leaderName = leader.toColoredString("[", "]");
+        gameData.getPIRHandler().broadcastPIR(
+                gameData
+                        .getPlayers(Player::isConnected),
+                (player, pirHandler) -> {
 
+                    PIRDelay pirDelay = new PIRDelay(player, 6,
+                            "The leader " + leaderName + " has drawn a new Adventure Card:",
+                            card.getCLIRepresentation());
+                    pirHandler.setAndRunTurn(pirDelay);
+                });
     }
 
 }

@@ -8,6 +8,7 @@ import it.polimi.ingsw.controller.commandsProcessors.exceptions.CommandNotAllowe
 import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
 import it.polimi.ingsw.network.exceptions.CantFindClientException;
 import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.util.ScoreCalculator;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
@@ -25,8 +26,23 @@ public class ScoreScreenGamePhase extends PlayableGamePhase implements ICLIPrint
     }
 
     @Override
-    public void playLoop() throws RemoteException, CantFindClientException, InterruptedException {
-        // TODO full loop for score game phase.
+    public void playLoop() throws InterruptedException {
+        notifyScoresToPlayers();
+    }
+
+    private void notifyScoresToPlayers() throws InterruptedException {
+        gameData.getPIRHandler().broadcastPIR(
+                        gameData.getPlayers(Player::isConnected),
+                        (player, pirHandler) -> {
+
+                                PIRDelay pirDelay = new PIRDelay(
+                                                player,
+                                        6,
+                                                "GG to all, match is over",
+                                                getCLIRepresentation());
+                                pirHandler.setAndRunTurn(pirDelay);
+
+                });
     }
 
     /**
