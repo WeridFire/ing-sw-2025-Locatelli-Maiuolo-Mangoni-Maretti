@@ -56,11 +56,9 @@ public class PIRAddLoadables extends PIR {
 				availableCount.put(loadable, availableCount.get(loadable) - 1);
 			}
 		}
-
-
 	}
 
-	private Map<Coordinates, ContainerTile> getContainerTiles() {
+	public Map<Coordinates, ContainerTile> getContainerTiles() {
 		return currentPlayer.getShipBoard()
 				.getVisitorCalculateCargoInfo()
 				.getInfoAllContainers()
@@ -112,6 +110,7 @@ public class PIRAddLoadables extends PIR {
 			checkForTileMask(c);
 		}
 		areAllCargoItemsAvailable(cargoToAdd);
+
 		for(Map.Entry<Coordinates, List<LoadableType>> entry : cargoToAdd.entrySet()){
 			ContainerTile container = currentPlayer.getShipBoard()
 											.getVisitorCalculateCargoInfo()
@@ -122,8 +121,8 @@ public class PIRAddLoadables extends PIR {
 				container.loadItems(loadable, 1);
 				getFloatingLoadables().remove(loadable);
 			}
-			endTurn();
 		}
+		endTurn();
 	}
 
 	/**
@@ -166,7 +165,7 @@ public class PIRAddLoadables extends PIR {
 			for (Coordinates coord : targetCoords) {
 				ContainerTile container = containerTiles.get(coord);
 				if (container != null) {
-					String info = ANSI.GREEN + "(" + coord.getColumn() + ", " + coord.getRow() + "): " + ANSI.RESET
+					String info = ANSI.GREEN + coord+": " + ANSI.RESET
 							+ container.getName();
 					containersFrame = containersFrame.merge(new CLIFrame(info), Direction.SOUTH, 0);
 				}
@@ -181,7 +180,7 @@ public class PIRAddLoadables extends PIR {
 				Direction.SOUTH, 0
 		);
 		frame = frame.merge(
-				new CLIFrame(ANSI.WHITE + ">allocate (x,y) <LoadableType> <amount>" + ANSI.RESET),
+				new CLIFrame(ANSI.WHITE + ">allocate (row,col) <LoadableType> <amount>" + ANSI.RESET),
 				Direction.SOUTH, 0
 		);
 		frame = frame.merge(
