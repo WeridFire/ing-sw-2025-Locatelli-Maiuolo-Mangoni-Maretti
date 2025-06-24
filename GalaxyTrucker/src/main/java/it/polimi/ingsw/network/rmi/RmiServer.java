@@ -475,7 +475,7 @@ public class RmiServer implements IServer {
 		switch (cheatName){
 			case "shipboard" -> {
 				try {
-					Cheats.cheatShipboard(pg.game, pg.player);
+					Cheats.cheatShipboard(pg.game.getGameData(), pg.player);
 				} catch (AlreadyEndedAssemblyException | FixedTileException | TileAlreadyPresentException |
 						 TileWithoutNeighborException | OutOfBuildingAreaException e) {
 					client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
