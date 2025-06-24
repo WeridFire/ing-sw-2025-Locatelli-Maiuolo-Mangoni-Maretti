@@ -49,10 +49,6 @@ public class PIRDelay extends PIR {
         }
     }
 
-    public String getMessage(){
-        return message;
-    }
-
     @Override
     void endTurn() {
         synchronized (lock){
