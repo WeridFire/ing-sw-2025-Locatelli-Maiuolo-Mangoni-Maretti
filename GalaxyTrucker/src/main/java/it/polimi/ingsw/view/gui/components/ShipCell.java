@@ -1,6 +1,8 @@
 package it.polimi.ingsw.view.gui.components;
 
+import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.BoardCoordinates;
 import it.polimi.ingsw.util.Coordinates;
@@ -20,6 +22,10 @@ public class ShipCell extends DropSlot {
     private final boolean isOnBoard;
     private boolean occupied;
     private boolean hasNeighbor;
+    private boolean isHighlighted = false;
+
+    private boolean isActiveForAdventureDrop = false;
+    private boolean isActiveForAdventureRemove = false;
 
     private final boolean isReserveSlot;
 
@@ -73,26 +79,62 @@ public class ShipCell extends DropSlot {
     }
 
     private boolean canAcceptTile() {
-        return !occupied && ((isReserveSlot) || (isOnBoard && hasNeighbor));
+        return CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE) && (!occupied && ((isReserveSlot) || (isOnBoard && hasNeighbor)));
     }
 
     @Override
     protected boolean canAccept(String dragId) {
-        return dragId.startsWith(ShipTile.BASE_ID) && canAcceptTile();
+        if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
+            return dragId.startsWith(ShipTile.BASE_ID) && canAcceptTile();
+        }
+        //TODO
+        return false;
     }
 
     @Override
     protected void acceptDrop(String dragId) {
-        if (isReserveSlot) {
-            ClientManager.getInstance().simulateCommand("reserve");
-        } else {
-            ClientManager.getInstance().simulateCommand("place", logicalRow, logicalColumn);
+        if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
+            if (isReserveSlot) {
+                ClientManager.getInstance().simulateCommand("reserve");
+            } else {
+                ClientManager.getInstance().simulateCommand("place", logicalRow, logicalColumn);
+            }
+            occupied = true;
         }
-        occupied = true;
+
     }
 
     @Override
     protected void onHover(boolean entering) {
-        setStyle((entering && canAcceptTile()) ? HIGHLIGHT_CELL_STYLE : DEFAULT_CELL_STYLE);
+        if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
+            if (isHighlighted) {
+                return;
+            }
+            setStyle((entering && canAcceptTile()) ? HIGHLIGHT_CELL_STYLE : DEFAULT_CELL_STYLE);
+        }
+    }
+
+    /**
+     * Sets a custom background color for the cell, overriding other styles.
+     * The highlight remains until cleared by calling this method with null or a blank string.
+     *
+     * @param color A valid JavaFX color string (e.g., "rgba(255,0,0,0.5)"), or null/blank to clear the highlight.
+     */
+    public void setHighlight(String color) {
+        if (color != null && !color.isBlank()) {
+            this.isHighlighted = true;
+            setStyle("-fx-background-color: " + color + ";");
+        } else {
+            this.isHighlighted = false;
+            setStyle(DEFAULT_CELL_STYLE);
+        }
+    }
+
+    public void setActiveForAdventureDrop(boolean activeForAdventureDrop) {
+        this.isActiveForAdventureDrop = activeForAdventureDrop;
+    }
+
+    public void setActiveForAdventureRemove(boolean activeForAdventureRemove) {
+        this.isActiveForAdventureRemove = activeForAdventureRemove;
     }
 }

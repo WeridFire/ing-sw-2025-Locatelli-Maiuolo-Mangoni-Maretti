@@ -573,12 +573,18 @@ public class Player implements Serializable {
      * Otherwise: the flight is ended, the end request is cleared, and any related data (e.g. position) is reset.
      */
     public void endFlight() {
-        System.out.println(username + "has requested to end his flight.");
         if (saveFromEndFlight != null && saveFromEndFlight.test(this)) {
             // player has been saved from ending the flight
+            System.out.println(username + " has requested to end his flight -> saved from ending flight with save way: "
+                    + saveFromEndFlight);
             saveFromEndFlight = null;
             return;
         }
+        System.out.println(username + " has requested to end his flight -> flight ended because " + (
+                (saveFromEndFlight != null)
+                        ? "save way " + saveFromEndFlight + " has not been satisfied"
+                        : "save way was not provided"
+                ));
         endedFlight = true;
         requestedEndFlight = false;
         saveFromEndFlight = null;

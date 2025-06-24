@@ -12,4 +12,11 @@ public abstract class KeepPlayerFlyingPredicate implements Predicate<Player>, Se
     public KeepPlayerFlyingPredicate(GameData gameData) {
         this.gameData = gameData;
     }
+
+    /**
+     * @param player the input argument
+     * @return {@code true} if and only if the player is safe and can keep flying
+     */
+    @Override
+    public abstract boolean test(Player player);
 }

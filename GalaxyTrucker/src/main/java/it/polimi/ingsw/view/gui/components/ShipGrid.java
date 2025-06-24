@@ -5,6 +5,7 @@ import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.model.shipboard.ShipBoard;
 import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.gui.helpers.Asset;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
 import javafx.geometry.Pos;
@@ -13,7 +14,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents the display area for a player's spaceship, consisting of a background image
@@ -39,6 +42,8 @@ public class ShipGrid extends StackPane {
     private final GridPane reserveSlotsPane;
     private final int reserveOffsetX;
     private final int reserveOffsetY;
+
+    private Set<ShipCell> activeCells = null;
 
     /**
      * Creates a new ship grid display.
@@ -185,5 +190,72 @@ public class ShipGrid extends StackPane {
 
     private void updateNeighbors(Coordinates coordinates, ShipCell cell) {
         cell.setHasNeighbor(coordinates.getNeighbors().stream().map(gridCells::get).toList());
+    }
+
+    /**
+     * Highlights a set of cells on the grid with a specific color.
+     * Before applying the new highlights, all previous highlights are cleared.
+     * If the provided set of coordinates is null or empty, this method will only clear existing highlights.
+     *
+     * @param coordinatesToHighlight A {@link Set} of {@link Coordinates} to highlight.
+     *                               If null or empty, no new highlights will be applied, but existing ones will be cleared.
+     * @param color                  A JavaFX color string (e.g., "rgba(255, 0, 0, 0.5)" or "#FF000080").
+     *                               The highlight will be applied only if the color is not null or blank.
+     */
+    private void highlightCells(Set<Coordinates> coordinatesToHighlight, String color) {
+        // Clear all previous highlights from all cells
+        for (ShipCell cell : gridCells.values()) {
+            cell.setHighlight(null);
+        }
+
+        // Check for corner cases: no coordinates to highlight or no valid color provided
+        if (coordinatesToHighlight == null || coordinatesToHighlight.isEmpty() || color == null || color.isBlank()) {
+            return;
+        }
+
+        // Apply the new highlight to the specified cells
+        for (Coordinates coord : coordinatesToHighlight) {
+            ShipCell cell = gridCells.get(coord);
+            if (cell != null) {
+                cell.setHighlight(color);
+            }
+        }
+    }
+
+    /**
+     * Sets the active cells based on a given set of coordinates.
+     * The provided coordinates are stored for later use, for example to apply specific logic or styles.
+     *
+     * @param coordinates The set of coordinates to mark as active. If null or empty, the active cells will be cleared.
+     */
+    public void setActiveCells(Set<Coordinates> coordinates, boolean drop, boolean remove) {
+        if (coordinates == null || coordinates.isEmpty()) {
+            this.activeCells = null;
+        } else {
+            this.activeCells = new HashSet<>();
+            for (Coordinates coord : coordinates) {
+                ShipCell cell = gridCells.get(coord);
+                if (cell != null) {
+                    cell.setActiveForAdventureDrop(drop);
+                    cell.setActiveForAdventureRemove(remove);
+                    this.activeCells.add(cell);
+                }
+            }
+
+            highlightCells(coordinates, drop ? Default.ADD_CARGO_STRING_COLOR : Default.REMOVE_CARGO_STRING_COLOR);
+        }
+    }
+
+    /**
+     * Clears the currently active cells.
+     */
+    public void unsetActiveCells() {
+        for (ShipCell cell : gridCells.values()) {
+            cell.setActiveForAdventureDrop(false);
+            cell.setActiveForAdventureRemove(false);
+
+            cell.setHighlight(null);
+        }
+        this.activeCells = null;
     }
 }
