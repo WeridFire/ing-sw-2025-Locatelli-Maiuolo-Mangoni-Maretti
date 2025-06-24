@@ -144,6 +144,12 @@ class CannonTileTest {
         assertNotNull(doubleCannon.getCLIRepresentation());
     }
 
+    @Test
+    void isDoubleCannon() {
+        assertEquals("Double Cannon with power 1.0", doubleCannon.getName());
+        assertEquals("Cannon with power 0.5", singleCannon.getName());
+    }
+
     // Helper class to test the visitor pattern
     private static class TestTileVisitor implements TileVisitor {
         boolean visitCannonCalled = false;
