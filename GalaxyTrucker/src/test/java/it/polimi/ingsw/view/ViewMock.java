@@ -4,6 +4,10 @@ import it.polimi.ingsw.controller.commandsProcessors.*;
 import it.polimi.ingsw.controller.states.State;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.model.game.GameData;
+import it.polimi.ingsw.model.playerInput.PIRType;
+import it.polimi.ingsw.model.playerInput.PIRs.PIR;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRDelay;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.view.gui.GUIView;
@@ -37,14 +41,18 @@ public class ViewMock extends GUIView {
 
     @Override
     public void _onUpdate(ClientUpdate update) {
-        System.out.println(mockName + " >> update");
-        /*
-        System.out.println("Mock View function: onUpdate [" + update + "] for client " + gameClient + " -> "
-                + mockName + " [" + update.getClientUUID() + "]"
-                + " | refresh: " + update.isRefreshRequired());
-
-         */
         clientUUID  = update.getClientUUID();
+        if(isPIRActive(update.getCurrentGame())){
+            PIR pir = update.getCurrentGame().getPIRHandler().getPlayerPIR(update.getClientPlayer());
+            String message = "";
+            if(pir.getPIRType() == PIRType.DELAY){
+                message = ((PIRDelay) pir).getMessage();
+            }else if (pir.getPIRType() == PIRType.CHOICE){
+                message = ((PIRMultipleChoice) pir).getChoiceMessage();
+            }
+            System.out.println(mockName + ">> received PIR: "
+                    + pir.getPIRType() + "|" + message);
+        }
     }
 
     @Override
@@ -55,7 +63,6 @@ public class ViewMock extends GUIView {
 
     @Override
     protected void _onRefresh() {
-        System.out.println(mockName + " >> refresh");
     }
 
     @Override
