@@ -48,10 +48,13 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
         return availableCommands;
     }
 
-    private boolean validateNonActivePIRType(PIRType pirType) {
+    private boolean validateNonActivePIRType(PIRType... pirTypes) {
         PIRType activePIRType = PIRState.getActivePIRType();
-        if (activePIRType != pirType){
-            view.showWarning("This command is not available for a PIR of type " + activePIRType);
+        if (Arrays.stream(pirTypes).noneMatch(p -> p == activePIRType)){
+            view.showWarning("This command is not available for a PIR of type "
+                    + activePIRType +
+                    ". Allowed PIRs: " +
+                    Arrays.stream(pirTypes).toList());
             return true;
         } else {
             return false;
@@ -203,8 +206,7 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
     }
 
     private boolean validateConfirmCommand() {
-        if (validateNonActivePIRType(PIRType.ADD_CARGO)) return false;
-        if (validateNonActivePIRType(PIRType.REMOVE_CARGO)) return false;
+        if (validateNonActivePIRType(PIRType.ADD_CARGO, PIRType.REMOVE_CARGO)) return false;
 
         // Check if localCargo is empty
         if (PIRState.getLocalCargo().isEmpty()) {

@@ -52,7 +52,7 @@ public class PlanetsCard extends Card {
 		if(planet == null){
 			return;
 		}
-
+		p.getShipBoard().resetVisitors();
 		int loadablesAmount = p.getShipBoard().getVisitorCalculateCargoInfo().getGoodsInfo().getAllLoadedItems().size();
 		if(loadablesAmount > 0){
 			boolean result = pirHandler.setAndRunTurn(
