@@ -4,7 +4,6 @@ import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRAddLoadables;
-import it.polimi.ingsw.model.playerInput.PIRs.PIRRearrangeLoadables;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.view.cli.ANSI;
@@ -44,34 +43,28 @@ public class SmugglersCard extends EnemyCard {
 				true);
 		boolean wantToAccept = game.getPIRHandler().setAndRunTurn(pirYesOrNoChoice);
 		if(wantToAccept){
-
-			boolean result = game.getPIRHandler().setAndRunTurn(
-					new PIRYesNoChoice(player, 30, "Do you want to rearrange the goods already on your ship?", false)
-			);
-			if(result) {
-				int[] quantities = game.getPIRHandler().setAndRunTurn(
-						new PIRRearrangeLoadables(player, 30, LoadableType.CARGO_SET), false
+			int loadablesAmount = player
+					.getShipBoard()
+					.getVisitorCalculateCargoInfo()
+					.getGoodsInfo()
+					.getAllLoadedItems().size();
+			if(loadablesAmount > 0){
+				boolean result = game.getPIRHandler().setAndRunTurn(
+						new PIRYesNoChoice(player, 30, "Do you want to rearrange the goods already on your ship?", false)
 				);
-
-				List<LoadableType> toAdd = new ArrayList<>();
-				for (int i = 0; i < quantities[0]; i++) {
-					toAdd.add(LoadableType.RED_GOODS);
+				if(result) {
+					List<LoadableType> loadablesToAdd = player
+							.getShipBoard()
+							.getVisitorCalculateCargoInfo()
+							.getGoodsInfo()
+							.getAllLoadedItems();
+					player.getShipBoard().loseBestGoods(loadablesToAdd.size());
+					game.getPIRHandler().setAndRunTurn(
+							new PIRAddLoadables(player, 30, loadablesToAdd)
+					);
 				}
-				for (int i = 0; i < quantities[1]; i++) {
-					toAdd.add(LoadableType.YELLOW_GOODS);
-				}
-				for (int i = 0; i < quantities[2]; i++) {
-					toAdd.add(LoadableType.GREEN_GOODS);
-				}
-				for (int i = 0; i < quantities[3]; i++) {
-					toAdd.add(LoadableType.BLUE_GOODS);
-				}
-
-				//assuming you can decide when to stop loading items
-				game.getPIRHandler().setAndRunTurn(
-						new PIRAddLoadables(player, 30, toAdd)
-				);
 			}
+
 
 			PIRAddLoadables pirAddLoadables = new PIRAddLoadables(player, 30, Arrays.stream(prizeGoods).toList());
 			game.getPIRHandler().setAndRunTurn(pirAddLoadables);
