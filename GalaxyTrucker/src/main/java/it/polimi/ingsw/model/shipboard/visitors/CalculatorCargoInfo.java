@@ -222,7 +222,10 @@ public class CalculatorCargoInfo<ContainerType extends ContainerTile> implements
     public void removeUpTo(Set<LoadableType> items, int quantity) {
         // pre-filter to call removeAny only for tiles that have something to remove
         for (ContainerTile container : getLocationsWithLoadedItems(items, 1).values()) {
+            System.out.println(" <<<<<<<<<<<<<< TEST >> removeUpTo >> container.coords: " + container.forceGetCoordinates());
+            System.out.println(" <<<<<<<<<<<<<< TEST >> removeUpTo >> quantity before: " + quantity);
             quantity -= container.removeAny(items, quantity);
+            System.out.println(" <<<<<<<<<<<<<< TEST >> removeUpTo >> quantity after: " + quantity);
             if (quantity <= 0) {
                 break;
             }

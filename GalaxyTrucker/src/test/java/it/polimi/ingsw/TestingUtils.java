@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.Deck;
 import it.polimi.ingsw.model.cards.DeckFactory;
 import it.polimi.ingsw.model.game.Game;
+import it.polimi.ingsw.model.gamePhases.AdventureGamePhase;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.playerInput.PIRType;
 import it.polimi.ingsw.model.playerInput.PIRs.PIR;
@@ -77,21 +78,26 @@ public class TestingUtils {
 		);
 
 		ArrayList<Card> cards = DeckFactory.createTutorialDeck();
-		cards.add(card);
-		g.getGameData().setDeck(Deck.deterministic(cards, 0));
+		cards.addFirst(card);
+		g.getGameData().setDeck(Deck.deterministic(cards, null));
 
+		// void card to refuse mixing deck at start of flight
+		g.getGameData().setCurrentGamePhase(new AdventureGamePhase(g.getGameData(), null));
+		// DO NOT play loop: it's just to simulate being in flight
+
+		// integrity problem of cheat shipboard
 		for(GameClientMock c : clients){
 			Thread.sleep(100);
 			c.simulateCommand("endTurn");
 		}
 		syncClients(clients, error);
-		Thread.sleep(1000);
 		for(GameClientMock c : clients){
 			Thread.sleep(100);
 			c.simulateCommand("endTurn");
 		}
 		syncClients(clients, error);
-		Thread.sleep(1000);
+		Thread.sleep(500);
+
 		assert g.getGameData().getCurrentGamePhaseType() == GamePhaseType.ADVENTURE;
 		return clients;
 	}

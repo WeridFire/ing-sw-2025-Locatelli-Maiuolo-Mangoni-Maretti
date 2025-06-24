@@ -49,7 +49,8 @@ class AbandonedShipGameAdventurePhaseTest {
 		int newCrew = player.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().countAll(LoadableType.CREW_SET);
 		assert newCrew == crew-2;
 		Thread.sleep(1000);
-		assert game.getGameData().getCurrentGamePhaseType() == GamePhaseType.ADVENTURE;
+		assert (game.getGameData().getCurrentGamePhaseType() == GamePhaseType.ADVENTURE)
+				&& (game.getGameData().getPlayersInFlight().size() == 2);
 	}
 
 
