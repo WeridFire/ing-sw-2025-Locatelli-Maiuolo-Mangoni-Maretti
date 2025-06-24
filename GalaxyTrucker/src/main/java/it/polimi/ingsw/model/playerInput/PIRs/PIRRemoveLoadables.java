@@ -67,7 +67,12 @@ public class PIRRemoveLoadables extends PIR {
 		synchronized (lock){
 			lock.wait(getCooldown()* 1000L);
 			if(getCargoAmount() > targetAmount){
-				currentPlayer.getShipBoard().loseBestGoods(getAmountToRemove());
+				System.out.println("Removing default loadables...");
+				if(this.allowedCargo.containsAll(LoadableType.CREW_SET)){
+					currentPlayer.getShipBoard().loseCrew(amountToRemove);
+				}else{
+					currentPlayer.getShipBoard().loseBestGoods(amountToRemove);
+				}
 			}
 		}
 	}
