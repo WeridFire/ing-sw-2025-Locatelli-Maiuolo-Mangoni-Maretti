@@ -184,6 +184,8 @@ class ShipBoardTest {
 
         shipBoard1.hit(Direction.NORTH, 7);
         assertThrows(NoTileFoundException.class, () -> {shipBoard1.getTile(coord3);});
+
+        assertNotNull(shipBoard1.getCLIRepresentation());
     }
 
 
