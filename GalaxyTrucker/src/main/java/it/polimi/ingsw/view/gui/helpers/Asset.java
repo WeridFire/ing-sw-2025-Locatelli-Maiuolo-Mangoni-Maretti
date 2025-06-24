@@ -2,6 +2,7 @@ package it.polimi.ingsw.view.gui.helpers;
 
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.shipboard.LoadableType;
 
 /**
  * Enum representing high-level GUI assets and providing utility methods
@@ -54,5 +55,34 @@ public enum Asset {
                 case BOARD -> "cardboard-5.png";
             };
         };
+    }
+
+    public static String fromLoadableType(LoadableType type) {
+        switch (type) {
+            case BATTERY -> {
+                return "battery.png";
+            }
+            case BLUE_GOODS -> {
+                return "loadable_blue.png";
+            }
+            case GREEN_GOODS -> {
+                return"loadable_green.png";
+            }
+            case YELLOW_GOODS -> {
+                return "loadable_yellow.png";
+            }
+            case RED_GOODS -> {
+                return "loadable_red.png";
+            }
+            case HUMAN -> {
+                return "astronaut.png";
+            }
+            case PURPLE_ALIEN -> {
+                return "purple_alien.png";
+            }
+            default -> {
+                return "brown_alien.png";
+            }
+        }
     }
 }

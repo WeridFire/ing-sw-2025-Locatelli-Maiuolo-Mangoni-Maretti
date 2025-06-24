@@ -16,14 +16,17 @@ public class Path {
         /** Card images folder. */
         CARD,
         /** Tile images folder. */
-        TILE;
+        TILE,
+
+        PIECE;
 
         @Override
         public String toString() {
             return switch (this) {
                 case CARDBOARD -> "cardboard/";
                 case CARD      -> "cards/";
-                default        -> "tiles/";
+                case TILE      -> "tiles/";
+                default        -> "pieces/";
             };
         }
     }
@@ -65,8 +68,10 @@ public class Path {
             return BASE_PATH + TYPE.CARDBOARD.toString() + textureName;
         } else if (textureName.startsWith(MINIMUM_DIFFERENT_PREFIX_CARD)) {
             return BASE_PATH + TYPE.CARD.toString() + textureName;
-        } else {
+        } else if (textureName.startsWith(MINIMUM_DIFFERENT_PREFIX_TILE)) {
             return BASE_PATH + TYPE.TILE.toString() + textureName;
+        }else{
+            return BASE_PATH + TYPE.PIECE.toString() + textureName;
         }
     }
 }
