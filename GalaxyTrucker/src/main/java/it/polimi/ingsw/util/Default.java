@@ -21,6 +21,9 @@ public class Default {
     public static final String PATH_BACK_TILE = "GT-new_tiles_16_for web157.jpg";
     public static final String PATH_BACK_CARD_I = "GT-cards_I_IT_0121.jpg";
     public static final String PATH_BACK_CARD_II = "GT-cards_II_IT_0121.jpg";
+    public static final String OVERLAY_DRAG_ID = "dragId";
+    public static final String ADD_CARGO_STRING_COLOR = "green";
+    public static final String REMOVE_CARGO_STRING_COLOR = "yellow";
 
     //GENRAL
     public static final int TOTAL_TILES_NUMBER = TilesFactory.createPileTiles().size();

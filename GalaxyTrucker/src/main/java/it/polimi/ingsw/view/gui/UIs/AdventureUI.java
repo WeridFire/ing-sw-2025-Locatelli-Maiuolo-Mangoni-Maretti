@@ -7,15 +7,19 @@ import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.model.playerInput.PIRs.PIR;
 import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.network.messages.ClientUpdate;
-import it.polimi.ingsw.view.gui.components.BoardComponent;
-import it.polimi.ingsw.view.gui.components.CardContainer;
-import it.polimi.ingsw.view.gui.components.LoadableContainer;
-import it.polimi.ingsw.view.gui.components.ShipGrid;
+import it.polimi.ingsw.view.gui.components.*;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
+
+import java.util.function.Consumer;
 
 public class AdventureUI implements INodeRefreshableOnUpdateUI {
 
@@ -26,7 +30,9 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     private ShipGrid shipGrid;
     private CardContainer cardPane;
     private LoadableContainer loadableContainer;
-    private PIRState pirContainer;
+    private PIRContainer pirContainer = new PIRContainer();
+
+    private Rectangle overlayBackground;
 
     private static Pane dragOverlay;
     public static Pane getDragOverlay() {
@@ -37,7 +43,25 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         return dragOverlay;
     }
 
+    private static StackPane root;
+    public static StackPane getRoot() {
+        if (root == null) {
+            root = new StackPane();
+        }
+        return root;
+    }
+
+    private static AdventureUI instance;
+    public static AdventureUI getInstance() {
+        if (instance == null) {
+            instance = new AdventureUI();
+        }
+        return instance;
+    }
+
     public AdventureUI() {
+        root = new StackPane();
+
         mainLayout = new GridPane();
 
         GameLevel gameLevel = LobbyState.getGameLevel();
@@ -65,6 +89,12 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
 
         // Utile per il debug del layout, mostra le linee della griglia:
         mainLayout.setGridLinesVisible(true);
+
+        root.getChildren().add(mainLayout);
+    }
+
+    public ShipGrid getShipGrid(){
+        return shipGrid;
     }
 
     public void updateCard() {
@@ -79,15 +109,47 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         return loadableContainer;
     }
 
+    public void showPirContainer() {
+        overlayBackground = new Rectangle();
+        overlayBackground.setFill(Color.rgb(0, 0, 0, 0.6));
+        overlayBackground.widthProperty().bind(getRoot().widthProperty());
+        overlayBackground.heightProperty().bind(getRoot().heightProperty());
+
+        this.pirContainer.setAlignment(Pos.CENTER);
+        root.getChildren().addAll(pirContainer, overlayBackground);
+    }
+
+    public void hidePirContainer() {
+        getRoot().getChildren().remove(overlayBackground);
+        getRoot().getChildren().remove(pirContainer);
+    }
+
     @Override
     public Node getLayout() {
-        return mainLayout;
+        return root;
     }
 
     @Override
     public void refreshOnUpdate(ClientUpdate update) {
-       Platform.runLater(this::updateCard);
-       lastPIR = PIRState.getActivePIR();
+        Platform.runLater(() -> {
+            // Aggiorna la carta
+            updateCard();
 
+            // Gestisci il PIR
+            lastPIR = PIRState.getActivePIR();
+            if (lastPIR != null) {
+                try {
+                    System.out.println("Setting pir to " + lastPIR.getPIRType());
+                    pirContainer.setPir(lastPIR);
+                    if (!root.getChildren().contains(pirContainer)) {
+                        showPirContainer();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }else{
+                hidePirContainer();
+            }
+        });
     }
 }
