@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.shipboard.SideType;
 import it.polimi.ingsw.model.shipboard.tiles.CargoHoldTile;
 import it.polimi.ingsw.model.shipboard.tiles.exceptions.TooMuchLoadException;
 import it.polimi.ingsw.model.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
+import it.polimi.ingsw.model.shipboard.visitors.TileVisitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -141,6 +142,69 @@ class CargoHoldTileTest {
 
             //Should return the most valuable good (red)
             assertEquals(testQueue.toString(), specialDoubleCargoHoldTile.getContrabandMostValuableItems(1, 2).toString());
+
+    }
+
+    @Test
+    void testGetName() {
+            assertEquals("Cargo Hold [] / 2", regularDoubleCargoHoldTile.getName());
+    }
+
+    @Test
+    void testAccept() {
+
+        // Create a stub for TileVisitor
+        CargoHoldTileTest.TestTileVisitor visitor = new CargoHoldTileTest.TestTileVisitor();
+
+        // Call accept on the cannon tile
+        regularDoubleCargoHoldTile.accept(visitor);
+
+        // Verify that visitCannon was called
+        assertTrue(visitor.visitCargoHoldCalled);
+        assertEquals(regularDoubleCargoHoldTile, visitor.lastCargoHoldVisited);
+    }
+
+    // Helper class to test the visitor pattern
+    private static class TestTileVisitor implements TileVisitor {
+        boolean visitCargoHoldCalled = false;
+        CargoHoldTile lastCargoHoldVisited = null;
+
+        @Override
+        public void visitEngine(EngineTile tile) {
+        }
+
+        // Implement other required methods with empty bodies
+        @Override public void visitStructural(StructuralTile tile) {}
+
+        /**
+         * What to do when visiting the provided life support system tile.
+         * To be implemented in each visitor.
+         *
+         * @param tile The visited life support system tile.
+         */
+        @Override
+        public void visitLifeSupportSystem(LifeSupportSystemTile tile) {}
+
+        @Override
+        public void visitCabin(CabinTile tile) {}
+
+        @Override
+        public void visitMainCabin(CabinTile tile) {}
+
+        @Override
+        public void visitBatteryComponent(BatteryComponentTile tile) {}
+
+        @Override
+        public void visitCannon(CannonTile tile) {}
+
+        @Override
+        public void visitShieldGenerator(ShieldGeneratorTile tile) {}
+
+        @Override
+        public void visitCargoHold(CargoHoldTile tile) {
+            visitCargoHoldCalled = true;
+            lastCargoHoldVisited = tile;
+        }
 
     }
 }
