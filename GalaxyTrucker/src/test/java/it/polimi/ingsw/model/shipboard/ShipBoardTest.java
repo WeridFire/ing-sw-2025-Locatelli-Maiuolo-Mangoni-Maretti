@@ -130,31 +130,32 @@ class ShipBoardTest {
         Coordinates coord6 = new Coordinates(8, 7);
 
         SideType[] northCannon = Direction.sortedArray(
-                SideType.CANNON,  // NORTH
-                SideType.UNIVERSAL,  // EAST
-                SideType.UNIVERSAL,     // SOUTH
-                SideType.UNIVERSAL   // WEST
+                SideType.UNIVERSAL,     // EAST
+                SideType.CANNON,        // NORTH
+                SideType.UNIVERSAL,     // WEST
+                SideType.UNIVERSAL      // SOUTH
         ).toArray(SideType[]::new);
         CannonTile northC = new CannonTile(northCannon, false);
         SideType[] eastCannon = Direction.sortedArray(
-                SideType.UNIVERSAL,  // NORTH
-                SideType.CANNON,  // EAST
-                SideType.UNIVERSAL,     // SOUTH
-                SideType.UNIVERSAL   // WEST
+                SideType.CANNON,        // EAST
+                SideType.UNIVERSAL,     // NORTH
+                SideType.UNIVERSAL,     // WEST
+                SideType.UNIVERSAL      // SOUTH
         ).toArray(SideType[]::new);
         CannonTile eastC = new CannonTile(eastCannon, false);
         SideType[] westCannon = Direction.sortedArray(
-                SideType.UNIVERSAL,  // NORTH
-                SideType.UNIVERSAL,  // EAST
-                SideType.UNIVERSAL,     // SOUTH
-                SideType.CANNON   // WEST
+                SideType.UNIVERSAL,     // EAST
+                SideType.UNIVERSAL,     // NORTH
+                SideType.CANNON,        // WEST
+                SideType.UNIVERSAL      // SOUTH
         ).toArray(SideType[]::new);
         CannonTile westC = new CannonTile(westCannon, false);
+        CannonTile westDoubleC = new CannonTile(westCannon, true);
         SideType[] southCannon = Direction.sortedArray(
-                SideType.UNIVERSAL,  // NORTH
-                SideType.UNIVERSAL,  // EAST
-                SideType.CANNON,     // SOUTH
-                SideType.UNIVERSAL   // WEST
+                SideType.UNIVERSAL,     // EAST
+                SideType.UNIVERSAL,     // NORTH
+                SideType.UNIVERSAL,     // WEST
+                SideType.CANNON         // SOUTH
         ).toArray(SideType[]::new);
         CannonTile southC = new CannonTile(southCannon, false);
 
@@ -170,14 +171,39 @@ class ShipBoardTest {
         shipBoard1.setTile(northC, coord3);
         shipBoard1.setTile(eastC, coord4);
         shipBoard1.setTile(westC, coord5);
+        shipBoard1.setTile(westDoubleC, new Coordinates(coord5.getRow() + 1, coord5.getColumn()));
         shipBoard1.setTile(southC, coord6);
 
-        //TODO: fix getCannonProtection method in shipboard
         shipBoard1.resetVisitors();
-        assertEquals(shipBoard1.getCannonProtection(Direction.NORTH, 7), ProtectionType.SINGLE_CANNON);
-        assertEquals(shipBoard1.getCannonProtection(Direction.EAST, 7), ProtectionType.SINGLE_CANNON);
-        assertEquals(shipBoard1.getCannonProtection(Direction.WEST, 7), ProtectionType.SINGLE_CANNON);
-        assertEquals(shipBoard1.getCannonProtection(Direction.SOUTH, 7), ProtectionType.SINGLE_CANNON);
+
+        // normal behavior
+        assertEquals(ProtectionType.SINGLE_CANNON, shipBoard1.getCannonProtection(Direction.EAST, 7));
+        assertEquals(ProtectionType.SINGLE_CANNON, shipBoard1.getCannonProtection(Direction.NORTH, 7));
+        assertEquals(ProtectionType.SINGLE_CANNON, shipBoard1.getCannonProtection(Direction.WEST, 7));
+        assertEquals(ProtectionType.SINGLE_CANNON, shipBoard1.getCannonProtection(Direction.SOUTH, 7));
+
+        // edge east
+        assertEquals(ProtectionType.NONE, shipBoard1.getCannonProtection(Direction.EAST, 5));
+        assertEquals(ProtectionType.SINGLE_CANNON, shipBoard1.getCannonProtection(Direction.EAST, 6));
+        assertEquals(ProtectionType.SINGLE_CANNON, shipBoard1.getCannonProtection(Direction.EAST, 8));
+        assertEquals(ProtectionType.NONE, shipBoard1.getCannonProtection(Direction.EAST, 9));
+
+        // edge north
+        assertEquals(ProtectionType.NONE, shipBoard1.getCannonProtection(Direction.NORTH, 6));
+        assertEquals(ProtectionType.NONE, shipBoard1.getCannonProtection(Direction.NORTH, 8));
+
+        // edge west
+        assertEquals(ProtectionType.NONE, shipBoard1.getCannonProtection(Direction.WEST, 5));
+        assertEquals(ProtectionType.SINGLE_CANNON, shipBoard1.getCannonProtection(Direction.WEST, 6));
+        assertEquals(ProtectionType.SINGLE_CANNON, shipBoard1.getCannonProtection(Direction.WEST, 8));
+        assertEquals(ProtectionType.DOUBLE_CANNON, shipBoard1.getCannonProtection(Direction.WEST, 9));
+        assertEquals(ProtectionType.NONE, shipBoard1.getCannonProtection(Direction.WEST, 10));
+
+        // edge south
+        assertEquals(ProtectionType.NONE, shipBoard1.getCannonProtection(Direction.SOUTH, 5));
+        assertEquals(ProtectionType.SINGLE_CANNON, shipBoard1.getCannonProtection(Direction.SOUTH, 6));
+        assertEquals(ProtectionType.SINGLE_CANNON, shipBoard1.getCannonProtection(Direction.SOUTH, 8));
+        assertEquals(ProtectionType.NONE, shipBoard1.getCannonProtection(Direction.SOUTH, 9));
 
         shipBoard1.endAssembly();
         assertThrows(AlreadyEndedAssemblyException.class, () -> {shipBoard1.endAssembly();});

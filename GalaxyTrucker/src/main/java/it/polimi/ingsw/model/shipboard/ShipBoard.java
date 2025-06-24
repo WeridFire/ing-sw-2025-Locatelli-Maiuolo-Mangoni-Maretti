@@ -487,19 +487,24 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 
 		// create coordinates box range
 		int firstCoordValue = BoardCoordinates.getFirstCoordinateFromDirection(direction);
+		int lastCoordValue = BoardCoordinates.getFirstCoordinateFromDirection(direction.getRotated(Rotation.OPPOSITE));
 		Coordinates coordTopLeft = null, coordBottomRight = null;
 		switch (direction) {
-			case EAST, WEST:
-				coordTopLeft = new Coordinates(coordinate - 1, firstCoordValue);
+			case EAST:
+				coordTopLeft = new Coordinates(coordinate - 1, lastCoordValue);
 				coordBottomRight = new Coordinates(coordinate + 1, firstCoordValue);
-				break;
-			case SOUTH:
-				coordTopLeft = new Coordinates(firstCoordValue, coordinate - 1);
-				coordBottomRight = new Coordinates(firstCoordValue, coordinate + 1);
 				break;
 			case NORTH:
 				coordTopLeft = new Coordinates(firstCoordValue, coordinate);
-				coordBottomRight = new Coordinates(firstCoordValue, coordinate);
+				coordBottomRight = new Coordinates(lastCoordValue, coordinate);
+				break;
+			case WEST:
+				coordTopLeft = new Coordinates(coordinate - 1, firstCoordValue);
+				coordBottomRight = new Coordinates(coordinate + 1, lastCoordValue);
+				break;
+			case SOUTH:
+				coordTopLeft = new Coordinates(lastCoordValue, coordinate - 1);
+				coordBottomRight = new Coordinates(firstCoordValue, coordinate + 1);
 				break;
 		}
 
