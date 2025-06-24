@@ -66,15 +66,14 @@ public class PIRRemoveLoadables extends PIR {
 	public void run() throws InterruptedException {
 		synchronized (lock){
 			lock.wait(getCooldown()* 1000L);
-			System.out.println(" <<<<<<<<<<<<<< TEST >> run >> getCargoAmount() = " + getCargoAmount());
-			System.out.println(" <<<<<<<<<<<<<< TEST >> run >> targetAmount = " + targetAmount);
 			if(getCargoAmount() > targetAmount){
 				System.out.println("Removing default loadables...");
-				if(this.allowedCargo.containsAll(LoadableType.CREW_SET)){
-					System.out.println(" <<<<<<<<<<<<<< TEST >> run >> loseCrew: " + amountToRemove);
+				if(this.allowedCargo.containsAll(LoadableType.CREW_SET)){  // crew
 					currentPlayer.getShipBoard().loseCrew(amountToRemove);
-				}else{
-					System.out.println(" <<<<<<<<<<<<<< TEST >> run >> loseBestGoods: " + amountToRemove);
+				} else if (this.allowedCargo.contains(LoadableType.BATTERY) && this.allowedCargo.size() == 1) {
+					// only batteries
+					currentPlayer.getShipBoard().loseBatteries(amountToRemove);
+				} else {  // goods that are not batteries
 					currentPlayer.getShipBoard().loseBestGoods(amountToRemove);
 				}
 			}

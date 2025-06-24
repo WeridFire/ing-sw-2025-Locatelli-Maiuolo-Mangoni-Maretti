@@ -31,7 +31,8 @@ public class VisitorSmugglers implements TileVisitor {
         minimumContrabandValue = 0;
         contrabandTargets = new PriorityQueue<>(maxRemovableItems + 1,
                 (e1, e2)
-                -> ContrabandCalculator.descendingContrabandComparator.compare(e1.getValue(), e2.getValue()));
+                -> ContrabandCalculator.ascendingContrabandComparator.compare(e1.getValue(), e2.getValue())
+        );
         alreadyRemoved = false;
     }
 

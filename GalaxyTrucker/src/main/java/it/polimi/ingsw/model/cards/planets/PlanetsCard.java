@@ -77,7 +77,7 @@ public class PlanetsCard extends Card {
 
 	private Planet getPlanetByPlayer(Player p){
 		for(Planet planet : planets){
-			if(planet.getCurrentPlayer().equals(p)){
+			if(p.equals(planet.getCurrentPlayer())){
 				return planet;
 			}
 		}

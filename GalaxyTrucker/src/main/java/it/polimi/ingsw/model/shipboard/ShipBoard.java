@@ -527,8 +527,18 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 * @param quantityToRemove the number of crew items to remove
 	 */
 	public void loseCrew(int quantityToRemove) {
-		CalculatorCargoInfo<CabinTile> c = visitorCalculateCargoInfo.getCrewInfo();
-		c.removeUpTo(LoadableType.CREW_SET, quantityToRemove);
+		visitorCalculateCargoInfo.getCrewInfo().removeUpTo(LoadableType.CREW_SET, quantityToRemove);
+	}
+
+	/**
+	 * Processes the removal (usage) of batteries.
+	 *
+	 * @param quantityToRemove the number of batteries to remove
+	 *
+	 * @implSpec requires to be called when this ship has enough batteries (>= quantityToRemove)
+	 */
+	public void loseBatteries(int quantityToRemove) {
+		visitorCalculateCargoInfo.getBatteriesInfo().removeUpTo(Set.of(LoadableType.BATTERY), quantityToRemove);
 	}
 
 	/**
