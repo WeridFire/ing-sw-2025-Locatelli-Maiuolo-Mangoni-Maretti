@@ -238,7 +238,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
 
         if (gameData != null && gameData.getCurrentGamePhaseType() == GamePhaseType.ADVENTURE) {
             Platform.runLater(() -> {
-                ClientManager.getInstance().updateScene(new AdventureUI());
+                ClientManager.getInstance().updateScene(AdventureUI.getInstance());
             });
             return; // Scene is changing, no need to update AssembleUI components
         }
