@@ -178,8 +178,9 @@ public class Game {
         AdventureGamePhase adventureGamePhase;
         while (currentAdventureCard != null) {
 
-            // skip if only 0 players are left, and go to endgame.
-            if(gameData.getPlayersInFlight().isEmpty()){
+            // endgame if 0 players are alive OR only 1 player is connected.
+            if(gameData.getPlayersInFlight().isEmpty() ||
+                    gameData.getPlayers(Player::isConnected).size() <= 1){
                 System.out.println(this + " Players flight list is empty. Ending flight phase.");
                 break;
             }
@@ -205,7 +206,8 @@ public class Game {
     }
 
     private void playEndgame() throws InterruptedException {
-        if(gameData.getPlayersInFlight().size() <= 1){
+        if(gameData.getPlayersInFlight().isEmpty() ||
+                gameData.getPlayers(Player::isConnected).size() <= 1){
             // play end of the game only after adventures and when no other cards are in the deck
             if (getGameData().getCurrentGamePhaseType() != GamePhaseType.ADVENTURE
                     || getGameData().getDeck().getCurrentCard() != null) {
