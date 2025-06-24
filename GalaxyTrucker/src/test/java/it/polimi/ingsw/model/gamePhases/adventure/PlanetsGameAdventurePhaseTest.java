@@ -100,8 +100,8 @@ class PlanetsGameAdventurePhaseTest {
 						+ p0.getShipBoard().getVisitorCalculateCargoInfo().getGoodsInfo().getAllLoadedItems().size();
 		assert pir.getFloatingLoadables().size() == 1 : "Floating loadables should be 1";
 
-		assert false : "The rest of the test is not finished. Ignore.";
 
+		pir = (PIRAddLoadables) game.getGameData().getPIRHandler().getPlayerPIR(p0);
 		System.out.println(pir.getCLIRepresentation());
 		clients[0].simulateCommand("allocate", "(8,6)", "RED_GOODS", "6");
 		assert pir.getFloatingLoadables().size() == 2;
@@ -109,14 +109,15 @@ class PlanetsGameAdventurePhaseTest {
 		clients[0].simulateCommand("allocate", "(7,9)", "RED_GOODS", "1");
 		//the request is processed locally, so effects happen only at the end of the pir.
 		//the player has space only for 1 loadable so the other one is left out
-		assert pir.getFloatingLoadables().size() == 1;
+		assert pir.getFloatingLoadables().isEmpty();
 
 		pir = (PIRAddLoadables) game.getGameData().getPIRHandler().getPlayerPIR(p1);
 		System.out.println(pir.getCLIRepresentation());
 
 		clients[1].simulateCommand("endTurn");
-
 		Thread.sleep(10);
+
+		assert game.getGameData().getPlayersInFlight().size() == 2;
 	}
 
 

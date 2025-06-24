@@ -48,7 +48,8 @@ public class ViewMock extends GUIView {
             if(pir.getPIRType() == PIRType.DELAY){
                 message = ((PIRDelay) pir).getMessage();
             }else if (pir.getPIRType() == PIRType.CHOICE){
-                message = ((PIRMultipleChoice) pir).getChoiceMessage();
+                PIRMultipleChoice cpir = (PIRMultipleChoice) pir;
+                message = cpir.getChoiceMessage()+"\n"+String.join("|", cpir.getPossibleOptions());
             }
             System.out.println(mockName + ">> received PIR: "
                     + pir.getPIRType() + "|" + message);

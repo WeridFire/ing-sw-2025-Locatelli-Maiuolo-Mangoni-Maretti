@@ -26,6 +26,7 @@ import it.polimi.ingsw.view.cli.ICLIPrintable;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ShipBoard implements ICLIPrintable, Serializable {
 
@@ -45,6 +46,8 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	private VisitorCalculatePowers visitorCalculatePowers;
 	private VisitorCalculateShieldedSides visitorCalculateShieldedSides;
 	private VisitorCheckIntegrity visitorCheckIntegrity;
+	private VisitorLifeSupport visitorLifeSupport;
+
 
 	protected ShipBoard(GameLevel level) {
 		this.level = level;
@@ -84,13 +87,17 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		visitorCalculatePowers = new VisitorCalculatePowers();
 		visitorCalculateShieldedSides = new VisitorCalculateShieldedSides();
 		visitorCheckIntegrity = new VisitorCheckIntegrity();
+		visitorLifeSupport = new VisitorLifeSupport();
 
 		for (TileSkeleton tile : board.values()) {
 			tile.accept(visitorCalculateCargoInfo);
 			tile.accept(visitorCalculatePowers);
 			tile.accept(visitorCalculateShieldedSides);
 			tile.accept(visitorCheckIntegrity);
+			tile.accept(visitorLifeSupport);
 		}
+		//TODO: @Manuel is this the correct place where to put this update?
+		visitorLifeSupport.updateLifeSupportSystems();
 	}
 
 	/**
@@ -549,6 +556,8 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 * @param handler A reference to the PIRHandler, to handle these requests.
 	 */
 	public void fill(Player p, PIRHandler handler){
+		System.out.println("Filling up shipboard: " + p.getUsername());
+
 		//Fill batteries
 		getVisitorCalculateCargoInfo()
 				.getBatteriesInfo()
@@ -559,38 +568,48 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 
 		Set<LoadableType> loadedAliens = new HashSet<>(); //this is a set to keep track of the aliens added,
 														// to prevent adding more than 1 alien of the same type.
-		getVisitorCalculateCargoInfo().getCrewInfo().getLocations().values().forEach((cabin) -> {
-			List<LoadableType> allowedTypes = new ArrayList<>(cabin.getAllowedItems().stream().toList()); //We need it ordered
-			allowedTypes.removeAll(loadedAliens); //Remove any alien that was already added, to prevent adding duplicates
-			LoadableType fillType = allowedTypes.getFirst(); //Get default choice
-			if(allowedTypes.size() > 1){
-				String[] choices = allowedTypes.stream().map((type) -> {
-					int amount = cabin.getCapacityLeft() / type.getRequiredCapacity();
-					return amount + " units of " + type.name();
-				}).toArray(String[]::new); //Generate messages for each type
-				try {
-					PIRMultipleChoice choicePir = new PIRMultipleChoice(p,
-										30,
-										"What type of crew do you want to add in cabin at coordinates "
-												+ cabin.getCoordinates().toString() + "?",
-										choices,
-							0
-					);
-					int selected = handler.setAndRunTurn(choicePir);
-					fillType = allowedTypes.get(selected);
-					if(fillType == LoadableType.PURPLE_ALIEN || fillType == LoadableType.BROWN_ALIEN){
-						loadedAliens.add(fillType);
-					}
-				} catch (NotFixedTileException e) {
-					throw new RuntimeException(e); //shouldn't happen
-				}
-			}
+		getVisitorCalculateCargoInfo()
+				.getCrewInfo()
+				.getLocations()
+				.values()
+				.forEach((cabin) -> {
+					List<LoadableType> allowedTypes = cabin
+							.getAllowedItems()
+							.stream()
+							.sorted(Comparator.naturalOrder())
+							.collect(Collectors.toCollection(ArrayList::new));
+ 					//We need it ordered
 
-			try {
-				cabin.fillWith(fillType);
-			} catch (AlreadyInitializedCabinException | UnsupportedLoadableItemException e) {
-				throw new RuntimeException(e); //Shouldn't happen
-			}
+					allowedTypes.removeAll(loadedAliens); //Remove any alien that was already added, to prevent adding duplicates
+					LoadableType fillType = allowedTypes.getFirst(); //Get default choice
+					if(allowedTypes.size() > 1){
+						String[] choices = allowedTypes.stream().map((type) -> {
+							int amount = cabin.getCapacityLeft() / type.getRequiredCapacity();
+							return amount + " units of " + type.name();
+						}).toArray(String[]::new); //Generate messages for each type
+						try {
+							PIRMultipleChoice choicePir = new PIRMultipleChoice(p,
+												30,
+												"What type of crew do you want to add in cabin at coordinates "
+														+ cabin.getCoordinates().toString() + "?",
+												choices,
+									0
+							);
+							int selected = handler.setAndRunTurn(choicePir);
+							fillType = allowedTypes.get(selected);
+							if(fillType == LoadableType.PURPLE_ALIEN || fillType == LoadableType.BROWN_ALIEN){
+								loadedAliens.add(fillType);
+							}
+						} catch (NotFixedTileException e) {
+							throw new RuntimeException(e); //shouldn't happen
+						}
+					}
+
+					try {
+						cabin.fillWith(fillType);
+					} catch (AlreadyInitializedCabinException | UnsupportedLoadableItemException e) {
+						throw new RuntimeException(e); //Shouldn't happen
+					}
 		});
 
 		// here this shipboard is completely filled

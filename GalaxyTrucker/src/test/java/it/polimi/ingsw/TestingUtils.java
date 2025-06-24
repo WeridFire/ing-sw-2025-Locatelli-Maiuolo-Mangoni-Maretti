@@ -89,12 +89,15 @@ public class TestingUtils {
 		for(GameClientMock c : clients){
 			Thread.sleep(100);
 			c.simulateCommand("endTurn");
-		}
-		syncClients(clients, error);
-		for(GameClientMock c : clients){
 			Thread.sleep(100);
 			c.simulateCommand("endTurn");
+			Thread.sleep(100);
+			c.simulateCommand("choose", "2");
+			Thread.sleep(100);
+			c.simulateCommand("choose", "1");
+			//the player places 1 purple alien & 1 brown alien
 		}
+
 		syncClients(clients, error);
 		Thread.sleep(500);
 
