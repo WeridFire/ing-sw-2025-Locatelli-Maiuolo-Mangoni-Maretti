@@ -1,7 +1,7 @@
 package it.polimi.ingsw.view.gui.components;
 
 import it.polimi.ingsw.enums.GameLevel;
-import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.BoardCoordinates;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.gui.helpers.DropSlot;

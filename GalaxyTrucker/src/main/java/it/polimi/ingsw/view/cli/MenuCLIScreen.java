@@ -3,8 +3,9 @@ package it.polimi.ingsw.view.cli;
 import it.polimi.ingsw.controller.commandsProcessors.MenuCommandsProcessor;
 import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.enums.AnchorPoint;
-import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.network.GameClient;
+import it.polimi.ingsw.model.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,7 @@ public class MenuCLIScreen extends CLIScreen {
 					.forEach(g -> gameLines.add(String.format(
 							"> " + ANSI.BLACK + "[%-10s]" + ANSI.RESET + " (%d/%d players)",
 							g.getGameId().toString(),
-							g.getPlayers().size(),
+							g.getPlayers(Player::isConnected).size(),
 							g.getRequiredPlayers()
 					)));
 			CLIFrame gamesContent = new CLIFrame(gameLines.toArray(new String[0]));

@@ -1,12 +1,12 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.GamesHandler;
-import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.network.exceptions.AlreadyRunningServerException;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.rmi.RmiServer;
 import it.polimi.ingsw.network.socket.SocketServer;
-import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.util.Default;
 
 import java.io.IOException;
@@ -24,7 +24,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class GameServer{
 
@@ -113,6 +112,7 @@ public class GameServer{
 
 	public void checkConnectedClients() {
 		List<UUID> markedToRemove = new ArrayList<>();
+		HashSet<UUID> gamesToUpdate = new HashSet<>();  // map to avoid duplicated updates
 
 		this.clients.forEach((uuid, client) -> {
 			try {
@@ -123,6 +123,7 @@ public class GameServer{
 				Player p = GamesHandler.getInstance().getPlayerByConnection(uuid);
 				if (g != null && p != null) {
 					g.disconnectPlayer(p);
+					gamesToUpdate.add(g.getId());
 				}
 				markedToRemove.add(uuid);
 			}
@@ -132,6 +133,14 @@ public class GameServer{
 		for (UUID uuid : markedToRemove) {
 			this.clients.remove(uuid);
 		}
+		// update games
+		gamesToUpdate.forEach(uuid -> {
+            try {
+                broadcastUpdateAllRefreshMenuAndGame(uuid);
+            } catch (RemoteException e) {
+				// in case of an exception no problem, not damaged clients will have to do simple "ping" command
+            }
+        });
 	}
 
 
@@ -221,6 +230,23 @@ public class GameServer{
 				//The client is no longer connected. The cleanup thread from game server will discover it.
 			}
 		}
+	}
+
+	/**
+	 * Broadcasts a {@link ClientUpdate} to all connected clients.
+	 * All the clients not in a game nor lobby will refresh their view,
+	 * but also all the players connected to the provided game will refresh their view
+	 *
+	 * @param gameUUID the game in which to update all clients view
+	 * @throws RemoteException if a remote communication error occurs during client notification
+	 */
+	public void broadcastUpdateAllRefreshMenuAndGame(UUID gameUUID) throws RemoteException {
+		broadcastUpdateAllRefreshOnlyIf((clientUUID, clientInterface) -> {
+			// refresh only the clients in this lobby and those in main menu
+			Game playerGame = GamesHandler.getInstance().findGameByClientUUID(clientUUID);
+			if (playerGame == null) return true;
+			else return playerGame.getId().equals(gameUUID);
+		});
 	}
 
 	/**

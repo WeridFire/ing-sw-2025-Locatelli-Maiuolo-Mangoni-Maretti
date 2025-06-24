@@ -3,7 +3,7 @@ package it.polimi.ingsw.view.gui.managers;
 import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
-import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
+import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.View;
 import it.polimi.ingsw.view.gui.UIs.*;

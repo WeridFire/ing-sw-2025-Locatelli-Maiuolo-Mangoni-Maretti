@@ -1,7 +1,7 @@
 package it.polimi.ingsw.view.cli;
 
-import it.polimi.ingsw.cards.Card;
-import it.polimi.ingsw.cards.CardsGroup;
+import it.polimi.ingsw.model.cards.Card;
+import it.polimi.ingsw.model.cards.CardsGroup;
 import it.polimi.ingsw.controller.commandsProcessors.AssembleCommandsProcessor;
 import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.CommonState;
@@ -9,8 +9,8 @@ import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.network.GameClient;
-import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.GameLevelStandards;
 
 import java.util.ArrayList;

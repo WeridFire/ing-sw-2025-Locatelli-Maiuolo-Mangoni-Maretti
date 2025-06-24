@@ -1,11 +1,11 @@
 package it.polimi.ingsw.view.gui.UIs;
 
-import it.polimi.ingsw.cards.CardsGroup;
+import it.polimi.ingsw.model.cards.CardsGroup;
 import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType; // Import GamePhaseType
-import it.polimi.ingsw.game.GameData; // Import GameData
+import it.polimi.ingsw.model.game.GameData; // Import GameData
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.components.*;
 import it.polimi.ingsw.view.gui.managers.ClientManager;

@@ -86,6 +86,11 @@ public class GameClientMock implements IClient {
         getMockThis().updateClient(clientUpdate);
     }
 
+    @Override
+    public void pingClient() throws RemoteException {
+        getMockThis().pingClient();
+    }
+
     /**
      * @return the label assigned to this mock instance.
      */

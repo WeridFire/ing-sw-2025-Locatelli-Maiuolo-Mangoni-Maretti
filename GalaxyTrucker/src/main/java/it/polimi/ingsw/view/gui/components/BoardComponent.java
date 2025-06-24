@@ -3,7 +3,7 @@ package it.polimi.ingsw.view.gui.components;
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
-import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.util.GameLevelStandards;
 import it.polimi.ingsw.util.Util;
 import it.polimi.ingsw.view.gui.UIs.AssembleUI;

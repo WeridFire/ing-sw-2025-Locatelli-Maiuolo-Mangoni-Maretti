@@ -2,7 +2,7 @@ package it.polimi.ingsw.util;
 
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GameLevel;
-import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.util.ArrayList;

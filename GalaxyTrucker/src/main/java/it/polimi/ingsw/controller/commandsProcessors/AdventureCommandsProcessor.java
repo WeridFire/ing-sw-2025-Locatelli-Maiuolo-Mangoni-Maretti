@@ -4,7 +4,7 @@ import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.controller.commandsProcessors.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.network.GameClient;
-import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.model.player.Player;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class AdventureCommandsProcessor extends PhaseCommandsProcessor {
         if(!Objects.equals(AssembleState.getPlayer().getSpectating(), AssembleState.getPlayer().getUsername())){
             availableCommands.add("stop-spectating|Go back to your shipboard.");
         }
-        availableCommands.add("spectate <" + getSpectatablePlayersUsernames() +"> |Spectate another player's shipboard.");
+        availableCommands.add("spectate <" + getSpectatablePlayersUsernames() +">|Spectate another player's shipboard.");
 
 
         return availableCommands;

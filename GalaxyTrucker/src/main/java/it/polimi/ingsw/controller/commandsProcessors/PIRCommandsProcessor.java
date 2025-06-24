@@ -3,12 +3,12 @@ package it.polimi.ingsw.controller.commandsProcessors;
 import it.polimi.ingsw.controller.states.PIRState;
 import it.polimi.ingsw.controller.commandsProcessors.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.network.GameClient;
-import it.polimi.ingsw.playerInput.PIRType;
-import it.polimi.ingsw.playerInput.PIRs.PIRActivateTiles;
-import it.polimi.ingsw.playerInput.PIRs.PIRAddLoadables;
-import it.polimi.ingsw.playerInput.PIRs.PIRMultipleChoice;
-import it.polimi.ingsw.playerInput.PIRs.PIRRemoveLoadables;
-import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.model.playerInput.PIRType;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRActivateTiles;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRAddLoadables;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRMultipleChoice;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRRemoveLoadables;
+import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.rmi.RemoteException;

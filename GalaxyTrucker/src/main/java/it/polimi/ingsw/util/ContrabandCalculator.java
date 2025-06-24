@@ -1,6 +1,6 @@
 package it.polimi.ingsw.util;
 
-import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.model.shipboard.LoadableType;
 
 import java.util.Comparator;
 import java.util.HashMap;

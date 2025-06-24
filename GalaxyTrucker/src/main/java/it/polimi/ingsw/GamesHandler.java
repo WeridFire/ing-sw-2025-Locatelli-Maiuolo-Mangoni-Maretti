@@ -1,13 +1,14 @@
 package it.polimi.ingsw;
 
-import it.polimi.ingsw.game.Game;
-import it.polimi.ingsw.game.GameData;
-import it.polimi.ingsw.game.exceptions.ColorAlreadyInUseException;
-import it.polimi.ingsw.game.exceptions.GameAlreadyRunningException;
-import it.polimi.ingsw.game.exceptions.PlayerAlreadyInGameException;
-import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
+import it.polimi.ingsw.model.game.Game;
+import it.polimi.ingsw.model.game.GameData;
+import it.polimi.ingsw.model.game.exceptions.ColorAlreadyInUseException;
+import it.polimi.ingsw.model.game.exceptions.GameAlreadyRunningException;
+import it.polimi.ingsw.model.game.exceptions.PlayerAlreadyInGameException;
+import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 
+import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -127,11 +128,9 @@ public class GamesHandler {
 
 
     /**
-     * Command to start a new game. Makes the gamehandler basically "forcestart" the saved gamestate, and automatically
-     * connects the player that is resuming to it, as a leader.
-     * @param savedGameState The saved game state to load.
-     * @param connectionUUID The connection fo the player that sent the command.
-     * @return The newly game object.
+     * Command to resume an existing game. Takes as argument the game state and builds a game in the gamehandler. Then
+     * makes the player that wanted to resume it connect as the game leader.
+     * @return the created game object.
      */
     public Game resumeGame(GameData savedGameState, UUID connectionUUID) throws PlayerAlreadyInGameException,
             GameAlreadyRunningException {
@@ -140,13 +139,12 @@ public class GamesHandler {
             throw new GameAlreadyRunningException(createdGame.getId());
         }
         games.add(createdGame);
-        startGame(createdGame);
-
         try {
             createdGame.addPlayer(savedGameState.getGameLeader(), connectionUUID, null);
         } catch (ColorAlreadyInUseException e) {
             throw new RuntimeException(e);  // should never happen -> runtime exception
         }
+        startGame(createdGame);
 
         return createdGame;
     }
@@ -170,6 +168,22 @@ public class GamesHandler {
 
     public ArrayList<Game> getGames() {
         return games;
+    }
+
+    /**
+     * Deletes the saved game state file associated with the given UUID.
+     *
+     * @param gameId the UUID of the game to delete the state file for
+     * @return true if the file was successfully deleted; false if it did not exist or deletion failed
+     */
+    public static boolean deleteGameSave(UUID gameId) {
+        File file = new File("games", gameId.toString() + ".state");
+
+        if (!file.exists()) {
+            return false;
+        }
+
+        return file.delete();
     }
 
 }

@@ -1,8 +1,8 @@
 package it.polimi.ingsw.controller.states;
 
-import it.polimi.ingsw.game.GameData;
-import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
+import it.polimi.ingsw.model.game.GameData;
+import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 
 import java.util.ArrayList;
 import java.util.List;

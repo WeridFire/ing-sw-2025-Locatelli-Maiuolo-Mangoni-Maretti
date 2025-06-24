@@ -4,11 +4,11 @@ import it.polimi.ingsw.controller.commandsProcessors.AdventureCommandsProcessor;
 import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.enums.*;
-import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.network.GameClient;
-import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
-import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
+import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRHandler;
+import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.GameLevelStandards;
 import it.polimi.ingsw.util.Util;
 

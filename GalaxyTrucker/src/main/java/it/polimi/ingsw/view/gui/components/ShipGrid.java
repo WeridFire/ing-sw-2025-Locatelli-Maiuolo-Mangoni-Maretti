@@ -1,10 +1,9 @@
 package it.polimi.ingsw.view.gui.components;
 
 import it.polimi.ingsw.controller.states.AssembleState;
-import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.enums.GameLevel;
-import it.polimi.ingsw.shipboard.ShipBoard;
-import it.polimi.ingsw.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.model.shipboard.ShipBoard;
+import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.view.gui.helpers.Asset;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;

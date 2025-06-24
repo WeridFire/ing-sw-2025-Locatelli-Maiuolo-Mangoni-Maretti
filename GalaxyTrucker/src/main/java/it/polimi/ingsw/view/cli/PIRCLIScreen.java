@@ -3,10 +3,12 @@ package it.polimi.ingsw.view.cli;
 import it.polimi.ingsw.controller.commandsProcessors.PIRCommandsProcessor;
 import it.polimi.ingsw.controller.states.PIRState;
 import it.polimi.ingsw.enums.Direction;
+import it.polimi.ingsw.model.playerInput.PIRs.PIR;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRAddLoadables;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRRemoveLoadables;
 import it.polimi.ingsw.network.GameClient;
-import it.polimi.ingsw.playerInput.PIRType;
-import it.polimi.ingsw.playerInput.PIRs.*;
-import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.model.playerInput.PIRType;
+import it.polimi.ingsw.model.shipboard.LoadableType;
 
 import java.util.*;
 

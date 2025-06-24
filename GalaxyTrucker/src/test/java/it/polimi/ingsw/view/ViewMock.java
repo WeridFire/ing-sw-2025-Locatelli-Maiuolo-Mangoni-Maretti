@@ -3,9 +3,9 @@ package it.polimi.ingsw.view;
 import it.polimi.ingsw.controller.commandsProcessors.*;
 import it.polimi.ingsw.controller.states.State;
 import it.polimi.ingsw.enums.GamePhaseType;
-import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.network.messages.ClientUpdate;
-import it.polimi.ingsw.player.Player;
+import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.view.gui.GUIView;
 
 import java.util.*;

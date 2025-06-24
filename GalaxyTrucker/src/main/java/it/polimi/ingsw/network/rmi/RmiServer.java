@@ -1,39 +1,39 @@
 package it.polimi.ingsw.network.rmi;
 
 import it.polimi.ingsw.GamesHandler;
-import it.polimi.ingsw.cards.exceptions.CardsGroupException;
+import it.polimi.ingsw.model.cards.exceptions.CardsGroupException;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.enums.Rotation;
-import it.polimi.ingsw.game.Cheats;
-import it.polimi.ingsw.game.Game;
-import it.polimi.ingsw.game.GameData;
-import it.polimi.ingsw.game.exceptions.*;
-import it.polimi.ingsw.gamePhases.exceptions.AlreadyPickedPosition;
+import it.polimi.ingsw.model.game.Cheats;
+import it.polimi.ingsw.model.game.Game;
+import it.polimi.ingsw.model.game.GameData;
+import it.polimi.ingsw.model.game.exceptions.*;
+import it.polimi.ingsw.model.gamePhases.exceptions.AlreadyPickedPosition;
 import it.polimi.ingsw.controller.commandsProcessors.exceptions.CommandNotAllowedException;
-import it.polimi.ingsw.gamePhases.exceptions.IllegalStartingPositionIndexException;
-import it.polimi.ingsw.gamePhases.exceptions.IncorrectGamePhaseTypeException;
-import it.polimi.ingsw.gamePhases.exceptions.TimerIsAlreadyRunningException;
+import it.polimi.ingsw.model.gamePhases.exceptions.IllegalStartingPositionIndexException;
+import it.polimi.ingsw.model.gamePhases.exceptions.IncorrectGamePhaseTypeException;
+import it.polimi.ingsw.model.gamePhases.exceptions.TimerIsAlreadyRunningException;
+import it.polimi.ingsw.model.player.exceptions.*;
+import it.polimi.ingsw.model.shipboard.exceptions.*;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
-import it.polimi.ingsw.player.Player;
-import it.polimi.ingsw.player.exceptions.*;
-import it.polimi.ingsw.player.kpf.KeepPlayerFlyingPredicate;
-import it.polimi.ingsw.playerInput.PIRs.PIR;
-import it.polimi.ingsw.playerInput.PIRs.PIRHandler;
-import it.polimi.ingsw.playerInput.exceptions.InputNotSupportedException;
-import it.polimi.ingsw.playerInput.exceptions.TileNotAvailableException;
-import it.polimi.ingsw.playerInput.exceptions.WrongPlayerTurnException;
-import it.polimi.ingsw.shipboard.LoadableType;
-import it.polimi.ingsw.shipboard.ShipBoard;
-import it.polimi.ingsw.shipboard.exceptions.*;
-import it.polimi.ingsw.shipboard.tiles.MainCabinTile;
-import it.polimi.ingsw.shipboard.tiles.exceptions.FixedTileException;
-import it.polimi.ingsw.shipboard.tiles.exceptions.NotEnoughItemsException;
-import it.polimi.ingsw.shipboard.tiles.exceptions.TooMuchLoadException;
-import it.polimi.ingsw.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
+import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.player.kpf.KeepPlayerFlyingPredicate;
+import it.polimi.ingsw.model.playerInput.PIRs.PIR;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRHandler;
+import it.polimi.ingsw.model.playerInput.exceptions.InputNotSupportedException;
+import it.polimi.ingsw.model.playerInput.exceptions.TileNotAvailableException;
+import it.polimi.ingsw.model.playerInput.exceptions.WrongPlayerTurnException;
+import it.polimi.ingsw.model.shipboard.LoadableType;
+import it.polimi.ingsw.model.shipboard.ShipBoard;
+import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
+import it.polimi.ingsw.model.shipboard.tiles.exceptions.FixedTileException;
+import it.polimi.ingsw.model.shipboard.tiles.exceptions.NotEnoughItemsException;
+import it.polimi.ingsw.model.shipboard.tiles.exceptions.TooMuchLoadException;
+import it.polimi.ingsw.model.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.util.Coordinates;
 
 import java.rmi.RemoteException;
@@ -131,8 +131,7 @@ public class RmiServer implements IServer {
 				throw new GameNotFoundException(gameId);
 			}
 			game.addPlayer(username, connectionUUID, desiredColor);
-            //notify everyone that a new player has joined -> refreshes their view
-            GameServer.getInstance().broadcastUpdate(game);
+			GameServer.getInstance().broadcastUpdateAllRefreshMenuAndGame(gameId);
         } catch (PlayerAlreadyInGameException | GameNotFoundException | GameAlreadyRunningException
 				 | ColorAlreadyInUseException e) {
 			client.updateClient(new ClientUpdate(connectionUUID, e.getMessage()));
@@ -144,9 +143,9 @@ public class RmiServer implements IServer {
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
 		if(pg == null) return;
 		pg.game.disconnectPlayer(pg.player);
-		//We update both the game (that may now no longer exist aswell) and the player that disconnected.
-		GameServer.getInstance().broadcastUpdate(pg.game);
-		client.updateClient(new ClientUpdate(gameServer.getUUIDbyConnection(client)));
+		// update both the game (that may now no longer exist aswell)
+		// and the player that disconnected (since it will be in main menu)
+		GameServer.getInstance().broadcastUpdateAllRefreshMenuAndGame(pg.game.getId());
 	}
 
 	@Override
