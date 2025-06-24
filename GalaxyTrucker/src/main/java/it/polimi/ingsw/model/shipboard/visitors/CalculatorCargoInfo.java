@@ -66,6 +66,13 @@ public class CalculatorCargoInfo<ContainerType extends ContainerTile> implements
                 .sum();
     }
 
+    public List<LoadableType> getAllLoadedItems() {
+        return containerLocations.values().stream()
+                .flatMap(c -> c.getLoadedItems().stream())
+                .toList();
+    }
+
+
     /**
      * @return A map of (coordinates -> visited container tile) entries.
      */
