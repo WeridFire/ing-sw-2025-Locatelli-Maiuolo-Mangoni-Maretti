@@ -158,8 +158,8 @@ class GameDataTest {
 
         Thread.sleep(1000);
 
-        Cheats.cheatShipboard(g, player1);
-        Cheats.cheatShipboard(g, player2);
+        Cheats.cheatShipboard(g.getGameData(), player1);
+        Cheats.cheatShipboard(g.getGameData(), player2);
         if(step == 1){
             stopAndSaveGame(gameData);
             return gameId;

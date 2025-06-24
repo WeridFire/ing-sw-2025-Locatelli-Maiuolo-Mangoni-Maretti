@@ -27,12 +27,6 @@ public class AdventureGamePhase extends PlayableGamePhase{
     public void playLoop() throws InterruptedException {
         notifyAdventureToPlayers();
         card.playEffect(gameData);
-        synchronized (gameData.getUnorderedPlayers()) {
-            if(gameData.getPlayers().isEmpty()){
-                GamesHandler gamesHandler = GamesHandler.getInstance();
-                gamesHandler.getGames().remove(gamesHandler.getGame(this.gameId));
-            }
-        }
     }
 
     /**
@@ -51,7 +45,7 @@ public class AdventureGamePhase extends PlayableGamePhase{
                 (player, pirHandler) -> {
 
                     PIRDelay pirDelay = new PIRDelay(player, 6,
-                            "The leader " + leaderName + " has drawn a new Adventure Card:",
+                            "The leader " + leaderName + " has drawn a new Adventure Card: " + card.getTitle(),
                             card.getCLIRepresentation());
                     pirHandler.setAndRunTurn(pirDelay);
                 });

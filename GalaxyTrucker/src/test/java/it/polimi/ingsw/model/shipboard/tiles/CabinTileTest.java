@@ -175,8 +175,8 @@ class CabinTileTest {
     }
 
     @Test
-    public void test() {
-
+    public void getNameTest() {
+        assertEquals("Cabin 0/2", cabin.getName());
     }
 
 }

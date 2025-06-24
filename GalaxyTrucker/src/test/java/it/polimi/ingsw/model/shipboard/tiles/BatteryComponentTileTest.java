@@ -67,6 +67,17 @@ class BatteryComponentTileTest {
     }
 
     @Test
+    void testException(){
+
+        //fills tiles, then checks that capacity is 0
+        doubleBatteryTile.fill();
+        assertEquals(0, doubleBatteryTile.getCapacityLeft());
+
+        assertThrows(TooMuchLoadException.class, () -> doubleBatteryTile.loadItems(LoadableType.BATTERY, 1));
+        assertThrows(UnsupportedLoadableItemException.class, () -> tripleBatteryTile.loadItems(LoadableType.HUMAN, 1));
+    }
+
+    @Test
     void testRemoveOneBattery() throws IllegalArgumentException, UnsupportedLoadableItemException, NotEnoughItemsException {
 
         //Fills tile
@@ -213,5 +224,10 @@ class BatteryComponentTileTest {
             doubleBatteryTile.loadItems(LoadableType.PURPLE_ALIEN, 1);
         });
 
+    }
+
+    @Test
+    void testGetName() {
+        assertEquals("Battery Tile 0/2", doubleBatteryTile.getName());
     }
 }

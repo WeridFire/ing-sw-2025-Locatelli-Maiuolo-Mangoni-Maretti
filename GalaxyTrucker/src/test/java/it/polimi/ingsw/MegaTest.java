@@ -26,6 +26,8 @@ import java.rmi.NotBoundException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static it.polimi.ingsw.TestingUtils.COOL_NAMES;
+import static it.polimi.ingsw.TestingUtils.getCoolName;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -39,17 +41,6 @@ public class MegaTest {
     /** number of mock clients used in this integration test */
     private final int N_CLIENTS = 10;
 
-    /**
-     * greek alphabet letters in order, useful for mock names.
-     */
-    private final String[] COOL_NAMES = {
-            "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota", "kappa", "lambda", "mu",
-            "nu", "xi", "omicron", "pi", "rho", "sigma", "tau", "upsilon", "phi", "chi", "psi", "omega"
-    };
-    private String getCoolName(int index) {
-        int times = index / COOL_NAMES.length;
-        return COOL_NAMES[index % COOL_NAMES.length] + (times > 0 ? ("-" + times) : "");
-    }
 
     /** array of initialized mock clients */
     private GameClientMock[] clients;
@@ -62,6 +53,14 @@ public class MegaTest {
      * This method should be called after each test step to synchronize and validate all side effects.
      */
     private void syncClients() {
+        syncClients(clients, error);
+    }
+
+    /**
+     * Ensures all client threads complete execution and fails if any error was raised during their execution.
+     * This method should be called after each test step to synchronize and validate all side effects.
+     */
+    public static void syncClients(GameClientMock[] clients, AtomicReference<Throwable> error) {
         for (GameClientMock client : clients) {
             client.joinAll();
         }
