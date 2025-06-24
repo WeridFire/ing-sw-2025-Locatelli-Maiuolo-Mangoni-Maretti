@@ -99,4 +99,8 @@ public abstract class Card implements ICLIPrintable, Serializable {
                 .merge(new CLIFrame(backgroundColor + ANSI.WHITE + " " + title + " "),
                         AnchorPoint.TOP, AnchorPoint.CENTER);
     }
+
+    public String getTitle(){
+        return title;
+    }
 }

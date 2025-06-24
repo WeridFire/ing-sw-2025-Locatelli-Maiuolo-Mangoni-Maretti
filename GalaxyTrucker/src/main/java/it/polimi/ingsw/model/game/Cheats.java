@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.TilesFactory;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.enums.Rotation;
@@ -19,8 +20,8 @@ import java.util.List;
 
 public class Cheats {
 
-	private static List<TileSkeleton> validatePhaseAndGetTilesAsGfxElements(Game game) {
-		if (game.getGameData().getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE) {
+	private static List<TileSkeleton> validatePhaseAndGetTilesAsGfxElements(GameData gameData) {
+		if (gameData.getCurrentGamePhaseType() != GamePhaseType.ASSEMBLE) {
 			return null;
 		}
 
@@ -32,9 +33,9 @@ public class Cheats {
 		return tileList;
 	}
 
-	public static void cheatShipboard(Game game, Player player) throws AlreadyEndedAssemblyException, FixedTileException,
+	public static void cheatShipboard(GameData gameData, Player player) throws AlreadyEndedAssemblyException, FixedTileException,
 			TileAlreadyPresentException, TileWithoutNeighborException, OutOfBuildingAreaException, RemoteException {
-		List<TileSkeleton> tileList = validatePhaseAndGetTilesAsGfxElements(game);
+		List<TileSkeleton> tileList = validatePhaseAndGetTilesAsGfxElements(gameData);
 		if (tileList == null) return;
 
 		player.getShipBoard().forceSetTile(tileList.get(97 - 1), new Coordinates(8, 7)); //double cannon
@@ -80,7 +81,7 @@ public class Cheats {
 		player.getShipBoard().forceSetTile(tileList.get(62 - 1), new Coordinates(7, 8));
 
 		player.getShipBoard().forceSetTile(tileList.get(133 - 1), new Coordinates(6, 8));
-
+		Game game = GamesHandler.getInstance().getGame(gameData.getGameId());
 		GameServer.getInstance().broadcastUpdateShipboardSpectators(game, player);
 
 	}
@@ -137,7 +138,7 @@ public class Cheats {
 	}
 
 	public static void integrityProblemShipboard(Game game, Player player) throws RemoteException, FixedTileException {
-		List<TileSkeleton> tileList = validatePhaseAndGetTilesAsGfxElements(game);
+		List<TileSkeleton> tileList = validatePhaseAndGetTilesAsGfxElements(game.getGameData());
 		if (tileList == null) return;
 
 		player.getShipBoard().forceSetTile(tileList.get(3 - 1), new Coordinates(8, 7));

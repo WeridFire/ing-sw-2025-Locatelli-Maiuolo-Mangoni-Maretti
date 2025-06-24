@@ -10,14 +10,8 @@ import it.polimi.ingsw.model.shipboard.exceptions.*;
 import it.polimi.ingsw.model.shipboard.integrity.IntegrityProblem;
 import it.polimi.ingsw.model.shipboard.integrity.IShipIntegrityListener;
 import it.polimi.ingsw.model.shipboard.integrity.VisitorCheckIntegrity;
-import it.polimi.ingsw.model.shipboard.tiles.BatteryComponentTile;
-import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
-import it.polimi.ingsw.model.shipboard.tiles.Tile;
-import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
-import it.polimi.ingsw.model.shipboard.visitors.VisitorCalculateCargoInfo;
-import it.polimi.ingsw.model.shipboard.visitors.VisitorCalculatePowers;
-import it.polimi.ingsw.model.shipboard.visitors.VisitorCalculateShieldedSides;
-import it.polimi.ingsw.model.shipboard.visitors.VisitorSmugglers;
+import it.polimi.ingsw.model.shipboard.tiles.*;
+import it.polimi.ingsw.model.shipboard.visitors.*;
 import it.polimi.ingsw.model.shipboard.tiles.exceptions.AlreadyInitializedCabinException;
 import it.polimi.ingsw.model.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.model.shipboard.tiles.exceptions.NotFixedTileException;
@@ -85,7 +79,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	/**
 	 * Resets and re-applies all visitor computations on the current board.
 	 */
-	private void resetVisitors() {
+	public void resetVisitors() {
 		visitorCalculateCargoInfo = new VisitorCalculateCargoInfo();
 		visitorCalculatePowers = new VisitorCalculatePowers();
 		visitorCalculateShieldedSides = new VisitorCalculateShieldedSides();
@@ -525,6 +519,16 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 			tile.accept(smugglers);
 		}
 		smugglers.removeMostValuableItems(quantityToRemove);
+	}
+
+	/**
+	 * Processes the removal of crew.
+	 *
+	 * @param quantityToRemove the number of crew items to remove
+	 */
+	public void loseCrew(int quantityToRemove) {
+		CalculatorCargoInfo<CabinTile> c = visitorCalculateCargoInfo.getCrewInfo();
+		c.removeUpTo(LoadableType.CREW_SET, quantityToRemove);
 	}
 
 	/**

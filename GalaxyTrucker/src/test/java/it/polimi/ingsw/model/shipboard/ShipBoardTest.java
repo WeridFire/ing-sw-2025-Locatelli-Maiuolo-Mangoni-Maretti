@@ -47,7 +47,7 @@ class ShipBoardTest {
         tiles = TilesFactory.createPileTiles();
 
         // Initialize a ShipBoard
-        Cheats.cheatShipboard(game1, player1);
+        Cheats.cheatShipboard(game1.getGameData(), player1);
     }
 
     @Test
