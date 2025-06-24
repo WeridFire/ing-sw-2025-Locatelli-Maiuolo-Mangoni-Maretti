@@ -1,6 +1,6 @@
 package it.polimi.ingsw.view.gui.components;
 
-import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.view.gui.helpers.Asset;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
 import it.polimi.ingsw.view.gui.helpers.Draggable;

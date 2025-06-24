@@ -4,10 +4,9 @@ import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.controller.states.PIRState;
 import it.polimi.ingsw.enums.GameLevel;
-import it.polimi.ingsw.game.GameData;
+import it.polimi.ingsw.model.playerInput.PIRs.PIR;
+import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.network.messages.ClientUpdate;
-import it.polimi.ingsw.playerInput.PIRs.PIR;
-import it.polimi.ingsw.shipboard.LoadableType;
 import it.polimi.ingsw.view.gui.components.BoardComponent;
 import it.polimi.ingsw.view.gui.components.CardContainer;
 import it.polimi.ingsw.view.gui.components.LoadableContainer;
@@ -56,7 +55,6 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
 
         // Create loadable container
         loadableContainer = new LoadableContainer();
-        loadableContainer.addLoadableObject(LoadableType.BATTERY);
 
         // Add components to the grid
         mainLayout.add(loadableContainer, 0, 0, 2, 1);  // Spanning across both columns at top

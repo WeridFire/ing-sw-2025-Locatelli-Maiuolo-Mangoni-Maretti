@@ -1,7 +1,7 @@
 package it.polimi.ingsw.view.gui.components;
 
-import it.polimi.ingsw.playerInput.PIRType;
-import it.polimi.ingsw.playerInput.PIRs.*;
+import it.polimi.ingsw.model.playerInput.PIRType;
+import it.polimi.ingsw.model.playerInput.PIRs.*;
 import javafx.scene.layout.StackPane;
 
 public class PIRContainer extends StackPane {

@@ -2,7 +2,7 @@ package it.polimi.ingsw.view.gui.helpers;
 
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.enums.GameLevel;
-import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.model.shipboard.LoadableType;
 
 /**
  * Enum representing high-level GUI assets and providing utility methods

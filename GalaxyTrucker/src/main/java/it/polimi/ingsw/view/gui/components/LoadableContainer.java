@@ -1,6 +1,6 @@
 package it.polimi.ingsw.view.gui.components;
 
-import it.polimi.ingsw.shipboard.LoadableType;
+import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.view.gui.UIs.AdventureUI;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
