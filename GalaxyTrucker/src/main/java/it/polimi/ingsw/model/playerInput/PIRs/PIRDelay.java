@@ -33,6 +33,10 @@ public class PIRDelay extends PIR {
         cliToShow = (toShow != null) ? toShow : new CLIFrame();
     }
 
+    public String getMessage() {
+        return message;
+    }
+
     @Override
     public Set<Coordinates> getHighlightMask() {
         return Set.of();
