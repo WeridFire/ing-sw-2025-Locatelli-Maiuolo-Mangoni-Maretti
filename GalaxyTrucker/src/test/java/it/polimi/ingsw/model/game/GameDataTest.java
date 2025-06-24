@@ -61,8 +61,10 @@ class GameDataTest {
 
     @Test
     void testSetLevel() {
+        GameLevel prevGL = gameData.getLevel();
         gameData.setLevel(GameLevel.ONE);
-        assertEquals(GameLevel.ONE, gameData.getLevel());
+        assertEquals(prevGL, gameData.getLevel());
+        // does not change because level ONE is not compliant
 
         gameData.setLevel(GameLevel.TWO);
         assertEquals(GameLevel.TWO, gameData.getLevel());
@@ -103,6 +105,7 @@ class GameDataTest {
     @Test
     void testResumeGameInAssembly() throws AlreadyPickedPosition, AlreadyEndedAssemblyException, NoShipboardException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, InterruptedException, PlayerAlreadyInGameException, OutOfBuildingAreaException, GameAlreadyRunningException, TooManyItemsInHandException, IllegalStartingPositionIndexException, ColorAlreadyInUseException {
         UUID gameId = runAndSaveGameUntilStep(0);
+        Thread.sleep(1000);
         Game g = GamesHandler.getInstance().getGame(gameId);
 
         assertNotNull(g);

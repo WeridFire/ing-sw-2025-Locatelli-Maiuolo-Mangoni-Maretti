@@ -248,12 +248,13 @@ class PlayerTest {
         Player player3 = new Player("A", UUID.randomUUID(), MainCabinTile.Color.GREEN);
         gameData.setCurrentGamePhaseType(ASSEMBLE);
         player3.setTileInHand(t);
-        player3.setShipBoard(shipBoard1);
+        player3.setShipBoard(ShipBoard.create(GameLevel.TWO, MainCabinTile.Color.GREEN));
         player3.discardTile(gameData);
+        assertNull(player3.getTileInHand());
         player3.pickTile(gameData,1);
-        assertEquals(t, player1.getTileInHand());
+        assertEquals(t, player3.getTileInHand());
         player3.forceEndAssembly(3);
-        assertEquals(player3.getLostTiles().size(), 1);
+        assertEquals(0, player3.getLostTiles().size());  // expect 0: tile in hand is not from reserved!
     }
 
     @Test

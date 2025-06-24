@@ -6,6 +6,7 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRDelay;
+import it.polimi.ingsw.util.Default;
 
 public class AdventureGamePhase extends PlayableGamePhase{
 
@@ -44,7 +45,7 @@ public class AdventureGamePhase extends PlayableGamePhase{
                         .getPlayers(Player::isConnected),
                 (player, pirHandler) -> {
 
-                    PIRDelay pirDelay = new PIRDelay(player, 6,
+                    PIRDelay pirDelay = new PIRDelay(player, Default.PIR_SHORT_SECONDS,
                             "The leader " + leaderName + " has drawn a new Adventure Card: " + card.getTitle(),
                             card.getCLIRepresentation());
                     pirHandler.setAndRunTurn(pirDelay);

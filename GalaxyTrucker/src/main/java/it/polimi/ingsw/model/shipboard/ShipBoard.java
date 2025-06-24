@@ -18,6 +18,7 @@ import it.polimi.ingsw.model.shipboard.tiles.exceptions.NotFixedTileException;
 import it.polimi.ingsw.model.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.util.BoardCoordinates;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.util.Util;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
@@ -594,10 +595,10 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 						}).toArray(String[]::new); //Generate messages for each type
 						try {
 							PIRMultipleChoice choicePir = new PIRMultipleChoice(p,
-												30,
-												"What type of crew do you want to add in cabin at coordinates "
-														+ cabin.getCoordinates().toString() + "?",
-												choices,
+									Default.PIR_SECONDS,
+									"What type of crew do you want to add in cabin at coordinates "
+											+ cabin.getCoordinates().toString() + "?",
+									choices,
 									0
 							);
 							int selected = handler.setAndRunTurn(choicePir);

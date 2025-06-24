@@ -8,6 +8,7 @@ import it.polimi.ingsw.controller.commandsProcessors.exceptions.CommandNotAllowe
 import it.polimi.ingsw.model.gamePhases.exceptions.TimerIsAlreadyRunningException;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRDelay;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.util.ScoreCalculator;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
@@ -34,10 +35,10 @@ public class ScoreGamePhase extends PlayableGamePhase implements ICLIPrintable, 
                         (player, pirHandler) -> {
 
                                 PIRDelay pirDelay = new PIRDelay(
-                                                player,
-                                        6,
-                                                "GG to all, match is over",
-                                                getCLIRepresentation());
+                                        player,
+                                        Default.PIR_SHORT_SECONDS,
+                                        "GG to all, match is over",
+                                        getCLIRepresentation());
                                 pirHandler.setAndRunTurn(pirDelay);
 
                 });

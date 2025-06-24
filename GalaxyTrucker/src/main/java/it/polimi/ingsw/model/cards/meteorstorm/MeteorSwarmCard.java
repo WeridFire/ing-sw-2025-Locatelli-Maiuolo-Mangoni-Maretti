@@ -9,6 +9,7 @@ import it.polimi.ingsw.model.playerInput.PIRUtils;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.model.shipboard.exceptions.NoTileFoundException;
 import it.polimi.ingsw.model.shipboard.exceptions.OutOfBuildingAreaException;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
@@ -52,7 +53,7 @@ public class MeteorSwarmCard extends Card {
 			String[] dicesString = dicesString(dice1, dice2);
 
 			game.getPIRHandler().broadcastPIR(game.getPlayersInFlight(), (player, pirHandler) -> {
-				PIRDelay pirDelay = new PIRDelay(player, 6,
+				PIRDelay pirDelay = new PIRDelay(player, Default.PIR_SHORT_SECONDS,
                         Arrays.toString(dicesString),
 						getCLIRepresentation());
 				pirHandler.setAndRunTurn(pirDelay);

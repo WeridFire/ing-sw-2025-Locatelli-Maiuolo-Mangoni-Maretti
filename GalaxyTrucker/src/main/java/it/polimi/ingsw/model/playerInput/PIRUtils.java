@@ -21,6 +21,7 @@ import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.model.shipboard.tiles.exceptions.NotFixedTileException;
 import it.polimi.ingsw.model.shipboard.visitors.VisitorCalculatePowers;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.util.Util;
 import it.polimi.ingsw.view.cli.ANSI;
 
@@ -52,14 +53,14 @@ public class PIRUtils {
 			// TODO: throw error invalid power type -> shield or none (remove none?)
 			return 0f;
 		}
-		PIRActivateTiles inputRequest = new PIRActivateTiles(player, 30, powerType);
+		PIRActivateTiles inputRequest = new PIRActivateTiles(player, Default.PIR_SECONDS, powerType);
 		// phase 1: ask activation
 		Set<Coordinates> activatedTiles = game.getPIRHandler().setAndRunTurn(inputRequest);
 
         // phase 2: ask batteries removal for desired activation
 		int batteriesToRemove = activatedTiles.size();
 		if(batteriesToRemove > 0){
-			PIRRemoveLoadables pirRemoveLoadables = new PIRRemoveLoadables(player, 30, Set.of(LoadableType.BATTERY), batteriesToRemove);
+			PIRRemoveLoadables pirRemoveLoadables = new PIRRemoveLoadables(player, Default.PIR_SECONDS, Set.of(LoadableType.BATTERY), batteriesToRemove);
 			game.getPIRHandler().setAndRunTurn(
 					pirRemoveLoadables
 			);
@@ -132,11 +133,11 @@ public class PIRUtils {
 				//Asking player to activate double cannon
 				String message = "You are being hit from direction " + projectile.getDirection().toString() + ". You can defend yourself " +
 						"with a double cannon. Do you want to activate it?";
-				PIRYesNoChoice choiceReq = new PIRYesNoChoice(player, 30, message, false);
+				PIRYesNoChoice choiceReq = new PIRYesNoChoice(player, Default.PIR_SECONDS, message, false);
 				boolean activateToDefend = game.getPIRHandler().setAndRunTurn(choiceReq);
 				if (activateToDefend) {
 					game.getPIRHandler().setAndRunTurn(
-							new PIRRemoveLoadables(player, 30, Set.of(LoadableType.BATTERY), 1));
+							new PIRRemoveLoadables(player, Default.PIR_SECONDS, Set.of(LoadableType.BATTERY), 1));
 					return true;
 				}
 			}
@@ -162,11 +163,11 @@ public class PIRUtils {
 
 			String message = "You are being hit from direction " + projectile.getDirection().toString() + ". You can defend yourself " +
 					"with a shield. Do you want to activate it?";
-			PIRYesNoChoice choiceReq = new PIRYesNoChoice(player, 30, message, false);
+			PIRYesNoChoice choiceReq = new PIRYesNoChoice(player, Default.PIR_SECONDS, message, false);
 			boolean activateToDefend = game.getPIRHandler().setAndRunTurn(choiceReq);
 			if (activateToDefend) {
 				game.getPIRHandler().setAndRunTurn(
-						new PIRRemoveLoadables(player, 30, Set.of(LoadableType.BATTERY), 1));
+						new PIRRemoveLoadables(player, Default.PIR_SECONDS, Set.of(LoadableType.BATTERY), 1));
 				return true;
 			}
 		}
@@ -207,7 +208,7 @@ public class PIRUtils {
 					.collect(Collectors.toSet());
 			if (maskTilesToRemove.isEmpty()) return false;
 			// notify
-			PIRDelay pirInfo = new PIRDelay(player, 5,
+			PIRDelay pirInfo = new PIRDelay(player, Default.PIR_SHORT_SECONDS,
 					"These tiles needs to be removed...",
 					playerShip.getCLIRepresentation(maskTilesToRemove, ANSI.RED));
 			integritySequence.addPlayerInputRequest(pirInfo);
@@ -227,7 +228,7 @@ public class PIRUtils {
 			// else -> no problem
 			if (clustersToKeep.size() == 1) return false;
 			if (clustersToKeep.isEmpty()) {
-				PIRDelay pirInfo = new PIRDelay(player, 6,
+				PIRDelay pirInfo = new PIRDelay(player, Default.PIR_SHORT_SECONDS,
 						"Your ship has no valid cluster of tiles." +
 								"You need to end your flight...", null);
 				integritySequence.addPlayerInputRequest(pirInfo);
@@ -252,7 +253,7 @@ public class PIRUtils {
 				options[i] = clustersToKeep.get(i).toString(Util.getModularAt(ansiColors, i));
 			}
 
-			PIRMultipleChoice pirChoice = new PIRMultipleChoice(player, 30,
+			PIRMultipleChoice pirChoice = new PIRMultipleChoice(player, Default.PIR_SECONDS,
 					"Choose one cluster to keep",
 					playerShip.getCLIRepresentation(coordCluster, ansiColors),
 					options,
@@ -280,7 +281,7 @@ public class PIRUtils {
 			boolean revalidateStructure;
 
 			// 1. notify about problems
-			PIRDelay pirInfo = new PIRDelay(player, 6,
+			PIRDelay pirInfo = new PIRDelay(player, Default.PIR_SHORT_SECONDS,
 					"Unfortunately, your Ship has some integrity problems...", null);
 			integritySequence.addPlayerInputRequest(pirInfo);
 			pirHandler.setAndRunTurn(pirInfo, false);

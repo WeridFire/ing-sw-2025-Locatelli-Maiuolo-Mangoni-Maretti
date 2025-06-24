@@ -26,6 +26,7 @@ public class AssemblyGamePhaseTest {
 	@Test
 	public void ShipFillingTest() throws InterruptedException, IncorrectGamePhaseTypeException {
 
+		Thread.sleep(200);
 		clients = setupUntilAssemblePhase(4, error);
 		game = GamesHandler.getInstance().getGames().getFirst();
 		Thread.sleep(1000);

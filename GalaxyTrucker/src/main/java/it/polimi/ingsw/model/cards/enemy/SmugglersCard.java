@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRAddLoadables;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.model.shipboard.LoadableType;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
@@ -38,7 +39,7 @@ public class SmugglersCard extends EnemyCard {
 	@Override
 	public void givePrize(Player player, GameData game) {
 		PIRYesNoChoice pirYesOrNoChoice = new PIRYesNoChoice(player,
-				30,
+				Default.PIR_SECONDS,
 				"You will receive the following goods: " + prizeGoods + " but you will lose " + getLostDays() + " travel days.",
 				true);
 		boolean wantToAccept = game.getPIRHandler().setAndRunTurn(pirYesOrNoChoice);
@@ -50,7 +51,7 @@ public class SmugglersCard extends EnemyCard {
 					.getAllLoadedItems().size();
 			if(loadablesAmount > 0){
 				boolean result = game.getPIRHandler().setAndRunTurn(
-						new PIRYesNoChoice(player, 30, "Do you want to rearrange the goods already on your ship?", false)
+						new PIRYesNoChoice(player, Default.PIR_SECONDS, "Do you want to rearrange the goods already on your ship?", false)
 				);
 				if(result) {
 					List<LoadableType> loadablesToAdd = player
@@ -60,13 +61,13 @@ public class SmugglersCard extends EnemyCard {
 							.getAllLoadedItems();
 					player.getShipBoard().loseBestGoods(loadablesToAdd.size());
 					game.getPIRHandler().setAndRunTurn(
-							new PIRAddLoadables(player, 30, loadablesToAdd)
+							new PIRAddLoadables(player, Default.PIR_SECONDS, loadablesToAdd)
 					);
 				}
 			}
 
 
-			PIRAddLoadables pirAddLoadables = new PIRAddLoadables(player, 30, Arrays.stream(prizeGoods).toList());
+			PIRAddLoadables pirAddLoadables = new PIRAddLoadables(player, Default.PIR_SECONDS, Arrays.stream(prizeGoods).toList());
 			game.getPIRHandler().setAndRunTurn(pirAddLoadables);
 			game.movePlayerBackward(player, getLostDays());
 		}

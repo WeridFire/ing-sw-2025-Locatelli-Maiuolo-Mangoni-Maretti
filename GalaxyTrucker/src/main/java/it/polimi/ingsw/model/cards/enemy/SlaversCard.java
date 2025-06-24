@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRRemoveLoadables;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.model.shipboard.LoadableType;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
@@ -44,7 +45,7 @@ public class SlaversCard extends EnemyCard {
 	@Override
 	public void givePrize(Player player, GameData game) {
 		PIRYesNoChoice pirYesNoChoice = new PIRYesNoChoice(player,
-				30,
+				Default.PIR_SECONDS,
 				"You will receive " + prizeBounty +" credits, but you will lose "
 						+ getLostDays() + " days.",
 				true);
@@ -61,7 +62,7 @@ public class SlaversCard extends EnemyCard {
 	 */
 	@Override
 	public void applyPunishment(Player player, GameData game) {
-		PIRRemoveLoadables pirRemoveLoadables = new PIRRemoveLoadables(player, 30, LoadableType.CREW_SET, punishCrewAmount);
+		PIRRemoveLoadables pirRemoveLoadables = new PIRRemoveLoadables(player, Default.PIR_SECONDS, LoadableType.CREW_SET, punishCrewAmount);
 		game.getPIRHandler().setAndRunTurn(pirRemoveLoadables);
 	}
 

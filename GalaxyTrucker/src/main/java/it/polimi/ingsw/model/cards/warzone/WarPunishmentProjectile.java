@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.playerInput.PIRUtils;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.model.shipboard.exceptions.NoTileFoundException;
 import it.polimi.ingsw.model.shipboard.exceptions.OutOfBuildingAreaException;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.cli.ANSI;
 
 public class WarPunishmentProjectile implements WarPunishment {
@@ -32,7 +33,7 @@ public class WarPunishmentProjectile implements WarPunishment {
 
             gameData.getPIRHandler().setAndRunTurn(new PIRMultipleChoice(
                     player,
-                    30,
+                    Default.PIR_SECONDS,
                     "Do you want to roll the dice?",
                     new String[]{"Yes"},
                     0

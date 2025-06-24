@@ -214,7 +214,7 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         Direction[] directions = Direction.values();
-        sb.append("[").append(cliSymbol).append(" | ")
+        sb.append("[ID: ").append(id).append(" | Symbol: ").append(cliSymbol).append(" | ")
                 .append(directions[0]).append(" -> ").append(sides[directions[0].getValue()]);
         for (int i = 1; i < directions.length; i++) {
             sb.append("; ").append(directions[i]).append(" -> ").append(sides[directions[i].getValue()]);

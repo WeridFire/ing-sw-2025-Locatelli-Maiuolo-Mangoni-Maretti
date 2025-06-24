@@ -9,6 +9,7 @@ import it.polimi.ingsw.model.playerInput.PIRUtils;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.model.shipboard.exceptions.NoTileFoundException;
 import it.polimi.ingsw.model.shipboard.exceptions.OutOfBuildingAreaException;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
@@ -39,10 +40,10 @@ public class PiratesCard extends EnemyCard{
     @Override
     public void givePrize(Player player, GameData gameData) {
         PIRYesNoChoice pirYesOrNoChoice = new PIRYesNoChoice(player,
-                                    30,
-                                "You will receive " + prizeBounty +" credits, but you will lose "
-                                             + getLostDays() + " days.",
-                                true);
+                Default.PIR_SECONDS,
+                "You will receive " + prizeBounty +" credits, but you will lose "
+                        + getLostDays() + " days.",
+                true);
         boolean wantToAccept = gameData.getPIRHandler().setAndRunTurn(pirYesOrNoChoice);
         if(wantToAccept){
             player.addCredits(prizeBounty);
@@ -56,7 +57,7 @@ public class PiratesCard extends EnemyCard{
 
             game.getPIRHandler().setAndRunTurn(new PIRMultipleChoice(
                     player,
-                    30,
+                    Default.PIR_SECONDS,
                     "Do you want to roll the dice?",
 					new String[]{"Yes"},
                     0

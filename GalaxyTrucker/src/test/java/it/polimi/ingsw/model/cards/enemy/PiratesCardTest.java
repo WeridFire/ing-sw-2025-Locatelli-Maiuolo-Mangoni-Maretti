@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.cards.projectile.Projectile;
 import it.polimi.ingsw.model.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,10 @@ class PiratesCardTest {
     void SevenPlusZeroShouldEqualSeven() {
 
         System.out.println("Test givePrize");
+        int oldSeconds = Default.PIR_SECONDS;
+        Default.PIR_SECONDS = 1;
         piratesCard.givePrize(player1, testGameData);
+        Default.PIR_SECONDS = oldSeconds;
         assertEquals(7, player1.getCredits());
 
     }

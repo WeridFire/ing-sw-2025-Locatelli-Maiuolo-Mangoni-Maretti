@@ -42,7 +42,7 @@ public class PIRRemoveLoadablesTest {
 	void testCLIRepresentation() {
 		Set<LoadableType> allowed = EnumSet.of(LoadableType.HUMAN, LoadableType.GREEN_GOODS);
 
-		PIRRemoveLoadables pir = new PIRRemoveLoadables(player, 10, allowed, 3);
+		PIRRemoveLoadables pir = new PIRRemoveLoadables(player, 1, allowed, 3);
 
 		CLIFrame cliFrame = pir.getCLIRepresentation();
 
