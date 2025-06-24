@@ -178,8 +178,8 @@ public class Game {
         AdventureGamePhase adventureGamePhase;
         while (currentAdventureCard != null) {
 
-            // skip if only 1 player is left, and go to endgame.
-            if(gameData.getPlayersInFlight().size() <= 1){
+            // skip if only 0 players are left, and go to endgame.
+            if(gameData.getPlayersInFlight().isEmpty()){
                 System.out.println(this + " Players flight list is empty. Ending flight phase.");
                 break;
             }
