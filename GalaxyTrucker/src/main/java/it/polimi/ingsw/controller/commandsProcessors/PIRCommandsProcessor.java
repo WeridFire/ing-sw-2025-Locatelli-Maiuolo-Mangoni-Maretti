@@ -48,10 +48,13 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
         return availableCommands;
     }
 
-    private boolean validateNonActivePIRType(PIRType pirType) {
+    private boolean validateNonActivePIRType(PIRType... pirTypes) {
         PIRType activePIRType = PIRState.getActivePIRType();
-        if (activePIRType != pirType){
-            view.showWarning("This command is not available for a PIR of type " + activePIRType);
+        if (Arrays.stream(pirTypes).noneMatch(p -> p == activePIRType)){
+            view.showWarning("This command is not available for a PIR of type "
+                    + activePIRType +
+                    ". Allowed PIRs: " +
+                    Arrays.stream(pirTypes).toList());
             return true;
         } else {
             return false;
@@ -202,16 +205,8 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
         localCargo.clear();  // Reset after sending to server
     }
 
-    private void executeRearrangeCommand() throws RemoteException {
-        Map<Coordinates, List<LoadableType>> localCargo = PIRState.getLocalCargo();
-        server.pirRearrangeLoadables(client, localCargo);
-        view.showInfo("All requested items marked for rearrangement. Confirming.");
-        localCargo.clear();  // Reset after sending to server
-    }
-
     private boolean validateConfirmCommand() {
-        if (validateNonActivePIRType(PIRType.ADD_CARGO)) return false;
-        if (validateNonActivePIRType(PIRType.REMOVE_CARGO)) return false;
+        if (validateNonActivePIRType(PIRType.ADD_CARGO, PIRType.REMOVE_CARGO)) return false;
 
         // Check if localCargo is empty
         if (PIRState.getLocalCargo().isEmpty()) {
@@ -229,9 +224,6 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
         if (activePIRType == PIRType.ADD_CARGO) {
             server.pirAllocateLoadables(client, localCargo);
             view.showInfo("Loadables allocation confirmed and sent to server.");
-        } else if(activePIRType == PIRType.REARRANGE_CARGO) {
-            server.pirRearrangeLoadables(client, localCargo);
-            view.showInfo("Loadables rearrangment confirmed and sent to server.");
         }
         else {  // PIRType.REMOVE_CARGO
             server.pirRemoveLoadables(client, localCargo);
@@ -420,7 +412,6 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
                 case "choose" -> server.pirSelectMultipleChoice(client, Integer.parseInt(args[0]));
                 case "activate" -> executeActivateCommand(args);
                 case "allocate" -> executeAllocateCommand();
-                case "rearrange" -> executeRearrangeCommand();
                 case "confirm" -> executeConfirmCommand();
                 case "remove" -> executeRemoveCommand();
                 case "endTurn" -> executeEndTurnCommand();

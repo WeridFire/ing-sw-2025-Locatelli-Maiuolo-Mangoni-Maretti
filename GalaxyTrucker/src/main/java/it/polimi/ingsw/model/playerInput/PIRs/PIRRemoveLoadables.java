@@ -66,11 +66,15 @@ public class PIRRemoveLoadables extends PIR {
 	public void run() throws InterruptedException {
 		synchronized (lock){
 			lock.wait(getCooldown()* 1000L);
+			System.out.println(" <<<<<<<<<<<<<< TEST >> run >> getCargoAmount() = " + getCargoAmount());
+			System.out.println(" <<<<<<<<<<<<<< TEST >> run >> targetAmount = " + targetAmount);
 			if(getCargoAmount() > targetAmount){
 				System.out.println("Removing default loadables...");
 				if(this.allowedCargo.containsAll(LoadableType.CREW_SET)){
+					System.out.println(" <<<<<<<<<<<<<< TEST >> run >> loseCrew: " + amountToRemove);
 					currentPlayer.getShipBoard().loseCrew(amountToRemove);
 				}else{
+					System.out.println(" <<<<<<<<<<<<<< TEST >> run >> loseBestGoods: " + amountToRemove);
 					currentPlayer.getShipBoard().loseBestGoods(amountToRemove);
 				}
 			}
@@ -168,7 +172,7 @@ public class PIRRemoveLoadables extends PIR {
 				Coordinates coords = entry.getKey();
 				ContainerTile tile = entry.getValue();
 
-				String containerInfo = String.format(" (%d, %d): ", coords.getColumn(), coords.getRow()) + tile.getName();
+				String containerInfo = coords.toString() + ": " + tile.getName();
 				frame = frame.merge(
 						new CLIFrame(containerInfo),
 						Direction.SOUTH, 0

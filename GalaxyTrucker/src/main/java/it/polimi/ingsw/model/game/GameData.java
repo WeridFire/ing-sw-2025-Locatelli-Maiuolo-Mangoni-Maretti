@@ -365,9 +365,9 @@ public class GameData implements Serializable {
         }
 
         // send risk to get lapped if present
-        GetLappedKPF riskGetLapped = new GetLappedKPF(this);
-        if (riskGetLapped.test(playerToMove)) {
-            playerToMove.requestEndFlight(riskGetLapped);
+        GetLappedKPF saveFromGettingLapped = new GetLappedKPF(this);
+        if (!saveFromGettingLapped.test(playerToMove)) {  // risk to get lapped <-> not safe
+            playerToMove.requestEndFlight(saveFromGettingLapped);
         }
     }
 

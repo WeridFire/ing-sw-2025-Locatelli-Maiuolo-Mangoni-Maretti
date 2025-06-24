@@ -48,12 +48,40 @@ public class PlanetsCard extends Card {
 	 * Controls the addLoadable interaction with the player.
 	 * */
 	public void addLoadablesInteraction(Player p, PIRHandler pirHandler) throws InterruptedException {
-		for (Planet planet: planets){
-			if (planet.getCurrentPlayer() != null && planet.getCurrentPlayer().equals(p)){
-				PIRAddLoadables pirAddLoadables = new PIRAddLoadables(p, 30, planet.getAvailableGoods());
-				pirHandler.setAndRunTurn(pirAddLoadables);
+		Planet planet = getPlanetByPlayer(p);
+		if(planet == null){
+			return;
+		}
+		p.getShipBoard().resetVisitors();
+		int loadablesAmount = p.getShipBoard().getVisitorCalculateCargoInfo().getGoodsInfo().getAllLoadedItems().size();
+		if(loadablesAmount > 0){
+			boolean result = pirHandler.setAndRunTurn(
+					new PIRYesNoChoice(p, 30, "Do you want to rearrange the goods already on your ship?", false)
+			);
+			if(result){
+				List<LoadableType> loadablesToAdd = p
+						.getShipBoard()
+						.getVisitorCalculateCargoInfo()
+						.getGoodsInfo()
+						.getAllLoadedItems();
+				p.getShipBoard().loseBestGoods(loadablesToAdd.size());
+				pirHandler.setAndRunTurn(
+						new PIRAddLoadables(p, 30, loadablesToAdd)
+				);
 			}
 		}
+
+		PIRAddLoadables pirAddLoadables = new PIRAddLoadables(p, 30, planet.getAvailableGoods());
+		pirHandler.setAndRunTurn(pirAddLoadables);
+	}
+
+	private Planet getPlanetByPlayer(Player p){
+		for(Planet planet : planets){
+			if(planet.getCurrentPlayer().equals(p)){
+				return planet;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -82,36 +110,16 @@ public class PlanetsCard extends Card {
 						throw new RuntimeException("Somehow a player choose to land on a planet that was already occupied");
 					}
 				}
-				boolean result = game.getPIRHandler().setAndRunTurn(
-						new PIRYesNoChoice(p, 30, "Do you want to rearrange the goods already on your ship?", false)
-				);
-				if(result){
-					int[] quantities = game.getPIRHandler().setAndRunTurn(
-						new PIRRearrangeLoadables(p, 30, LoadableType.CARGO_SET), false
-					);
-
-					List<LoadableType> toAdd = new ArrayList<>();
-					for (int i = 0; i < quantities[0]; i++) {
-						toAdd.add(LoadableType.RED_GOODS);
-					}
-					for (int i = 0; i < quantities[1]; i++) {
-						toAdd.add(LoadableType.YELLOW_GOODS);
-					}
-					for (int i = 0; i < quantities[2]; i++) {
-						toAdd.add(LoadableType.GREEN_GOODS);
-					}
-					for (int i = 0; i < quantities[3]; i++) {
-						toAdd.add(LoadableType.BLUE_GOODS);
-					}
-
-					//assuming you can decide when to stop loading items
-					game.getPIRHandler().setAndRunTurn(
-							new PIRAddLoadables(p, 30, toAdd)
-					);
-				}
 			}
 		}
-		game.getPIRHandler().broadcastPIR(game.getPlayersInFlight(),
+
+
+		game.getPIRHandler().broadcastPIR(
+				game
+						.getPlayersInFlight()
+						.stream()
+						.filter(p -> getPlanetByPlayer(p) != null)
+						.toList(),
 				(player, pirHandler) -> {
                     try {
                         addLoadablesInteraction(player, pirHandler);

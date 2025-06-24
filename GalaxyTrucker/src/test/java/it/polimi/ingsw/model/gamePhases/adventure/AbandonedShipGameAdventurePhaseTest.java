@@ -1,10 +1,11 @@
-package it.polimi.ingsw.model.gamePhases;
+package it.polimi.ingsw.model.gamePhases.adventure;
 
 import it.polimi.ingsw.GamesHandler;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.model.cards.AbandonedShipCard;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.game.Game;
+import it.polimi.ingsw.model.gamePhases.AdventureGamePhase;
 import it.polimi.ingsw.model.gamePhases.exceptions.IncorrectGamePhaseTypeException;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.shipboard.LoadableType;
@@ -17,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static it.polimi.ingsw.TestingUtils.setupUntilAdventurePhase;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-class AdventureGamePhaseTest {
+class AbandonedShipGameAdventurePhaseTest {
 
 	private GameClientMock[] clients;
 	private AdventureGamePhase adventureGamePhase;
@@ -48,7 +49,8 @@ class AdventureGamePhaseTest {
 		int newCrew = player.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().countAll(LoadableType.CREW_SET);
 		assert newCrew == crew-2;
 		Thread.sleep(1000);
-		assert game.getGameData().getCurrentGamePhaseType() == GamePhaseType.ADVENTURE;
+		assert (game.getGameData().getCurrentGamePhaseType() == GamePhaseType.ADVENTURE)
+				&& (game.getGameData().getPlayersInFlight().size() == 2);
 	}
 
 

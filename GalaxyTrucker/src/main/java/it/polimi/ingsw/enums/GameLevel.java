@@ -6,7 +6,7 @@ import java.util.List;
 public enum GameLevel implements Serializable {
     TESTFLIGHT, ONE, TWO;
 
-    public static final List<GameLevel> LEVELS_TO_PLAY = List.of(TESTFLIGHT, ONE, TWO);
+    public static final List<GameLevel> LEVELS_TO_PLAY = List.of(TESTFLIGHT, TWO);
     /**
      * Validate a level to be in {@link #LEVELS_TO_PLAY}
      * @param level the level to check
