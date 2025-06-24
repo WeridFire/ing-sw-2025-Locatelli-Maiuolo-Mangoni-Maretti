@@ -61,12 +61,12 @@ public class PlanetsCardTest {
         Thread.sleep(1000);
         clients[0].simulateCommand("choose", "1");
         Thread.sleep(1000);
-        clients[0].simulateCommand("allocate", "(9,7) RED_GOODS 2");
+        clients[0].simulateCommand("allocate", "(7,9)", "RED_GOODS",  "2");
         Player player = game.getGameData().getPlayer(p -> p.getConnectionUUID().equals(clients[0].getClientUUID()));
         int cargo = player.getShipBoard().getVisitorCalculateCargoInfo().getGoodsInfo().countAll(LoadableType.CARGO_SET);
         clients[0].simulateCommand("endTurn");
         player.getShipBoard().resetVisitors();
-        int newCargo = player.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().countAll(LoadableType.CARGO_SET);
+        int newCargo = player.getShipBoard().getVisitorCalculateCargoInfo().getGoodsInfo().countAll(LoadableType.CARGO_SET);
         assertEquals(newCargo, cargo+2);
         Thread.sleep(1000);
         assert game.getGameData().getCurrentGamePhaseType() == GamePhaseType.ADVENTURE;
