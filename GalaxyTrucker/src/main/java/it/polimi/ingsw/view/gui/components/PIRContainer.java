@@ -22,7 +22,6 @@ public class PIRContainer extends StackPane {
             case PIRType.ADD_CARGO -> handleAddCargoPir();
             case PIRType.REMOVE_CARGO -> handleRemoveCargoPir();
             case PIRType.CHOICE -> handleChoicePir();
-            case PIRType.REARRANGE_CARGO -> handleRearrangeCargoPir();
             case PIRType.DELAY -> handleDelayPir();
         }
     }
@@ -51,11 +50,6 @@ public class PIRContainer extends StackPane {
         // TODO: implementa logica specifica
     }
 
-    public void handleRearrangeCargoPir() {
-        labelText = "Rearrange Cargo";
-        PIRRearrangeLoadables castedPir = (PIRRearrangeLoadables) pir;
-        // TODO: implementa logica specifica
-    }
 
     public void handleDelayPir() {
         labelText = "Delay";

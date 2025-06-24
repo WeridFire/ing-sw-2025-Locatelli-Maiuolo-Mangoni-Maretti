@@ -168,7 +168,7 @@ public class PIRRemoveLoadables extends PIR {
 				Coordinates coords = entry.getKey();
 				ContainerTile tile = entry.getValue();
 
-				String containerInfo = String.format(" (%d, %d): ", coords.getColumn(), coords.getRow()) + tile.getName();
+				String containerInfo = coords.toString() + ": " + tile.getName();
 				frame = frame.merge(
 						new CLIFrame(containerInfo),
 						Direction.SOUTH, 0
