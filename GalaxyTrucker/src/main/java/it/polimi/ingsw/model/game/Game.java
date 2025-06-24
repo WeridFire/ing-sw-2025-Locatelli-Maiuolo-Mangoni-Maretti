@@ -181,7 +181,10 @@ public class Game {
             // endgame if 0 players are alive OR only 1 player is connected.
             if(gameData.getPlayersInFlight().isEmpty() ||
                     gameData.getPlayers(Player::isConnected).size() <= 1){
-                System.out.println(this + " Players flight list is empty. Ending flight phase.");
+                System.out.println(this + " Alive players: " + gameData.getPlayersInFlight().size()
+                        + ", Connected players: " + gameData.getPlayers(Player::isConnected)
+                        + "... Ending flight."
+                );
                 break;
             }
 
