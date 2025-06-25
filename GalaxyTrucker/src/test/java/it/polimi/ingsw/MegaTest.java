@@ -598,7 +598,7 @@ public class MegaTest {
                     }
                     return (count == 18);
                 }, "load debug shipboard for player beta")
-                .simulateCommand("cheat", "shipboard");
+                .simulateCommand("cheat", "standard");
         syncClient(1);
 
 
@@ -614,7 +614,7 @@ public class MegaTest {
                     }
                     return (count == 18);
                 }, "load debug shipboard for player alpha")
-                .simulateCommand("cheat", "shipboard");
+                .simulateCommand("cheat", "standard");
         syncClient(0);
 
         clients[0].awaitConditionOnUpdate(gcm -> {

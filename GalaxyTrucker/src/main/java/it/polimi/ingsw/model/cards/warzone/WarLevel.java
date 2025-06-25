@@ -7,6 +7,7 @@ import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class WarLevel implements Serializable {
 
@@ -36,6 +37,9 @@ public class WarLevel implements Serializable {
 	 * @return
 	 */
 	public Player getWorstPlayer(GameData game) {
+		System.out.println("getting worst player for " + Arrays.toString(game.getPlayersInFlight().toArray()));
+		System.out.println(warCriteria.compare(game.getPlayersInFlight().get(0), game.getPlayersInFlight().get(1)));
+
 		return game.getPlayersInFlight().stream()
 				.min(warCriteria).orElse(null);
 	}

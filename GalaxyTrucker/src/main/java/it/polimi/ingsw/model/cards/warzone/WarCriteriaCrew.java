@@ -13,8 +13,13 @@ public class WarCriteriaCrew implements WarCriteria {
 
     @Override
     public int compare(Player p1, Player p2) {
-        int crew1 = p1.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().countAll(LoadableType.CREW_SET);
-        int crew2 = p2.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().countAll(LoadableType.CREW_SET);
-        return Integer.compare(crew1, crew2);
+        float delta = p2.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().countAll(LoadableType.CREW_SET) -
+                p1.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().countAll(LoadableType.CREW_SET);
+        if (delta == 0) {
+            return Integer.compare(p1.getOrder(), p2.getOrder());
+            // order and not position because when a player has a
+            // better position it's like it has worse power (for equal powers)
+        }
+        return (delta > 0) ? 1 : -1;
     }
 }

@@ -34,7 +34,7 @@ public class WarPunishmentProjectile implements WarPunishment {
             gameData.getPIRHandler().setAndRunTurn(new PIRMultipleChoice(
                     player,
                     Default.PIR_SECONDS,
-                    "Do you want to roll the dice?",
+                    "War: Do you want to roll the dice?",
                     new String[]{"Yes"},
                     0
             ));

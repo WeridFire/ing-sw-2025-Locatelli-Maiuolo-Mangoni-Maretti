@@ -20,5 +20,7 @@ public class WarPunishmentCrewDeath implements WarPunishment {
     @Override
     public void apply(Player player, GameData gameData) {
         // TODO: implement method so that it asks the player where they wants their crew to be removed.
+        System.out.println("Execution of " + crewAmount + " crew members for player " + player.getUsername());
+        player.getShipBoard().loseCrew(crewAmount);
     }
 }

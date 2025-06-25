@@ -72,7 +72,7 @@ public class TestingUtils {
 		Game g = GamesHandler.getInstance().getGames().getFirst();
 		Arrays.stream(clients).forEach((c) ->
 				{
-					c.simulateCommand("cheat", "shipboard");
+					c.simulateCommand("cheat", "standard");
 					c.simulateCommand("finish");
 				}
 		);

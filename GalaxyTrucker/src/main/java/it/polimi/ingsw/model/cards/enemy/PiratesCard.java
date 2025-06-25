@@ -58,7 +58,7 @@ public class PiratesCard extends EnemyCard{
             game.getPIRHandler().setAndRunTurn(new PIRMultipleChoice(
                     player,
                     Default.PIR_SECONDS,
-                    "Do you want to roll the dice?",
+                    "Pirates: Do you want to roll the dice?",
 					new String[]{"Yes"},
                     0
             ));

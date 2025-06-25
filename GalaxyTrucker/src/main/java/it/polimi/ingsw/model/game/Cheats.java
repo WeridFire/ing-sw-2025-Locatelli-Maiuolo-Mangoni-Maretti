@@ -98,7 +98,7 @@ public class Cheats {
 			case "ipship" -> Cheats.integrityProblemShipboard(game, player);
 			case "randomship" -> Cheats.randomShipboard(game, player);
 			case "shielded" -> Cheats.cheatShieldedShipboard(game.getGameData(), player);
-			default -> throw new UninitializedShipboardException("Cheat shibpard '" + cheatName +"' not found.");
+			default -> throw new UninitializedShipboardException("Cheat shipboard '" + cheatName +"' not found.");
 		}
 
 	}

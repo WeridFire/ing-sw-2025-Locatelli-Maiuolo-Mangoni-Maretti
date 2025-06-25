@@ -33,7 +33,7 @@ public class AssemblyGamePhaseTest {
 
 		Arrays.stream(clients).forEach((c) ->
 				{
-					c.simulateCommand("cheat", "shipboard");
+					c.simulateCommand("cheat", "standard");
 					c.simulateCommand("finish");
 				}
 		);
@@ -65,6 +65,7 @@ public class AssemblyGamePhaseTest {
 			PIRMultipleChoice pir = (PIRMultipleChoice) game.getGameData().getPIRHandler().getPlayerPIR(player);
 			assert pir.getPossibleOptions().length == 2;
 			//place humans (TOTAL 6 HUMANS)
+			Thread.sleep(100);
 			c.simulateCommand("choose", "0");
 		}
 
