@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRAddLoadables;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.model.shipboard.LoadableType;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
@@ -53,14 +54,14 @@ public class AbandonedStationCard extends Card{
 		for(Player p : game.getPlayersInFlight()){
 			if(p.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().countAll(LoadableType.CREW_SET) >= requiredCrew){
 				boolean result = game.getPIRHandler().setAndRunTurn(
-						new PIRYesNoChoice(p, 30, "Do you want to loot the station? " +
+						new PIRYesNoChoice(p, Default.PIR_SECONDS, "Do you want to loot the station? " +
 								"You will lose " + lostDays + " travel days, but you will receive the " +
 								"following loot: " + Arrays.toString(availableCargo)
 								, false)
 				);
 				if(result){ //meaning they accepted to do it
 					game.getPIRHandler().setAndRunTurn(
-							new PIRAddLoadables(p, 30, List.of(availableCargo))
+							new PIRAddLoadables(p, Default.PIR_SECONDS, List.of(availableCargo))
 					);
 					game.movePlayerBackward(p, lostDays);
 					break;

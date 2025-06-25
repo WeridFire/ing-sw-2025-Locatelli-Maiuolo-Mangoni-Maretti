@@ -8,12 +8,10 @@ import it.polimi.ingsw.enums.Rotation;
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.game.exceptions.DrawTileException;
 import it.polimi.ingsw.model.player.Player;
-import it.polimi.ingsw.model.player.exceptions.NoTileInHandException;
-import it.polimi.ingsw.model.player.exceptions.ReservedTileException;
-import it.polimi.ingsw.model.player.exceptions.TooManyItemsInHandException;
-import it.polimi.ingsw.model.player.exceptions.TooManyReservedTilesException;
+import it.polimi.ingsw.model.player.exceptions.*;
 import it.polimi.ingsw.model.shipboard.ShipBoard;
 import it.polimi.ingsw.model.shipboard.SideType;
+import it.polimi.ingsw.model.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.model.shipboard.exceptions.OutOfBuildingAreaException;
 import it.polimi.ingsw.model.shipboard.exceptions.ThatTileIdDoesNotExistsException;
 import it.polimi.ingsw.model.shipboard.exceptions.TileAlreadyPresentException;
@@ -158,6 +156,16 @@ class PlayerTest {
         }
     }
 
+    @Test
+    void testEndFlight(){
+        player1.endFlight();
+
+        assertTrue(player1.isEndedFlight());
+        assertFalse(player1.hasRequestedEndFlight());
+        assertNull(player1.getPosition());
+
+    }
+
 
     @Test
     void testCliPrint() throws OutOfBuildingAreaException,FixedTileException, TileAlreadyPresentException {
@@ -224,5 +232,54 @@ class PlayerTest {
                 setTileId(id);
             }
         };
+    }
+
+    @Test
+    void testForceEndFlight() throws AlreadyEndedAssemblyException, NoShipboardException, TileCanNotDisappearException, TooManyItemsInHandException, NoTileInHandException, ReservedTileException, ThatTileIdDoesNotExistsException {
+        TileSkeleton t = createMockTile(1);
+        player1.setShipBoard(shipBoard1);
+        player1.setTileInHand(t);
+        player1.forceEndAssembly(2);
+
+        Player player2 = new Player("Paperino", UUID.randomUUID(), MainCabinTile.Color.RED);
+        assertThrows(NoShipboardException.class, () -> {player2.forceEndAssembly(4);});
+        assertNull(player1.getTileInHand());
+
+        Player player3 = new Player("A", UUID.randomUUID(), MainCabinTile.Color.GREEN);
+        gameData.setCurrentGamePhaseType(ASSEMBLE);
+        player3.setTileInHand(t);
+        player3.setShipBoard(ShipBoard.create(GameLevel.TWO, MainCabinTile.Color.GREEN));
+        player3.discardTile(gameData);
+        assertNull(player3.getTileInHand());
+        player3.pickTile(gameData,1);
+        assertEquals(t, player3.getTileInHand());
+        player3.forceEndAssembly(3);
+        assertEquals(0, player3.getLostTiles().size());  // expect 0: tile in hand is not from reserved!
+    }
+
+    @Test
+    void miscTests() throws TileCanNotDisappearException, AlreadyHaveTileInHandException, TooManyReservedTilesException, NoTileInHandException {
+        TileSkeleton t = createMockTile(1);
+
+
+        assertThrows(NoTileInHandException.class, () -> {player1.reserveTile();});
+        assertFalse(player1.isTileInHandFromReserved());
+        player1.requestEndFlight();
+        assertTrue(player1.hasRequestedEndFlight());
+        player1.setTileInHand(t);
+        assertThrows(AlreadyHaveTileInHandException.class, () -> {player1.setTileInHand(t);});
+        assertThrows(TileCanNotDisappearException.class, () -> {player1.setTileInHand(null);});
+        player1.reserveTile();
+        player1.setTileInHand(t);
+        player1.reserveTile();
+        player1.setTileInHand(t);
+        assertThrows(TooManyReservedTilesException.class, () -> {player1.reserveTile();});
+        player1.getColor();
+        player1.addCredits(1);
+        player1.getCredits();
+        player1.getOrder();
+        assertThrows(AlreadyHaveTileInHandException.class, () -> {player1.setCardGroupInHand(1);});
+        assertThrows(AlreadyHaveTileInHandException.class, () -> {player1.pickTile(gameData,1);});
+        assertThrows(TooManyItemsInHandException.class, () -> {player1.endAssembly(3);});
     }
 }

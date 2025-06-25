@@ -473,24 +473,15 @@ public class RmiServer implements IServer {
 		if(pg == null) return;
 
 		switch (cheatName){
-			case "shipboard" -> {
+			case "skip" -> Cheats.skipPhase(pg.game);
+			default -> {
 				try {
-					Cheats.cheatShipboard(pg.game.getGameData(), pg.player);
-				} catch (AlreadyEndedAssemblyException | FixedTileException | TileAlreadyPresentException |
+					Cheats.cheatShipboard(cheatName, pg.game, pg.player);
+				} catch (UninitializedShipboardException | AlreadyEndedAssemblyException | FixedTileException | TileAlreadyPresentException |
 						 TileWithoutNeighborException | OutOfBuildingAreaException e) {
 					client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
 				}
 			}
-			case "randomship" -> Cheats.randomShipboard(pg.game, pg.player);
-			case "ipship" -> {
-                try {
-                    Cheats.integrityProblemShipboard(pg.game, pg.player);
-                } catch (FixedTileException e) {
-					client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
-                }
-            }
-			case "skip" -> Cheats.skipPhase(pg.game);
-			default -> client.updateClient(new ClientUpdate(pg.connectionUUID, "Cheat not found."));
 		}
 	}
 

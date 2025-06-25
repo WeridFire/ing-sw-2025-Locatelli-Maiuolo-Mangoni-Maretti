@@ -102,7 +102,9 @@ public class CLIView extends View {
 
 	@Override
 	protected void _onRefresh() {
-		getCurrentScreen().refresh();
+		CLIScreen screenToRefresh = getCurrentScreen();
+		if (screenToRefresh == null) return;
+		screenToRefresh.refresh();
 	}
 
 	@Override

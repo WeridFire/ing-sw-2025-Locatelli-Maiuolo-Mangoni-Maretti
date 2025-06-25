@@ -9,6 +9,7 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.util.Default;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -89,7 +90,7 @@ public class LobbyCLIScreen extends CLIScreen {
 				Objects.equals(LobbyState.getGameData().getGameLeader(), player.getUsername()))));
 		membersLines.add("");
 
-		CLIFrame membersFrame = getScreenFrame(membersLines.size(), 30, ANSI.BACKGROUND_WHITE)
+		CLIFrame membersFrame = getScreenFrame(membersLines.size(), Default.PIR_SECONDS, ANSI.BACKGROUND_WHITE)
 				.merge(new CLIFrame(membersLines.toArray(new String[0])), AnchorPoint.CENTER, AnchorPoint.CENTER);
 		// Merge lobby members block in the center of the lobby info frame
 		lobbyInfoFrame = lobbyInfoFrame.merge(membersFrame, AnchorPoint.BOTTOM, AnchorPoint.BOTTOM, -1, 0);

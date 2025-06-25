@@ -575,12 +575,15 @@ public class GameData implements Serializable {
             throw new AlreadyPickedPosition("Position at index " + preferredPositionIndex + " is already taken");
         }
 
+        Cheats.shipboardMethodPrinter(player.getShipBoard(), this);
+
         // handle player management
         if (force) {
             player.forceEndAssembly(preferredPosition);
         } else {
             player.endAssembly(preferredPosition);
         }
+
 
         // handle game management
         for (Player p : players) {

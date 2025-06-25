@@ -43,6 +43,7 @@ public class PIRContainer extends StackPane {
                 case PIRType.ADD_CARGO -> handleAddCargoPir();
                 case PIRType.REMOVE_CARGO -> handleRemoveCargoPir();
                 case PIRType.CHOICE -> handleChoicePir();
+                case PIRType.REARRANGE_CARGO -> handleRearrangeCargoPir();
                 case PIRType.DELAY -> handleDelayPir();
             }
         });
@@ -112,6 +113,14 @@ public class PIRContainer extends StackPane {
         this.setVisible(true);
     }
 
+    public void handleRearrangeCargoPir() {
+        labelText = "Rearrange Cargo";
+        label = new Label(labelText);
+        content.getChildren().clear();
+        content.getChildren().add(label);
+        PIRRearrangeLoadables castedPir = (PIRRearrangeLoadables) pir;
+        // TODO: implementa logica specifica
+    }
 
     public void handleDelayPir() {
         PIRDelay castedPir = (PIRDelay) pir;

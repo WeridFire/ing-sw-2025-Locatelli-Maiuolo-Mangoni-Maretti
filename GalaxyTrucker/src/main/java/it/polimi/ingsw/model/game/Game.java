@@ -149,6 +149,8 @@ public class Game {
         // Blocking function that waits for everyone to finish set up their shipboard aliens
         System.out.println(this + " Started filling the shipboards");
         fillUpShipboards();
+        //resetting visitor after fillup is necessary to recalculate fire powers.
+        gameData.getPlayers().forEach(p -> p.getShipBoard().resetVisitors());
         System.out.println(this + " Filled all the shipboards");
 
         gameData.getPIRHandler().joinEndTurn(gameData.getPlayers());
@@ -218,7 +220,6 @@ public class Game {
             }
         }
 
-
         System.out.println(this + " Started scoring phase");
 
         //********//
@@ -243,6 +244,9 @@ public class Game {
 			}
 		});
 
+        System.out.println(this + " Ended scoring phase.");
+
+
         stopGame();
     }
 
@@ -250,10 +254,16 @@ public class Game {
      * Starts and manages the game loop.
      */
     public void gameLoop() throws InterruptedException, RemoteException {
-        playLobby();
-        playAssemble();
-        playFlight();
-        playEndgame();
+        try{
+            playLobby();
+            playAssemble();
+            playFlight();
+            playEndgame();
+        }catch (InterruptedException e) {
+            System.out.println("Thread interrupted: " + e.getMessage());
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -343,7 +353,9 @@ public class Game {
      * through multiple PIRs choice, in parallel on new threads. Will return once everyone has filled up their
      */
     private void fillUpShipboards() throws InterruptedException {
-        gameData.getPIRHandler().broadcastPIR(gameData.getPlayers(), (player, pirHandler) ->
+        gameData.getPIRHandler().broadcastPIR(
+                gameData.getPlayers(),
+                (player, pirHandler) ->
                 player.getShipBoard().fill(player, pirHandler));
     }
 

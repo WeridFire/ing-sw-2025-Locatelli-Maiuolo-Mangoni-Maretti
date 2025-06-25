@@ -21,7 +21,7 @@ public class PIRMultipleChoice extends PIR {
 
 	/**
 	 * Object that makes the server wait for player to make a 2-ways choice. The choice is either yes or no.
-	 * Will auto last 30 seconds, and then use default.
+	 * Will auto last {@code cooldown} seconds, and then use default.
 	 *
 	 * @param currentPlayer  The player the game waits for
 	 * @param cooldown       The cooldown duration.
@@ -41,7 +41,7 @@ public class PIRMultipleChoice extends PIR {
 
 	/**
 	 * Object that makes the server wait for player to make a 2-ways choice. The choice is either yes or no.
-	 * Will auto last 30 seconds, and then use default.
+	 * Will auto last {@code cooldown} seconds, and then use default.
 	 *
 	 * @param currentPlayer  The player the game waits for
 	 * @param cooldown       The cooldown duration.

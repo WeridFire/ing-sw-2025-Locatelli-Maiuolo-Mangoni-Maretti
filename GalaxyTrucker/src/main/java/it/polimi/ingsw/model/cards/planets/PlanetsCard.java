@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.playerInput.PIRs.*;
 import it.polimi.ingsw.model.shipboard.LoadableType;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
@@ -56,7 +57,7 @@ public class PlanetsCard extends Card {
 		int loadablesAmount = p.getShipBoard().getVisitorCalculateCargoInfo().getGoodsInfo().getAllLoadedItems().size();
 		if(loadablesAmount > 0){
 			boolean result = pirHandler.setAndRunTurn(
-					new PIRYesNoChoice(p, 30, "Do you want to rearrange the goods already on your ship?", false)
+					new PIRYesNoChoice(p, Default.PIR_SECONDS, "Do you want to rearrange the goods already on your ship?", false)
 			);
 			if(result){
 				List<LoadableType> loadablesToAdd = p
@@ -66,18 +67,18 @@ public class PlanetsCard extends Card {
 						.getAllLoadedItems();
 				p.getShipBoard().loseBestGoods(loadablesToAdd.size());
 				pirHandler.setAndRunTurn(
-						new PIRAddLoadables(p, 30, loadablesToAdd)
+						new PIRAddLoadables(p, Default.PIR_SECONDS, loadablesToAdd)
 				);
 			}
 		}
 
-		PIRAddLoadables pirAddLoadables = new PIRAddLoadables(p, 30, planet.getAvailableGoods());
+		PIRAddLoadables pirAddLoadables = new PIRAddLoadables(p, Default.PIR_SECONDS, planet.getAvailableGoods());
 		pirHandler.setAndRunTurn(pirAddLoadables);
 	}
 
 	private Planet getPlanetByPlayer(Player p){
 		for(Planet planet : planets){
-			if(planet.getCurrentPlayer().equals(p)){
+			if(p.equals(planet.getCurrentPlayer())){
 				return planet;
 			}
 		}
@@ -97,7 +98,7 @@ public class PlanetsCard extends Card {
 			availablePlanets.forEach(planet -> planetsOption.add("Loot: " + planet.getAvailableGoods()));
 			planetsOption.addFirst("Don't land");
 			int choice = game.getPIRHandler().setAndRunTurn(
-					new PIRMultipleChoice(p, 30, "On what planet do you want to land? " +
+					new PIRMultipleChoice(p, Default.PIR_SECONDS, "On what planet do you want to land? " +
 							"(-" + lostDays +" travel days)",
 							planetsOption.toArray(new String[0]), 0)
 			);

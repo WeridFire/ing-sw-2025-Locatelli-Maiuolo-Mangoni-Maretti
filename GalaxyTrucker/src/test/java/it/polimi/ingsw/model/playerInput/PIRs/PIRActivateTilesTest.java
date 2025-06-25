@@ -10,6 +10,7 @@ import it.polimi.ingsw.model.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,7 @@ public class PIRActivateTilesTest {
 		}
 
 		// Create a PIRActivateTiles object
-		PIRActivateTiles pir = new PIRActivateTiles(player, 15, PowerType.FIRE);
+		PIRActivateTiles pir = new PIRActivateTiles(player, 1, PowerType.FIRE);
 
 		// For testing: Simulate highlight mask (mocking would be best, but for the demo you can set up valid coordinates on the shipboard)
 		Set<Coordinates> fakeHighlights = new HashSet<>();

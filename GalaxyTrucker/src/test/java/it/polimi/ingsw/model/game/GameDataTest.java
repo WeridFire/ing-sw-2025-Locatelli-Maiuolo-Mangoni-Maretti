@@ -5,9 +5,6 @@ import it.polimi.ingsw.model.cards.Deck;
 import it.polimi.ingsw.enums.Direction;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
-import it.polimi.ingsw.model.game.Cheats;
-import it.polimi.ingsw.model.game.Game;
-import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.game.exceptions.ColorAlreadyInUseException;
 import it.polimi.ingsw.model.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.model.gamePhases.exceptions.AlreadyPickedPosition;
@@ -61,8 +58,10 @@ class GameDataTest {
 
     @Test
     void testSetLevel() {
+        GameLevel prevGL = gameData.getLevel();
         gameData.setLevel(GameLevel.ONE);
-        assertEquals(GameLevel.ONE, gameData.getLevel());
+        assertEquals(prevGL, gameData.getLevel());
+        // does not change because level ONE is not compliant
 
         gameData.setLevel(GameLevel.TWO);
         assertEquals(GameLevel.TWO, gameData.getLevel());
@@ -103,6 +102,7 @@ class GameDataTest {
     @Test
     void testResumeGameInAssembly() throws AlreadyPickedPosition, AlreadyEndedAssemblyException, NoShipboardException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, InterruptedException, PlayerAlreadyInGameException, OutOfBuildingAreaException, GameAlreadyRunningException, TooManyItemsInHandException, IllegalStartingPositionIndexException, ColorAlreadyInUseException {
         UUID gameId = runAndSaveGameUntilStep(0);
+        Thread.sleep(1000);
         Game g = GamesHandler.getInstance().getGame(gameId);
 
         assertNotNull(g);
@@ -158,8 +158,8 @@ class GameDataTest {
 
         Thread.sleep(1000);
 
-        Cheats.cheatShipboard(g.getGameData(), player1);
-        Cheats.cheatShipboard(g.getGameData(), player2);
+        Cheats.cheatStandardShipboard(g.getGameData(), player1);
+        Cheats.cheatStandardShipboard(g.getGameData(), player2);
         if(step == 1){
             stopAndSaveGame(gameData);
             return gameId;

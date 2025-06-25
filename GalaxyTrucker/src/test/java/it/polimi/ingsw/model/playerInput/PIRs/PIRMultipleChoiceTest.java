@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.playerInput.PIRs;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,7 @@ public class PIRMultipleChoiceTest {
 		// Create the PIRMultipleChoice instance
 		PIRMultipleChoice pir = new PIRMultipleChoice(
 				testPlayer,
-				30, // cooldown in seconds
+				1, // mock -> 1s cooldown
 				"What option do you prefer?",
 				options,
 				0 // default choice if no response
@@ -55,7 +56,7 @@ public class PIRMultipleChoiceTest {
 		// Create the PIRMultipleChoice instance
 		PIRMultipleChoice pir = new PIRMultipleChoice(
 				testPlayer,
-				30, // cooldown in seconds
+				1, // mock -> 1s cooldown
 				"What option do you prefer?" + " bla".repeat(69),
 				options,
 				0 // default choice if no response
