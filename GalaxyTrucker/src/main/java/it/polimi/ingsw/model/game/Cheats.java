@@ -17,6 +17,7 @@ import it.polimi.ingsw.util.Coordinates;
 
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class Cheats {
 
@@ -31,6 +32,28 @@ public class Cheats {
 		tileList.add(61, null);
 		tileList.add(33, null);
 		return tileList;
+	}
+
+
+	public static void shipboardMethodPrinter(ShipBoard shipBoard, GameData gameData){
+		List<TileSkeleton> tileList = validatePhaseAndGetTilesAsGfxElements(gameData);
+		for (TileSkeleton skeleton : shipBoard.getTiles()) {
+			int tileId = IntStream.range(0, tileList.size())
+					.filter(i -> tileList.get(i) != null && tileList.get(i).getTextureName().equals(skeleton.getTextureName()))
+					.findFirst()
+					.orElse(-1); // or throw an exception if not found
+			Coordinates coords = skeleton.forceGetCoordinates();
+			if(skeleton.getAppliedRotation() != Rotation.NONE){
+				System.out.printf("tileList.get(%s).rotateTile(%s)%n", tileId, skeleton.getAppliedRotation());
+			}
+			System.out.printf(
+					"player.getShipBoard().forceSetTile(tileList.get(%s), new Coordinates(%s)); //%s%n%n",
+					tileId,
+					coords.getRow() + ", " + coords.getColumn(),
+					skeleton.getName()
+			);
+
+		}
 	}
 
 	public static void cheatShipboard(GameData gameData, Player player) throws AlreadyEndedAssemblyException, FixedTileException,
