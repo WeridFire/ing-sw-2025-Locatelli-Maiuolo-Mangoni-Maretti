@@ -10,15 +10,10 @@ import it.polimi.ingsw.model.game.exceptions.ColorAlreadyInUseException;
 import it.polimi.ingsw.model.game.exceptions.GameAlreadyRunningException;
 import it.polimi.ingsw.model.game.exceptions.PlayerAlreadyInGameException;
 import it.polimi.ingsw.model.player.Player;
-import it.polimi.ingsw.model.player.exceptions.NoTileInHandException;
-import it.polimi.ingsw.model.shipboard.ShipBoard;
-import it.polimi.ingsw.model.shipboard.SideType;
 import it.polimi.ingsw.model.shipboard.exceptions.*;
 import it.polimi.ingsw.model.shipboard.tiles.*;
 import it.polimi.ingsw.model.shipboard.tiles.exceptions.FixedTileException;
-import it.polimi.ingsw.model.shipboard.visitors.VisitorCalculatePowers;
 import it.polimi.ingsw.util.Coordinates;
-import it.polimi.ingsw.view.cli.CLIFrame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +47,7 @@ class ShipBoardTest {
 
 
         // Initialize a ShipBoard
-        Cheats.cheatShipboard(game1.getGameData(), player1);
+        Cheats.cheatStandardShipboard(game1.getGameData(), player1);
     }
 
     @Test

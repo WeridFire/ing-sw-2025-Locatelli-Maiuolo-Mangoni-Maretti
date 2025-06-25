@@ -254,10 +254,16 @@ public class Game {
      * Starts and manages the game loop.
      */
     public void gameLoop() throws InterruptedException, RemoteException {
-        playLobby();
-        playAssemble();
-        playFlight();
-        playEndgame();
+        try{
+            playLobby();
+            playAssemble();
+            playFlight();
+            playEndgame();
+        }catch (InterruptedException e) {
+            System.out.println("Thread interrupted: " + e.getMessage());
+            e.printStackTrace();
+        }
+
     }
 
     /**
