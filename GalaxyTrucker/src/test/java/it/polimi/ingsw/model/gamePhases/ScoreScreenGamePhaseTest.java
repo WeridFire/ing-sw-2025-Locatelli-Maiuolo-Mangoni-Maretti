@@ -17,6 +17,7 @@ import it.polimi.ingsw.model.shipboard.ShipBoard;
 import it.polimi.ingsw.model.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.rmi.RemoteException;
 import java.util.Map;
@@ -93,7 +94,7 @@ class ScoreScreenGamePhaseTest {
     }
 
     @Test
-    public void testCalculateScores() {
+    public void testCalculateScores() throws InterruptedException {
         GameLevel level = GameLevel.TWO;
         try {
             setup(level);
@@ -114,5 +115,9 @@ class ScoreScreenGamePhaseTest {
         }
 
         printScores(scoreScreenGamePhase.calculateScores());
+        scoreScreenGamePhase.playLoop();
+        assertNotNull(scoreScreenGamePhase.getCLIRepresentation());
+
     }
+
 }
