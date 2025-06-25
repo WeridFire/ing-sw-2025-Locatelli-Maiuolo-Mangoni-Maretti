@@ -88,8 +88,6 @@ public class Cheats {
 
 		player.getShipBoard().forceSetTile(tileList.get(127), new Coordinates(8, 5)); //Double Cannon with power 2.0
 
-		player.getShipBoard().forceSetTile(tileList.get(32), new Coordinates(8, 9)); //Cabin 0/2
-
 		player.getShipBoard().forceSetTile(tileList.get(14), new Coordinates(9, 5)); //Battery Tile 0/3
 
 	}

@@ -211,15 +211,6 @@ public class Game {
     }
 
     private void playEndgame() throws InterruptedException {
-        if(gameData.getPlayersInFlight().isEmpty() ||
-                gameData.getPlayers(Player::isConnected).size() <= 1){
-            // play end of the game only after adventures and when no other cards are in the deck
-            if (getGameData().getCurrentGamePhaseType() != GamePhaseType.ADVENTURE
-                    || getGameData().getDeck().getCurrentCard() != null) {
-                return;
-            }
-        }
-
         System.out.println(this + " Started scoring phase");
 
         //********//
