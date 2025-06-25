@@ -18,10 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.rmi.RemoteException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -159,16 +156,30 @@ class ShipBoardTest {
         assertThrows(NoTileFoundException.class, () -> {shipBoard1.getTile(coord2);});
         assertThrows(UninitializedShipboardException.class, () -> {shipBoard1.getColor();});
 
+        List<String> fgColors = new ArrayList<>();
+        fgColors.add("\u001B[31m");
+        fgColors.add("\u001B[34m");
+        Set<Coordinates> set1 = Set.of(coord3);
+        Set<Coordinates> set2 = Set.of(coord4);
+        List<Set<Coordinates>> highlight = List.of(set1, set2);
 
+        assertNotNull(shipBoard1.getCLIRepresentation(highlight, fgColors));
+        shipBoard1.resetVisitors();
+        shipBoard1.fill(player1, game1.getGameData().getPIRHandler());
+        shipBoard1.loseBestGoods(2);
+        shipBoard1.loseCrew(1);
+        shipBoard1.loseBatteries(1);
+        Boolean b2 = shipBoard1.isEndedAssembly();
         Boolean b = shipBoard1.isFilled();
         GameLevel l = shipBoard1.getLevel();
         Map<Coordinates, TileSkeleton> map = shipBoard1.getBoard();
+        Map<Coordinates, TileSkeleton> map2 = shipBoard1.getTilesOnBoard();
         shipBoard1.setTile(northC, coord3);
         shipBoard1.setTile(eastC, coord4);
         shipBoard1.setTile(westC, coord5);
         shipBoard1.setTile(westDoubleC, new Coordinates(coord5.getRow() + 1, coord5.getColumn()));
         shipBoard1.setTile(southC, coord6);
-
+        Set<TileSkeleton> shipBoard1Tiles = shipBoard1.getTiles();
         shipBoard1.resetVisitors();
 
         // normal behavior
@@ -199,10 +210,11 @@ class ShipBoardTest {
         assertEquals(ProtectionType.SINGLE_CANNON, shipBoard1.getCannonProtection(Direction.SOUTH, 6));
         assertEquals(ProtectionType.SINGLE_CANNON, shipBoard1.getCannonProtection(Direction.SOUTH, 8));
         assertEquals(ProtectionType.NONE, shipBoard1.getCannonProtection(Direction.SOUTH, 9));
+        assertThrows(IllegalArgumentException.class, () -> {shipBoard1.setTile(null, coord3);});
 
         shipBoard1.endAssembly();
         assertThrows(AlreadyEndedAssemblyException.class, () -> {shipBoard1.endAssembly();});
-
+        assertThrows(AlreadyEndedAssemblyException.class, () -> {shipBoard1.setTile(northC, coord3);});
         shipBoard1.hit(Direction.NORTH, 7);
         assertThrows(NoTileFoundException.class, () -> {shipBoard1.getTile(coord3);});
 
