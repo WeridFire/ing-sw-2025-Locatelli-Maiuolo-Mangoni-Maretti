@@ -49,7 +49,7 @@ public class LoadableContainer extends StackPane {
         
         if (loadableTypes != null) {
             for (LoadableType type : loadableTypes) {
-                LoadableObject loadableObj = new LoadableObject(AdventureUI.getDragOverlay(), type);
+                LoadableObject loadableObj = new LoadableObject(AdventureUI.getDragOverlay(), type, null);
                 loadableObjectsLayout.getChildren().add(loadableObj);
             }
         }
@@ -60,7 +60,7 @@ public class LoadableContainer extends StackPane {
      * @param loadableType The LoadableType to add
      */
     public void addLoadableObject(LoadableType loadableType) {
-        LoadableObject loadableObj = new LoadableObject(AdventureUI.getDragOverlay(), loadableType);
+        LoadableObject loadableObj = new LoadableObject(AdventureUI.getDragOverlay(), loadableType, null);
         loadableObjectsLayout.getChildren().add(loadableObj);
     }
     

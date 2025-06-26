@@ -42,6 +42,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         if (dragOverlay == null) {
             dragOverlay = new Pane(); // Transparent pane above everything
             dragOverlay.setPickOnBounds(false); // Important: so it doesn't block mouse events
+            dragOverlay.setViewOrder(-1);
         }
         return dragOverlay;
     }
@@ -97,7 +98,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         // Utile per il debug del layout, mostra le linee della griglia:
         mainLayout.setGridLinesVisible(true);
 
-        root.getChildren().add(mainLayout);
+        root.getChildren().addAll(mainLayout, getDragOverlay());
     }
 
     public ShipGrid getShipGrid(){

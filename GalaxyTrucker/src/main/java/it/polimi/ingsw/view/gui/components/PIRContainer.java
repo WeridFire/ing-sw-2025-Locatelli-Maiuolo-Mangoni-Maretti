@@ -59,6 +59,7 @@ public class PIRContainer extends StackPane {
         content.getChildren().add(getLabel("TODO"));
         PIRActivateTiles castedPir = (PIRActivateTiles) pir;
         // TODO: implementa logica specifica activate row col
+        addCloseButton();
     }
 
     public void handleAddCargoPir() {
@@ -75,6 +76,7 @@ public class PIRContainer extends StackPane {
         content.getChildren().add(getLabel("TODO"));
         PIRRemoveLoadables castedPir = (PIRRemoveLoadables) pir;
         // TODO: implementa logica specifica remove (x, y) <LoadableType> <amount>
+        addCloseButton();
     }
 
     public void handleChoicePir() {
@@ -94,7 +96,7 @@ public class PIRContainer extends StackPane {
             buff.setStyle("-fx-padding: 10; -fx-min-width: 120;");
             buff.setOnMouseClicked(event -> {
                 Platform.runLater(() -> {
-                    ClientManager.getInstance().simulateCommand("choose " + choiceIndex);
+                    ClientManager.getInstance().simulateCommand("choose", String.valueOf(choiceIndex));
                 });
 
                 AdventureUI.getInstance().hidePirContainer();
@@ -116,6 +118,8 @@ public class PIRContainer extends StackPane {
 
         content.getChildren().clear();
         content.getChildren().add(label);
+
+        addCloseButton();
     }
 
     private Label getLabel(String labelText) {
@@ -124,5 +128,13 @@ public class PIRContainer extends StackPane {
         labelObj.setStyle("-fx-font-weight: bold; -fx-text-fill: black;"); // Changed to black text
         labelObj.setViewOrder(-1);
         return labelObj;
+    }
+
+    private void addCloseButton() {
+        Button close = new Button("Close");
+        close.setOnMouseClicked(event -> {
+            AdventureUI.getInstance().hidePirContainer();
+        });
+        content.getChildren().add(close);
     }
 }

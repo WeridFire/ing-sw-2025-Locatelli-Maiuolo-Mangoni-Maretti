@@ -116,6 +116,14 @@ public class ShipCell extends DropSlot {
         this.isActiveForAdventureRemove = activeForAdventureRemove;
     }
 
+    public boolean isActiveForAdventureDrop(){
+        return isActiveForAdventureDrop && isHighlighted;
+    }
+
+    public boolean isActiveForAdventureRemove() {
+        return isActiveForAdventureRemove && isHighlighted;
+    }
+
     public boolean addLoadable(LoadableObject loadableObject) {
         if (loadablesContent.size() >= 4) {
             return false;
@@ -148,7 +156,7 @@ public class ShipCell extends DropSlot {
         if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
             return dragId.startsWith(ShipTile.BASE_ID) && canAcceptTile();
         }
-        else if (isActiveForAdventureDrop) {
+        else if (isActiveForAdventureDrop()) {
             return dragId.startsWith(LoadableObject.BASE_ID);
         }
         return false;
@@ -163,12 +171,12 @@ public class ShipCell extends DropSlot {
                 ClientManager.getInstance().simulateCommand("place", logicalRow, logicalColumn);
             }
             occupied = true;
-        } else if (isActiveForAdventureDrop) {
-            //TODO
-            Platform.runLater(() -> {
-                ClientManager.getInstance().simulateCommand("allocate " + logicalRow + " " + logicalColumn + " " +
-                        DragDropManager.getCurrentDraggable().getType() + "1");
-            });
+        } else if (isActiveForAdventureDrop()) {
+            if (DragDropManager.getCurrentDraggable().getType() != null){
+                ClientManager.getInstance().simulateCommand("allocate",logicalRow, logicalColumn,
+                        DragDropManager.getCurrentDraggable().getType().toString(), "1");
+                addLoadable((LoadableObject) DragDropManager.getCurrentDraggable());
+            }
         }
 
     }
