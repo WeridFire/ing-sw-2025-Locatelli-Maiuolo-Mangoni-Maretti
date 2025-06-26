@@ -5,21 +5,17 @@ import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.controller.states.PIRState;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.model.playerInput.PIRs.PIR;
-import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.components.*;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
-import java.util.function.Consumer;
 
 /**
  * Manages the user interface for the adventure phase of the game.
