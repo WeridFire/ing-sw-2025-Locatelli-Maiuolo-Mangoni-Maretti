@@ -44,18 +44,14 @@ public class MeteorSwarmCard extends Card {
 	 */
 	@Override
 	public void playEffect(GameData game) throws InterruptedException {
-		Random random = new Random();
-
 		for(Projectile proj : meteors){
-			int dice1 = random.nextInt(6) + 1;
-			int dice2 = random.nextInt(6) + 1;
-
-			String[] dicesString = dicesString(dice1, dice2);
+			proj.roll2D6();
 
 			game.getPIRHandler().broadcastPIR(game.getPlayersInFlight(), (player, pirHandler) -> {
 				PIRDelay pirDelay = new PIRDelay(player, Default.PIR_SHORT_SECONDS,
-                        Arrays.toString(dicesString),
-						getCLIRepresentation());
+                        proj.toVerboseString(),
+						proj.getCLIRepresentation(player.getShipBoard()
+						));
 				pirHandler.setAndRunTurn(pirDelay);
 			});
 
@@ -72,27 +68,6 @@ public class MeteorSwarmCard extends Card {
 		}
 	}
 
-	public String[] dicesString(int dice1, int dice2){
-		String[] diceLines = {
-				"The ancients have rolled the dice of fate",
-				"The will of the cosmos has been cast",
-				"The dice thunder with divine judgment",
-				"The threads of destiny have been thrown upon the table",
-				"Eternity has spoken in the language of dice",
-				"From the heavens, the roll echoes through time",
-				"The celestial hand has sealed your fate",
-				"In the great halls beyond, the dice have fallen"
-		};
-
-		int index = ThreadLocalRandom.current().nextInt(diceLines.length);
-		String randomLine = diceLines[index];
-
-		ArrayList<String> diceFrameLines = new ArrayList<>();
-		diceFrameLines.add(randomLine);
-		diceFrameLines.add("The magic numbers are: " + dice1 + " and " + dice2);
-
-		return diceFrameLines.toArray(new String[0]);
-	}
 
 	/**
 	 * Generates a CLI representation of the implementing object.

@@ -1,9 +1,20 @@
 package it.polimi.ingsw.model.cards.projectile;
 
 import it.polimi.ingsw.enums.Direction;
+import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.shipboard.ShipBoard;
+import it.polimi.ingsw.util.BoardCoordinates;
+import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.cli.ANSI;
+import it.polimi.ingsw.view.cli.CLIFrame;
+import it.polimi.ingsw.view.cli.ICLIPrintable;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Projectile implements Serializable {
 
@@ -96,7 +107,7 @@ public class Projectile implements Serializable {
             type = "Heavy Cannon Fire";
         }
 
-        return type + " from " + direction.toVerboseString() + "]";
+        return type + " at coords [" + coord + "] from [" + direction.toVerboseString() + "]";
     }
 
     public String toEmojiString() {
@@ -141,4 +152,27 @@ public class Projectile implements Serializable {
     public int getCoord() {
         return coord;
     }
+
+
+
+    public CLIFrame getCLIRepresentation(ShipBoard shipBoard){
+        Coordinates coords = shipBoard.getFirstTileLocation(this.direction, this.coord);
+        if(coords != null){
+            List<Set<Coordinates>> shipGroups = new ArrayList<>();
+            shipGroups.add(Set.of(coords)); //coordinate hit is in red
+            shipGroups.add(
+                    shipBoard
+                            .getOccupiedCoordinates()
+                            .stream()
+                            .filter(c -> !c.equals(coords))
+                            .collect(Collectors.toSet())
+            ); //rest of shipboard is green
+            return shipBoard.getCLIRepresentation(shipGroups, List.of(ANSI.RED, ANSI.GREEN));
+        }else{
+            return shipBoard.getCLIRepresentation(shipBoard
+                    .getOccupiedCoordinates(), ANSI.GREEN);
+        }
+    }
+
+
 }
