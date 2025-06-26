@@ -22,6 +22,8 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -32,7 +34,9 @@ public class GameServer{
 	private final int rmiPort;
 	private RmiServer rmiServer;
 	private final Map<UUID, IClient> clients = new HashMap<>();
+
 	private final ExecutorService executor = Executors.newFixedThreadPool(3);
+	private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
 	private static GameServer instance;
 
@@ -86,12 +90,14 @@ public class GameServer{
 				e.printStackTrace();
 			}
 		});
-		executor.submit(() -> {
-			while (true) {
+
+		scheduler.scheduleAtFixedRate(() -> {
+			try {
 				checkConnectedClients();
-				Thread.sleep(5000);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		});
+		}, 0, 3, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -210,6 +216,24 @@ public class GameServer{
             e.printStackTrace();
         }
     }
+
+	public static void shutdown() {
+		if (instance == null) return;
+		try {
+			instance.executor.shutdown();
+			instance.scheduler.shutdown();
+			if (!instance.executor.awaitTermination(5, TimeUnit.SECONDS)) {
+				instance.executor.shutdownNow();
+			}
+			if (!instance.scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+				instance.scheduler.shutdownNow();
+			}
+		} catch (InterruptedException e) {
+			instance.executor.shutdownNow();
+			instance.scheduler.shutdownNow();
+			Thread.currentThread().interrupt();
+		}
+	}
 
 	/**
 	 * Broadcasts a {@link ClientUpdate} to all connected clients.

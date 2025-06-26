@@ -27,13 +27,16 @@ import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Represents a game instance with a unique identifier, game data, and a timer.
  */
 public class Game {
 
-
+    ScheduledExecutorService schedulerPeriodicSaver = Executors.newSingleThreadScheduledExecutor();
     private transient Thread gameThread;
 
     /**
@@ -89,10 +92,14 @@ public class Game {
         return gameData;
     }
 
-    private void playLobby() throws RemoteException, InterruptedException {
+    /**
+     * Perform the Lobby phase of this game
+     * @return {@code true} if lobby has been completed successfully, {@code false} otherwise
+     */
+    private boolean playLobby() throws RemoteException {
         // play lobby only after no game phase has been started
         if (getGameData().getCurrentGamePhaseType() != GamePhaseType.NONE) {
-            return;
+            return true;
         }
 
         //*******//
@@ -101,37 +108,87 @@ public class Game {
 
         LobbyGamePhase lobby = new LobbyGamePhase(gameData);
         getGameData().setCurrentGamePhase(lobby);
-        lobby.playLoop();
+        try {
+            lobby.playLoop();
+        } catch (InterruptedException e) {
+            return false;
+        }
 
         // call function to initialize all players stuff
         System.out.println(this + " Initialization");
         initGame();
+
+        return true;
     }
 
-    private void playAssemble() throws RemoteException, InterruptedException {
-        // play assemble only after lobby
-        if (getGameData().getCurrentGamePhaseType() != GamePhaseType.LOBBY) {
-            return;
+    private void startPeriodicSave() {
+        schedulerPeriodicSaver.scheduleAtFixedRate(gameData::saveGameState, 0, 15, TimeUnit.SECONDS);
+    }
+
+    private void stopPeriodicSave() {
+        schedulerPeriodicSaver.shutdown();
+        try {
+            if (!schedulerPeriodicSaver.awaitTermination(1, TimeUnit.SECONDS)) {
+                schedulerPeriodicSaver.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            schedulerPeriodicSaver.shutdownNow();
         }
+    }
 
-        //**********//
-        // ASSEMBLE
-        System.out.println(this + " Started assemble phase");
-
-        AssembleGamePhase assemble = new AssembleGamePhase(gameData, () -> {
+    private AssembleGamePhase retrieveAssembleGamePhase(GamePhaseType currentGamePhaseType) {
+        Runnable onTimerSwitch = () -> {
             // notify all players about the new game state with an expired timer
             try {
                 GameServer.getInstance().broadcastUpdate(this);
             } catch (RemoteException e) {
                 // ignore exception since there is no other way to notify the players
             }
-        });
+        };
+        AssembleGamePhase assemble;
+        if (currentGamePhaseType == GamePhaseType.ASSEMBLE) {  // resume previous assemble
+            assemble = new AssembleGamePhase((AssembleGamePhase) gameData.getCurrentGamePhase(), onTimerSwitch);
+        } else {  // create new assemble
+            assemble = new AssembleGamePhase(gameData, onTimerSwitch);
+        }
+        return assemble;
+    }
+
+    /**
+     * Perform the Assemble phase of this game
+     * @return {@code true} if assemble has been completed successfully, {@code false} otherwise
+     */
+    private boolean playAssemble() throws RemoteException {
+        // play assemble only after lobby or from previous assemble
+        GamePhaseType currentGamePhaseType = getGameData().getCurrentGamePhaseType();
+        if (currentGamePhaseType != GamePhaseType.LOBBY && currentGamePhaseType != GamePhaseType.ASSEMBLE) {
+            return true;
+        }
+
+        //**********//
+        // ASSEMBLE
+        System.out.println(this + " Started assemble phase");
+
+        // create schedule to save game in assemble every tot seconds
+        startPeriodicSave();
+
+        AssembleGamePhase assemble = retrieveAssembleGamePhase(currentGamePhaseType);
         getGameData().setCurrentGamePhase(assemble);
 
         // notify all players about the new game state
         GameServer.getInstance().broadcastUpdate(this);
 
-        assemble.playLoop();
+        // actually run assemble
+        try {
+            assemble.playLoop();
+        } catch (InterruptedException e) {
+            stopPeriodicSave();
+            return false;
+        }
+
+        // end periodic save
+        stopPeriodicSave();
+
         System.out.println(this + " Ended assemble phase");
         // if here can be because time ended: force all the players that haven't finished yet to end assembly
         for (Player player : getGameData().getPlayers()) {
@@ -148,7 +205,11 @@ public class Game {
 
         // Blocking function that waits for everyone to finish set up their shipboard aliens
         System.out.println(this + " Started filling the shipboards");
-        fillUpShipboards();
+        try {
+            fillUpShipboards();
+        } catch (InterruptedException e) {
+            return false;  // no need to do anything: simply don't save
+        }
         //resetting visitor after fillup is necessary to recalculate fire powers.
         gameData.getPlayers().forEach(p -> p.getShipBoard().resetVisitors());
         System.out.println(this + " Filled all the shipboards");
@@ -156,13 +217,19 @@ public class Game {
         gameData.getPIRHandler().joinEndTurn(gameData.getPlayers());
 
         gameData.saveGameState();
+
+        return true;
     }
 
-    private void playFlight() throws InterruptedException {
+    /**
+     * Perform the Flight phase of this game
+     * @return {@code true} if flight has been completed successfully, {@code false} otherwise
+     */
+    private boolean playFlight() {
         // play flight only after assemble, or after another adventure... (*1)
         GamePhaseType currentGamePhaseType = getGameData().getCurrentGamePhaseType();
         if (currentGamePhaseType != GamePhaseType.ASSEMBLE && currentGamePhaseType != GamePhaseType.ADVENTURE) {
-            return;
+            return true;
         }
 
         //********//
@@ -182,15 +249,20 @@ public class Game {
             // endgame if 0 players are flying.
             // we don't check for <= 1 players connected because the game still progresses in this case.
             if (getGameData().getPlayersInFlight().isEmpty()) {
-                System.out.println(this + " Zero alive players... Ending flight.");
-                break;
+                System.out.println(this + " Zero alive players... Exiting game.");
+                gameData.saveGameState();
+                return false;
             }
 
             // create adventure
             adventureGamePhase = new AdventureGamePhase(gameData, currentAdventureCard);
             getGameData().setCurrentGamePhase(adventureGamePhase);
             // play the adventure
-            adventureGamePhase.playLoop();
+            try {
+                adventureGamePhase.playLoop();
+            } catch (InterruptedException e) {
+                return false;
+            }
 
             // revalidate structure at the end of each adventure for non-notified-yet problems (e.g. 0 crew)
             List<Player> playersInFlight = getGameData().getPlayersInFlight();
@@ -211,16 +283,21 @@ public class Game {
         }
 
         System.out.println(this + " Ended flight phase");
+        return true;
     }
 
-    private void playEndgame() throws InterruptedException {
+    private void playEndgame() {
         System.out.println(this + " Started scoring phase");
 
         //********//
         // SCORE SCREEN
         ScoreGamePhase scoreScreenGamePhase = new ScoreGamePhase(gameData);
         getGameData().setCurrentGamePhase(scoreScreenGamePhase);
-        scoreScreenGamePhase.playLoop();
+        try {
+            scoreScreenGamePhase.playLoop();
+        } catch (InterruptedException e) {
+            return;
+        }
 
         // Delete game save file to prevent the resuming of a finished game.
         GamesHandler.deleteGameSave(getId());
@@ -240,24 +317,17 @@ public class Game {
 
         System.out.println(this + " Ended scoring phase.");
 
-
         stopGame();
     }
 
     /**
      * Starts and manages the game loop.
      */
-    public void gameLoop() throws InterruptedException, RemoteException {
-        try{
-            playLobby();
-            playAssemble();
-            playFlight();
-            playEndgame();
-        }catch (InterruptedException e) {
-            System.out.println("Thread interrupted: " + e.getMessage());
-            e.printStackTrace();
-        }
-
+    public void gameLoop() throws RemoteException {
+        boolean continueLoop = playLobby();
+        if (continueLoop) continueLoop = playAssemble();
+        if (continueLoop) continueLoop = playFlight();
+        if (continueLoop) playEndgame();
     }
 
     /**
