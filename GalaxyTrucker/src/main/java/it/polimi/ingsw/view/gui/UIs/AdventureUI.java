@@ -100,7 +100,6 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
             gameLevel = GameLevel.TESTFLIGHT;
         }
 
-        boardComponent = BoardComponent.create(gameLevel);
         shipGrid = new ShipGrid(gameLevel);
 
         cardPane = new CardContainer();
@@ -112,7 +111,6 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
 
         // Add components to the grid
         mainLayout.add(loadableContainer, 0, 0, 2, 1);  // Spanning across both columns at top
-        mainLayout.add(boardComponent, 0, 1, 2, 1);
         mainLayout.add(shipGrid, 0, 2);
         mainLayout.add(cardPane, 1, 2);
         mainLayout.setAlignment(Pos.CENTER);

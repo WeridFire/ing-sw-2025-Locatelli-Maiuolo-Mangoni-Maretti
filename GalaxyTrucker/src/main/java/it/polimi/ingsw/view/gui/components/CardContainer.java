@@ -49,6 +49,8 @@ public class CardContainer extends StackPane {
      * @param card the card to be displayed
      */
     public void setCard(Card card) {
+        if (card == null) return;
+
         this.card = card;
 
         this.getChildren().remove(imageView);

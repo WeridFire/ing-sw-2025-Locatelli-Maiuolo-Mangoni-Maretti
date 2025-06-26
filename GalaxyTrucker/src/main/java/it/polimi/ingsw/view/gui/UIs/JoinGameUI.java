@@ -60,13 +60,18 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
 
         Button joinGameButton = createJoinGameButton(username);
 
+        Button backButton = new Button("Back");
+        backButton.setOnAction(event -> {
+            ClientManager.getInstance().updateScene(ClientManager.getInstance().getGameLayout());
+        });
+
         layout = new VBox(15);
         layout.setAlignment(Pos.CENTER);
         layout.getChildren().addAll(
                 uuidLabel, gameUUIDField,
                 activeGamesLabel, activeGamesList,
                 colorLabel, colorSelectionBox,
-                joinGameButton
+                joinGameButton, backButton
         );
     }
 
