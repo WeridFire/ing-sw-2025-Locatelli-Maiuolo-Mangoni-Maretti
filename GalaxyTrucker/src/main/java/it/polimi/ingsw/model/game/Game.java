@@ -216,7 +216,6 @@ public class Game {
 
         gameData.getPIRHandler().joinEndTurn(gameData.getPlayers());
 
-        gameData.saveGameState();
 
         return true;
     }
@@ -250,13 +249,14 @@ public class Game {
             // we don't check for <= 1 players connected because the game still progresses in this case.
             if (getGameData().getPlayersInFlight().isEmpty()) {
                 System.out.println(this + " Zero alive players... Exiting game.");
-                gameData.saveGameState();
-                return false;
+
+                return true;
             }
 
             // create adventure
             adventureGamePhase = new AdventureGamePhase(gameData, currentAdventureCard);
             getGameData().setCurrentGamePhase(adventureGamePhase);
+            gameData.saveGameState();
             // play the adventure
             try {
                 adventureGamePhase.playLoop();
