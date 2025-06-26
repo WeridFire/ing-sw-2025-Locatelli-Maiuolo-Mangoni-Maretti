@@ -1,11 +1,19 @@
 package it.polimi.ingsw.view.gui.components;
 
 import it.polimi.ingsw.controller.states.AssembleState;
+import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.model.shipboard.ShipBoard;
+import it.polimi.ingsw.model.shipboard.tiles.BatteryComponentTile;
+import it.polimi.ingsw.model.shipboard.tiles.CabinTile;
+import it.polimi.ingsw.model.shipboard.tiles.CargoHoldTile;
 import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.model.shipboard.visitors.CalculatorCargoInfo;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.util.Default;
+import it.polimi.ingsw.view.gui.UIs.AdventureUI;
 import it.polimi.ingsw.view.gui.helpers.Asset;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
 import javafx.geometry.Pos;
@@ -13,10 +21,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents the display area for a player's spaceship, consisting of a background image
@@ -171,14 +176,48 @@ public class ShipGrid extends StackPane {
     public void update() {
         ShipBoard shipBoard = AssembleState.getSpectatedShipBoard();
         if (shipBoard == null) return;  // guard against null shipboard
+        Map<Coordinates, CargoHoldTile> loadables = Map.of();
+        Map<Coordinates, CabinTile> crew = Map.of();
+        Map<Coordinates, BatteryComponentTile> batteries = Map.of();
+
+        if (shipBoard.getVisitorCalculateCargoInfo() != null){
+            loadables = shipBoard.getVisitorCalculateCargoInfo().getGoodsInfo().getLocations();
+            crew = shipBoard.getVisitorCalculateCargoInfo().getCrewInfo().getLocations();
+            batteries = shipBoard.getVisitorCalculateCargoInfo().getBatteriesInfo().getLocations();
+        }
 
         // tiles in ship
         Map<Coordinates, TileSkeleton> tilesOnBoard = shipBoard.getTilesOnBoard();
         for (Map.Entry<Coordinates, ShipCell> entry : gridCells.entrySet()) {
             Coordinates logicalCoords = entry.getKey();
             ShipCell cell = entry.getValue();
+
             cell.setTile(tilesOnBoard.get(logicalCoords));
             updateNeighbors(logicalCoords, cell);
+
+            if (CommonState.isCurrentPhase(GamePhaseType.ADVENTURE)){
+                if (loadables != null && loadables.get(entry.getKey()) != null) {
+                    List<LoadableType> goods = loadables.get(entry.getKey()).getLoadedItems();
+                    System.out.println(goods);
+                    goods.forEach(x ->
+                            cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
+                    );
+                }
+                else if (crew != null && crew.get(entry.getKey()) != null) {
+                    List<LoadableType> goods = crew.get(entry.getKey()).getLoadedItems();
+                    System.out.println(goods);
+                    goods.forEach(x ->
+                            cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
+                    );
+                }
+                else if (batteries != null && batteries.get(entry.getKey()) != null) {
+                    List<LoadableType> goods = batteries.get(entry.getKey()).getLoadedItems();
+                    System.out.println(goods);
+                    goods.forEach(x ->
+                            cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
+                    );
+                }
+            }
         }
 
         // reserved tiles
