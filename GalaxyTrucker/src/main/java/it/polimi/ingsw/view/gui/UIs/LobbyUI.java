@@ -13,6 +13,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
+import java.util.UUID;
+
 public class LobbyUI implements INodeRefreshableOnUpdateUI {
     private final VBox layout;
     private ComboBox<Integer> playerCountBox;

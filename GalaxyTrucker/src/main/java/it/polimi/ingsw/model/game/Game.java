@@ -180,11 +180,10 @@ public class Game {
         AdventureGamePhase adventureGamePhase;
         while (currentAdventureCard != null) {
 
-            // endgame if 0 players are alive OR only 1 player is connected.
-            if(gameData.getPlayersInFlight().isEmpty() ||
-                    gameData.getPlayers(Player::isConnected).size() <= 1){
-                System.out.println(this + " Alive players: " + gameData.getPlayersInFlight().size()
-                        + ", Connected players: " + gameData.getPlayers(Player::isConnected)
+            // endgame if 0 players are alive.
+            //we don't check for <= 1 players connected because the game still progresses in this case.
+            if(gameData.getPlayersInFlight().isEmpty()){
+                System.out.println(this + " Alive players: " + gameData.getPlayersInFlight().size() 
                         + "... Ending flight."
                 );
                 break;

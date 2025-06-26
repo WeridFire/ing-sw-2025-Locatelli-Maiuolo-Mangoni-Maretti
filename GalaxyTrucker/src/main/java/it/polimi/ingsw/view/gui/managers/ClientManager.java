@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
@@ -189,15 +190,13 @@ public class ClientManager {
      */
     private void createOrJoinGame(String username) {
         // ---- create ----
-        // color combobox
         ComboBox<MainCabinTile.Color> colorBox = new ComboBox<>(
                 FXCollections.observableArrayList(MainCabinTile.Color.values()));
         colorBox.setPromptText("Color on Create");
         colorBox.setValue(MainCabinTile.Color.BLUE);
-        // button
+
         Button createGameButton = new Button("Create Game");
         createGameButton.setOnAction(_ -> handleCreateGame(username, colorBox.getValue()));
-        // merge color combobox and create button
         HBox createControls = new HBox(10, colorBox, createGameButton);
         createControls.setAlignment(Pos.CENTER);
 
@@ -205,8 +204,26 @@ public class ClientManager {
         Button joinButton = new Button("Join Game");
         joinButton.setOnAction(_ -> handleJoinGame(username));
 
+        // ---- resume ----
+        javafx.scene.control.TextField uuidField = new javafx.scene.control.TextField();
+        uuidField.setPromptText("Enter Game UUID");
+
+        Button resumeButton = new Button("Resume Game");
+        resumeButton.setOnAction(_ -> {
+            String uuidText = uuidField.getText();
+            try {
+                UUID gameId = UUID.fromString(uuidText);
+                handleResumeGame(gameId);
+            } catch (IllegalArgumentException e) {
+                AlertUtils.showError("Invalid UUID", "Please enter a valid UUID.");
+            }
+        });
+
+        HBox resumeControls = new HBox(10, uuidField, resumeButton);
+        resumeControls.setAlignment(Pos.CENTER);
+
         // ---- layout ----
-        VBox gameLayout = new VBox(15, createControls, joinButton);
+        VBox gameLayout = new VBox(15, createControls, joinButton, resumeControls);
         gameLayout.setAlignment(Pos.CENTER);
 
         updateScene(gameLayout);
@@ -221,6 +238,11 @@ public class ClientManager {
             });
             event.consume();
         });
+    }
+
+
+    private void handleResumeGame(UUID gameId){
+        ClientManager.getInstance().simulateCommand("resume", gameId.toString());
     }
 
     /**
