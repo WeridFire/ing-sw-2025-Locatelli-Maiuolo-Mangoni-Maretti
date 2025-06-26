@@ -74,6 +74,8 @@ public class ClientUpdate implements Serializable {
 	}
 
 	private GameData obfuscateGame(GameData game, Player target){
+		return game;
+		/*
 		try {
 			// Write object to a byte stream
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -98,6 +100,8 @@ public class ClientUpdate implements Serializable {
 		} catch (IOException | ClassNotFoundException e) {
 			throw new RuntimeException("Error during deep copy", e);
 		}
+
+		 */
 	}
 
 	public GameData getCurrentGame() {
