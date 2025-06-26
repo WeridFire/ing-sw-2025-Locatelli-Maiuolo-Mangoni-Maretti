@@ -33,14 +33,12 @@ public class ScoreGamePhase extends PlayableGamePhase implements ICLIPrintable, 
         gameData.getPIRHandler().broadcastPIR(
                         gameData.getPlayers(Player::isConnected),
                         (player, pirHandler) -> {
-
                                 PIRDelay pirDelay = new PIRDelay(
                                         player,
-                                        Default.PIR_SHORT_SECONDS,
-                                        "GG to all, match is over",
+                                        10,
+                                        "GG to all, match is over. You will be sent to the menu in 10 seconds...",
                                         getCLIRepresentation());
                                 pirHandler.setAndRunTurn(pirDelay);
-
                 });
     }
 
