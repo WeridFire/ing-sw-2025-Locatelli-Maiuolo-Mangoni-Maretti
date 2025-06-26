@@ -1,6 +1,8 @@
 package it.polimi.ingsw.model.gamePhases;
 
 import it.polimi.ingsw.GamesHandler;
+import it.polimi.ingsw.TestingUtils;
+import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.gamePhases.exceptions.IncorrectGamePhaseTypeException;
 import it.polimi.ingsw.model.player.Player;
@@ -88,6 +90,43 @@ public class AssemblyGamePhaseTest {
 			assert player.getShipBoard().getVisitorCalculateCargoInfo().getCrewInfo().count(LoadableType.HUMAN) == 6 :
 					"the player should have 6 humans because he filled up his shipboard with aliens.";
 		}
+
+
+	}
+
+	@Test
+	public void miscTest() throws InterruptedException, IncorrectGamePhaseTypeException {
+		Thread.sleep(200);
+		GameClientMock[] clients = TestingUtils.setupServerAndClients(4, error);
+		clients[0].simulateCommand("create", clients[0].getMockName());
+		clients[0].simulateCommand("settings", "level", "TWO");
+		Game g = GamesHandler.getInstance().getGames().getFirst();
+		syncClients(clients, error);
+		assert g.getGameData().getCurrentGamePhaseType() == GamePhaseType.LOBBY;
+		clients[0].simulateCommand("settings", "minplayers", String.valueOf(4));
+		Arrays.stream(clients).forEach(c -> c.simulateCommand("join",
+				String.valueOf(g.getId()),
+				c.getMockName()));
+		Thread.sleep(1000);
+		assert g.getGameData().getCurrentGamePhaseType() == GamePhaseType.ASSEMBLE;
+		syncClients(clients, error);
+		game = GamesHandler.getInstance().getGames().getFirst();
+		Thread.sleep(1000);
+
+		Arrays.stream(clients).forEach((c) ->
+				{
+					c.simulateCommand("cheat", "standard");
+				}
+		);
+		syncClients(clients, error);
+		clients[0].simulateCommand("timerflip");
+		Thread.sleep(10000);
+		syncClients(clients, error);
+		clients[0].simulateCommand("cheat", "shipboard");
+		clients[0].simulateCommand("finish");
+		clients[0].simulateCommand("timerflip");
+		Thread.sleep(10000);
+
 
 
 	}
