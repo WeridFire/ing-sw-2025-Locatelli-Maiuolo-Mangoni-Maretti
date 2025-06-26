@@ -432,6 +432,15 @@ public class Game {
             getGameThread().interrupt();
         }
         GamesHandler.getInstance().getGames().remove(this);
+        getGameData().getPlayers(Player::isConnected).forEach(p -> {
+            UUID clientId = p.getConnectionUUID();
+            p.disconnect();
+			try {
+				GameServer.getInstance().getClient(clientId).updateClient(new ClientUpdate(clientId, true));
+			} catch (RemoteException e) {
+				System.out.println("Could not update client " + clientId + " after ending a game.");
+			}
+		});
     }
 
     public void disconnectPlayer(Player player){
