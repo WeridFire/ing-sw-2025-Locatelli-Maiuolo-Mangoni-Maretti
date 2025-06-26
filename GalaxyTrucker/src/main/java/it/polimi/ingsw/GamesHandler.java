@@ -72,9 +72,7 @@ public class GamesHandler {
         Thread t = new Thread(() -> {
             try {
                 game.gameLoop();
-            } catch (InterruptedException e) {
-                System.out.println("Interrupted game: " + game.getId());
-            }catch (RemoteException e) {
+            } catch (RemoteException e) {
                 throw new RuntimeException(e);
             }
             finally {

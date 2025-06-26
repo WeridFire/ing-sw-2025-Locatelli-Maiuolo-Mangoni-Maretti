@@ -51,6 +51,22 @@ public class AssembleGamePhase extends PlayableGamePhase {
         this(gameData, null);
     }
 
+    /**
+     * Constructs a new PlayableGamePhase as {@link GamePhaseType#ASSEMBLE} by resuming a previous
+     * {@link AssembleGamePhase}.
+     * Every time a timer stops or gets resumed: executes {@code onTimerSwitchCallback}.
+     *
+     * @param toResume the previous {@link AssembleGamePhase} to resume.
+     * @param onTimerSwitchCallback The callback function to be executed every time a timer switches state.
+     */
+    public AssembleGamePhase(AssembleGamePhase toResume, Runnable onTimerSwitchCallback) {
+        super(GamePhaseType.ASSEMBLE, toResume.gameData);
+        totalTimerRotations = GameLevelStandards.getTimerSlotsCount(gameData.getLevel());
+        howManyTimerRotationsLeft = toResume.howManyTimerRotationsLeft;
+        setOnTimerSwitchCallback(onTimerSwitchCallback);
+        setTimerRunning(false);
+    }
+
     private void setTimerRunning(boolean running) {
         timerRunning = running;
         // callback for timer ended or started
@@ -61,8 +77,8 @@ public class AssembleGamePhase extends PlayableGamePhase {
 
     public void playLoop() throws RemoteException, InterruptedException {
 
-            if (gameData.getCurrentGamePhase() != this) {
-            throw new  RuntimeException("Trying to run a game phase which is not active on the game.");
+        if (gameData.getCurrentGamePhase() != this) {
+            throw new RuntimeException("Trying to run a game phase which is not active on the game.");
         }
 
         while (howManyTimerRotationsLeft > 1) {
