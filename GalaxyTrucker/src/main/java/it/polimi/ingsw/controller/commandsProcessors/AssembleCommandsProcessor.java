@@ -50,11 +50,11 @@ public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
         }
         availableCommands.add("spectate <" + getSpectatablePlayersUsernames() +">|Spectate another player's shipboard.");
 
+        // note: last timerflip only if assemble phase ended for this player
+        availableCommands.add("timerflip|Flips the hourglass of the game.");
+
 
         if (!AssembleState.isEndedAssembly()) {
-
-            // note: last timerflip only if assemble phase ended for this player
-            availableCommands.add("timerflip|Flips the hourglass of the game.");
 
             boolean hasCardGroupInHand = AssembleState.getCardGroupInHand().isPresent();
             boolean areThereCardGroups = !AssembleState.listOfAvailableCardGroups().isEmpty();

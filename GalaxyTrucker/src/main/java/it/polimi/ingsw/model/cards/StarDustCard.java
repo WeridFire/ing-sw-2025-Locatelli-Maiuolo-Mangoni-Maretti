@@ -23,8 +23,7 @@ public class StarDustCard extends Card{
 	}
 
 	/**
-	 * Iterates each player in reverse, counts how many connectors each one has, and moves accordingly.
-	 *
+	 * Iterates each player (still flying) in reverse, counts how many connectors each one has, and moves accordingly.
 	 */
 	@Override
 	public void playEffect(GameData game) {

@@ -85,6 +85,7 @@ public class ClientUpdate implements Serializable {
 			ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
 			ObjectInputStream in = new ObjectInputStream(bis);
 			GameData clone = (GameData) in.readObject();
+
 			if (clone.getCurrentGamePhaseType() == GamePhaseType.NONE
 					|| clone.getCurrentGamePhaseType() == GamePhaseType.LOBBY) {
 				return clone;

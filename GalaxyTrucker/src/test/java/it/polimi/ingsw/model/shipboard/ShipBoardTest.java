@@ -113,6 +113,12 @@ class ShipBoardTest {
     }
 
     @Test
+    void testGetFirstTileLocation() {
+        ShipBoard sb2 = ShipBoard.create(GameLevel.TWO, MainCabinTile.Color.RED);
+        assertEquals(new Coordinates(7, 7), sb2.getFirstTileLocation(Direction.NORTH, 7));
+    }
+
+    @Test
     void miscTests() throws UninitializedShipboardException, AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, OutOfBuildingAreaException, NoTileFoundException {
         Coordinates coord = new Coordinates(1, 1);
         Coordinates coord2 = new Coordinates(6, 6);
