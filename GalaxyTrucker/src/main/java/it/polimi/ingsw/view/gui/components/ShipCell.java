@@ -130,6 +130,7 @@ public class ShipCell extends DropSlot {
         if (color != null && !color.isBlank()) {
             this.isHighlighted = true;
             setStyle("-fx-background-color: " + color + ";");
+            System.out.println("Highlighted cell");
         } else {
             this.isHighlighted = false;
             setStyle(DEFAULT_CELL_STYLE);
@@ -203,6 +204,15 @@ public class ShipCell extends DropSlot {
             loadableBox.getChildren().remove(loadableObject);
         }
         return removed;
+    }
+
+    public void setClickAbility() {
+        if (isHighlighted && !isActiveForAdventureDrop && !isActiveForAdventureRemove) {
+            // if just highlighted it means we are on a activatetile situation
+            this.setOnMouseClicked(mouseEvent -> {
+                ClientManager.getInstance().simulateCommand("activate", logicalRow, logicalColumn);
+            });
+        }
     }
 
     /**

@@ -56,6 +56,7 @@ public class PIRContainer extends StackPane {
         content.getChildren().clear();
         content.getChildren().add(getLabel("TODO"));
         PIRActivateTiles castedPir = (PIRActivateTiles) pir;
+        System.out.println(castedPir.getHighlightMask());
         // TODO: implementa logica specifica activate row col
         addCloseButton();
     }
@@ -63,6 +64,7 @@ public class PIRContainer extends StackPane {
     public void handleAddCargoPir() {
         PIRAddLoadables castedPir = (PIRAddLoadables) pir;
         ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
+        System.out.println(castedPir.getHighlightMask());
         shipGrid.setActiveCells(castedPir.getHighlightMask(), true, false);
         for (LoadableType loadable: castedPir.getFloatingLoadables()){
             AdventureUI.getInstance().getLoadableContainer().addLoadableObject(loadable);
@@ -73,6 +75,7 @@ public class PIRContainer extends StackPane {
         content.getChildren().clear();
         content.getChildren().add(getLabel("TODO"));
         PIRRemoveLoadables castedPir = (PIRRemoveLoadables) pir;
+        System.out.println(castedPir.getHighlightMask());
         // TODO: implementa logica specifica remove (x, y) <LoadableType> <amount>
         addCloseButton();
     }
