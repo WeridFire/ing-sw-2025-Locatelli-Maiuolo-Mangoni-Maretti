@@ -5,6 +5,9 @@ import it.polimi.ingsw.view.gui.helpers.AssetHandler;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 
+/**
+ * Represents a container for a card.
+ */
 public class CardContainer extends StackPane {
 
     private Card card;
@@ -14,6 +17,9 @@ public class CardContainer extends StackPane {
     private static final double FIXED_HEIGHT = 400;
     private static final double PADDING = 20;
 
+    /**
+     * Constructs a new CardContainer.
+     */
     public CardContainer() {
         // Set fixed size for the CardContainer
         this.setPrefSize(FIXED_WIDTH, FIXED_HEIGHT);
@@ -29,11 +35,19 @@ public class CardContainer extends StackPane {
 
     }
 
+    /**
+     * Constructs a new CardContainer with a given card.
+     * @param card the card to be displayed
+     */
     public CardContainer(Card card) {
         this(); // Call the default constructor
         setCard(card);
     }
 
+    /**
+     * Sets the card to be displayed in the container.
+     * @param card the card to be displayed
+     */
     public void setCard(Card card) {
         this.card = card;
 

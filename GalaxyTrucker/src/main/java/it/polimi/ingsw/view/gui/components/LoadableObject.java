@@ -7,7 +7,14 @@ import it.polimi.ingsw.view.gui.helpers.Draggable;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 
+/**
+ * Class representing a draggable object that can be loaded onto a ship.
+ * It displays an image corresponding to its type (e.g., crew, battery, cargo).
+ */
 public class LoadableObject extends Draggable {
+    /**
+     * Base string for the drag-and-drop identifier.
+     */
     public static final String BASE_ID = "LOADABLE";
 
     private ShipCell parentCell = null;
@@ -17,11 +24,21 @@ public class LoadableObject extends Draggable {
 
     private LoadableType type;
 
+    /**
+     * Constructs a new loadable object.
+     * @param dragOverlay The pane on which the object is rendered while being dragged.
+     * @param type The type of the loadable object.
+     * @param parentCell The initial cell containing this object, can be null.
+     */
     public LoadableObject(Pane dragOverlay, LoadableType type, ShipCell parentCell) {
         super(dragOverlay);
         setType(type);
     }
 
+    /**
+     * Sets the type for this object and updates its visual representation.
+     * @param type The new type for the object.
+     */
     public void setType(LoadableType type) {
         this.type = type;
         this.imageView = AssetHandler.loadImage(Asset.fromLoadableType(type));
@@ -31,16 +48,29 @@ public class LoadableObject extends Draggable {
         this.getChildren().add(imageView);
     }
 
+    /**
+     * Returns the type of the loadable object.
+     * @return The {@link LoadableType}.
+     */
     @Override
     public LoadableType getType(){
         return type;
     }
 
+    /**
+     * Generates a unique identifier for the drag operation, combining the base ID with the object's type.
+     * @return The drag identifier string.
+     */
     @Override
     protected String getDragId() {
         return BASE_ID + this.type.toString();
     }
 
+    /**
+     * Determines if the object can be dragged.
+     * It can be dragged if it's not on a ship cell or if the parent cell is active for removal during the adventure phase.
+     * @return True if the object can be dragged, false otherwise.
+     */
     @Override
     protected boolean canBeDragged() {
         if (parentCell != null) {
@@ -48,10 +78,4 @@ public class LoadableObject extends Draggable {
         }
         return true;
     }
-
-    @Override
-    protected void onBeginDrag() {
-
-    }
-
 }

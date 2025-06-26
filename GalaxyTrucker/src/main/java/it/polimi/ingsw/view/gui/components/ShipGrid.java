@@ -225,6 +225,15 @@ public class ShipGrid extends StackPane {
         for (int i = 0; i < reserveSlots.length; i++) {
             reserveSlots[i].setTile((i < reservedTiles.length) ? reservedTiles[i] : null);
         }
+
+        // decide cells clickAbility
+        decideCellsClickAbility();
+    }
+
+    private void decideCellsClickAbility() {
+        for (ShipCell c: gridCells.values()) {
+            c.setClickAbility();
+        }
     }
 
     private void updateNeighbors(Coordinates coordinates, ShipCell cell) {

@@ -10,10 +10,18 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 
+/**
+ * A singleton JavaFX component that displays a countdown timer and the state of hourglass slots.
+ * It is used during the assembly phase of the game.
+ */
 public class TimerComponent extends TextFlow {
 
     private static TimerComponent instance;
 
+    /**
+     * Gets the singleton instance of the TimerComponent.
+     * @return The single instance of this class.
+     */
     public static TimerComponent getInstance() {
         if (instance == null) {
             instance = new TimerComponent();
@@ -29,6 +37,10 @@ public class TimerComponent extends TextFlow {
     private boolean isRunning = false;
     private int totalTimerSlots;
 
+    /**
+     * Constructs a new TimerComponent.
+     * Initializes the timeline and sets the default state.
+     */
     public TimerComponent() {
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> updateTimer()));
         timeline.setCycleCount(Timeline.INDEFINITE);
@@ -36,6 +48,12 @@ public class TimerComponent extends TextFlow {
         reset();
     }
 
+    /**
+     * Formats the given total seconds into a Text object with MM:SS format.
+     * The text color changes based on the time remaining to indicate urgency.
+     * @param totalSeconds The total seconds to format.
+     * @return A {@link Text} object representing the formatted time.
+     */
     private Text formatTime(int totalSeconds) {
         Color emphasis = totalSeconds > 15 ? null : (totalSeconds > 5 ? Color.DARKORANGE : Color.RED);
         int minutes = totalSeconds / 60;
@@ -47,6 +65,12 @@ public class TimerComponent extends TextFlow {
         return text;
     }
 
+    /**
+     * Creates an array of Text objects representing the hourglass timer slots.
+     * Colors are used to indicate used, current, and available slots.
+     * @param timerSlot The index of the current timer slot.
+     * @return An array of {@link Text} objects for the slots.
+     */
     private Text[] formatSlots(int timerSlot) {
         Text[] slots = new Text[totalTimerSlots];
         for (int i = 0; i < timerSlot; i++) {
@@ -62,6 +86,9 @@ public class TimerComponent extends TextFlow {
         return slots;
     }
 
+    /**
+     * Updates the entire text display of the component, including time and slots.
+     */
     private void updateText() {
         Integer timerSlot = AssembleState.getTimerSlotIndex();
         Text[] texts;
@@ -85,6 +112,10 @@ public class TimerComponent extends TextFlow {
         }
     }
 
+    /**
+     * Resets the timer to its initial state based on the current game level.
+     * Stops the timeline and updates the display.
+     */
     public void reset() {
         secondsRemaining = START_SECONDS;
         totalTimerSlots = GameLevelStandards.getTimerSlotsCount(AssembleState.getGameData().getLevel());
@@ -92,6 +123,10 @@ public class TimerComponent extends TextFlow {
         stop();
     }
 
+    /**
+     * This method is called every second by the timeline.
+     * It decrements the remaining time, updates the text, and calls the finished handler if the timer reaches zero.
+     */
     private void updateTimer() {
         secondsRemaining--;
         if (secondsRemaining <= 0) {
@@ -107,15 +142,24 @@ public class TimerComponent extends TextFlow {
         }
     }
 
+    /**
+     * The default behavior to execute when the timer finishes.
+     */
     private void defaultBehavior(){
         //default timer behav?
     }
 
+    /**
+     * Stops the timer timeline.
+     */
     public void stop() {
         isRunning = false;
         timeline.stop();
     }
 
+    /**
+     * Starts the timer. It resets the timer before starting the countdown.
+     */
     public void start() {
         reset();  // reset before starting
         isRunning = true;
@@ -123,10 +167,18 @@ public class TimerComponent extends TextFlow {
         timeline.playFromStart();
     }
 
+    /**
+     * Sets a callback to be executed when the timer finishes.
+     * @param onTimerFinished The {@link Runnable} to execute.
+     */
     public void setOnTimerFinished(Runnable onTimerFinished) {
         this.onTimerFinished = onTimerFinished;
     }
 
+    /**
+     * Checks if the timer is currently running.
+     * @return True if the timer is running, false otherwise.
+     */
     public boolean isRunning() {
         return isRunning;
     }
