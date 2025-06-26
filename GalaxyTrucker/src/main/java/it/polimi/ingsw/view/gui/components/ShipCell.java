@@ -18,6 +18,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Represents a single cell in the ship grid. It can hold a ship tile or be empty.
+ * It acts as a drop target for draggable ship tiles and loadable objects.
+ */
 public class ShipCell extends DropSlot {
     private static final String SHIP_CELL_STYLE = "";//"-fx-background-color: rgba(173, 216, 230, 0.5); -fx-border-color: blue;"; // lightblue semi-trasparente
     private static final String SPACE_CELL_STYLE = "";//"-fx-background-color: rgba(211, 211, 211, 0.5); -fx-border-color: darkgray;"; // lightgray semi-trasparente
@@ -39,6 +43,9 @@ public class ShipCell extends DropSlot {
     private List<LoadableObject> loadablesContent = new ArrayList<LoadableObject>();
     private HBox loadableBox;
 
+    /**
+     * Private constructor for creating a special reserve slot.
+     */
     private ShipCell() {
         isReserveSlot = true;
         DEFAULT_CELL_STYLE = "";
@@ -51,6 +58,11 @@ public class ShipCell extends DropSlot {
         setPrefSize(ShipGrid.CELL_SIZE, ShipGrid.CELL_SIZE);
     }
 
+    /**
+     * Constructs a ship cell for a specific position on the board.
+     * @param coordinates The logical coordinates of the cell.
+     * @param level The game level, used to determine if the cell is on the actual board.
+     */
     public ShipCell(Coordinates coordinates, GameLevel level) {
         isReserveSlot = false;
         logicalRow = String.valueOf(coordinates.getRow());
@@ -66,10 +78,18 @@ public class ShipCell extends DropSlot {
         hasNeighbor = false;
     }
 
+    /**
+     * Factory method to create a reserve slot cell.
+     * @return A new ShipCell configured as a reserve slot.
+     */
     public static ShipCell reserveSlot() {
         return new ShipCell();
     }
 
+    /**
+     * Places a tile on the cell or clears it.
+     * @param tileOnCell The tile to place, or null to clear the cell.
+     */
     public void setTile(TileSkeleton tileOnCell) {
         getChildren().clear();
         occupied = tileOnCell != null;
@@ -78,6 +98,10 @@ public class ShipCell extends DropSlot {
         }
     }
 
+    /**
+     * Updates the cell's state based on whether it has occupied neighbors.
+     * @param neighbors A collection of neighboring cells.
+     */
     public void setHasNeighbor(Collection<ShipCell> neighbors) {
         if (isReserveSlot) return;
         for (ShipCell neighbor : neighbors) {
@@ -88,6 +112,10 @@ public class ShipCell extends DropSlot {
         }
     }
 
+    /**
+     * Checks if a tile can be placed on this cell.
+     * @return True if a tile can be accepted, false otherwise.
+     */
     private boolean canAcceptTile() {
         return CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE) && (!occupied && ((isReserveSlot) || (isOnBoard && hasNeighbor)));
     }
@@ -108,22 +136,43 @@ public class ShipCell extends DropSlot {
         }
     }
 
+    /**
+     * Sets whether this cell is an active drop target during the adventure phase.
+     * @param activeForAdventureDrop True to activate, false to deactivate.
+     */
     public void setActiveForAdventureDrop(boolean activeForAdventureDrop) {
         this.isActiveForAdventureDrop = activeForAdventureDrop;
     }
 
+    /**
+     * Sets whether loadables can be removed from this cell during the adventure phase.
+     * @param activeForAdventureRemove True to activate, false to deactivate.
+     */
     public void setActiveForAdventureRemove(boolean activeForAdventureRemove) {
         this.isActiveForAdventureRemove = activeForAdventureRemove;
     }
 
+    /**
+     * Checks if the cell is active for dropping loadables during the adventure phase.
+     * @return True if the cell is active and highlighted, false otherwise.
+     */
     public boolean isActiveForAdventureDrop(){
         return isActiveForAdventureDrop && isHighlighted;
     }
 
+    /**
+     * Checks if the cell is active for removing loadables during the adventure phase.
+     * @return True if the cell is active and highlighted, false otherwise.
+     */
     public boolean isActiveForAdventureRemove() {
         return isActiveForAdventureRemove && isHighlighted;
     }
 
+    /**
+     * Adds a loadable object to this cell.
+     * @param loadableObject The loadable object to add.
+     * @return True if the object was added, false if the cell is full.
+     */
     public boolean addLoadable(LoadableObject loadableObject) {
         if (loadablesContent.size() >= 4) {
             return false;
@@ -142,6 +191,11 @@ public class ShipCell extends DropSlot {
         return true;
     }
 
+    /**
+     * Removes a loadable object from this cell.
+     * @param loadableObject The loadable object to remove.
+     * @return True if the object was successfully removed, false otherwise.
+     */
     public boolean removeLoadable(LoadableObject loadableObject) {
         boolean removed = loadablesContent.remove(loadableObject);
         if (removed && loadableBox != null) {
@@ -151,6 +205,11 @@ public class ShipCell extends DropSlot {
         return removed;
     }
 
+    /**
+     * Determines if the cell can accept a dragged item.
+     * @param dragId The identifier of the dragged item.
+     * @return True if the item can be dropped here, false otherwise.
+     */
     @Override
     protected boolean canAccept(String dragId) {
         if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
@@ -162,6 +221,10 @@ public class ShipCell extends DropSlot {
         return false;
     }
 
+    /**
+     * Handles the drop of an item onto the cell.
+     * @param dragId The identifier of the dropped item.
+     */
     @Override
     protected void acceptDrop(String dragId) {
         if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
@@ -181,6 +244,10 @@ public class ShipCell extends DropSlot {
 
     }
 
+    /**
+     * Handles mouse hover events to provide visual feedback.
+     * @param entering True if the mouse is entering the cell, false if it is leaving.
+     */
     @Override
     protected void onHover(boolean entering) {
         if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){

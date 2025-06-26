@@ -137,6 +137,11 @@ public class BoardComponent extends VBox {
         }
     }
 
+    /**
+     * Creates a new BoardComponent based on the specified game level.
+     * @param gameLevel the level of the game
+     * @return a new BoardComponent
+     */
     public static BoardComponent create(GameLevel gameLevel) {
         double phi = 0;
         double rx = 0, ry = 0;

@@ -21,6 +21,12 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.function.Consumer;
 
+/**
+ * Manages the user interface for the adventure phase of the game.
+ * This class assembles and displays various components like the ship grid, game board,
+ * adventure cards, and handles player input requests (PIRs).
+ * It follows a singleton pattern.
+ */
 public class AdventureUI implements INodeRefreshableOnUpdateUI {
 
     private final double WIDTH = 400;
@@ -38,6 +44,11 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     private Rectangle overlayBackground;
 
     private static Pane dragOverlay;
+    /**
+     * Gets the overlay pane used for drag-and-drop operations.
+     * This pane sits on top of all other components to render dragged items.
+     * @return The singleton drag overlay pane.
+     */
     public static Pane getDragOverlay() {
         if (dragOverlay == null) {
             dragOverlay = new Pane(); // Transparent pane above everything
@@ -48,6 +59,10 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     }
 
     private static StackPane root;
+    /**
+     * Gets the root container for the entire Adventure UI.
+     * @return The singleton root StackPane.
+     */
     public static StackPane getRoot() {
         if (root == null) {
             root = new StackPane();
@@ -56,6 +71,10 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     }
 
     private static AdventureUI instance;
+    /**
+     * Gets the singleton instance of the AdventureUI.
+     * @return The single instance of this class.
+     */
     public static AdventureUI getInstance() {
         if (instance == null) {
             instance = new AdventureUI();
@@ -63,6 +82,9 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         return instance;
     }
 
+    /**
+     * Constructs the AdventureUI, initializing all its components and layout.
+     */
     public AdventureUI() {
         root = new StackPane();
 
@@ -101,22 +123,33 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         root.getChildren().addAll(mainLayout, getDragOverlay());
     }
 
+    /**
+     * Provides access to the ship grid component.
+     * @return The {@link ShipGrid}.
+     */
     public ShipGrid getShipGrid(){
         return shipGrid;
     }
 
+    /**
+     * Updates the displayed adventure card based on the current game state.
+     */
     public void updateCard() {
         cardPane.setCard(CommonState.getLastUpdate().getCurrentGame().getDeck().getCurrentCard());
     }
 
     /**
-     * Provides access to the loadable container
-     * @return The LoadableContainer.
+     * Provides access to the loadable container.
+     * @return The {@link LoadableContainer}.
      */
     public LoadableContainer getLoadableContainer() {
         return loadableContainer;
     }
 
+    /**
+     * Displays the Player Input Request (PIR) container with a semi-transparent overlay.
+     * This effectively creates a modal dialog for player interaction.
+     */
     public void showPirContainer() {
         // Remove any existing instances first to avoid duplicates
         hidePirContainer();
@@ -134,16 +167,29 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         root.getChildren().add(pirContainer);
     }
 
+    /**
+     * Hides the Player Input Request (PIR) container and its overlay.
+     */
     public void hidePirContainer() {
         getRoot().getChildren().remove(overlayBackground);
         getRoot().getChildren().remove(pirContainer);
     }
 
+    /**
+     * Returns the root node of the UI layout.
+     * @return The root {@link Node} for this UI.
+     */
     @Override
     public Node getLayout() {
         return root;
     }
 
+    /**
+     * Refreshes the UI components based on a new client update from the server.
+     * This method is called whenever the game state changes. It updates the adventure card
+     * and shows or hides the PIR container as needed.
+     * @param update The {@link ClientUpdate} containing the new game state.
+     */
     @Override
     public void refreshOnUpdate(ClientUpdate update) {
         Platform.runLater(() -> {

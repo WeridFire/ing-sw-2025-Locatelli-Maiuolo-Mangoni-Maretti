@@ -1,9 +1,7 @@
 package it.polimi.ingsw.view.gui.components;
 
-import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.model.playerInput.PIRType;
 import it.polimi.ingsw.model.playerInput.PIRs.*;
-import it.polimi.ingsw.model.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.view.gui.UIs.AdventureUI;
 import it.polimi.ingsw.view.gui.managers.ClientManager;

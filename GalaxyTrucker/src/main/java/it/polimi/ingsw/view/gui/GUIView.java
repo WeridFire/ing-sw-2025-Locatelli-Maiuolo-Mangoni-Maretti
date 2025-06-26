@@ -13,6 +13,9 @@ import java.util.LinkedList;
 
 // TODO: create GUI view
 
+/**
+ * Represents the graphical user interface view of the game.
+ */
 public class GUIView extends View {
 
     private MenuCommandsProcessor cpMenu;  // menu
@@ -21,6 +24,9 @@ public class GUIView extends View {
     private AdventureCommandsProcessor cpAdventure;  // flight and adventure cards
     private PIRCommandsProcessor cpPIR;  // input
 
+    /**
+     * Initializes the view.
+     */
     @Override
     public void _init() {
         cpMenu = new MenuCommandsProcessor(gameClient);
@@ -30,6 +36,10 @@ public class GUIView extends View {
         cpPIR = new PIRCommandsProcessor(gameClient);
     }
 
+    /**
+     * Called when the view receives an update from the server.
+     * @param update the update message
+     */
     @Override
     public void _onUpdate(ClientUpdate update) {
         /*
@@ -39,22 +49,35 @@ public class GUIView extends View {
         // TODO: implement (e.g. transform any active YerNoChoice pir into confirmation Alert, and more...)
     }
 
+    /**
+     * Runs the view.
+     */
     @Override
     public void run() {
         // System.out.println("GUI function: run");
     }
 
+    /**
+     * Called when a void event occurs.
+     */
     @Override
     public void onVoid() {
         // System.out.println("GUI function: onVoid");
         onRefresh();
     }
 
+    /**
+     * Called when the view needs to be refreshed.
+     */
     @Override
     protected void _onRefresh() {
         // System.out.println("GUI function: onRefresh");
     }
 
+    /**
+     * Called when the screen changes.
+     * @param screenName the name of the new screen
+     */
     @Override
     public void onScreen(String screenName) {
         System.out.println("GUI function: onScreen -> " + screenName);
@@ -62,6 +85,9 @@ public class GUIView extends View {
         onRefresh();
     }
 
+    /**
+     * Called when the help command is triggered.
+     */
     @Override
     public void onHelp() {
         System.out.println("GUI function: onHelp");
@@ -69,6 +95,11 @@ public class GUIView extends View {
         onRefresh();
     }
 
+    /**
+     * Shows an information message.
+     * @param title the title of the message
+     * @param content the content of the message
+     */
     @Override
     public void showInfo(String title, String content) {
         // System.out.println("GUI function: showInfo -> [" + title + "] >> " + content);
@@ -76,6 +107,11 @@ public class GUIView extends View {
         onRefresh();
     }
 
+    /**
+     * Shows a warning message.
+     * @param title the title of the message
+     * @param content the content of the message
+     */
     @Override
     public void showWarning(String title, String content) {
         // System.out.println("GUI function: showWarning -> [" + title + "] >> " + content);
@@ -83,6 +119,11 @@ public class GUIView extends View {
         onRefresh();
     }
 
+    /**
+     * Shows an error message.
+     * @param title the title of the message
+     * @param content the content of the message
+     */
     @Override
     public void showError(String title, String content) {
         // System.out.println("GUI function: showError -> [" + title + "] >> " + content);
@@ -90,6 +131,10 @@ public class GUIView extends View {
         onRefresh();
     }
 
+    /**
+     * Returns the command processors for the current game state.
+     * @return a deque of command processors
+     */
     @Override
     public Deque<ICommandsProcessor> getCommandsProcessors() {
         Deque<ICommandsProcessor> processors = new LinkedList<>();
