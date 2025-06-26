@@ -54,16 +54,6 @@ public class ShowDeckGrid extends StackPane {
             imageGrid.add(imageView, col, row);
         }
 
-        // ScrollPane che contiene la griglia
-        /*
-        ScrollPane scrollPane = new ScrollPane(imageGrid);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setMaxHeight(400);
-        scrollPane.setStyle("-fx-background-color: transparent;");
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-
-         */
-
         // close
         VBox container = getVBox(imageGrid);
 
