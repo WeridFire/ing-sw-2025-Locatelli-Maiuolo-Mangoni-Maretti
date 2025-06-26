@@ -233,6 +233,7 @@ public class PIRUtils {
 								" You need to end your flight...", null);
 				integritySequence.addPlayerInputRequest(pirInfo);
 				pirHandler.setAndRunTurn(pirInfo, false);
+				pirHandler.destroyAtomicSequence(integritySequence);
 				player.requestEndFlight();
 				return false;
 			}
