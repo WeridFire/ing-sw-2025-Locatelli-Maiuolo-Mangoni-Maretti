@@ -11,6 +11,8 @@ import java.util.Set;
 
 public class CabinTile extends ContainerTile {
 
+    public static final Set<LoadableType> BASIC_ALLOWED_ITEMS = Set.of(LoadableType.HUMAN);
+
     private LoadableType loadedCrew = null;
 
     /**
@@ -19,7 +21,7 @@ public class CabinTile extends ContainerTile {
      * @param sides An array of sides defining the structure of the tile.
      */
     protected CabinTile(SideType[] sides, Set<LoadableType> maxAllowedCrew) {
-        super(sides, maxAllowedCrew, Set.of(LoadableType.HUMAN), 2);
+        super(sides, maxAllowedCrew, BASIC_ALLOWED_ITEMS, 2);
         setCLISymbol("cb");
     }
 

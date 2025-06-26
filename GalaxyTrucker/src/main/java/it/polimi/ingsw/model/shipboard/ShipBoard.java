@@ -80,25 +80,39 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		return sb;
     }
 
+	private void populateVisitors(Set<TileVisitor> visitors) {
+		for (TileSkeleton tile : board.values()) {
+			for (TileVisitor visitor : visitors) {
+				tile.accept(visitor);
+			}
+		}
+	}
+
 	/**
 	 * Resets and re-applies all visitor computations on the current board.
 	 */
 	public void resetVisitors() {
+		// 1. life supports
+		visitorLifeSupport = new VisitorLifeSupport();
+		populateVisitors(Set.of(visitorLifeSupport));
+		// ensure correct update for cabins allowed items
+		visitorLifeSupport.updateLifeSupportSystems();
+
+		// 2. other visitors
 		visitorCalculateCargoInfo = new VisitorCalculateCargoInfo();
 		visitorCalculatePowers = new VisitorCalculatePowers();
 		visitorCalculateShieldedSides = new VisitorCalculateShieldedSides();
-		visitorCheckIntegrity = new VisitorCheckIntegrity();
-		visitorLifeSupport = new VisitorLifeSupport();
 
-		for (TileSkeleton tile : board.values()) {
-			tile.accept(visitorCalculateCargoInfo);
-			tile.accept(visitorCalculatePowers);
-			tile.accept(visitorCalculateShieldedSides);
-			tile.accept(visitorCheckIntegrity);
-			tile.accept(visitorLifeSupport);
-		}
-		//TODO: @Manuel is this the correct place where to put this update?
-		visitorLifeSupport.updateLifeSupportSystems();
+		// populate visitors
+		populateVisitors(Set.of(
+				visitorCalculateCargoInfo,
+				visitorCalculatePowers,
+				visitorCalculateShieldedSides)
+		);
+
+		// 3. after all: check integrity
+		visitorCheckIntegrity = new VisitorCheckIntegrity();
+		populateVisitors(Set.of(visitorCheckIntegrity));
 	}
 
 	/**

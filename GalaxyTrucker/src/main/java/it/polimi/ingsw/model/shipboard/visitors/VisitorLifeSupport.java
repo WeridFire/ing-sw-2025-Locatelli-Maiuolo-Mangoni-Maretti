@@ -57,6 +57,12 @@ public class VisitorLifeSupport implements TileVisitor {
 	 * supports, and for each cabin updates the allowed items to also allow the alien type supported.
 	 */
 	public void updateLifeSupportSystems(){
+		HashMap<CabinTile, Set<LoadableType>> supportedLife = new HashMap<>();
+		// 1. populate initial supported life as basic
+		for (CabinTile cabinTile : cabinTiles) {
+			supportedLife.put(cabinTile, new HashSet<>(CabinTile.BASIC_ALLOWED_ITEMS));
+		}
+		// 2. calculate additional supported life
 		for(LifeSupportSystemTile lifeSupport : lifeSupportSystems){
 			try {
 				for(Coordinates neighbour : lifeSupport.getCoordinates().getNeighbors()){
@@ -69,18 +75,20 @@ public class VisitorLifeSupport implements TileVisitor {
 								}
 							})
 							.forEach((cabin) -> {
-								Set<LoadableType> allowed = cabin.getAllowedItems();
-								allowed.add(lifeSupport.getProvidedLifeSupport());
-								try {
-									cabin.setAllowedItems(allowed);
-								} catch (UnsupportedLoadableItemException e) {
-									throw new RuntimeException(e);
-								}
+								supportedLife.get(cabin).add(lifeSupport.getProvidedLifeSupport());
 							});
 				}
 			} catch (NotFixedTileException e) {
 				throw new RuntimeException(e);
 			}
 		}
+		// 3. apply new supported life for cabins
+		for (CabinTile cabinTile : cabinTiles) {
+            try {
+                cabinTile.setAllowedItems(supportedLife.get(cabinTile));
+            } catch (UnsupportedLoadableItemException e) {
+                throw new RuntimeException(e);  // should never happen
+            }
+        }
 	}
 }

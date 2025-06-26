@@ -179,13 +179,10 @@ public class Game {
         Card currentAdventureCard = gameData.getDeck().drawNextCard();
         AdventureGamePhase adventureGamePhase;
         while (currentAdventureCard != null) {
-
-            // endgame if 0 players are alive.
-            //we don't check for <= 1 players connected because the game still progresses in this case.
-            if(gameData.getPlayersInFlight().isEmpty()){
-                System.out.println(this + " Alive players: " + gameData.getPlayersInFlight().size() 
-                        + "... Ending flight."
-                );
+            // endgame if 0 players are flying.
+            // we don't check for <= 1 players connected because the game still progresses in this case.
+            if (getGameData().getPlayersInFlight().isEmpty()) {
+                System.out.println(this + " Zero alive players... Ending flight.");
                 break;
             }
 
@@ -194,6 +191,13 @@ public class Game {
             getGameData().setCurrentGamePhase(adventureGamePhase);
             // play the adventure
             adventureGamePhase.playLoop();
+
+            // revalidate structure at the end of each adventure for non-notified-yet problems (e.g. 0 crew)
+            List<Player> playersInFlight = getGameData().getPlayersInFlight();
+            for (Player player : playersInFlight) {
+                player.getShipBoard().validateStructure();
+            }
+            gameData.getPIRHandler().joinEndTurn(playersInFlight);
 
             // end flight for players that requested it
             for (Player player : getGameData().getPlayers(Player::hasRequestedEndFlight)) {

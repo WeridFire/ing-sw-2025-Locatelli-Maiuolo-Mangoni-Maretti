@@ -230,7 +230,7 @@ public class PIRUtils {
 			if (clustersToKeep.isEmpty()) {
 				PIRDelay pirInfo = new PIRDelay(player, Default.PIR_SHORT_SECONDS,
 						"Your ship has no valid cluster of tiles." +
-								"You need to end your flight...", null);
+								" You need to end your flight...", null);
 				integritySequence.addPlayerInputRequest(pirInfo);
 				pirHandler.setAndRunTurn(pirInfo, false);
 				player.requestEndFlight();

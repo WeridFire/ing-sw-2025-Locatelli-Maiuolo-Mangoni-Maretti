@@ -601,6 +601,17 @@ public class Player implements Serializable {
     }
 
     /**
+     * Returns whether the player has requested to end the flight with a particular condition
+     * that can save it if tested to true
+     *
+     * @return {@code true} if the player has a save condition (whether it will evaluate to true or false);
+     * {@code false} otherwise
+     */
+    public boolean hasSaveConditionInEndFlight() {
+        return saveFromEndFlight != null;
+    }
+
+    /**
      * Requests to end the flight for this player without conditions.
      */
     public void requestEndFlight() {
