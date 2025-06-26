@@ -210,6 +210,12 @@ public class ShipCell extends DropSlot {
         return removed;
     }
 
+    public boolean removeAllLoadables() {
+        for(LoadableObject loadableObject : loadablesContent) {
+            removeLoadable(loadableObject);
+        }
+    }
+
     public void setClickAbility() {
         if (isHighlighted && !isActiveForAdventureDrop && !isActiveForAdventureRemove) {
             // if just highlighted it means we are on a activatetile situation

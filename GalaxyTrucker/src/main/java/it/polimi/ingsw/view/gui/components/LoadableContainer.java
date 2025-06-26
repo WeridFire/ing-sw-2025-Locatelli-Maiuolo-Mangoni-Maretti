@@ -12,7 +12,7 @@ import javafx.scene.shape.Rectangle;
 import java.util.List;
 
 public class LoadableContainer extends StackPane {
-    private static final double CONTAINER_WIDTH = 680;
+    private static final double CONTAINER_WIDTH = 630;
     private static final double CONTAINER_HEIGHT = 80;
     private static final double SPACING = 10;
     private static final double PADDING = 10;

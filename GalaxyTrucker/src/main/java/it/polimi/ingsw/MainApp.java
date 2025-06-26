@@ -64,15 +64,13 @@ public class MainApp extends Application {
      */
     private void updateSceneRoot(Node newContent) {
         root.getChildren().setAll(newContent);
-        // Ensure alignment is maintained if needed, though VBox alignment might suffice
-        // root.setAlignment(Pos.CENTER);
     }
 
     /**
      * Displays the initial launcher buttons.
      */
     private void showLauncherUI() {
-        Button startClientButton = new Button("Start Client");
+        Button startClientButton = new Button("Connect");
         startClientButton.setOnAction(_ -> clientManager.showLoginUI());
 
         // Use the scene updater to show the buttons

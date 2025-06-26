@@ -10,7 +10,6 @@ import it.polimi.ingsw.model.shipboard.tiles.BatteryComponentTile;
 import it.polimi.ingsw.model.shipboard.tiles.CabinTile;
 import it.polimi.ingsw.model.shipboard.tiles.CargoHoldTile;
 import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
-import it.polimi.ingsw.model.shipboard.visitors.CalculatorCargoInfo;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.gui.UIs.AdventureUI;
@@ -175,7 +174,10 @@ public class ShipGrid extends StackPane {
      */
     public void update() {
         ShipBoard shipBoard = AssembleState.getSpectatedShipBoard();
-        if (shipBoard == null) return;  // guard against null shipboard
+        if (!AssembleState.isSpectatingOther()){
+            shipBoard = CommonState.getPlayer().getShipBoard();
+        }
+
         Map<Coordinates, CargoHoldTile> loadables = Map.of();
         Map<Coordinates, CabinTile> crew = Map.of();
         Map<Coordinates, BatteryComponentTile> batteries = Map.of();
@@ -195,26 +197,29 @@ public class ShipGrid extends StackPane {
             cell.setTile(tilesOnBoard.get(logicalCoords));
             updateNeighbors(logicalCoords, cell);
 
-            if (loadables != null && loadables.get(entry.getKey()) != null) {
-                List<LoadableType> goods = loadables.get(entry.getKey()).getLoadedItems();
-                System.out.println(goods);
-                goods.forEach(x ->
-                        cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
-                );
-            }
-            else if (crew != null && crew.get(entry.getKey()) != null) {
-                List<LoadableType> goods = crew.get(entry.getKey()).getLoadedItems();
-                System.out.println(goods);
-                goods.forEach(x ->
-                        cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
-                );
-            }
-            else if (batteries != null && batteries.get(entry.getKey()) != null) {
-                List<LoadableType> goods = batteries.get(entry.getKey()).getLoadedItems();
-                System.out.println(goods);
-                goods.forEach(x ->
-                        cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
-                );
+            if (CommonState.isCurrentPhase(GamePhaseType.ADVENTURE)){
+
+                if (loadables != null && loadables.get(entry.getKey()) != null) {
+                    List<LoadableType> goods = loadables.get(entry.getKey()).getLoadedItems();
+                    System.out.println(goods);
+                    goods.forEach(x ->
+                            cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
+                    );
+                }
+                else if (crew != null && crew.get(entry.getKey()) != null) {
+                    List<LoadableType> goods = crew.get(entry.getKey()).getLoadedItems();
+                    System.out.println(goods);
+                    goods.forEach(x ->
+                            cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
+                    );
+                }
+                else if (batteries != null && batteries.get(entry.getKey()) != null) {
+                    List<LoadableType> goods = batteries.get(entry.getKey()).getLoadedItems();
+                    System.out.println(goods);
+                    goods.forEach(x ->
+                            cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
+                    );
+                }
             }
 
         }
