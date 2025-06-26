@@ -13,6 +13,8 @@ import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -128,8 +130,10 @@ public class ShipCell extends DropSlot {
      */
     public void setHighlight(String color) {
         if (color != null && !color.isBlank()) {
+            Rectangle highlightOverlay = new Rectangle(ShipGrid.CELL_SIZE, ShipGrid.CELL_SIZE, Color.web(color));
+            highlightOverlay.setMouseTransparent(true); // Ignora i click
+            this.getChildren().add(highlightOverlay); // Aggiungi in cima alla lista
             this.isHighlighted = true;
-            setStyle("-fx-background-color: " + color + ";");
             System.out.println("Highlighted cell");
         } else {
             this.isHighlighted = false;
