@@ -1,5 +1,7 @@
 package it.polimi.ingsw.view.gui.helpers;
 
+import it.polimi.ingsw.model.shipboard.LoadableType;
+import it.polimi.ingsw.view.gui.components.LoadableObject;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.image.WritableImage;
@@ -69,4 +71,8 @@ public abstract class Draggable extends StackPane {
     protected void onEndDrag(boolean dropAccepted) { }
 
     protected void fallbackDropHandler() { }
+
+    public LoadableType getType(){
+        return null;
+    }
 }

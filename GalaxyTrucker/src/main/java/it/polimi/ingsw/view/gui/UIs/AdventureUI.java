@@ -23,6 +23,9 @@ import java.util.function.Consumer;
 
 public class AdventureUI implements INodeRefreshableOnUpdateUI {
 
+    private final double WIDTH = 400;
+    private final double HEIGHT = 400;
+
     private PIR lastPIR;
 
     private GridPane mainLayout;
@@ -63,6 +66,10 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         root = new StackPane();
 
         mainLayout = new GridPane();
+
+        pirContainer.setMaxSize(WIDTH, HEIGHT);
+        pirContainer.setMinSize(WIDTH, HEIGHT);
+        pirContainer.setAlignment(Pos.CENTER);
 
         GameLevel gameLevel = LobbyState.getGameLevel();
         if (gameLevel == null) {
@@ -110,13 +117,20 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     }
 
     public void showPirContainer() {
+        // Remove any existing instances first to avoid duplicates
+        hidePirContainer();
+        
         overlayBackground = new Rectangle();
         overlayBackground.setFill(Color.rgb(0, 0, 0, 0.6));
         overlayBackground.widthProperty().bind(getRoot().widthProperty());
         overlayBackground.heightProperty().bind(getRoot().heightProperty());
-
-        this.pirContainer.setAlignment(Pos.CENTER);
-        root.getChildren().addAll(pirContainer, overlayBackground);
+        
+        // Center the PIR container both horizontally and vertically
+        StackPane.setAlignment(pirContainer, Pos.CENTER);
+        
+        // Add elements in the correct order (background first, then PIR container)
+        root.getChildren().add(overlayBackground);
+        root.getChildren().add(pirContainer);
     }
 
     public void hidePirContainer() {

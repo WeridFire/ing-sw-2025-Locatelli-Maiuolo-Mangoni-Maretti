@@ -8,8 +8,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 
 public class LoadableObject extends Draggable {
+    public static final String BASE_ID = "LOADABLE";
+
     private ImageView imageView;
-    private double IMAGE_SIZE = 50;
+    private double IMAGE_SIZE = 25;
 
     private LoadableType type;
 
@@ -23,12 +25,18 @@ public class LoadableObject extends Draggable {
         this.imageView = AssetHandler.loadImage(Asset.fromLoadableType(type));
         imageView.setFitWidth(IMAGE_SIZE);
         imageView.setFitHeight(IMAGE_SIZE);
+        this.setViewOrder(-1);
         this.getChildren().add(imageView);
     }
 
     @Override
+    public LoadableType getType(){
+        return type;
+    }
+
+    @Override
     protected String getDragId() {
-        return this.type.toString();
+        return BASE_ID + this.type.toString();
     }
 
     @Override

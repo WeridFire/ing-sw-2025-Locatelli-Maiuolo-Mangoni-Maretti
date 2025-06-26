@@ -6,12 +6,13 @@ import it.polimi.ingsw.model.playerInput.PIRs.*;
 import it.polimi.ingsw.model.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.view.gui.UIs.AdventureUI;
+import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,11 @@ public class PIRContainer extends StackPane {
         // Initialize content in the constructor
         this.content = new VBox();
         this.content.setSpacing(10); // Add some spacing for better layout
+        this.content.setAlignment(Pos.CENTER);
+
+        // Add a more suitable background for dialog
+        this.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 5;");
+
         this.getChildren().add(content);
     }
 
@@ -49,12 +55,10 @@ public class PIRContainer extends StackPane {
     }
 
     public void handleActivateTilePir() {
-        labelText = "Activate Tile";
-        label = new Label(labelText);
         content.getChildren().clear();
-        content.getChildren().add(label);
+        content.getChildren().add(getLabel("TODO"));
         PIRActivateTiles castedPir = (PIRActivateTiles) pir;
-        // TODO: implementa logica specifica
+        // TODO: implementa logica specifica activate row col
     }
 
     public void handleAddCargoPir() {
@@ -67,18 +71,15 @@ public class PIRContainer extends StackPane {
     }
 
     public void handleRemoveCargoPir() {
-        labelText = "Remove Cargo";
-        label = new Label(labelText);
         content.getChildren().clear();
-        content.getChildren().add(label);
+        content.getChildren().add(getLabel("TODO"));
         PIRRemoveLoadables castedPir = (PIRRemoveLoadables) pir;
-        // TODO: implementa logica specifica
+        // TODO: implementa logica specifica remove (x, y) <LoadableType> <amount>
     }
 
     public void handleChoicePir() {
         PIRMultipleChoice castedPir = (PIRMultipleChoice) pir;
-        labelText = castedPir.getChoiceMessage();
-        label = new Label(labelText);
+        label = getLabel(castedPir.getChoiceMessage());
 
         buttons.clear();
 
@@ -88,18 +89,15 @@ public class PIRContainer extends StackPane {
             final int choiceIndex = i;
 
             Button buff = new Button(optionText);
+            buff.setViewOrder(-1);
+            // Add some styling to make buttons more visible
+            buff.setStyle("-fx-padding: 10; -fx-min-width: 120;");
             buff.setOnMouseClicked(event -> {
-                try {
-                    castedPir.makeChoice(CommonState.getPlayer(), choiceIndex);
-                    AdventureUI.getInstance().hidePirContainer();
-                } catch (WrongPlayerTurnException e) {
-                    System.err.println("Wrong player turn, choice not registered.");
-                }
-                this.setVisible(false);
-                // If you want to remove it from the parent, do it like this:
-                if (this.getParent() != null) {
-                    ((Pane) this.getParent()).getChildren().remove(this);
-                }
+                Platform.runLater(() -> {
+                    ClientManager.getInstance().simulateCommand("choose " + choiceIndex);
+                });
+
+                AdventureUI.getInstance().hidePirContainer();
             });
 
             buttons.add(buff);
@@ -114,10 +112,17 @@ public class PIRContainer extends StackPane {
 
     public void handleDelayPir() {
         PIRDelay castedPir = (PIRDelay) pir;
-        this.labelText = castedPir.getMessage();
-        label = new Label(labelText);
+        label = getLabel(castedPir.getMessage());
 
         content.getChildren().clear();
         content.getChildren().add(label);
+    }
+
+    private Label getLabel(String labelText) {
+        Label labelObj = new Label(labelText); // Using the parameter instead of the field
+        labelObj.setWrapText(true);
+        labelObj.setStyle("-fx-font-weight: bold; -fx-text-fill: black;"); // Changed to black text
+        labelObj.setViewOrder(-1);
+        return labelObj;
     }
 }

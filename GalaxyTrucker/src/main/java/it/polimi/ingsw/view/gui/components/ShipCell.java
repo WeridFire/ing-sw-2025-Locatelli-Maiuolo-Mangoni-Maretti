@@ -6,10 +6,17 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.BoardCoordinates;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.gui.helpers.DragDropManager;
 import it.polimi.ingsw.view.gui.helpers.DropSlot;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
+import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class ShipCell extends DropSlot {
     private static final String SHIP_CELL_STYLE = "";//"-fx-background-color: rgba(173, 216, 230, 0.5); -fx-border-color: blue;"; // lightblue semi-trasparente
@@ -28,6 +35,9 @@ public class ShipCell extends DropSlot {
     private boolean isActiveForAdventureRemove = false;
 
     private final boolean isReserveSlot;
+
+    private List<LoadableObject> loadablesContent = new ArrayList<LoadableObject>();
+    private HBox loadableBox;
 
     private ShipCell() {
         isReserveSlot = true;
@@ -82,38 +92,6 @@ public class ShipCell extends DropSlot {
         return CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE) && (!occupied && ((isReserveSlot) || (isOnBoard && hasNeighbor)));
     }
 
-    @Override
-    protected boolean canAccept(String dragId) {
-        if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
-            return dragId.startsWith(ShipTile.BASE_ID) && canAcceptTile();
-        }
-        //TODO
-        return false;
-    }
-
-    @Override
-    protected void acceptDrop(String dragId) {
-        if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
-            if (isReserveSlot) {
-                ClientManager.getInstance().simulateCommand("reserve");
-            } else {
-                ClientManager.getInstance().simulateCommand("place", logicalRow, logicalColumn);
-            }
-            occupied = true;
-        }
-
-    }
-
-    @Override
-    protected void onHover(boolean entering) {
-        if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
-            if (isHighlighted) {
-                return;
-            }
-            setStyle((entering && canAcceptTile()) ? HIGHLIGHT_CELL_STYLE : DEFAULT_CELL_STYLE);
-        }
-    }
-
     /**
      * Sets a custom background color for the cell, overriding other styles.
      * The highlight remains until cleared by calling this method with null or a blank string.
@@ -136,5 +114,72 @@ public class ShipCell extends DropSlot {
 
     public void setActiveForAdventureRemove(boolean activeForAdventureRemove) {
         this.isActiveForAdventureRemove = activeForAdventureRemove;
+    }
+
+    public boolean addLoadable(LoadableObject loadableObject) {
+        if (loadablesContent.size() >= 4) {
+            return false;
+        }
+
+        if (loadableBox == null) {
+            loadableBox = new HBox();
+            loadableBox.setStyle("-fx-background-color: transparent; -fx-border-color: black;");
+            loadableBox.setAlignment(Pos.CENTER);
+            getChildren().add(loadableBox);
+        }
+
+        loadablesContent.add(loadableObject);
+        loadableBox.getChildren().add(loadableObject);
+
+        return true;
+    }
+
+    public boolean removeLoadable(LoadableObject loadableObject) {
+        boolean removed = loadablesContent.remove(loadableObject);
+        if (removed && loadableBox != null) {
+            loadableBox.getChildren().clear();
+            loadableBox.getChildren().remove(loadableObject);
+        }
+        return removed;
+    }
+
+    @Override
+    protected boolean canAccept(String dragId) {
+        if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
+            return dragId.startsWith(ShipTile.BASE_ID) && canAcceptTile();
+        }
+        else if (isActiveForAdventureDrop) {
+            return dragId.startsWith(LoadableObject.BASE_ID);
+        }
+        return false;
+    }
+
+    @Override
+    protected void acceptDrop(String dragId) {
+        if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
+            if (isReserveSlot) {
+                ClientManager.getInstance().simulateCommand("reserve");
+            } else {
+                ClientManager.getInstance().simulateCommand("place", logicalRow, logicalColumn);
+            }
+            occupied = true;
+        } else if (isActiveForAdventureDrop) {
+            //TODO
+            Platform.runLater(() -> {
+                ClientManager.getInstance().simulateCommand("allocate " + logicalRow + " " + logicalColumn + " " +
+                        DragDropManager.getCurrentDraggable().getType() + "1");
+            });
+        }
+
+    }
+
+    @Override
+    protected void onHover(boolean entering) {
+        if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
+            if (isHighlighted) {
+                return;
+            }
+            setStyle((entering && canAcceptTile()) ? HIGHLIGHT_CELL_STYLE : DEFAULT_CELL_STYLE);
+        }
     }
 }
