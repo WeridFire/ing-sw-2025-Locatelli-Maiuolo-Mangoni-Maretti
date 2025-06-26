@@ -4,6 +4,7 @@ import it.polimi.ingsw.model.cards.projectile.Projectile;
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.playerInput.PIRUtils;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.model.shipboard.exceptions.NoTileFoundException;
 import it.polimi.ingsw.model.shipboard.exceptions.OutOfBuildingAreaException;
@@ -31,15 +32,18 @@ public class WarPunishmentProjectile implements WarPunishment {
     public void apply(Player player, GameData gameData) {
         for(Projectile proj : projectiles){
 
-            gameData.getPIRHandler().setAndRunTurn(new PIRMultipleChoice(
-                    player,
-                    Default.PIR_SECONDS,
-                    "War: Do you want to roll the dice?",
-                    new String[]{"Yes"},
-                    0
-            ));
-
             proj.roll2D6();
+            try{
+                gameData.getPIRHandler().broadcastPIR(gameData.getPlayersInFlight(), (p, pirHandler) -> {
+                    PIRDelay pirDelay = new PIRDelay(p, Default.PIR_SHORT_SECONDS,
+                            proj.toVerboseString(),
+                            proj.getCLIRepresentation(p.getShipBoard()
+                            ));
+                    pirHandler.setAndRunTurn(pirDelay);
+                });
+            }catch (InterruptedException e){
+                e.printStackTrace();
+            }
             boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, gameData);
             if(!defended) {
                 try {
