@@ -195,29 +195,28 @@ public class ShipGrid extends StackPane {
             cell.setTile(tilesOnBoard.get(logicalCoords));
             updateNeighbors(logicalCoords, cell);
 
-            if (CommonState.isCurrentPhase(GamePhaseType.ADVENTURE)){
-                if (loadables != null && loadables.get(entry.getKey()) != null) {
-                    List<LoadableType> goods = loadables.get(entry.getKey()).getLoadedItems();
-                    System.out.println(goods);
-                    goods.forEach(x ->
-                            cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
-                    );
-                }
-                else if (crew != null && crew.get(entry.getKey()) != null) {
-                    List<LoadableType> goods = crew.get(entry.getKey()).getLoadedItems();
-                    System.out.println(goods);
-                    goods.forEach(x ->
-                            cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
-                    );
-                }
-                else if (batteries != null && batteries.get(entry.getKey()) != null) {
-                    List<LoadableType> goods = batteries.get(entry.getKey()).getLoadedItems();
-                    System.out.println(goods);
-                    goods.forEach(x ->
-                            cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
-                    );
-                }
+            if (loadables != null && loadables.get(entry.getKey()) != null) {
+                List<LoadableType> goods = loadables.get(entry.getKey()).getLoadedItems();
+                System.out.println(goods);
+                goods.forEach(x ->
+                        cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
+                );
             }
+            else if (crew != null && crew.get(entry.getKey()) != null) {
+                List<LoadableType> goods = crew.get(entry.getKey()).getLoadedItems();
+                System.out.println(goods);
+                goods.forEach(x ->
+                        cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
+                );
+            }
+            else if (batteries != null && batteries.get(entry.getKey()) != null) {
+                List<LoadableType> goods = batteries.get(entry.getKey()).getLoadedItems();
+                System.out.println(goods);
+                goods.forEach(x ->
+                        cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
+                );
+            }
+
         }
 
         // reserved tiles

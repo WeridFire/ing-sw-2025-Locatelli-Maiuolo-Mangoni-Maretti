@@ -39,6 +39,8 @@ public class ClientManager {
     private GameClient gameClient;
     private String username;
 
+    private VBox gameLayout;
+
     private Consumer<ClientUpdate> refreshOnUpdate = null;
 
 
@@ -223,7 +225,7 @@ public class ClientManager {
         resumeControls.setAlignment(Pos.CENTER);
 
         // ---- layout ----
-        VBox gameLayout = new VBox(15, createControls, joinButton, resumeControls);
+        gameLayout = new VBox(15, createControls, joinButton, resumeControls);
         gameLayout.setAlignment(Pos.CENTER);
 
         updateScene(gameLayout);
@@ -264,8 +266,11 @@ public class ClientManager {
         updateScene(new JoinGameUI(username));
     }
 
-
     public String getUsername() {
         return username;
+    }
+
+    public VBox getGameLayout() {
+        return gameLayout;
     }
 }

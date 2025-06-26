@@ -172,6 +172,8 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         finishButton.setOnMouseClicked(event -> {
             Platform.runLater(() -> {
                 ClientManager.getInstance().simulateCommand("finish");
+                getRoot().getChildren().remove(boardComponent);
+                setFinished();
             });
         });
 
@@ -227,6 +229,12 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         return root;
     }
 
+    public void setFinished(){
+        Platform.runLater(() -> {
+            ClientManager.getInstance().updateScene(AdventureUI.getInstance());
+        });
+    }
+
     /**
      * Updates the UI based on client updates.
      * Recreates the drawn tiles scroll pane, ensuring its fixed size is maintained.
@@ -236,7 +244,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     public void refreshOnUpdate(ClientUpdate update) {
         GameData gameData = update.getCurrentGame();
 
-        if (gameData != null && gameData.getCurrentGamePhaseType() == GamePhaseType.ADVENTURE) {
+        if (gameData != null && (gameData.getCurrentGamePhaseType() == GamePhaseType.ADVENTURE)) {
             Platform.runLater(() -> {
                 ClientManager.getInstance().updateScene(AdventureUI.getInstance());
             });

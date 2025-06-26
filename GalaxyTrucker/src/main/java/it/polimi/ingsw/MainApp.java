@@ -3,7 +3,6 @@ package it.polimi.ingsw;
 // Keep necessary imports
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
-import it.polimi.ingsw.view.gui.managers.ServerManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -18,20 +17,7 @@ public class MainApp extends Application {
 
     private VBox root; // The root container for the current scene content
     private Stage primaryStage;
-    private ServerManager serverManager;
     private ClientManager clientManager;
-
-    /***
-     * Singleton getter for ServerManager.
-     *
-     * @return {@link ServerManager}
-     */
-    public ServerManager getServerManager() {
-        if (serverManager == null) {
-            this.serverManager = new ServerManager(primaryStage, this::updateSceneRoot, this::showLauncherUI);
-        }
-        return serverManager;
-    }
 
     /***
      * Singleton getter for ClientManager.
@@ -58,7 +44,6 @@ public class MainApp extends Application {
 
         // Create managers, passing the stage, the scene updater lambda, and a callback to show launcher
         getClientManager();
-        getServerManager();
 
         // Set the initial scene
         Scene scene = new Scene(root, 400, 300);
@@ -87,20 +72,11 @@ public class MainApp extends Application {
      * Displays the initial launcher buttons.
      */
     private void showLauncherUI() {
-        Button startServerButton = new Button("Start Server");
-        // Disable button immediately if server is already running (e.g., after returning from server UI)
-        if (serverManager != null && serverManager.isServerRunning()) {
-            startServerButton.setDisable(true);
-            startServerButton.setText("Server Running");
-        } else {
-            startServerButton.setOnAction(_ -> serverManager.startServerAndShowUI());
-        }
-
         Button startClientButton = new Button("Start Client");
         startClientButton.setOnAction(_ -> clientManager.showLoginUI());
 
         // Use the scene updater to show the buttons
-        VBox launcherLayout = new VBox(15, startServerButton, startClientButton);
+        VBox launcherLayout = new VBox(15, startClientButton);
         launcherLayout.setAlignment(Pos.CENTER);
         updateSceneRoot(launcherLayout); // Update the root VBox content
 
