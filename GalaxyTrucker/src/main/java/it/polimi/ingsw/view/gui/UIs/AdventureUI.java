@@ -189,9 +189,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         Platform.runLater(() -> {
             // Aggiorna la carta
             updateCard();
-
             shipGrid.update();
-
             // Gestisci il PIR
             lastPIR = PIRState.getActivePIR();
             if (lastPIR != null) {

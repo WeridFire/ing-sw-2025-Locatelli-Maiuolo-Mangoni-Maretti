@@ -81,6 +81,7 @@ public class VisitorEpidemic implements TileVisitor {
 		for(Coordinates c : result){
 			CabinTile targetCabin = ((CabinTile) shipBoard.get(c));
 			try{
+				if (targetCabin == null) return;
 				if(targetCabin.getLoadedItems().contains(LoadableType.HUMAN)){
 					targetCabin.removeItems(LoadableType.HUMAN, 1);
 				}else if(targetCabin.getLoadedItems().contains(LoadableType.PURPLE_ALIEN)){
