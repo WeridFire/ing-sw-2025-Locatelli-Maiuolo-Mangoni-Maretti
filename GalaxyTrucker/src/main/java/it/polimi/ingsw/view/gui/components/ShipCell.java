@@ -94,6 +94,7 @@ public class ShipCell extends DropSlot {
      */
     public void setTile(TileSkeleton tileOnCell) {
         getChildren().clear();
+        loadableBox = null;
         occupied = tileOnCell != null;
         if (occupied) {
             getChildren().add(new ShipTile(tileOnCell));
