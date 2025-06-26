@@ -18,7 +18,7 @@ import java.util.*;
 public abstract class PIR implements ICLIPrintable, Serializable {
 
 	protected Player currentPlayer;
-	private final int cooldown;
+	private int cooldown;
 	transient protected final Object lock = new Object();
 	private final PIRType pirType;
 
@@ -29,7 +29,7 @@ public abstract class PIR implements ICLIPrintable, Serializable {
 	 * @param currentPlayer The player the game waits for
 	 * @param cooldown The cooldown duration.
 	 */
-	public PIR(Player currentPlayer, int cooldown, PIRType PIRType){
+	public PIR(Player currentPlayer, int cooldown, PIRType PIRType) {
 		this.currentPlayer = currentPlayer;
 		this.cooldown = cooldown;
 		this.pirType = PIRType;
@@ -50,11 +50,18 @@ public abstract class PIR implements ICLIPrintable, Serializable {
 	public abstract void run() throws InterruptedException;
 
 	/**
-	 *
 	 * @return the cooldown of the turn (the max time it can take for the player to fulfill the request)
 	 */
 	public int getCooldown() {
 		return cooldown;
+	}
+
+	/**
+	 * Set the cooldown of the turn (the max time it can take for the player to fulfill the request)
+	 * @param cooldown the seconds to wait as cooldown
+	 */
+	public void setCooldown(int cooldown) {
+		this.cooldown = cooldown;
 	}
 
 	/**

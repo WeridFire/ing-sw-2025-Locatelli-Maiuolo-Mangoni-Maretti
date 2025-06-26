@@ -112,7 +112,7 @@ public class GameData implements Serializable {
         coveredTiles = new ArrayList<>();
         uncoveredTiles = new ArrayList<>();
         deck = null;
-        pirHandler = new PIRHandler();
+        pirHandler = new PIRHandler(gameId);
         setLevel(GameLevel.TESTFLIGHT);
         setCurrentGamePhaseType(GamePhaseType.NONE);
         setRequiredPlayers(2);

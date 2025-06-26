@@ -18,7 +18,13 @@ public class PIRHandler implements Serializable {
 	private final Map<Player, PIR> activePIRs = new HashMap<>(4);
 	private final List<PIRAtomicSequence> atomicSequences = new ArrayList<>(4);
 
+	private final UUID gameReference;
+
 	private boolean standardRunRefreshAll = true;
+
+	public PIRHandler(UUID gameID) {
+		gameReference = gameID;
+	}
 
 	/**
 	 * @return the currently running PIRs atomic sequence for the specified player, or {@code null} if there is no
@@ -103,19 +109,20 @@ public class PIRHandler implements Serializable {
 			activePIRs.put(pir.getCurrentPlayer(), pir);
 			activePIRs.notifyAll();
 		}
+		// skip decisions for disconnected players and pick default
+		if (!pir.getCurrentPlayer().isConnected()) {
+			pir.setCooldown(1);
+		}
 		// notify players about the newly set pir
 		try {
-			Game game = GamesHandler.getInstance().findGameByClientUUID(pir.getCurrentPlayer().getConnectionUUID());
-			if(game != null){
-				//TODO: find a cleaner way to do this. Currently sometimes game is null because the player associated
-				// to the pir is not connected.
+			Game game = GamesHandler.getInstance().getGame(gameReference);
+			if (game != null) {
 				if (refreshAllPlayers) {
 					GameServer.getInstance().broadcastUpdate(game);
 				} else {
 					GameServer.getInstance().broadcastUpdateRefreshOnly(game, Set.of(pir.getCurrentPlayer()));
 				}
 			}
-
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}

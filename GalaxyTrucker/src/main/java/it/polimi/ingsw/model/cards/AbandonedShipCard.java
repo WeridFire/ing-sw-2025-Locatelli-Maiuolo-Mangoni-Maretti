@@ -46,8 +46,8 @@ public class AbandonedShipCard extends Card{
 	}
 
 	/**
-	 * Iterates through each player, checking if they can take the ship. If they can (and want), removes crew from their
-	 * ship and awards the credits.
+	 * Iterates through each player, checking if they can take the ship.
+	 * If they can (and want), removes crew from their ship and awards the credits.
 	 */
 	@Override
 	public void playEffect(GameData game) {
