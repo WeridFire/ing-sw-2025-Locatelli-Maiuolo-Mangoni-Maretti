@@ -61,7 +61,7 @@ public class PIRContainer extends StackPane {
         //highlight the possible choices to be activated
         ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
         shipGrid.setActiveCells(castedPir.getHighlightMask(), false, false);
-        addCloseButton(false);
+        addCloseButton();
 
         if(!pir.getHighlightMask().isEmpty()){
             Button butt = new Button("Confirm Activation");
@@ -98,7 +98,7 @@ public class PIRContainer extends StackPane {
 
         ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
         shipGrid.setActiveCells(castedPir.getHighlightMask(), false, true);
-        addCloseButton(false);
+        addCloseButton();
     }
 
     public void handleChoicePir() {
@@ -139,7 +139,7 @@ public class PIRContainer extends StackPane {
         content.getChildren().clear();
         content.getChildren().add(label);
 
-        addCloseButton(false);
+        addCloseButton();
     }
 
     private Label getLabel(String labelText) {
@@ -153,15 +153,9 @@ public class PIRContainer extends StackPane {
 
 
 
-    private void addCloseButton(boolean endsTurn) {
+    private void addCloseButton() {
         Button close = new Button("Close");
         close.setOnMouseClicked(event -> {
-            if (endsTurn) {
-                Platform.runLater(() -> {
-                    ClientManager.getInstance().simulateCommand("endTurn");
-                });
-                AdventureUI.getInstance().getShipGrid().update();
-            }
             AdventureUI.getInstance().hidePirContainer();
         });
         content.getChildren().add(close);
