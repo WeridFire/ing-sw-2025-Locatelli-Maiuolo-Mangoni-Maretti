@@ -264,6 +264,7 @@ public class PIRUtils {
 					playerShip.getCLIRepresentation(coordCluster, ansiColors),
 					options,
 					0);
+			pirChoice.addTag(IntegrityProblem.TAG);
 			integritySequence.addPlayerInputRequest(pirChoice);
 			int choice = pirHandler.setAndRunTurn(pirChoice, false);
 

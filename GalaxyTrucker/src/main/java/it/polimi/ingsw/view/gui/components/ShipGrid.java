@@ -5,6 +5,7 @@ import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.model.shipboard.ShipBoard;
+import it.polimi.ingsw.model.shipboard.TileCluster;
 import it.polimi.ingsw.model.shipboard.tiles.BatteryComponentTile;
 import it.polimi.ingsw.model.shipboard.tiles.CabinTile;
 import it.polimi.ingsw.model.shipboard.tiles.CargoHoldTile;
@@ -14,6 +15,9 @@ import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.gui.UIs.AdventureUI;
 import it.polimi.ingsw.view.gui.helpers.Asset;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
+import it.polimi.ingsw.view.gui.managers.ClientManager;
+import it.polimi.ingsw.view.gui.utils.ShipIntegrityProblemManager;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -48,6 +52,8 @@ public class ShipGrid extends StackPane {
 
     private Set<ShipCell> activeCells = null;
     private List<ShipCell> cellsToActivate = new ArrayList<>();
+
+    private ShipIntegrityProblemManager sipManager = null;
 
     /**
      * Creates a new ship grid display.
@@ -167,6 +173,45 @@ public class ShipGrid extends StackPane {
         }
     }
 
+    public void handleIntegrityProblemChoice() {
+        if (sipManager != null) return;  // it's already managing integrity problem
+
+        ShipBoard shipBoard = CommonState.getPlayer().getShipBoard();
+        List<TileCluster> clustersToKeep = shipBoard.getVisitorCheckIntegrity()
+                .getProblem(!shipBoard.isFilled())
+                .getClustersToKeep();
+        int totClusters = clustersToKeep.size();
+        sipManager = new ShipIntegrityProblemManager(this, totClusters);
+
+        for (int i = 0; i < totClusters; i++) {
+            TileCluster cluster = clustersToKeep.get(i);
+            Set<Coordinates> coordinates = cluster.getCoordinates();
+            sipManager.addCluster(coordinates, i);
+
+            for (Coordinates coord : coordinates) {
+                ShipCell cell = gridCells.get(coord);
+                if (cell != null) {
+                    sipManager.addShipCell(cell, i);
+                }
+            }
+        }
+
+        sipManager.start();
+    }
+    private void confirmIntegrityProblemChoice() {
+        int choice = sipManager.getChoice();
+        dropIntegrityProblemChoice();
+        Platform.runLater(() -> ClientManager.getInstance()
+                .simulateCommand("choice", String.valueOf(choice)));
+    }
+    public void dropIntegrityProblemChoice() {
+        if (sipManager == null) return;
+        // else: actually need to drop integrity problem choice
+        sipManager.unhighlightAll();
+        sipManager = null;
+        unsetActiveCells();
+    }
+
     /**
      * Updates the visual representation of the grid based on the current state of the {@link ShipBoard}.
      * It clears existing tiles and re-populates cells with tiles from the spectated ShipBoard.
@@ -226,6 +271,11 @@ public class ShipGrid extends StackPane {
         for (int i = 0; i < reserveSlots.length; i++) {
             reserveSlots[i].setTile((i < reservedTiles.length) ? reservedTiles[i] : null);
         }
+
+        // highlight integrity problem (if present)
+        if (sipManager != null) {
+            sipManager.highlightAll();
+        }
     }
 
     private void decideCellsClickAbility() {
@@ -248,7 +298,7 @@ public class ShipGrid extends StackPane {
      * @param color                  A JavaFX color string (e.g., "rgba(255, 0, 0, 0.5)" or "#FF000080").
      *                               The highlight will be applied only if the color is not null or blank.
      */
-    private void highlightCells(Set<Coordinates> coordinatesToHighlight, String color) {
+    public void highlightCells(Set<Coordinates> coordinatesToHighlight, String color) {
         // Check for corner cases: no coordinates to highlight or no valid color provided
         if (coordinatesToHighlight == null || coordinatesToHighlight.isEmpty() || color == null || color.isBlank()) {
             return;

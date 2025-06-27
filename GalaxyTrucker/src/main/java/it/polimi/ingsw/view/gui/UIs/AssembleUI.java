@@ -274,7 +274,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     //TODO: remove this
     public void handleCheatButton() {
         Platform.runLater(() -> {
-            ClientManager.getInstance().simulateCommand("cheat", "standard");
+            ClientManager.getInstance().simulateCommand("cheat", "ipship");
         });
     }
 }

@@ -13,6 +13,7 @@ import it.polimi.ingsw.view.cli.ANSI;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents a cluster of connected tiles, with an optional main tile.
@@ -103,6 +104,18 @@ public class TileCluster implements Serializable {
      */
     public Set<TileSkeleton> getTiles() {
         return tiles;
+    }
+
+    /**
+     * Retrieves the list of coordinates of the placed tiles in this cluster
+     *
+     * @return a set of all coordinates occupied by the tiles in this cluster
+     */
+    public Set<Coordinates> getCoordinates() {
+        return tiles.stream()
+                .filter(TileSkeleton::isPlaced)
+                .map(TileSkeleton::forceGetCoordinates)
+                .collect(Collectors.toSet());
     }
 
     public boolean containsAny(Collection<TileSkeleton> tiles) {

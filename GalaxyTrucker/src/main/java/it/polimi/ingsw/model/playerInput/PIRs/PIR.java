@@ -21,6 +21,7 @@ public abstract class PIR implements ICLIPrintable, Serializable {
 	private int cooldown;
 	transient protected final Object lock = new Object();
 	private final PIRType pirType;
+	private final List<String> tags = new ArrayList<>();
 
 	/**
 	 * Abstract object for a PlayerInput request. The server will instance a new thread and wait for the player to
@@ -33,6 +34,16 @@ public abstract class PIR implements ICLIPrintable, Serializable {
 		this.currentPlayer = currentPlayer;
 		this.cooldown = cooldown;
 		this.pirType = PIRType;
+	}
+
+	public void addTag(String tag) {
+		tags.add(tag);
+	}
+	public void removeTag(String tag) {
+		tags.remove(tag);
+	}
+	public boolean containsTag(String tag) {
+		return tags.contains(tag);
 	}
 
 	/**
