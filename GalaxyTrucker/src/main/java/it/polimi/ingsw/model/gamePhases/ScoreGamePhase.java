@@ -16,6 +16,7 @@ import it.polimi.ingsw.view.cli.ICLIPrintable;
 import it.polimi.ingsw.util.GameLevelStandards;
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ScoreGamePhase extends PlayableGamePhase implements ICLIPrintable, Serializable {
@@ -30,15 +31,16 @@ public class ScoreGamePhase extends PlayableGamePhase implements ICLIPrintable, 
     }
 
     private void notifyScoresToPlayers() throws InterruptedException {
+        CLIFrame scoresFrame = getCLIRepresentation();
         gameData.getPIRHandler().broadcastPIR(
-                        gameData.getPlayers(Player::isConnected),
-                        (player, pirHandler) -> {
-                                PIRDelay pirDelay = new PIRDelay(
-                                        player,
-                                        10,
-                                        "GG to all, match is over. You will be sent to the menu in 10 seconds...",
-                                        getCLIRepresentation());
-                                pirHandler.setAndRunTurn(pirDelay);
+                gameData.getPlayers(Player::isConnected),
+                (player, pirHandler) -> {
+                    PIRDelay pirDelay = new PIRDelay(
+                            player,
+                            10,
+                            "GG to all, match is over. You will be sent to the menu in 10 seconds...",
+                            scoresFrame);
+                    pirHandler.setAndRunTurn(pirDelay);
                 });
     }
 
@@ -50,6 +52,20 @@ public class ScoreGamePhase extends PlayableGamePhase implements ICLIPrintable, 
         throw new CommandNotAllowedException("startTimer","No timer is allowed during the score screen phase.");
     }
 
+    private Predicate<Player> calculateGiveBestLookingShipboardAward() {
+        //finds the count of the least exposed connectors
+        int leastExposedConnectors = Integer.MAX_VALUE;
+        for(Player p: gameData.getPlayers()) {
+            int tempExposedConnectors = p.getShipBoard().getExposedConnectorsCount();
+            if (leastExposedConnectors > tempExposedConnectors) {
+                leastExposedConnectors = tempExposedConnectors;
+            }
+        }
+        int finalLeastExposedConnectors = leastExposedConnectors;
+        return (p -> !p.isEndedFlight()
+                && p.getShipBoard().getExposedConnectorsCount() == finalLeastExposedConnectors);
+    }
+
     /**
      * Used to calculate scores at the end of a match
      * @return sorted map (descending) of players and their scores
@@ -59,14 +75,7 @@ public class ScoreGamePhase extends PlayableGamePhase implements ICLIPrintable, 
         float score;
         Map<Player, Float> playerScores = new HashMap<>();
 
-        //finds the count of the least exposed connectors
-        int leastExposedConnectors = Integer.MAX_VALUE;
-        for(Player p: gameData.getPlayers()) {
-            int tempExposedConnectors = p.getShipBoard().getExposedConnectorsCount();
-            if (leastExposedConnectors > tempExposedConnectors) {
-                leastExposedConnectors = tempExposedConnectors;
-            }
-        }
+        Predicate<Player> giveBestLookingShipboardAward = calculateGiveBestLookingShipboardAward();
 
         //calculates points
         int i = 0;
@@ -83,7 +92,7 @@ public class ScoreGamePhase extends PlayableGamePhase implements ICLIPrintable, 
             }
 
             //adds points for the best ship
-            if(p.getShipBoard().getExposedConnectorsCount() == leastExposedConnectors){
+            if(giveBestLookingShipboardAward.test(p)){
                 score += awardForBestLookingShip;
             }
 

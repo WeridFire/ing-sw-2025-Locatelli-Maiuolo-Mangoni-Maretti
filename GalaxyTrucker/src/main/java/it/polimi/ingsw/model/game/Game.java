@@ -224,7 +224,7 @@ public class Game {
      * Perform the Flight phase of this game
      * @return {@code true} if flight has been completed successfully, {@code false} otherwise
      */
-    private boolean playFlight() {
+    private boolean playFlight() throws RemoteException {
         // play flight only after assemble, or after another adventure... (*1)
         GamePhaseType currentGamePhaseType = getGameData().getCurrentGamePhaseType();
         if (currentGamePhaseType != GamePhaseType.ASSEMBLE && currentGamePhaseType != GamePhaseType.ADVENTURE) {
@@ -249,7 +249,7 @@ public class Game {
             // we don't check for <= 1 players connected because the game still progresses in this case.
             if (getGameData().getPlayersInFlight().isEmpty()) {
                 System.out.println(this + " Zero alive players... Exiting game.");
-
+                GameServer.getInstance().broadcastUpdateRefreshOnlyIf(this, _ -> false);
                 return true;
             }
 

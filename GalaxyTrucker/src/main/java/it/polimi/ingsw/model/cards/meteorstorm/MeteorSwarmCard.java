@@ -48,23 +48,22 @@ public class MeteorSwarmCard extends Card {
 			proj.roll2D6();
 
 			game.getPIRHandler().broadcastPIR(game.getPlayersInFlight(), (player, pirHandler) -> {
+				// notify hit
 				PIRDelay pirDelay = new PIRDelay(player, Default.PIR_SHORT_SECONDS,
                         proj.toVerboseString(),
 						proj.getCLIRepresentation(player.getShipBoard()
 						));
 				pirHandler.setAndRunTurn(pirDelay);
-			});
-
-			for(Player player : game.getPlayersInFlight()){
+				// actually try to hit
 				boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, game);
 				if(!defended){
-                    try {
-                        player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
-                    } catch (NoTileFoundException | OutOfBuildingAreaException e) {
+					try {
+						player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
+					} catch (NoTileFoundException | OutOfBuildingAreaException e) {
 						throw new RuntimeException(e);  // should never happen -> runtime exception
-                    }
-                }
-			}
+					}
+				}
+			});
 		}
 	}
 

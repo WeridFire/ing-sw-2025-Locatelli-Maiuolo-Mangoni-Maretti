@@ -100,7 +100,7 @@ public class PIRHandler implements Serializable {
 					Logger.info("Waiting for atomic sequence");
                     atomicSequences.wait();
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+					Thread.currentThread().interrupt();
                 }
             }
 		}
@@ -135,7 +135,7 @@ public class PIRHandler implements Serializable {
 		try {
 			pir.run();
 		} catch(InterruptedException e) {
-			e.printStackTrace();
+			Thread.currentThread().interrupt();
 		}
 		//Do not clear in here the map entry after the turn has finished. This because after it we still
 		//need to retrieve from the object the result of the turn!
@@ -420,6 +420,7 @@ public class PIRHandler implements Serializable {
 	public void broadcastPIR(List<Player> players, BiConsumer<Player, PIRHandler> pirCascadeFunction) throws InterruptedException {
 		List<Thread> threads = new ArrayList<>();
 		standardRunRefreshAll = false;  // avoid updating view every time another player interacts with the broadcasted pir
+		joinEndTurn(players);
 		for(Player p : players){
 			Thread th = new Thread(() -> pirCascadeFunction.accept(p, this));
 			th.start();

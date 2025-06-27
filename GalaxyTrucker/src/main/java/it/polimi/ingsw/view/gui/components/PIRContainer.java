@@ -3,6 +3,7 @@ package it.polimi.ingsw.view.gui.components;
 import it.polimi.ingsw.model.playerInput.PIRType;
 import it.polimi.ingsw.model.playerInput.PIRs.*;
 import it.polimi.ingsw.model.shipboard.LoadableType;
+import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.gui.UIs.AdventureUI;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
@@ -53,28 +54,29 @@ public class PIRContainer extends StackPane {
     }
 
     public void handleActivateTilePir() {
-        content.getChildren().add(getLabel("Activate Tiles!"));
         content.getChildren().clear();
+        content.getChildren().add(getLabel("Activate Tiles!"));
+
         PIRActivateTiles castedPir = (PIRActivateTiles) pir;
 
         //highlight the possible choices to be activated
         ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
         shipGrid.setActiveCells(castedPir.getHighlightMask(), false, false);
-        addCloseButton(false);
+        addCloseButton();
 
-        Button butt = new Button("Confirm Activation");
-        butt.setOnMouseClicked(e -> {
-            Platform.runLater(() -> {
-                if(!shipGrid.getCellsToActivate().isEmpty()){
-                    ClientManager.getInstance().simulateCommand("activate", formatCoordinates(shipGrid.getCellsToActivate()));
-                    shipGrid.getCellsToActivate().clear();
-                    AdventureUI.getInstance().getCardPane().getChildren().remove(butt);
-                }
+        if(!pir.getHighlightMask().isEmpty()){
+            Button butt = new Button("Confirm Activation");
+            butt.setOnMouseClicked(e -> {
+                Platform.runLater(() -> {
+                    if(!shipGrid.getCellsToActivate().isEmpty()){
+                        ClientManager.getInstance().simulateCommand("activate", formatCoordinates(shipGrid.getCellsToActivate()));
+                        shipGrid.getCellsToActivate().clear();
+                        AdventureUI.getInstance().getCardPane().getChildren().remove(butt);
+                    }
+                });
             });
-        });
-        AdventureUI.getInstance().getCardPane().getChildren().add(butt);
-
-
+            AdventureUI.getInstance().getCardPane().getChildren().add(butt);
+        }
     }
 
     public void handleAddCargoPir() {
@@ -88,13 +90,15 @@ public class PIRContainer extends StackPane {
     }
 
     public void handleRemoveCargoPir() {
-        content.getChildren().add(getLabel("HANDLEREMOVECARGO"));
         content.getChildren().clear();
+
+        content.getChildren().add(getLabel("HANDLEREMOVECARGO"));
+
         PIRRemoveLoadables castedPir = (PIRRemoveLoadables) pir;
 
         ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
         shipGrid.setActiveCells(castedPir.getHighlightMask(), false, true);
-        addCloseButton(false);
+        addCloseButton();
     }
 
     public void handleChoicePir() {
@@ -135,11 +139,11 @@ public class PIRContainer extends StackPane {
         content.getChildren().clear();
         content.getChildren().add(label);
 
-        addCloseButton(false);
+        addCloseButton();
     }
 
     private Label getLabel(String labelText) {
-        Label labelObj = new Label(labelText); // Using the parameter instead of the field
+        Label labelObj = new Label(ANSI.Helper.stripAnsi(labelText)); // Using the parameter instead of the field
         labelObj.setWrapText(true);
         labelObj.setStyle("-fx-font-weight: bold; -fx-text-fill: black;"); // Changed to black text
         labelObj.setViewOrder(-1);
@@ -149,17 +153,10 @@ public class PIRContainer extends StackPane {
 
 
 
-    private void addCloseButton(boolean endsTurn) {
+    private void addCloseButton() {
         Button close = new Button("Close");
         close.setOnMouseClicked(event -> {
-            if (endsTurn) {
-                Platform.runLater(() -> {
-                    ClientManager.getInstance().simulateCommand("endTurn");
-                });
-            }
             AdventureUI.getInstance().hidePirContainer();
-            AdventureUI.getInstance().getShipGrid().update();
-
         });
         content.getChildren().add(close);
     }

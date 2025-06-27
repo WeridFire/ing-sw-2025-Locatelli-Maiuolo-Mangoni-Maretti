@@ -35,6 +35,7 @@ public class LoadableObject extends Draggable {
     public LoadableObject(Pane dragOverlay, LoadableType type, ShipCell parentCell) {
         super(dragOverlay);
         setType(type);
+        this.parentCell = parentCell;
     }
 
     /**
@@ -78,7 +79,7 @@ public class LoadableObject extends Draggable {
         if (parentCell != null) {
             if (parentCell.isActiveForAdventureRemove()){
                 Platform.runLater(() -> {
-                    ClientManager.getInstance().simulateCommand("remove", parentCell.getLogicalRow(), parentCell.getLogicalColumn(), type.toString(), "1");
+                    ClientManager.getInstance().simulateCommand("remove",  "("+parentCell.getLogicalRow()+","+parentCell.getLogicalColumn()+")", type.toString(), "1");
                 });
                 return false;
             }
