@@ -135,6 +135,7 @@ public class PIRContainer extends StackPane {
         Button close = new Button("Close");
         close.setOnMouseClicked(event -> {
             AdventureUI.getInstance().hidePirContainer();
+            AdventureUI.getInstance().getShipGrid().update();
         });
         content.getChildren().add(close);
     }
