@@ -260,7 +260,7 @@ public class ShipCell extends DropSlot {
             occupied = true;
         } else if (isActiveForAdventureDrop()) {
             if (DragDropManager.getCurrentDraggable().getType() != null){
-                ClientManager.getInstance().simulateCommand("allocate",logicalRow, logicalColumn,
+                ClientManager.getInstance().simulateCommand("allocate","("+logicalRow+","+logicalColumn+")",
                         DragDropManager.getCurrentDraggable().getType().toString(), "1");
                 addLoadable((LoadableObject) DragDropManager.getCurrentDraggable());
             }
