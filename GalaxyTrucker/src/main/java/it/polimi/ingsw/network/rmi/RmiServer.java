@@ -35,6 +35,7 @@ import it.polimi.ingsw.model.shipboard.tiles.exceptions.NotEnoughItemsException;
 import it.polimi.ingsw.model.shipboard.tiles.exceptions.TooMuchLoadException;
 import it.polimi.ingsw.model.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.util.Logger;
 
 import java.rmi.RemoteException;
 import java.util.*;
@@ -157,6 +158,7 @@ public class RmiServer implements IServer {
 
 	@Override
 	public void pirActivateTiles(IClient client, Set<Coordinates> tilesToActivate) throws RemoteException {
+		Logger.info("Received PIR command ACTIVATE TILES.");
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
 		if (pg == null) return;
 		// else: actually try to perform the action
@@ -175,6 +177,7 @@ public class RmiServer implements IServer {
 
 	@Override
 	public void pirAllocateLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException {
+		Logger.info("Received PIR command ALLOCATE LOADABLES");
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
 		if (pg == null) return;
 		// else: actually try to perform the action
@@ -193,6 +196,7 @@ public class RmiServer implements IServer {
 
 	@Override
 	public void pirForceEndTurn(IClient client) throws RemoteException {
+		Logger.info("Received PIR command END TURN");
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
 		if (pg == null) return;
 		// else: actually try to perform the action
@@ -210,6 +214,7 @@ public class RmiServer implements IServer {
 
 	@Override
 	public void pirRemoveLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToAdd) throws RemoteException {
+		Logger.info("Received PIR command REMOVE LOADABLES");
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
 		if (pg == null) return;
 
@@ -226,24 +231,8 @@ public class RmiServer implements IServer {
 	}
 
 	@Override
-	public void pirRearrangeLoadables(IClient client, Map<Coordinates, List<LoadableType>> cargoToRearrange) throws RemoteException {
-		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
-		if (pg == null) return;
-
-		try {
-			PIR activePIR = pg.game.getGameData().getPIRHandler().getPlayerPIR(pg.player);
-			if(activePIR != null){
-				activePIR.rearrangeLoadables(pg.player, cargoToRearrange);
-			}
-			client.updateClient(new ClientUpdate(pg.connectionUUID));
-		} catch (InputNotSupportedException | WrongPlayerTurnException | TileNotAvailableException |
-				 UnsupportedLoadableItemException | NotEnoughItemsException e) {
-			client.updateClient(new ClientUpdate(pg.connectionUUID, e.getMessage()));
-		}
-	}
-
-	@Override
 	public void pirSelectMultipleChoice(IClient client, int selection) throws RemoteException {
+		Logger.info("Received PIR command MULTIPLE CHOICE");
 		PlayerGameInstance pg = PlayerGameInstance.validateClient(gamesHandler, gameServer, client);
 		if (pg == null) return;
 
