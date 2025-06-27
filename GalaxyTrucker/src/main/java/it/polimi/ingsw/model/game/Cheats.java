@@ -91,6 +91,12 @@ public class Cheats {
 		player.getShipBoard().forceSetTile(tileList.get(14), new Coordinates(9, 5)); //Battery Tile 0/3
 
 	}
+	public static void cheatb3_0200(GameData gameData, Player player) throws FixedTileException {
+		List<TileSkeleton> tileList = validatePhaseAndGetTilesAsGfxElements(gameData);
+		if (tileList == null) return;
+
+		player.getShipBoard().forceSetTile(tileList.get(13), new Coordinates(8, 7));
+	}
 
 	public static void cheatShipboard(String cheatName, Game game, Player player) throws AlreadyEndedAssemblyException, FixedTileException, TileAlreadyPresentException, TileWithoutNeighborException, RemoteException, OutOfBuildingAreaException, UninitializedShipboardException {
 		switch(cheatName){
@@ -98,6 +104,7 @@ public class Cheats {
 			case "ipship" -> Cheats.integrityProblemShipboard(game, player);
 			case "randomship" -> Cheats.randomShipboard(game, player);
 			case "shielded" -> Cheats.cheatShieldedShipboard(game.getGameData(), player);
+			case "b3-0200" -> Cheats.cheatb3_0200(game.getGameData(), player);
 			default -> throw new UninitializedShipboardException("Cheat shipboard '" + cheatName +"' not found.");
 		}
 
