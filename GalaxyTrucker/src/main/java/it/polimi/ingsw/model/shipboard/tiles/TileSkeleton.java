@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.shipboard.SideType;
 import it.polimi.ingsw.model.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.model.shipboard.tiles.exceptions.NotFixedTileException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.util.Logger;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import it.polimi.ingsw.view.cli.ICLIPrintable;
 
@@ -76,7 +77,8 @@ public abstract class TileSkeleton implements Tile, ICLIPrintable {
         try {
             return getCoordinates();
         } catch (NotFixedTileException e) {
-            throw new RuntimeException(e);
+            Logger.error("Attempted to retrieve coordinates of a tile which is not set.", e);
+            return null;
         }
     }
 

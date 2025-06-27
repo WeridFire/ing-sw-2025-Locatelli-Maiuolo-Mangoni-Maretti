@@ -6,6 +6,7 @@ import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.playerInput.exceptions.WrongPlayerTurnException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.util.Logger;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
@@ -92,18 +93,22 @@ public class PIRHandler implements Serializable {
 	 */
 	private void setAndRunGenericTurn(PIR pir, boolean refreshAllPlayers) {
 		// verify correctness of pir and atomic sequences
+		Logger.info("Running generic turn pir " + pir.getPIRType());
 		synchronized (atomicSequences) {
 			while (!validateAtomicSequence(pir)) {
                 try {
+					Logger.info("Waiting for atomic sequence");
                     atomicSequences.wait();
                 } catch (InterruptedException e) {
 					Thread.currentThread().interrupt();
                 }
             }
 		}
+		Logger.info("Post atomic sequences verification");
 		// setup the pir
 		if (!isPlayerReadyForInputRequest(pir.getCurrentPlayer())) {
-			throw new RuntimeException("Can not start new turn while another turn has not ended itself");
+			Logger.error("Can not start new turn while another turn has not ended itself");
+			return;
 		}
 		synchronized (activePIRs) {
 			activePIRs.put(pir.getCurrentPlayer(), pir);

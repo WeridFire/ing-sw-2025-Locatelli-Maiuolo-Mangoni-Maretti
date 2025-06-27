@@ -2,8 +2,12 @@ package it.polimi.ingsw.view.gui.components;
 
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
+import it.polimi.ingsw.view.gui.managers.ClientManager;
+import javafx.application.Platform;
+import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 /**
  * Represents a container for a card.
@@ -17,6 +21,8 @@ public class CardContainer extends StackPane {
     private static final double FIXED_HEIGHT = 400;
     private static final double PADDING = 20;
 
+    private Button endTurnButton;
+
     /**
      * Constructs a new CardContainer.
      */
@@ -26,13 +32,19 @@ public class CardContainer extends StackPane {
         this.setMinSize(FIXED_WIDTH, FIXED_HEIGHT);
         this.setMaxSize(FIXED_WIDTH, FIXED_HEIGHT);
 
-        this.imageView = new ImageView();
-        this.imageView.setPreserveRatio(true);
-        this.imageView.setFitWidth(FIXED_WIDTH - PADDING);
-        this.imageView.setFitHeight(FIXED_HEIGHT - PADDING);
+        imageView = new ImageView();
+        imageView.setPreserveRatio(true);
+        imageView.setFitWidth(FIXED_WIDTH - PADDING);
+        imageView.setFitHeight(FIXED_HEIGHT - PADDING);
 
-        this.getChildren().add(imageView);
+        endTurnButton = new Button("End Turn");
+        endTurnButton.setOnAction(e -> Platform.runLater(() -> {
+            ClientManager.getInstance().simulateCommand("endTurn");
+        }));
 
+        VBox container = new VBox(10); // Optional spacing
+        container.getChildren().addAll(imageView, endTurnButton);
+        this.getChildren().add(container);
     }
 
     /**
@@ -53,9 +65,6 @@ public class CardContainer extends StackPane {
 
         this.card = card;
 
-        this.getChildren().remove(imageView);
-        this.imageView.setImage(AssetHandler.loadRawImage(card.getTextureName()));
-        this.getChildren().add(imageView);
+        imageView.setImage(AssetHandler.loadRawImage(card.getTextureName()));
     }
-
 }

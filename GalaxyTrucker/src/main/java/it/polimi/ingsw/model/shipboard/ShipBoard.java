@@ -16,10 +16,7 @@ import it.polimi.ingsw.model.shipboard.tiles.exceptions.AlreadyInitializedCabinE
 import it.polimi.ingsw.model.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.model.shipboard.tiles.exceptions.NotFixedTileException;
 import it.polimi.ingsw.model.shipboard.tiles.exceptions.UnsupportedLoadableItemException;
-import it.polimi.ingsw.util.BoardCoordinates;
-import it.polimi.ingsw.util.Coordinates;
-import it.polimi.ingsw.util.Default;
-import it.polimi.ingsw.util.Util;
+import it.polimi.ingsw.util.*;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import it.polimi.ingsw.view.cli.CLIScreen;
@@ -129,7 +126,10 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	public void validateStructure() {
 		if (endedFlight) return;
 		countExposedConnectors = null;
+		Logger.info("Starting visitors reset proces...");
+		long startTime = System.currentTimeMillis();
 		resetVisitors();
+		Logger.info("Time elapsed: " + (System.currentTimeMillis() - startTime) + "ms");
 		notifyIntegrityListeners(visitorCheckIntegrity.getProblem(!filled));
 	}
 

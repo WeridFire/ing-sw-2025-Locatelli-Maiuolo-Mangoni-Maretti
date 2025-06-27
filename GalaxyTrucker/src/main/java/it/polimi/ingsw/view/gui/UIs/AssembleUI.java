@@ -118,6 +118,10 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
             System.out.println("Child " + i + ": " + root.getChildren().get(i).getClass().getSimpleName() +
                     " - Visible: " + root.getChildren().get(i).isVisible());
         }
+        //TODO: remove these 3 lines
+        Button cheatButton = new Button("cheat");
+        cheatButton.setOnMouseClicked(event -> handleCheatButton());
+        root.getChildren().add(cheatButton);
     }
 
     /**
@@ -264,6 +268,13 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
             if (leftGrid != null) {
                 leftGrid.update();
             }
+        });
+    }
+
+    //TODO: remove this
+    public void handleCheatButton() {
+        Platform.runLater(() -> {
+            ClientManager.getInstance().simulateCommand("cheat", "standard");
         });
     }
 }

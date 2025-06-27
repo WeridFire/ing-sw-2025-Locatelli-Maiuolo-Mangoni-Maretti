@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.cards;
 import it.polimi.ingsw.model.cards.exceptions.CardsGroupException;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.util.Default;
 
 import java.io.Serializable;
 import java.util.*;
@@ -160,6 +161,12 @@ public class Deck implements Serializable {
         // ensure the first card is one of the selected level
         while (deck.getFirst().getLevel() != gameLevel) {
             deck.add(deck.removeFirst());  // set as last card
+        }
+
+        Card firstCard = deck.stream().filter(c -> c.getTitle().equals(Default.STARTING_CARD)).findAny().orElse(null);
+        if(firstCard != null){
+            deck.remove(firstCard);
+            deck.addFirst(firstCard);
         }
         // this loop will end thanks to the constructor, which gives the correct number of cards
     }

@@ -38,7 +38,6 @@ public class AdventureCommandsProcessor extends PhaseCommandsProcessor {
         }
         availableCommands.add("spectate <" + getSpectatablePlayersUsernames() +">|Spectate another player's shipboard.");
 
-
         return availableCommands;
 
     }

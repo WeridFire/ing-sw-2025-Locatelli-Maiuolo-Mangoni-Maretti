@@ -47,6 +47,7 @@ public class ShipGrid extends StackPane {
     private final int reserveOffsetY;
 
     private Set<ShipCell> activeCells = null;
+    private List<ShipCell> cellsToActivate = new ArrayList<>();
 
     /**
      * Creates a new ship grid display.
@@ -141,7 +142,7 @@ public class ShipGrid extends StackPane {
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 Coordinates logicalCoords = new Coordinates(r + baseRow, c + baseCol);
-                ShipCell cell = new ShipCell(logicalCoords, level);
+                ShipCell cell = new ShipCell(logicalCoords, level, this);
                 gridCells.put(logicalCoords, cell);
                 cellGridPane.add(cell, c, r);
             }
@@ -225,9 +226,6 @@ public class ShipGrid extends StackPane {
         for (int i = 0; i < reserveSlots.length; i++) {
             reserveSlots[i].setTile((i < reservedTiles.length) ? reservedTiles[i] : null);
         }
-
-        // decide cells clickAbility
-        decideCellsClickAbility();
     }
 
     private void decideCellsClickAbility() {
@@ -251,11 +249,6 @@ public class ShipGrid extends StackPane {
      *                               The highlight will be applied only if the color is not null or blank.
      */
     private void highlightCells(Set<Coordinates> coordinatesToHighlight, String color) {
-        // Clear all previous highlights from all cells
-        for (ShipCell cell : gridCells.values()) {
-            cell.setHighlight(null);
-        }
-
         // Check for corner cases: no coordinates to highlight or no valid color provided
         if (coordinatesToHighlight == null || coordinatesToHighlight.isEmpty() || color == null || color.isBlank()) {
             return;
@@ -291,6 +284,7 @@ public class ShipGrid extends StackPane {
             }
 
             highlightCells(coordinates, drop ? Default.ADD_CARGO_STRING_COLOR : Default.REMOVE_CARGO_STRING_COLOR);
+            decideCellsClickAbility();
         }
     }
 
@@ -306,4 +300,10 @@ public class ShipGrid extends StackPane {
         }
         this.activeCells = null;
     }
+
+    public List<ShipCell> getCellsToActivate() {
+        return this.cellsToActivate;
+    }
+
+
 }

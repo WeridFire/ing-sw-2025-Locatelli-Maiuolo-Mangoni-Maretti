@@ -53,18 +53,34 @@ public class PIRContainer extends StackPane {
     }
 
     public void handleActivateTilePir() {
+        content.getChildren().add(getLabel("Activate Tiles!"));
         content.getChildren().clear();
-        content.getChildren().add(getLabel("TODO"));
         PIRActivateTiles castedPir = (PIRActivateTiles) pir;
-        System.out.println(castedPir.getHighlightMask());
-        // TODO: implementa logica specifica activate row col
-        addCloseButton();
+
+        //highlight the possible choices to be activated
+        ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
+        shipGrid.setActiveCells(castedPir.getHighlightMask(), false, false);
+        addCloseButton(false);
+
+        Button butt = new Button("Confirm Activation");
+        butt.setOnMouseClicked(e -> {
+            Platform.runLater(() -> {
+                if(!shipGrid.getCellsToActivate().isEmpty()){
+                    ClientManager.getInstance().simulateCommand("activate", formatCoordinates(shipGrid.getCellsToActivate()));
+                    shipGrid.getCellsToActivate().clear();
+                    AdventureUI.getInstance().getCardPane().getChildren().remove(butt);
+                }
+            });
+        });
+        AdventureUI.getInstance().getCardPane().getChildren().add(butt);
+
+
     }
 
     public void handleAddCargoPir() {
+        content.getChildren().add(getLabel("HANDLEADDCARGO"));
         PIRAddLoadables castedPir = (PIRAddLoadables) pir;
         ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
-        System.out.println(castedPir.getHighlightMask());
         shipGrid.setActiveCells(castedPir.getHighlightMask(), true, false);
         for (LoadableType loadable: castedPir.getFloatingLoadables()){
             AdventureUI.getInstance().getLoadableContainer().addLoadableObject(loadable);
@@ -72,12 +88,13 @@ public class PIRContainer extends StackPane {
     }
 
     public void handleRemoveCargoPir() {
+        content.getChildren().add(getLabel("HANDLEREMOVECARGO"));
         content.getChildren().clear();
-        content.getChildren().add(getLabel("TODO"));
         PIRRemoveLoadables castedPir = (PIRRemoveLoadables) pir;
-        System.out.println(castedPir.getHighlightMask());
-        // TODO: implementa logica specifica remove (x, y) <LoadableType> <amount>
-        addCloseButton();
+
+        ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
+        shipGrid.setActiveCells(castedPir.getHighlightMask(), false, true);
+        addCloseButton(false);
     }
 
     public void handleChoicePir() {
@@ -109,8 +126,6 @@ public class PIRContainer extends StackPane {
         content.getChildren().clear();
         content.getChildren().add(label);
         content.getChildren().addAll(buttons);
-
-        this.setVisible(true);
     }
 
     public void handleDelayPir() {
@@ -120,7 +135,7 @@ public class PIRContainer extends StackPane {
         content.getChildren().clear();
         content.getChildren().add(label);
 
-        addCloseButton();
+        addCloseButton(false);
     }
 
     private Label getLabel(String labelText) {
@@ -131,11 +146,36 @@ public class PIRContainer extends StackPane {
         return labelObj;
     }
 
-    private void addCloseButton() {
+
+
+
+    private void addCloseButton(boolean endsTurn) {
         Button close = new Button("Close");
         close.setOnMouseClicked(event -> {
+            if (endsTurn) {
+                Platform.runLater(() -> {
+                    ClientManager.getInstance().simulateCommand("endTurn");
+                });
+            }
             AdventureUI.getInstance().hidePirContainer();
+            AdventureUI.getInstance().getShipGrid().update();
+
         });
         content.getChildren().add(close);
     }
+
+    public static String formatCoordinates(List<ShipCell> cells) {
+        StringBuilder sb = new StringBuilder();
+        for (ShipCell obj : cells) {
+            String r = obj.getLogicalRow(); // Dummy getter
+            String c = obj.getLogicalColumn(); // Dummy getter
+            sb.append("(").append(r).append(",").append(c).append(") ");
+        }
+        // Remove trailing space if needed
+        if (sb.length() > 0) {
+            sb.setLength(sb.length() - 1);
+        }
+        return sb.toString();
+    }
+
 }
