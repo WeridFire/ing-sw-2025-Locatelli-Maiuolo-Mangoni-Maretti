@@ -22,6 +22,7 @@ import it.polimi.ingsw.model.shipboard.tiles.exceptions.NotFixedTileException;
 import it.polimi.ingsw.model.shipboard.visitors.VisitorCalculatePowers;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.util.Default;
+import it.polimi.ingsw.util.Logger;
 import it.polimi.ingsw.util.Util;
 import it.polimi.ingsw.view.cli.ANSI;
 
@@ -205,6 +206,7 @@ public class PIRUtils {
 			Set<Coordinates> maskTilesToRemove = clustersToRemove.stream()
 					.flatMap(cluster -> cluster.getTiles().stream())
 					.map(TileSkeleton::forceGetCoordinates)
+					.filter(Objects::nonNull)
 					.collect(Collectors.toSet());
 			if (maskTilesToRemove.isEmpty()) return false;
 			// notify
@@ -228,12 +230,14 @@ public class PIRUtils {
 			// else -> no problem
 			if (clustersToKeep.size() == 1) return false;
 			if (clustersToKeep.isEmpty()) {
+				Logger.info("Starting end flight pir.");
 				PIRDelay pirInfo = new PIRDelay(player, Default.PIR_SHORT_SECONDS,
 						"Your ship has no valid cluster of tiles." +
 								" You need to end your flight...", null);
 				integritySequence.addPlayerInputRequest(pirInfo);
 				pirHandler.setAndRunTurn(pirInfo, false);
 				pirHandler.destroyAtomicSequence(integritySequence);
+				Logger.info("Ending end flight pir.");
 				player.requestEndFlight();
 				return false;
 			}
@@ -243,6 +247,7 @@ public class PIRUtils {
 			for (TileCluster cluster : clustersToKeep) {
 				coordCluster.add(cluster.getTiles().stream().
 						map(TileSkeleton::forceGetCoordinates)
+						.filter(Objects::nonNull)
 						.collect(Collectors.toSet()));
 			}
 
@@ -268,6 +273,7 @@ public class PIRUtils {
 					.flatMap(cluster -> cluster.getTiles().stream())
 					.filter(c -> !chosenCluster.getTiles().contains(c))
 					.map(TileSkeleton::forceGetCoordinates)
+					.filter(Objects::nonNull)
 					.collect(Collectors.toSet());
 			// actually remove those
 			for (Coordinates placeTileToRemove : maskTilesToRemove) {
@@ -308,7 +314,7 @@ public class PIRUtils {
 			try {
 				GameServer.getInstance().broadcastUpdateShipboardSpectators(game, player);
 			} catch (RemoteException e) {
-				System.err.println("RemoteException while broadcasting end of integrity problem");
+				Logger.error("RemoteException while broadcasting end of integrity problem");
 			}
 		}
 
