@@ -46,7 +46,7 @@ public class WarLevel implements Serializable {
 	 * Applies the punishment associated to this war level to a player.
 	 * @param p
 	 */
-	public void applyPunishment(Player p, GameData game) {
+	public void applyPunishment(Player p, GameData game) throws InterruptedException {
 		warPunishment.apply(p, game);
 	}
 

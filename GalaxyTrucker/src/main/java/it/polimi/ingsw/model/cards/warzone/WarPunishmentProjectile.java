@@ -29,29 +29,25 @@ public class WarPunishmentProjectile implements WarPunishment {
     }
 
     @Override
-    public void apply(Player player, GameData gameData) {
+    public void apply(Player player, GameData gameData) throws InterruptedException {
         for(Projectile proj : projectiles){
-
             proj.roll2D6();
-            try{
-                gameData.getPIRHandler().broadcastPIR(gameData.getPlayersInFlight(), (p, pirHandler) -> {
-                    PIRDelay pirDelay = new PIRDelay(p, Default.PIR_SHORT_SECONDS,
-                            proj.toVerboseString(),
-                            proj.getCLIRepresentation(p.getShipBoard()
-                            ));
-                    pirHandler.setAndRunTurn(pirDelay);
-                    boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, gameData);
-                    if(!defended) {
-                        try {
-                            player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
-                        } catch (NoTileFoundException | OutOfBuildingAreaException e) {
-                            throw new RuntimeException(e);  // should never happen -> runtime exception
-                        }
+
+            gameData.getPIRHandler().broadcastPIR(gameData.getPlayersInFlight(), (p, pirHandler) -> {
+                PIRDelay pirDelay = new PIRDelay(p, Default.PIR_SHORT_SECONDS,
+                        proj.toVerboseString(),
+                        proj.getCLIRepresentation(p.getShipBoard()
+                        ));
+                pirHandler.setAndRunTurn(pirDelay);
+                boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, gameData);
+                if(!defended) {
+                    try {
+                        player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
+                    } catch (NoTileFoundException | OutOfBuildingAreaException e) {
+                        throw new RuntimeException(e);  // should never happen -> runtime exception
                     }
-                });
-            }catch (InterruptedException e){
-                e.printStackTrace();
-            }
+                }
+            });
         }
     }
 }

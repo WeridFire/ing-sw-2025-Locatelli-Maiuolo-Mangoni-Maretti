@@ -32,7 +32,7 @@ public class WarZoneCard extends Card {
 	 * Iterates each single war level. For each one selects the worst player. Punishes that player.
 	 */
 	@Override
-	public void playEffect(GameData game) {
+	public void playEffect(GameData game) throws InterruptedException {
 		for(WarLevel wl : warLevels){
 			Player p = wl.getWorstPlayer(game);
 			if(p != null){
