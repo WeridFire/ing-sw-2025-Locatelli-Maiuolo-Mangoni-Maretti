@@ -78,7 +78,7 @@ public class LoadableObject extends Draggable {
         if (parentCell != null) {
             if (parentCell.isActiveForAdventureRemove()){
                 Platform.runLater(() -> {
-                    ClientManager.getInstance().simulateCommand("remove", parentCell.getLogicalRow(), parentCell.getLogicalColumn(), type.toString(), "1");
+                    ClientManager.getInstance().simulateCommand("remove",  "("+parentCell.getLogicalRow()+","+parentCell.getLogicalColumn()+")", type.toString(), "1");
                 });
                 return false;
             }

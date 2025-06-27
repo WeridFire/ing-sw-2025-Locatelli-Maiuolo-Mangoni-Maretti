@@ -73,8 +73,6 @@ public class PIRContainer extends StackPane {
             });
         });
         AdventureUI.getInstance().getCardPane().getChildren().add(butt);
-
-
     }
 
     public void handleAddCargoPir() {
