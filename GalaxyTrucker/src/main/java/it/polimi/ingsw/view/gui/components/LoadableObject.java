@@ -35,6 +35,7 @@ public class LoadableObject extends Draggable {
     public LoadableObject(Pane dragOverlay, LoadableType type, ShipCell parentCell) {
         super(dragOverlay);
         setType(type);
+        this.parentCell = parentCell;
     }
 
     /**
