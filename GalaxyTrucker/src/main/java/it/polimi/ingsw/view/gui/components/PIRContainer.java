@@ -80,7 +80,6 @@ public class PIRContainer extends StackPane {
     }
 
     public void handleAddCargoPir() {
-
         content.getChildren().add(getLabel("HANDLEADDCARGO"));
         PIRAddLoadables castedPir = (PIRAddLoadables) pir;
         ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
