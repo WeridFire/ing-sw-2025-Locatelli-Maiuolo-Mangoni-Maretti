@@ -125,6 +125,11 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         return shipGrid;
     }
 
+
+    public CardContainer getCardPane(){
+        return cardPane;
+    }
+
     /**
      * Updates the displayed adventure card based on the current game state.
      */
