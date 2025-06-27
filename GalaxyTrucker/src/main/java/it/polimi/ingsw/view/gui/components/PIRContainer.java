@@ -113,8 +113,6 @@ public class PIRContainer extends StackPane {
         content.getChildren().clear();
         content.getChildren().add(label);
         content.getChildren().addAll(buttons);
-
-        this.setVisible(true);
     }
 
     public void handleDelayPir() {
@@ -124,7 +122,7 @@ public class PIRContainer extends StackPane {
         content.getChildren().clear();
         content.getChildren().add(label);
 
-        addCloseButton(true);
+        addCloseButton(false);
     }
 
     private Label getLabel(String labelText) {
