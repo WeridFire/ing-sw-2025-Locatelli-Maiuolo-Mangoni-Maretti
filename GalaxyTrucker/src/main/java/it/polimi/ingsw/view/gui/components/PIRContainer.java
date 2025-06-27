@@ -53,15 +53,28 @@ public class PIRContainer extends StackPane {
     }
 
     public void handleActivateTilePir() {
+        content.getChildren().add(getLabel("Activate Tiles!"));
         content.getChildren().clear();
         PIRActivateTiles castedPir = (PIRActivateTiles) pir;
-        content.getChildren().add(getLabel("HANDLEACTIVATETILE"));
 
         //highlight the possible choices to be activated
         ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
         shipGrid.setActiveCells(castedPir.getHighlightMask(), false, false);
-
         addCloseButton(false);
+
+        Button butt = new Button("Confirm Activation");
+        butt.setOnMouseClicked(e -> {
+            Platform.runLater(() -> {
+                if(!shipGrid.getCellsToActivate().isEmpty()){
+                    ClientManager.getInstance().simulateCommand("activate", formatCoordinates(shipGrid.getCellsToActivate()));
+                    shipGrid.getCellsToActivate().clear();
+                    AdventureUI.getInstance().getCardPane().getChildren().remove(butt);
+                }
+            });
+        });
+        AdventureUI.getInstance().getCardPane().getChildren().add(butt);
+
+
     }
 
     public void handleAddCargoPir() {
@@ -150,4 +163,19 @@ public class PIRContainer extends StackPane {
         });
         content.getChildren().add(close);
     }
+
+    public static String formatCoordinates(List<ShipCell> cells) {
+        StringBuilder sb = new StringBuilder();
+        for (ShipCell obj : cells) {
+            String r = obj.getLogicalRow(); // Dummy getter
+            String c = obj.getLogicalColumn(); // Dummy getter
+            sb.append("(").append(r).append(",").append(c).append(") ");
+        }
+        // Remove trailing space if needed
+        if (sb.length() > 0) {
+            sb.setLength(sb.length() - 1);
+        }
+        return sb.toString();
+    }
+
 }

@@ -31,6 +31,9 @@ public class ShipCell extends DropSlot {
 
     private final String DEFAULT_CELL_STYLE;
 
+    private static final String SELECTED_STYLE = "-fx-border-color: red; -fx-border-width: 2;";
+
+
     private final String logicalRow, logicalColumn;
     private final boolean isOnBoard;
     private boolean occupied;
@@ -44,6 +47,7 @@ public class ShipCell extends DropSlot {
 
     private List<LoadableObject> loadablesContent = new ArrayList<LoadableObject>();
     private HBox loadableBox;
+    private ShipGrid parentShip;
 
     /**
      * Private constructor for creating a special reserve slot.
@@ -65,7 +69,7 @@ public class ShipCell extends DropSlot {
      * @param coordinates The logical coordinates of the cell.
      * @param level The game level, used to determine if the cell is on the actual board.
      */
-    public ShipCell(Coordinates coordinates, GameLevel level) {
+    public ShipCell(Coordinates coordinates, GameLevel level, ShipGrid parentShip) {
         isReserveSlot = false;
         logicalRow = String.valueOf(coordinates.getRow());
         logicalColumn = String.valueOf(coordinates.getColumn());
@@ -78,6 +82,7 @@ public class ShipCell extends DropSlot {
 
         occupied = false;
         hasNeighbor = false;
+        this.parentShip = parentShip;
     }
 
     /**
@@ -214,12 +219,18 @@ public class ShipCell extends DropSlot {
 
     public void setClickAbility() {
         if (isHighlighted && !isActiveForAdventureDrop && !isActiveForAdventureRemove) {
-            // if just highlighted it means we are on a activatetile situation
             this.setOnMouseClicked(mouseEvent -> {
-                ClientManager.getInstance().simulateCommand("activate", logicalRow, logicalColumn);
+                if (parentShip.getCellsToActivate().contains(this)) {
+                    parentShip.getCellsToActivate().remove(this);
+                    setStyle(DEFAULT_CELL_STYLE); // Reset style
+                } else {
+                    parentShip.getCellsToActivate().add(this);
+                    setStyle(SELECTED_STYLE); // Show selected style
+                }
             });
         }
     }
+
 
     public String getLogicalRow(){
         return logicalRow;
@@ -281,4 +292,7 @@ public class ShipCell extends DropSlot {
             setStyle((entering && canAcceptTile()) ? HIGHLIGHT_CELL_STYLE : DEFAULT_CELL_STYLE);
         }
     }
+
+
+
 }

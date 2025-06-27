@@ -47,6 +47,7 @@ public class ShipGrid extends StackPane {
     private final int reserveOffsetY;
 
     private Set<ShipCell> activeCells = null;
+    private List<ShipCell> cellsToActivate = new ArrayList<>();
 
     /**
      * Creates a new ship grid display.
@@ -141,7 +142,7 @@ public class ShipGrid extends StackPane {
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 Coordinates logicalCoords = new Coordinates(r + baseRow, c + baseCol);
-                ShipCell cell = new ShipCell(logicalCoords, level);
+                ShipCell cell = new ShipCell(logicalCoords, level, this);
                 gridCells.put(logicalCoords, cell);
                 cellGridPane.add(cell, c, r);
             }
@@ -299,4 +300,10 @@ public class ShipGrid extends StackPane {
         }
         this.activeCells = null;
     }
+
+    public List<ShipCell> getCellsToActivate() {
+        return this.cellsToActivate;
+    }
+
+
 }
