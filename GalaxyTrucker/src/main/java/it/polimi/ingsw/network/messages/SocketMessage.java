@@ -29,7 +29,6 @@ public class SocketMessage implements Serializable{
 		REQUEST_END_FLIGHT,
 		PIR_ACTIVATE_TILES,
 		PIR_ALLOCATE_REMOVE_LOADABLES,
-		PIR_REARRANGE_LOADABLES,
 		PIR_FORCE_END_TURN,
 		PIR_SELECT_MULTIPLE_CHOICE,
 		CHEAT,
@@ -220,10 +219,6 @@ public class SocketMessage implements Serializable{
 
 	public static SocketMessage pirAllocateRemoveLoadables(Map<Coordinates, List<LoadableType>> cargo, boolean adding){
 		return new SocketMessage(MessageType.PIR_ALLOCATE_REMOVE_LOADABLES, List.of(cargo, adding));
-	}
-
-	public static SocketMessage pirRearrangeLoadables(Map<Coordinates, List<LoadableType>> cargo){
-		return new SocketMessage(MessageType.PIR_REARRANGE_LOADABLES, List.of(cargo));
 	}
 
 	public static SocketMessage pirForceEndTurn(){
