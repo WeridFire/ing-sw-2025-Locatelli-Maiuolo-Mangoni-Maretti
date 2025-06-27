@@ -17,6 +17,7 @@ import java.util.*;
 
 public abstract class PIR implements ICLIPrintable, Serializable {
 
+	private final String id = UUID.randomUUID().toString();
 	protected Player currentPlayer;
 	private int cooldown;
 	transient protected final Object lock = new Object();
@@ -119,7 +120,9 @@ public abstract class PIR implements ICLIPrintable, Serializable {
 		throw new InputNotSupportedException(getPIRType());
 	}
 
-
+	public String getId(){
+		return id.toString();
+	}
 
 	@Override
 	public String toString() {

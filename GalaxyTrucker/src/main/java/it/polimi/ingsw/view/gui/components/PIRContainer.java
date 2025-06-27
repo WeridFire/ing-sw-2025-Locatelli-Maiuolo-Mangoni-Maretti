@@ -150,9 +150,6 @@ public class PIRContainer extends StackPane {
         return labelObj;
     }
 
-
-
-
     private void addCloseButton() {
         Button close = new Button("Close");
         close.setOnMouseClicked(event -> {
