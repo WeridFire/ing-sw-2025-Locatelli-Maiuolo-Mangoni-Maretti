@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.gui.UIs;
 
+import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.model.game.GameData;
@@ -11,21 +12,19 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-
-import java.util.UUID;
 
 public class LobbyUI implements INodeRefreshableOnUpdateUI {
     private final VBox layout;
     private ComboBox<Integer> playerCountBox;
     private ComboBox<GameLevel> gameLevelBox;
+    private Label statusLabel;
 
-    public LobbyUI(String username) {
-        Label statusLabel = new Label("Logged as: " + username);
-
-        GameData gameData = ClientManager.getInstance()
-                .getLastUpdate()
-                .getCurrentGame();
+    public LobbyUI() {
+        ClientManager clientManager = ClientManager.getInstance();
+        String username = clientManager.getUsername();
+        GameData gameData = clientManager.getLastUpdate().getCurrentGame();
 
         if (gameData == null) {
             throw new IllegalStateException("Game not initialized");
@@ -33,20 +32,30 @@ public class LobbyUI implements INodeRefreshableOnUpdateUI {
 
         boolean canChangeSettings = gameData.getGameLeader().equals(username);
 
+        Label headerLabel = new Label("GAME LOBBY");
+        headerLabel.getStyleClass().add("header-label");
+
+        statusLabel = new Label("Pilots in lobby: " + gameData.getPlayers().size());
+        statusLabel.getStyleClass().add("label");
+
+        Label settingsLabel = new Label("Mission Parameters");
+        settingsLabel.getStyleClass().add("label");
+
         layout = new VBox(15);
         layout.setAlignment(Pos.CENTER);
+        layout.getStyleClass().add("root");
+        VBox.setVgrow(layout, Priority.ALWAYS); // <--- AGGIUNGI QUESTA LINEA
 
-        // ComboBox per numero di giocatori
         playerCountBox = new ComboBox<>(FXCollections.observableArrayList(2, 3, 4));
-        playerCountBox.setPromptText("Number of players");
+        playerCountBox.setPromptText("Crew Size");
         playerCountBox.setValue(gameData.getRequiredPlayers());
+        playerCountBox.getStyleClass().add("combo-box");
 
-        // ComboBox per livello di gioco
         gameLevelBox = new ComboBox<>(FXCollections.observableArrayList(GameLevel.LEVELS_TO_PLAY));
-        gameLevelBox.setPromptText("Select game level");
+        gameLevelBox.setPromptText("Danger Level");
         gameLevelBox.setValue(gameData.getLevel());
+        gameLevelBox.getStyleClass().add("combo-box");
 
-        // Disabilita le ComboBox se non sei il game leader
         playerCountBox.setDisable(!canChangeSettings);
         gameLevelBox.setDisable(!canChangeSettings);
 
@@ -55,10 +64,11 @@ public class LobbyUI implements INodeRefreshableOnUpdateUI {
         }
 
         layout.getChildren().addAll(
-                new Label("Game Settings:"),
+                headerLabel,
+                statusLabel,
+                settingsLabel,
                 playerCountBox,
-                gameLevelBox,
-                statusLabel
+                gameLevelBox
         );
     }
 
@@ -94,16 +104,17 @@ public class LobbyUI implements INodeRefreshableOnUpdateUI {
             return;
         }
 
-        if (game.getCurrentGamePhaseType().equals(GamePhaseType.ASSEMBLE)){
-            Platform.runLater(() -> {
-                ClientManager.getInstance().updateScene(AssembleUI.getInstance());
-            });
+        if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
+            Platform.runLater(() -> ClientManager.getInstance().updateScene(AssembleUI.getInstance()));
             return;
         }
 
         boolean canChangeSettings = update.isGameLeader();
 
         Platform.runLater(() -> {
+            statusLabel.setText("Pilots in lobby: " +
+                    game.getPlayers().size());
+
             // Aggiorna i valori delle comboBox
             playerCountBox.setDisable(false);
             gameLevelBox.setDisable(false);

@@ -10,6 +10,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Pos;
 
@@ -27,15 +28,21 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
 
     public JoinGameUI(String username) {
         Label uuidLabel = new Label("Enter game UUID:");
+        uuidLabel.getStyleClass().add("label");
+
         gameUUIDField = new TextField();
         gameUUIDField.setPromptText("Game UUID");
+        gameUUIDField.getStyleClass().add("text-field");
         gameUUIDField.textProperty().addListener((obs, oldText, newText) -> {
             refreshColorsAvailability(getAvailableColors());
         });
 
         Label activeGamesLabel = new Label("Active Games:");
+        activeGamesLabel.getStyleClass().add("label");
+
         activeGamesList = new ListView<>(FXCollections.observableArrayList(MenuState.getActiveGamesUUID()));
         activeGamesList.setMaxHeight(150);
+        activeGamesList.getStyleClass().add("list-view");
         activeGamesList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 gameUUIDField.setText(newVal);
@@ -43,6 +50,8 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
         });
 
         Label colorLabel = new Label("Choose your color:");
+        colorLabel.getStyleClass().add("label");
+
         HBox colorSelectionBox = new HBox(10);
         colorSelectionBox.setAlignment(Pos.CENTER);
         // create colors list
@@ -51,6 +60,7 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
             ToggleButton toggleButton = new ToggleButton(displayName);
             toggleButton.setToggleGroup(colorToggleGroup);
             toggleButton.setUserData(color);
+            toggleButton.getStyleClass().add("toggle-button");
             colorSelectionBox.getChildren().add(toggleButton);
         }
         // select first color as default
@@ -61,12 +71,15 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
         Button joinGameButton = createJoinGameButton(username);
 
         Button backButton = new Button("Back");
+        backButton.getStyleClass().add("button");
         backButton.setOnAction(event -> {
             ClientManager.getInstance().updateScene(ClientManager.getInstance().getGameLayout());
         });
 
         layout = new VBox(15);
         layout.setAlignment(Pos.CENTER);
+        layout.getStyleClass().add("root");
+        VBox.setVgrow(layout, Priority.ALWAYS);
         layout.getChildren().addAll(
                 uuidLabel, gameUUIDField,
                 activeGamesLabel, activeGamesList,
@@ -82,6 +95,7 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
 
     private Button createJoinGameButton(String username) {
         Button joinGameButton = new Button("Join Game");
+        joinGameButton.getStyleClass().add("button");
         joinGameButton.setOnAction(e -> {
             String uuid = gameUUIDField.getText().trim();
             if (!uuid.isEmpty()) {
@@ -89,7 +103,7 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
 
                 clientManager.simulateCommand("join", uuid, username,
                         "--color", colorToggleGroup.getSelectedToggle().getUserData().toString());
-                clientManager.updateScene(new LobbyUI(clientManager.getUsername()));
+                clientManager.updateScene(new LobbyUI());
 
             } else {
                 AlertUtils.showWarning("Empty UUID", "Please enter a valid game UUID.");

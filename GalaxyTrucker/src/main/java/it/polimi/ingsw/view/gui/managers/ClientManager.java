@@ -1,26 +1,35 @@
 package it.polimi.ingsw.view.gui.managers;
 
 import it.polimi.ingsw.controller.states.CommonState;
+import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
-import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.View;
-import it.polimi.ingsw.view.gui.UIs.*;
+import it.polimi.ingsw.view.gui.UIs.INodeRefreshableOnUpdateUI;
+import it.polimi.ingsw.view.gui.UIs.JoinGameUI;
+import it.polimi.ingsw.view.gui.UIs.LobbyUI;
+import it.polimi.ingsw.view.gui.UIs.LoginUI;
+import it.polimi.ingsw.view.gui.style.CSS;
 import it.polimi.ingsw.view.gui.utils.AlertUtils;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
@@ -42,6 +51,8 @@ public class ClientManager {
     private VBox gameLayout;
 
     private Consumer<ClientUpdate> refreshOnUpdate = null;
+
+    private static final String SPACE_THEME_CSS = CSS.CLIENTMANAGER_STYLESHEET;
 
 
     public static ClientManager getInstance() {
@@ -67,6 +78,8 @@ public class ClientManager {
     }
 
     public void updateScene(Node layout) {
+        String cssAsDataURI = "data:text/css;base64," + Base64.getEncoder().encodeToString(SPACE_THEME_CSS.getBytes(StandardCharsets.UTF_8));
+        ((Parent) layout).getStylesheets().add(cssAsDataURI);
         sceneUpdater.accept(layout);
     }
 
@@ -191,45 +204,55 @@ public class ClientManager {
      * @param username the username of the current client
      */
     private void createOrJoinGame(String username) {
+        Label headerLabel = new Label("GALAXY TRUCKER");
+        headerLabel.getStyleClass().add("header-label");
+
         // ---- create ----
         ComboBox<MainCabinTile.Color> colorBox = new ComboBox<>(
                 FXCollections.observableArrayList(MainCabinTile.Color.values()));
-        colorBox.setPromptText("Color on Create");
+        colorBox.setPromptText("Ship Color");
         colorBox.setValue(MainCabinTile.Color.BLUE);
+        colorBox.getStyleClass().add("combo-box");
 
-        Button createGameButton = new Button("Create Game");
+        Button createGameButton = new Button("Establish New Convoy");
         createGameButton.setOnAction(_ -> handleCreateGame(username, colorBox.getValue()));
+        createGameButton.getStyleClass().add("button");
         HBox createControls = new HBox(10, colorBox, createGameButton);
         createControls.setAlignment(Pos.CENTER);
 
         // ---- join ----
-        Button joinButton = new Button("Join Game");
+        Button joinButton = new Button("Join Existing Convoy");
         joinButton.setOnAction(_ -> handleJoinGame(username));
+        joinButton.getStyleClass().add("button");
 
         // ---- resume ----
         javafx.scene.control.TextField uuidField = new javafx.scene.control.TextField();
-        uuidField.setPromptText("Enter Game UUID");
+        uuidField.setPromptText("Enter Convoy UUID");
+        uuidField.getStyleClass().add("text-field");
 
-        Button resumeButton = new Button("Resume Game");
+        Button resumeButton = new Button("Resume Mission");
         resumeButton.setOnAction(_ -> {
             String uuidText = uuidField.getText();
             try {
                 UUID gameId = UUID.fromString(uuidText);
                 handleResumeGame(gameId);
             } catch (IllegalArgumentException e) {
-                AlertUtils.showError("Invalid UUID", "Please enter a valid UUID.");
+                AlertUtils.showError("Invalid UUID", "Please enter a valid Convoy UUID.");
             }
         });
+        resumeButton.getStyleClass().add("button");
 
         HBox resumeControls = new HBox(10, uuidField, resumeButton);
         resumeControls.setAlignment(Pos.CENTER);
 
         // ---- layout ----
-        gameLayout = new VBox(15, createControls, joinButton, resumeControls);
+        gameLayout = new VBox(20, headerLabel, createControls, joinButton, resumeControls);
         gameLayout.setAlignment(Pos.CENTER);
+        gameLayout.getStyleClass().add("root");
+        VBox.setVgrow(gameLayout, Priority.ALWAYS); // <--- AGGIUNGI QUESTA LINEA
 
         updateScene(gameLayout);
-        primaryStage.setTitle("Join or Create Game");
+        primaryStage.setTitle("Galaxy Trucker - Mission Control");
         primaryStage.setOnCloseRequest(event -> {
             showLauncherCallback.run();
             primaryStage.setTitle("Join or Create Game");
@@ -254,7 +277,7 @@ public class ClientManager {
      */
     public void handleCreateGame(String username, MainCabinTile.Color color) {
         simulateCommand("create", username, "--color", color.toString());
-        updateScene(new LobbyUI(username));
+        updateScene(new LobbyUI());
     }
 
     /**
