@@ -5,6 +5,7 @@ import it.polimi.ingsw.network.rmi.RmiClient;
 import it.polimi.ingsw.network.socket.SocketClient;
 import it.polimi.ingsw.controller.states.State;
 import it.polimi.ingsw.util.Default;
+import it.polimi.ingsw.util.Logger;
 import it.polimi.ingsw.view.View;
 import it.polimi.ingsw.view.cli.CLIView;
 import it.polimi.ingsw.view.gui.GUIView;
@@ -142,12 +143,11 @@ public class GameClient implements IClient {
 			);
 			start(gameClient);  // running body
 		} catch (java.net.ConnectException | java.rmi.ConnectException e) {
-			System.err.println(e.getMessage() + "\n - The server is not available");
-		} catch (Exception e) {
+			Logger.warn(e.getMessage() + "\n - The server is not available");
+		} catch (IOException | NotBoundException e) {
 			e.printStackTrace();
 		}
-
-		System.err.println("Client instance is closed. Please restart and connect to a running server instance.");
+		Logger.error("Client instance is closed. Please restart and connect to a running server instance.");
 	}
 
 	/**
