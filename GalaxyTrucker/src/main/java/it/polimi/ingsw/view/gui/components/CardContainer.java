@@ -38,7 +38,7 @@ public class CardContainer extends StackPane {
         imageView.setFitHeight(FIXED_HEIGHT - PADDING);
 
         endTurnButton = new Button("End Turn");
-        endTurnButton.setOnAction(e -> Platform.runLater(() -> {
+        endTurnButton.setOnMouseClicked(e -> Platform.runLater(() -> {
             ClientManager.getInstance().simulateCommand("endTurn");
         }));
 

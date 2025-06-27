@@ -53,8 +53,9 @@ public class PIRContainer extends StackPane {
     }
 
     public void handleActivateTilePir() {
-        content.getChildren().add(getLabel("Activate Tiles!"));
         content.getChildren().clear();
+        content.getChildren().add(getLabel("Activate Tiles!"));
+
         PIRActivateTiles castedPir = (PIRActivateTiles) pir;
 
         //highlight the possible choices to be activated
@@ -62,22 +63,23 @@ public class PIRContainer extends StackPane {
         shipGrid.setActiveCells(castedPir.getHighlightMask(), false, false);
         addCloseButton(false);
 
-        Button butt = new Button("Confirm Activation");
-        butt.setOnMouseClicked(e -> {
-            Platform.runLater(() -> {
-                if(!shipGrid.getCellsToActivate().isEmpty()){
-                    ClientManager.getInstance().simulateCommand("activate", formatCoordinates(shipGrid.getCellsToActivate()));
-                    shipGrid.getCellsToActivate().clear();
-                    AdventureUI.getInstance().getCardPane().getChildren().remove(butt);
-                }
+        if(!pir.getHighlightMask().isEmpty()){
+            Button butt = new Button("Confirm Activation");
+            butt.setOnMouseClicked(e -> {
+                Platform.runLater(() -> {
+                    if(!shipGrid.getCellsToActivate().isEmpty()){
+                        ClientManager.getInstance().simulateCommand("activate", formatCoordinates(shipGrid.getCellsToActivate()));
+                        shipGrid.getCellsToActivate().clear();
+                        AdventureUI.getInstance().getCardPane().getChildren().remove(butt);
+                    }
+                });
             });
-        });
-        AdventureUI.getInstance().getCardPane().getChildren().add(butt);
-
-
+            AdventureUI.getInstance().getCardPane().getChildren().add(butt);
+        }
     }
 
     public void handleAddCargoPir() {
+
         content.getChildren().add(getLabel("HANDLEADDCARGO"));
         PIRAddLoadables castedPir = (PIRAddLoadables) pir;
         ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
@@ -88,8 +90,10 @@ public class PIRContainer extends StackPane {
     }
 
     public void handleRemoveCargoPir() {
-        content.getChildren().add(getLabel("HANDLEREMOVECARGO"));
         content.getChildren().clear();
+
+        content.getChildren().add(getLabel("HANDLEREMOVECARGO"));
+
         PIRRemoveLoadables castedPir = (PIRRemoveLoadables) pir;
 
         ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
@@ -156,10 +160,9 @@ public class PIRContainer extends StackPane {
                 Platform.runLater(() -> {
                     ClientManager.getInstance().simulateCommand("endTurn");
                 });
+                AdventureUI.getInstance().getShipGrid().update();
             }
             AdventureUI.getInstance().hidePirContainer();
-            AdventureUI.getInstance().getShipGrid().update();
-
         });
         content.getChildren().add(close);
     }
