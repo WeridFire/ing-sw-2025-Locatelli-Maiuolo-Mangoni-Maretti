@@ -231,22 +231,23 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
             updateCard();
             shipGrid.update();
             // Gestisci il PIR
-            lastPIR = PIRState.getActivePIR();
-            dropManuallyHandledPIRs(lastPIR);
-            if (lastPIR != null) {
-                try {
-                    System.out.println("Setting pir to " + lastPIR.getPIRType());
-                    if (!handleTaggedPIR(lastPIR)) {
-                        pirContainer.setPir(lastPIR);
-                        if (!root.getChildren().contains(pirContainer)) {
-                            showPirContainer();
+            PIR newPir = PIRState.getActivePIR();
+            dropManuallyHandledPIRs(newPir);
+            if (newPir != null) {
+                if (lastPIR == null || !lastPIR.getId().equals(newPir.getId())) {
+                    lastPIR = newPir;
+                    try {
+                        System.out.println("Setting pir to " + lastPIR.getPIRType());
+                        if (!handleTaggedPIR(lastPIR)) {
+                            pirContainer.setPir(lastPIR);
+                            if (!root.getChildren().contains(pirContainer)) {
+                                showPirContainer();
+                            }
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-            }else{
-                hidePirContainer();
             }
         });
     }
