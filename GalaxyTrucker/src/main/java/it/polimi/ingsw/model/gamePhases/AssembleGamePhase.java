@@ -84,7 +84,15 @@ public class AssembleGamePhase extends PlayableGamePhase {
         while (howManyTimerRotationsLeft > 1) {
             GameServer.getInstance().broadcastUpdate(GamesHandler.getInstance().getGame(gameId));
             setTimerRunning(true);
-            Thread.sleep(timerMilliseconds);  // Wait for a full hourglass time
+
+            synchronized (timerLock) {
+                timerLock.wait(timerMilliseconds);  // Wait for a full hourglass time
+            }
+            if (howManyTimerRotationsLeft <= 0) {
+                // end playLoop because all players finished assemble during the hourglass time
+                return;
+            }
+
             setTimerRunning(false);
 
             // wait for a player to restart the timer

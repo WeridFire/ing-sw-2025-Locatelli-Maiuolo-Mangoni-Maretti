@@ -287,6 +287,18 @@ public class PIRUtils {
 		private void manageIntegrityProblem(IntegrityProblem integrityProblem) {
 			boolean revalidateStructure;
 
+			// 0. if no more humans: end here the flight and the problem
+			if (integrityProblem.isNoMoreHumansProblem()) {
+				PIRDelay pirInfo = new PIRDelay(player, Default.PIR_SHORT_SECONDS,
+						"Your ship has no more humans." +
+								" You need to end your flight...", null);
+				integritySequence.addPlayerInputRequest(pirInfo);
+				pirHandler.setAndRunTurn(pirInfo, false);
+				interruptProblem();
+				player.requestEndFlight();
+				return;
+			}
+
 			// 1. notify about problems
 			PIRDelay pirInfo = new PIRDelay(player, Default.PIR_SHORT_SECONDS,
 					"Unfortunately, your Ship has some integrity problems...", null);
@@ -318,15 +330,19 @@ public class PIRUtils {
 			}
 		}
 
+		private void interruptProblem() {
+			if (integritySequence != null) {
+				// destroy atomic sequence to continue with other PIRs for this player
+				pirHandler.destroyAtomicSequence(integritySequence);
+				integritySequence = null;
+				notifyEndOfIntegrityProblem();
+			}
+		}
+
 		@Override
 		public void update(IntegrityProblem integrityProblem) {
 			if (!integrityProblem.isProblem()) {
-				if (integritySequence != null) {
-					// destroy atomic sequence to continue with other PIRs for this player
-					pirHandler.destroyAtomicSequence(integritySequence);
-					integritySequence = null;
-					notifyEndOfIntegrityProblem();
-				}
+				interruptProblem();
 				return;
 			}
 

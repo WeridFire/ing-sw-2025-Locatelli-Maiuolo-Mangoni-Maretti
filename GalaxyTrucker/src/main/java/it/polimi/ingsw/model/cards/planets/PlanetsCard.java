@@ -48,7 +48,7 @@ public class PlanetsCard extends Card {
 	/**
 	 * Controls the addLoadable interaction with the player.
 	 * */
-	public void addLoadablesInteraction(Player p, PIRHandler pirHandler) throws InterruptedException {
+	public void addLoadablesInteraction(Player p, PIRHandler pirHandler) {
 		Planet planet = getPlanetByPlayer(p);
 		if(planet == null){
 			return;
@@ -91,6 +91,7 @@ public class PlanetsCard extends Card {
 	 */
 	@Override
 	public void playEffect(GameData game) throws InterruptedException {
+		// prepare planets
 		for (Player p : game.getPlayersInFlight()){
 			List<Planet> availablePlanets = Arrays.stream(planets)
 					.filter(planet -> planet.getCurrentPlayer() == null).toList();
@@ -114,33 +115,24 @@ public class PlanetsCard extends Card {
 			}
 		}
 
-
+		// send input request to players
 		game.getPIRHandler().broadcastPIR(
-				game
-						.getPlayersInFlight()
-						.stream()
-						.filter(p -> getPlanetByPlayer(p) != null)
-						.toList(),
+				game.getPlayers(p -> getPlanetByPlayer(p) != null),
 				(player, pirHandler) -> {
-                    try {
-                        addLoadablesInteraction(player, pirHandler);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
+					addLoadablesInteraction(player, pirHandler);
+					for(Player p : game.getPlayersInFlight().reversed()){
+						Planet landedPlanet = Arrays.stream(planets)
+								.filter(pl -> Objects.equals(pl.getCurrentPlayer(), p))
+								.findFirst()
+								.orElse(null);
+						if(landedPlanet != null){
+							landedPlanet.leavePlanet();
+							game.movePlayerBackward(p, lostDays);
+						}
+					}
                 }
 		);
 
-		for(Player p : game.getPlayersInFlight().reversed()){
-			Planet landedPlanet = Arrays.stream(planets)
-					.filter(pl -> Objects.equals(pl.getCurrentPlayer(), p))
-					.findFirst()
-					.orElse(null);
-
-			if(landedPlanet != null){
-				landedPlanet.leavePlanet();
-				game.movePlayerBackward(p, lostDays);
-			}
-		}
 	}
 
 	/**

@@ -40,17 +40,17 @@ public class WarPunishmentProjectile implements WarPunishment {
                             proj.getCLIRepresentation(p.getShipBoard()
                             ));
                     pirHandler.setAndRunTurn(pirDelay);
+                    boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, gameData);
+                    if(!defended) {
+                        try {
+                            player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
+                        } catch (NoTileFoundException | OutOfBuildingAreaException e) {
+                            throw new RuntimeException(e);  // should never happen -> runtime exception
+                        }
+                    }
                 });
             }catch (InterruptedException e){
                 e.printStackTrace();
-            }
-            boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, gameData);
-            if(!defended) {
-                try {
-                    player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
-                } catch (NoTileFoundException | OutOfBuildingAreaException e) {
-                    throw new RuntimeException(e);  // should never happen -> runtime exception
-                }
             }
         }
     }
