@@ -59,12 +59,16 @@ public class PIRAddLoadables extends PIR {
 	}
 
 	public Map<Coordinates, ContainerTile> getContainerTiles() {
-		return currentPlayer.getShipBoard()
-				.getVisitorCalculateCargoInfo()
-				.getInfoAllContainers()
-				.getLocationsWithAllowedContent(
-						new HashSet<>(getFloatingLoadables())
-				);
+		Set<LoadableType> uniqueLoadables = new HashSet<>(getFloatingLoadables());
+		Map<Coordinates, ContainerTile> result = new HashMap<>();
+		uniqueLoadables.forEach(lt -> {
+			result.putAll(currentPlayer.getShipBoard()
+					.getVisitorCalculateCargoInfo()
+					.getInfoAllContainers()
+					.getLocationsWithAllowedContent(Set.of(lt)));
+			;
+		});
+		return result;
 	}
 
 	@Override
