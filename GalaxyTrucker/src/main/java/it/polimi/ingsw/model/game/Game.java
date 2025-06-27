@@ -386,7 +386,7 @@ public class Game {
         }
     }
 
-    private void initGame(){
+    public void initGame(){
         //After the lobby phase has ended, we initialize the game.
 
         List<TileSkeleton> t = TilesFactory.createPileTiles();
@@ -406,10 +406,6 @@ public class Game {
             shipBoard.attachIntegrityListener(new PIRUtils.ShipIntegrityListener(player, this));
             player.setShipBoard(shipBoard);
         }
-    }
-
-    public void testInitGame() {
-        initGame();
     }
 
     /**

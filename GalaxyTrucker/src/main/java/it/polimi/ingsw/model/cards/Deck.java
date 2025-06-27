@@ -161,6 +161,12 @@ public class Deck implements Serializable {
         while (deck.getFirst().getLevel() != gameLevel) {
             deck.add(deck.removeFirst());  // set as last card
         }
+
+        Card firstCard = deck.stream().filter(c -> c.getTitle().equals("PLANETS")).findAny().orElse(null);
+        if(firstCard != null){
+            deck.remove(firstCard);
+            deck.addFirst(firstCard);
+        }
         // this loop will end thanks to the constructor, which gives the correct number of cards
     }
 

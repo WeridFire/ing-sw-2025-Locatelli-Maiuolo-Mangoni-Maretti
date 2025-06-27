@@ -148,7 +148,7 @@ class GameDataTest {
             return gameId;
         }
 
-        g.testInitGame();
+        g.initGame();
         gameData.setCurrentGamePhase(new AssembleGamePhase(gameId, gameData));
 
         if(step == 0){
