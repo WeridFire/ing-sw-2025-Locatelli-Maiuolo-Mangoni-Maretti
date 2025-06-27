@@ -4,7 +4,9 @@ import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.controller.states.PIRState;
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.model.playerInput.PIRType;
 import it.polimi.ingsw.model.playerInput.PIRs.PIR;
+import it.polimi.ingsw.model.shipboard.integrity.IntegrityProblem;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.components.*;
 import javafx.application.Platform;
@@ -184,6 +186,39 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     }
 
     /**
+     * Handles cleanup of any previously handled PIR.
+     * <p>
+     * This prevents the same PIR from being re-processed or conflicting with new updates.
+     *
+     * @param lastPIR the most recently received PIR to inspect. can be null.
+     */
+    private void dropManuallyHandledPIRs(PIR lastPIR) {
+        if (lastPIR == null
+                || !lastPIR.containsTag(IntegrityProblem.TAG)
+                || (lastPIR.getPIRType() != PIRType.CHOICE)) {
+            shipGrid.dropIntegrityProblemChoice();
+        }
+    }
+
+    /**
+     * @return {@code true} if the pir has already been handled with this function thanks to its tags,
+     * {@code false} otherwise (it needs propagation to pirContainer)
+     */
+    private boolean handleTaggedPIR(PIR pir) {
+        if (pir.containsTag(IntegrityProblem.TAG)) {
+            // validate multiple choice
+            if (pir.getPIRType() != PIRType.CHOICE) {
+                return false;  // unexpected mix of tag and type
+            }
+            // handle integrity problem
+            shipGrid.handleIntegrityProblemChoice();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Refreshes the UI components based on a new client update from the server.
      * This method is called whenever the game state changes. It updates the adventure card
      * and shows or hides the PIR container as needed.
@@ -196,14 +231,18 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
             updateCard();
             shipGrid.update();
             // Gestisci il PIR
-            if (PIRState.getActivePIR() != null) {
-                if (lastPIR == null || !lastPIR.getId().equals(PIRState.getActivePIR().getId())) {
-                    lastPIR = PIRState.getActivePIR();
+            PIR newPir = PIRState.getActivePIR();
+            dropManuallyHandledPIRs(newPir);
+            if (newPir != null) {
+                if (lastPIR == null || !lastPIR.getId().equals(newPir.getId())) {
+                    lastPIR = newPir;
                     try {
                         System.out.println("Setting pir to " + lastPIR.getPIRType());
-                        pirContainer.setPir(lastPIR);
-                        if (!root.getChildren().contains(pirContainer)) {
-                            showPirContainer();
+                        if (!handleTaggedPIR(lastPIR)) {
+                            pirContainer.setPir(lastPIR);
+                            if (!root.getChildren().contains(pirContainer)) {
+                                showPirContainer();
+                            }
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

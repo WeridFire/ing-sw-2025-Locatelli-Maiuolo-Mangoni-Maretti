@@ -30,8 +30,8 @@ public class Default {
     public static final int HOURGLASS_SECONDS = 10;  // TODO: reset HOURGLASS_SECONDS = 90. This is for debug purposes
 
     // NON-FINAL: "settings" to change during game (used mainly for tests)
-    public static int PIR_SECONDS = 60;
-    public static int PIR_SHORT_SECONDS = 6;
+    public static int PIR_SECONDS = 10;
+    public static int PIR_SHORT_SECONDS = 1;
 
     public static String STARTING_CARD = "PLANETS";
 

@@ -23,6 +23,8 @@ import java.util.*;
  * </p>
  */
 public class IntegrityProblem {
+    public static final String TAG = "IntegrityProblem";
+
     /** Clusters of tiles that must be completely removed. */
     private final Set<TileCluster> clustersToRemove;
 

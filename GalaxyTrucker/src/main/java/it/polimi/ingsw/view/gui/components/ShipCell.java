@@ -38,7 +38,9 @@ public class ShipCell extends DropSlot {
     private final boolean isOnBoard;
     private boolean occupied;
     private boolean hasNeighbor;
+
     private boolean isHighlighted = false;
+    private final List<Rectangle> highlights = new ArrayList<>();
 
     private boolean isActiveForAdventureDrop = false;
     private boolean isActiveForAdventureRemove = false;
@@ -137,13 +139,18 @@ public class ShipCell extends DropSlot {
      */
     public void setHighlight(String color) {
         if (color != null && !color.isBlank()) {
+            System.out.println("color: <<" + color + ">>");
             Rectangle highlightOverlay = new Rectangle(ShipGrid.CELL_SIZE, ShipGrid.CELL_SIZE, Color.web(color));
             highlightOverlay.setMouseTransparent(true); // Ignora i click
+            highlights.add(highlightOverlay);
             this.getChildren().add(highlightOverlay); // Aggiungi in cima alla lista
             this.isHighlighted = true;
             System.out.println("Highlighted cell");
         } else {
             this.isHighlighted = false;
+            this.setOnMouseClicked(null);
+            highlights.forEach(h -> this.getChildren().remove(h));
+            highlights.clear();
             setStyle(DEFAULT_CELL_STYLE);
         }
     }
