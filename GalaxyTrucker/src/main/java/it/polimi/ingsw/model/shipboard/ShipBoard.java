@@ -39,6 +39,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 
 	private boolean endedAssembly;
 	private boolean filled;
+	private boolean endedFlight;
 
 	private final List<IShipIntegrityListener> integrityListeners;
 	private Integer countExposedConnectors;
@@ -57,6 +58,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		emptyRepresentation = BoardCoordinates.getCLIRepresentation(level);
 		endedAssembly = false;
 		filled = false;
+		endedFlight = false;
 		integrityListeners = new ArrayList<>();
 		countExposedConnectors = null;
 	}
@@ -116,7 +118,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	}
 
 	/**
-	 * Validates the current structure of the ship.
+	 * Validates the current structure of the ship, if it's still flying.
 	 * <p>
 	 * This method recomputes all cargo, powers, shielded sides, and structural integrity
 	 * by resetting and reapplying visitors to each tile.
@@ -125,6 +127,7 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 	 * Typically called after initialization or after structural modifications such as removing tiles.
 	 */
 	public void validateStructure() {
+		if (endedFlight) return;
 		countExposedConnectors = null;
 		resetVisitors();
 		notifyIntegrityListeners(visitorCheckIntegrity.getProblem(!filled));
@@ -365,6 +368,14 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 		}
 		endedAssembly = true;
 		validateStructure();
+	}
+
+
+	/**
+	 * Notify the shipboard that the flight ended (no more interaction accepted)
+	 */
+	public void endFlight() {
+		endedFlight = true;
 	}
 
 	/**

@@ -112,7 +112,6 @@ public class ClientUpdate implements Serializable {
 		return availableGames;
 	}
 
-
 	/**
 	 * Serializes the object instance into an UTF-8 encoded string.
 	 * @return
@@ -124,6 +123,13 @@ public class ClientUpdate implements Serializable {
 			out.writeObject(this);
 			out.flush();
 			return bos.toByteArray();
+		}catch (ConcurrentModificationException e) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+            return serialize();
 		}catch(IOException e){
 			e.printStackTrace();
 		}

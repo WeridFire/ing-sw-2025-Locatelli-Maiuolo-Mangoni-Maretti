@@ -585,6 +585,7 @@ public class Player implements Serializable {
                         ? "save way " + saveFromEndFlight + " has not been satisfied"
                         : "save way was not provided"
                 ));
+        shipBoard.endFlight();
         endedFlight = true;
         requestedEndFlight = false;
         saveFromEndFlight = null;

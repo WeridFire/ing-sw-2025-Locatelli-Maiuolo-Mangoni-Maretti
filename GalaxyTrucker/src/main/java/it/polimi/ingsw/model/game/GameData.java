@@ -96,7 +96,7 @@ public class GameData implements Serializable {
     /**
      * Used for synchronization of moving players
      */
-    private final transient Object movementLock = new Object();
+    private transient Object movementLock = new Object();
 
     private int requiredPlayers;
 
@@ -337,9 +337,9 @@ public class GameData implements Serializable {
      * @param forward      true if moving forward, false if moving backward
      */
     private void movePlayer(Player playerToMove, int steps, boolean forward) {
+        if (movementLock == null) movementLock = new Object();
 
         synchronized (movementLock) {
-
             Set<Integer> occupiedPositions = new HashSet<>();
             List<Player> currentOrder = getPlayersInFlight();
             for (Player player : currentOrder) {

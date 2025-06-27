@@ -29,6 +29,9 @@ public class IntegrityProblem {
     /** Clusters of tiles where exactly one needs to be kept. */
     private final Set<TileCluster> clustersToKeep;
 
+    /** Info about absence of humans on board, iff problem to continue */
+    private final boolean noMoreHumans;
+
     /*
      * POSSIBLE CASES:
      * - If clustersToKeep.isEmpty():
@@ -43,18 +46,6 @@ public class IntegrityProblem {
      *       all the tiles in the intersection will be kept.
      */
 
-    /**
-     * Constructs an integrity problem with the given tile clusters to remove and to keep.
-     *
-     * @param clustersToRemove a list of tile clusters that must be removed
-     * @param clustersToKeep a list of tile clusters where exactly one needs to be kept
-     */
-    public IntegrityProblem(Set<TileCluster> clustersToRemove, Set<TileCluster> clustersToKeep) {
-        this.clustersToRemove = clustersToRemove;
-        this.clustersToKeep = clustersToKeep;
-    }
-
-
     public IntegrityProblem(List<TileCluster> clusters,
                             Set<TileSkeleton> intrinsicallyWrongTiles,
                             List<Pair<TileSkeleton>> illegallyWeldedTiles,
@@ -62,6 +53,13 @@ public class IntegrityProblem {
 
         this.clustersToRemove = new HashSet<>();
         this.clustersToKeep = new HashSet<>();
+
+        if (tilesWithHumans.isEmpty()) {
+            noMoreHumans = true;
+            return;
+        } else {
+            noMoreHumans = false;
+        }
 
         // add intrinsically wrong tiles as 1-tile clusters to remove
         for (TileSkeleton intrinsicallyWrongTile : intrinsicallyWrongTiles) {
@@ -152,6 +150,14 @@ public class IntegrityProblem {
      */
     public boolean isProblem() {
         return !clustersToRemove.isEmpty() || (clustersToKeep.size() != 1);
+    }
+
+    /**
+     * @return {@code true} if this integrity problem is caused by having zero humans on board of the ship,
+     * regardless of ship structure; {@code false} otherwise (if at least one human is present).
+     */
+    public boolean isNoMoreHumansProblem() {
+        return noMoreHumans;
     }
 
     /**
