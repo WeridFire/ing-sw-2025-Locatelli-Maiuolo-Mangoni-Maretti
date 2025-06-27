@@ -1,11 +1,13 @@
 package it.polimi.ingsw.view.gui.components;
 
+import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.util.GameLevelStandards;
 import it.polimi.ingsw.util.Util;
+import it.polimi.ingsw.view.gui.UIs.AdventureUI;
 import it.polimi.ingsw.view.gui.UIs.AssembleUI;
 import it.polimi.ingsw.view.gui.helpers.Asset;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
@@ -116,7 +118,9 @@ public class BoardComponent extends VBox {
         if (LobbyState.getGameData().getCurrentGamePhaseType() == GamePhaseType.ASSEMBLE) {
             Button backButton = new Button("Back");
             backButton.setOnMouseClicked(e -> {
-                AssembleUI.getInstance().setAssembleLayout(AssembleUI.AssemblePane.PLAYER_BOARD);
+                if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
+                    AssembleUI.getInstance().setAssembleLayout(AssembleUI.AssemblePane.PLAYER_BOARD);
+                }
             });
             this.getChildren().addAll(boardDisplayPane, backButton);
         }else{

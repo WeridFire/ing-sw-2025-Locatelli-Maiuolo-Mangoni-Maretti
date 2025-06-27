@@ -102,22 +102,9 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     }
 
     public void setAssembleLayout(AssemblePane paneToShow){
-        System.out.println("Switching to: " + paneToShow);
-        System.out.println("MainGrid visible before: " + mainGrid.isVisible());
-        System.out.println("BoardComponent visible before: " + boardComponent.isVisible());
-
         mainGrid.setVisible(paneToShow == AssemblePane.PLAYER_BOARD);
         boardComponent.setVisible(paneToShow == AssemblePane.SHARED_BOARD);
 
-        System.out.println("MainGrid visible after: " + mainGrid.isVisible());
-        System.out.println("BoardComponent visible after: " + boardComponent.isVisible());
-
-        // Verifica anche i children del root
-        System.out.println("Root children count: " + root.getChildren().size());
-        for (int i = 0; i < root.getChildren().size(); i++) {
-            System.out.println("Child " + i + ": " + root.getChildren().get(i).getClass().getSimpleName() +
-                    " - Visible: " + root.getChildren().get(i).isVisible());
-        }
         //TODO: remove these 3 lines
         Button cheatButton = new Button("cheat");
         cheatButton.setOnMouseClicked(event -> handleCheatButton());

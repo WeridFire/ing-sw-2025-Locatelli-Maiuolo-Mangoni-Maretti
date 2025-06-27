@@ -27,12 +27,16 @@ public class WarPunishmentCrewDeath implements WarPunishment {
     }
 
     @Override
-    public void apply(Player player, GameData gameData) throws InterruptedException {
+    public void apply(Player player, GameData gameData) {
 
-        gameData.getPIRHandler().broadcastPIR(
-                List.of(player),
-                (p, pirHandler) -> runPir(p, pirHandler)
-        );
+        try {
+            gameData.getPIRHandler().broadcastPIR(
+                    List.of(player),
+                    (p, pirHandler) -> runPir(p, pirHandler)
+            );
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void runPir(Player player, PIRHandler pirHandler) {
