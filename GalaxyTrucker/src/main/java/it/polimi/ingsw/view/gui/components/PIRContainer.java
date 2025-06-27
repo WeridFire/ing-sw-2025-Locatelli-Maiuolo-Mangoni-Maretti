@@ -3,6 +3,7 @@ package it.polimi.ingsw.view.gui.components;
 import it.polimi.ingsw.model.playerInput.PIRType;
 import it.polimi.ingsw.model.playerInput.PIRs.*;
 import it.polimi.ingsw.model.shipboard.LoadableType;
+import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.gui.UIs.AdventureUI;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
@@ -143,7 +144,7 @@ public class PIRContainer extends StackPane {
     }
 
     private Label getLabel(String labelText) {
-        Label labelObj = new Label(labelText); // Using the parameter instead of the field
+        Label labelObj = new Label(ANSI.Helper.stripAnsi(labelText)); // Using the parameter instead of the field
         labelObj.setWrapText(true);
         labelObj.setStyle("-fx-font-weight: bold; -fx-text-fill: black;"); // Changed to black text
         labelObj.setViewOrder(-1);

@@ -70,17 +70,7 @@ public class MainApp extends Application {
      * Displays the initial launcher buttons.
      */
     private void showLauncherUI() {
-        Button startClientButton = new Button("Connect");
-        startClientButton.setOnAction(_ -> clientManager.showLoginUI());
-
-        // Use the scene updater to show the buttons
-        VBox launcherLayout = new VBox(15, startClientButton);
-        launcherLayout.setAlignment(Pos.CENTER);
-        updateSceneRoot(launcherLayout); // Update the root VBox content
-
-        // Reset title and close handler for the launcher view
-        primaryStage.setTitle("Game Launcher");
-        primaryStage.setOnCloseRequest(this::handleLauncherCloseRequest);
+       clientManager.showLoginUI();
     }
 
 
