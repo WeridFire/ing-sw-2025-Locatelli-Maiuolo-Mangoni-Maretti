@@ -7,6 +7,7 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.util.Logger;
 
 import java.io.*;
 import java.util.*;
@@ -114,22 +115,34 @@ public class ClientUpdate implements Serializable {
 
 
 	/**
-	 * Serializes the object instance into an UTF-8 encoded string.
-	 * @return
+	 * Serializes the object instance into a UTF-8 encoded byte array.
+	 * Retries up to 5 times with a 10ms delay on failure.
+	 *
+	 * @return byte array of serialized object or null if all attempts fail
 	 */
 	public byte[] serialize() {
-		try{
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			ObjectOutputStream out = new ObjectOutputStream(bos);
-			out.writeObject(this);
-			out.flush();
-			return bos.toByteArray();
-		}catch(IOException e){
-			e.printStackTrace();
+		for (int attempt = 1; attempt <= 5; attempt++) {
+			try {
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				ObjectOutputStream out = new ObjectOutputStream(bos);
+				out.writeObject(this);
+				out.flush();
+				return bos.toByteArray();
+			} catch (IOException e) {
+				Logger.error("Serialization attempt " + attempt + " failed. Retrying...");
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException ie) {
+					Thread.currentThread().interrupt(); // restore interrupt status
+					Logger.error("Thread interrupted during serialization retry delay.");
+					break;
+				}
+			}
 		}
+		Logger.error("All serialization attempts failed. Returning null.");
 		return null;
-
 	}
+
 
 	/**
 	 * Creates an instance based on a serialized string, encoded in UTF-8.
