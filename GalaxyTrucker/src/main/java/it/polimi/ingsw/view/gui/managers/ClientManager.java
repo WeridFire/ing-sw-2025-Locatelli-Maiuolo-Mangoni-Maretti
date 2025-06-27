@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.gui.managers;
 
 import it.polimi.ingsw.controller.states.CommonState;
+import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
@@ -78,8 +79,10 @@ public class ClientManager {
     }
 
     public void updateScene(Node layout) {
-        String cssAsDataURI = "data:text/css;base64," + Base64.getEncoder().encodeToString(SPACE_THEME_CSS.getBytes(StandardCharsets.UTF_8));
-        ((Parent) layout).getStylesheets().add(cssAsDataURI);
+        if (getLastUpdate() == null || (!CommonState.isCurrentPhase(GamePhaseType.ADVENTURE) && !CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE))){
+            String cssAsDataURI = "data:text/css;base64," + Base64.getEncoder().encodeToString(SPACE_THEME_CSS.getBytes(StandardCharsets.UTF_8));
+            ((Parent) layout).getStylesheets().add(cssAsDataURI);
+        }
         sceneUpdater.accept(layout);
     }
 
