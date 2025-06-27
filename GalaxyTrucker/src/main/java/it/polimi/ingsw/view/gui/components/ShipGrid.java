@@ -225,9 +225,6 @@ public class ShipGrid extends StackPane {
         for (int i = 0; i < reserveSlots.length; i++) {
             reserveSlots[i].setTile((i < reservedTiles.length) ? reservedTiles[i] : null);
         }
-
-        // decide cells clickAbility
-        decideCellsClickAbility();
     }
 
     private void decideCellsClickAbility() {
@@ -251,11 +248,6 @@ public class ShipGrid extends StackPane {
      *                               The highlight will be applied only if the color is not null or blank.
      */
     private void highlightCells(Set<Coordinates> coordinatesToHighlight, String color) {
-        // Clear all previous highlights from all cells
-        for (ShipCell cell : gridCells.values()) {
-            cell.setHighlight(null);
-        }
-
         // Check for corner cases: no coordinates to highlight or no valid color provided
         if (coordinatesToHighlight == null || coordinatesToHighlight.isEmpty() || color == null || color.isBlank()) {
             return;
@@ -291,6 +283,7 @@ public class ShipGrid extends StackPane {
             }
 
             highlightCells(coordinates, drop ? Default.ADD_CARGO_STRING_COLOR : Default.REMOVE_CARGO_STRING_COLOR);
+            decideCellsClickAbility();
         }
     }
 

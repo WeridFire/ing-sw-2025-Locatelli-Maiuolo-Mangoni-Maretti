@@ -4,6 +4,8 @@ import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.view.gui.helpers.Asset;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
 import it.polimi.ingsw.view.gui.helpers.Draggable;
+import it.polimi.ingsw.view.gui.managers.ClientManager;
+import javafx.application.Platform;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 
@@ -74,7 +76,12 @@ public class LoadableObject extends Draggable {
     @Override
     protected boolean canBeDragged() {
         if (parentCell != null) {
-            return parentCell.isActiveForAdventureRemove();
+            if (parentCell.isActiveForAdventureRemove()){
+                Platform.runLater(() -> {
+                    ClientManager.getInstance().simulateCommand("remove", parentCell.getLogicalRow(), parentCell.getLogicalColumn(), type.toString(), "1");
+                });
+                return false;
+            }
         }
         return true;
     }

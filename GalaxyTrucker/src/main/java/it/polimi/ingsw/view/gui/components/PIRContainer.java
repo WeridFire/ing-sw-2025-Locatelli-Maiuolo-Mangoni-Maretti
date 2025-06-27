@@ -54,17 +54,20 @@ public class PIRContainer extends StackPane {
 
     public void handleActivateTilePir() {
         content.getChildren().clear();
-        content.getChildren().add(getLabel("TODO"));
         PIRActivateTiles castedPir = (PIRActivateTiles) pir;
-        System.out.println(castedPir.getHighlightMask());
-        // TODO: implementa logica specifica activate row col
+        content.getChildren().add(getLabel("HANDLEACTIVATETILE"));
+
+        //highlight the possible choices to be activated
+        ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
+        shipGrid.setActiveCells(castedPir.getHighlightMask(), false, false);
+
         addCloseButton();
     }
 
     public void handleAddCargoPir() {
+        content.getChildren().add(getLabel("HANDLEADDCARGO"));
         PIRAddLoadables castedPir = (PIRAddLoadables) pir;
         ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
-        System.out.println(castedPir.getHighlightMask());
         shipGrid.setActiveCells(castedPir.getHighlightMask(), true, false);
         for (LoadableType loadable: castedPir.getFloatingLoadables()){
             AdventureUI.getInstance().getLoadableContainer().addLoadableObject(loadable);
@@ -72,11 +75,12 @@ public class PIRContainer extends StackPane {
     }
 
     public void handleRemoveCargoPir() {
+        content.getChildren().add(getLabel("HANDLEREMOVECARGO"));
         content.getChildren().clear();
-        content.getChildren().add(getLabel("TODO"));
         PIRRemoveLoadables castedPir = (PIRRemoveLoadables) pir;
-        System.out.println(castedPir.getHighlightMask());
-        // TODO: implementa logica specifica remove (x, y) <LoadableType> <amount>
+
+        ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
+        shipGrid.setActiveCells(castedPir.getHighlightMask(), false, true);
         addCloseButton();
     }
 

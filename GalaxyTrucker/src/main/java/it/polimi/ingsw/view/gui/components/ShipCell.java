@@ -221,6 +221,14 @@ public class ShipCell extends DropSlot {
         }
     }
 
+    public String getLogicalRow(){
+        return logicalRow;
+    }
+
+    public String getLogicalColumn(){
+        return logicalColumn;
+    }
+
     /**
      * Determines if the cell can accept a dragged item.
      * @param dragId The identifier of the dragged item.
