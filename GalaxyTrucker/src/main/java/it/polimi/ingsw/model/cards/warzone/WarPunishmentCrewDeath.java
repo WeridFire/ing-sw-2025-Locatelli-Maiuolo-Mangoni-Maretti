@@ -10,6 +10,7 @@ import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.cli.ANSI;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 public class WarPunishmentCrewDeath implements WarPunishment {
@@ -29,7 +30,7 @@ public class WarPunishmentCrewDeath implements WarPunishment {
     public void apply(Player player, GameData gameData) throws InterruptedException {
 
         gameData.getPIRHandler().broadcastPIR(
-                Collections.singletonList(player), // Solo questo giocatore
+                List.of(player),
                 (p, pirHandler) -> runPir(p, pirHandler)
         );
     }
