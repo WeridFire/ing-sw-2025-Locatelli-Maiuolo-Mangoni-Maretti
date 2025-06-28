@@ -13,6 +13,7 @@ import it.polimi.ingsw.view.gui.components.*;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -199,6 +200,15 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     public void hidePirContainer() {
         getRoot().getChildren().remove(overlayBackground);
         getRoot().getChildren().remove(pirContainer);
+    }
+
+    public void addIntegrityButton() {
+        Button integrityButton = new Button("Confirm Integrity Choice");
+        integrityButton.setOnMouseClicked(event -> {
+            getShipGrid().confirmIntegrityProblemChoice();
+            getCardPane().getChildren().remove(integrityButton);
+        });
+        getCardPane().getChildren().add(integrityButton);
     }
 
     /**

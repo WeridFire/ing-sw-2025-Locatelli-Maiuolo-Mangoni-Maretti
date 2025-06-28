@@ -1,6 +1,9 @@
 package it.polimi.ingsw.controller.states;
 
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.model.player.Player;
+
+import java.util.List;
 
 public class LobbyState extends CommonState {
 
@@ -18,6 +21,10 @@ public class LobbyState extends CommonState {
 
     public static int getRequiredPlayers() {
         return getGameData().getRequiredPlayers();
+    }
+
+    public static List<Player> getPlayers(){
+        return getGameData().getPlayers();
     }
 
 }
