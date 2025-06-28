@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.cards;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
@@ -26,7 +27,17 @@ public class StarDustCard extends Card{
 	 * Iterates each player (still flying) in reverse, counts how many connectors each one has, and moves accordingly.
 	 */
 	@Override
-	public void playEffect(GameData game) {
+	public void playEffect(GameData game) throws InterruptedException {
+		game.getPIRHandler().broadcastPIR(
+				game.getPlayersInFlight(),
+				(player, pirHandler) -> {
+					PIRDelay pirDelay = new PIRDelay(
+							player,
+							10,
+							"Some stardust got into some exposed components on your ship! You lose travel days to clean the mess up!",
+							null);
+					pirHandler.setAndRunTurn(pirDelay);
+				});
 		for(Player p : game.getPlayersInFlight().reversed()){
 			int exposedConnectors = countExposedConnectors(p);
 			game.movePlayerBackward(p, exposedConnectors);
