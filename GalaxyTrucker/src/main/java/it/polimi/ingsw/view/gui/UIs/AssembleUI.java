@@ -170,7 +170,9 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
 
         Button boardButton = getBoardButton();
 
-        decksAndTimerGrid.getChildren().addAll(timerComponent, flipButton, finishButton, boardButton);
+        SpectateVBox spectateVBox = new SpectateVBox();
+
+        decksAndTimerGrid.getChildren().addAll(timerComponent, flipButton, finishButton, boardButton, spectateVBox);
 
         if (LobbyState.getGameLevel() != GameLevel.TESTFLIGHT){
             DecksComponent decksComponent = new DecksComponent();
