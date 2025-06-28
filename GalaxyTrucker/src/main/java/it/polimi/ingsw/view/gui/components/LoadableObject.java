@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.gui.components;
 
 import it.polimi.ingsw.model.shipboard.LoadableType;
+import it.polimi.ingsw.view.gui.UIs.AdventureUI;
 import it.polimi.ingsw.view.gui.helpers.Asset;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
 import it.polimi.ingsw.view.gui.helpers.Draggable;
@@ -97,6 +98,7 @@ public class LoadableObject extends Draggable {
             if (parentCell.isActiveForAdventureRemove()){
                 Platform.runLater(() -> {
                     ClientManager.getInstance().simulateCommand("remove",  "("+parentCell.getLogicalRow()+","+parentCell.getLogicalColumn()+")", type.toString(), "1");
+                    AdventureUI.getInstance().getShipGrid().update();
                 });
             }
         }

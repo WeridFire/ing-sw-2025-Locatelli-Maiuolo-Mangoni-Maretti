@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.model.shipboard.SideType;
 import it.polimi.ingsw.model.shipboard.visitors.TileVisitor;
 import it.polimi.ingsw.view.cli.ANSI;
+import javafx.scene.paint.Paint;
 
 import java.util.Set;
 
@@ -30,6 +31,15 @@ public class MainCabinTile extends CabinTile {
                         ". Should be between 0 and " + (numOfColors - 1));
             }
             return Color.values()[playerIndex];
+        }
+
+        public static Paint toPaint(Color color) {
+            return switch (color) {
+                case BLUE -> Paint.valueOf("blue");
+                case RED -> Paint.valueOf("red");
+                case GREEN -> Paint.valueOf("green");
+                default -> Paint.valueOf("yellow");
+            };
         }
     }
 
