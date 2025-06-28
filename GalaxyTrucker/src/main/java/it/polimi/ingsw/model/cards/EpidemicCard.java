@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.cards;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.model.shipboard.ShipBoard;
 import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.model.shipboard.visitors.VisitorEpidemic;
@@ -30,9 +31,18 @@ public class EpidemicCard extends Card{
 	 * looking for adjacent tiles, to kill the passengers.
 	 */
 	@Override
-	public void playEffect(GameData game) {
+	public void playEffect(GameData game) throws InterruptedException {
 		VisitorEpidemic visitor = new VisitorEpidemic();
-
+		game.getPIRHandler().broadcastPIR(
+				game.getPlayersInFlight(),
+				(player, pirHandler) -> {
+					PIRDelay pirDelay = new PIRDelay(
+							player,
+							10,
+							"An epidemic has struck your ship! Some of your crew died",
+							null);
+					pirHandler.setAndRunTurn(pirDelay);
+				});
 		for (Player p : game.getPlayersInFlight()) {
 			ShipBoard shipBoard = p.getShipBoard();
 			Map<Coordinates, TileSkeleton> board = shipBoard.getTilesOnBoard();
