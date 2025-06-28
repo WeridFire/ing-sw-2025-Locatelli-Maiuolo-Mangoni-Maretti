@@ -30,7 +30,9 @@ public class StarDustCard extends Card{
 	public void playEffect(GameData game) {
 		for(Player p : game.getPlayersInFlight().reversed()){
 			int exposedConnectors = countExposedConnectors(p);
-			PIRUtils.runPlayerMovementBackward(p, exposedConnectors, game);
+			PIRUtils.runPlayerMovementBackward(p, exposedConnectors, game, movement ->
+					"Some stardust got into some exposed components on your ship! You lose "
+                    + movement + " travel days to clean the mess up!");
 		}
 	}
 
