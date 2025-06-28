@@ -6,12 +6,9 @@ import it.polimi.ingsw.controller.states.PIRState;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.model.playerInput.PIRType;
 import it.polimi.ingsw.model.playerInput.PIRs.PIR;
-import it.polimi.ingsw.model.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.model.shipboard.integrity.IntegrityProblem;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.components.*;
-import it.polimi.ingsw.view.gui.managers.ClientManager;
-import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -21,7 +18,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.util.Duration;
 
 
 /**
@@ -263,19 +259,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
                     lastPIR = newPir;
                     try {
                         System.out.println("Setting pir to " + lastPIR.getPIRType());
-                        if (newPir.getPIRType() == PIRType.DELAY) {
-                            PIRDelay pirDelay = (PIRDelay) newPir;
-                            if (pirDelay.getMessage() != null && pirDelay.getMessage().equals("GG to all, match is over. You will be sent to the menu in 10 seconds...")) {
-
-                                PauseTransition delay = new PauseTransition(Duration.seconds(10));
-                                delay.setOnFinished(event -> {
-                                    System.out.println("10-second delay finished. Returning to Login UI.");
-                                    ClientManager.getInstance().showLoginUI();
-                                });
-                                delay.play();
-                            }
-                        }
-                        else if (!handleTaggedPIR(lastPIR)) {
+                        if (!handleTaggedPIR(lastPIR)) {
                             pirContainer.setPir(lastPIR);
                             if (!root.getChildren().contains(pirContainer)
                                     && !newPir.getPIRType().equals(PIRType.DELAY)
@@ -291,4 +275,5 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
             }
         });
     }
+
 }
