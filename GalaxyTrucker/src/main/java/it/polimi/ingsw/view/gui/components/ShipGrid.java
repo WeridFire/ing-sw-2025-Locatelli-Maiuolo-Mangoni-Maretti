@@ -3,6 +3,7 @@ package it.polimi.ingsw.view.gui.components;
 import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.model.shipboard.ShipBoard;
 import it.polimi.ingsw.model.shipboard.TileCluster;
@@ -13,6 +14,7 @@ import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.gui.UIs.AdventureUI;
+import it.polimi.ingsw.view.gui.UIs.AssembleUI;
 import it.polimi.ingsw.view.gui.helpers.Asset;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
@@ -197,13 +199,26 @@ public class ShipGrid extends StackPane {
         }
 
         sipManager.start();
+
+        // highlight integrity problem (if present)
+        if (sipManager != null) {
+            //note highlihgtall actually triggers the highlight
+            if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE))
+                AssembleUI.getInstance().addIntegrityButton();
+            if(sipManager.highlightAll()){
+                AdventureUI.getInstance().addIntegrityButton();
+            }
+        }
     }
     public void confirmIntegrityProblemChoice() {
         int choice = sipManager.getChoice();
         dropIntegrityProblemChoice();
         Platform.runLater(() -> ClientManager.getInstance()
                 .simulateCommand("choose", String.valueOf(choice)));
-        AdventureUI.getInstance().removeIntegrityButton();
+        if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE))
+            AssembleUI.getInstance().hideIntegrityButton();
+        else
+            AdventureUI.getInstance().removeIntegrityButton();
     }
     public void dropIntegrityProblemChoice() {
         if (sipManager == null) return;
@@ -272,13 +287,6 @@ public class ShipGrid extends StackPane {
             reserveSlots[i].setTile((i < reservedTiles.length) ? reservedTiles[i] : null);
         }
 
-        // highlight integrity problem (if present)
-        if (sipManager != null) {
-            //note highlihgtall actually triggers the highlight
-            if(sipManager.highlightAll()){
-                AdventureUI.getInstance().addIntegrityButton();
-            }
-        }
     }
 
     private void decideCellsClickAbility() {

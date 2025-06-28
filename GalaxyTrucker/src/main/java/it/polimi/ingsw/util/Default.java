@@ -33,7 +33,7 @@ public class Default {
 
     // NON-FINAL: "settings" to change during game (used mainly for tests)
     public static int PIR_SECONDS = 60;
-    public static int PIR_SHORT_SECONDS = 6;
+    public static int PIR_SHORT_SECONDS = 10;
 
     public static String STARTING_CARD = "PLANETS";
 

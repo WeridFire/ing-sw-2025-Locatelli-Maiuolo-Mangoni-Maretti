@@ -4,6 +4,7 @@ import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.controller.states.PIRState;
 import it.polimi.ingsw.enums.GameLevel;
+import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.model.playerInput.PIRType;
 import it.polimi.ingsw.model.playerInput.PIRs.PIR;
 import it.polimi.ingsw.model.shipboard.integrity.IntegrityProblem;
@@ -188,7 +189,12 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     public void addIntegrityButton() {
         integrityButton = new Button("Confirm Integrity Choice");
         integrityButton.setOnMouseClicked(event -> {
-            getShipGrid().confirmIntegrityProblemChoice();
+            if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE))
+                AssembleUI.getInstance().getLeftGrid().confirmIntegrityProblemChoice();
+            else
+               getShipGrid().confirmIntegrityProblemChoice();
+
+            integrityButton.setVisible(false);
         });
         getCardPane().getChildren().add(integrityButton);
     }

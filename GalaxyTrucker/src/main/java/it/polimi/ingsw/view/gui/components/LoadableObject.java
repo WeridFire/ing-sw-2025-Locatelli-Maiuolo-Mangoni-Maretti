@@ -85,11 +85,9 @@ public class LoadableObject extends Draggable {
 
     @Override
     protected void onEndDrag(boolean dropAccepted) {
-        if (dropAccepted){
-            Pane parent = (Pane) this.getParent();
-            if (parent == null) return;
-            parent.getChildren().remove(this);
-        }
+        Pane parent = (Pane) this.getParent();
+        if (parent == null) return;
+        parent.getChildren().remove(this);
     }
 
     @Override
