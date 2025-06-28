@@ -38,7 +38,7 @@ public class CabinTile extends ContainerTile {
 
     @Override
     public String getName() {
-        return "Cabin " + (getCapacity() - getCapacityLeft()) + "/" + getCapacity();
+        return "Cabin [" + (getCapacity() - getCapacityLeft()) + " " + loadedCrew + "] / " + getCapacity();
     }
 
     @Override
