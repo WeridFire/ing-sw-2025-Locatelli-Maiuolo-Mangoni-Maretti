@@ -49,6 +49,11 @@ public class ANSI {
 		}
 	}
 
+	public static String sanitizeCLIText(String input) {
+		String out = ANSI.Helper.stripAnsi(input);
+		return out.replaceAll("[^a-zA-Z0-9 \\n]", "");
+	}
+
 	public static final String RESET = "\u001B[0m";
 
 	public static final String BLACK = "\u001B[30m";

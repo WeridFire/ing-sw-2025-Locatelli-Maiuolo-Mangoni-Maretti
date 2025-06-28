@@ -76,15 +76,10 @@ public class LoadableObject extends Draggable {
      */
     @Override
     protected boolean canBeDragged() {
-        if (parentCell != null) {
-            if (parentCell.isActiveForAdventureRemove()){
-                Platform.runLater(() -> {
-                    ClientManager.getInstance().simulateCommand("remove",  "("+parentCell.getLogicalRow()+","+parentCell.getLogicalColumn()+")", type.toString(), "1");
-                });
-                return false;
-            }
+        if (parentCell == null) {
+            return true;
         }
-        return true;
+        return parentCell.isActiveForAdventureRemove();
     }
 
     @Override
@@ -93,6 +88,17 @@ public class LoadableObject extends Draggable {
             Pane parent = (Pane) this.getParent();
             if (parent == null) return;
             parent.getChildren().remove(this);
+        }
+    }
+
+    @Override
+    protected void fallbackDropHandler(){
+        if (parentCell != null) {
+            if (parentCell.isActiveForAdventureRemove()){
+                Platform.runLater(() -> {
+                    ClientManager.getInstance().simulateCommand("remove",  "("+parentCell.getLogicalRow()+","+parentCell.getLogicalColumn()+")", type.toString(), "1");
+                });
+            }
         }
     }
 }

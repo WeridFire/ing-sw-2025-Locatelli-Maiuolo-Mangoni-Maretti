@@ -93,6 +93,7 @@ public class PIRContainer extends StackPane {
         this.content.getChildren().clear();
         PIRAddLoadables castedPir = (PIRAddLoadables) pir;
         ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
+        shipGrid.unsetActiveCells();
         shipGrid.setActiveCells(castedPir.getHighlightMask(), true, false);
         AdventureUI.getInstance().getLoadableContainer().clearLoadableObjects();
         for (LoadableType loadable: castedPir.getFloatingLoadables()){
@@ -108,12 +109,14 @@ public class PIRContainer extends StackPane {
     public void handleRemoveCargoPir() {
         setPlacingLoadables(false);
         content.getChildren().clear();
-
-        content.getChildren().add(getLabel("HANDLEREMOVECARGO"));
+        AdventureUI.getInstance().hidePirContainer();
 
         PIRRemoveLoadables castedPir = (PIRRemoveLoadables) pir;
+        Label text = getLabel(castedPir.getCLIRepresentation().toString());
+        AdventureUI.getInstance().getPirDelayContainer().setText(text.getText());
 
         ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
+        shipGrid.unsetActiveCells();
         shipGrid.setActiveCells(castedPir.getHighlightMask(), false, true);
         addCloseButton();
     }
@@ -150,13 +153,18 @@ public class PIRContainer extends StackPane {
         content.getChildren().addAll(buttons);
     }
 
+
     public void handleDelayPir() {
         PIRDelay castedPir = (PIRDelay) pir;
-        AdventureUI.getInstance().getPirDelayContainer().setText(castedPir.getMessage());
+        setPirDelayContainerContent(castedPir.getMessage());
+    }
+
+    private void setPirDelayContainerContent(String text){
+        AdventureUI.getInstance().getPirDelayContainer().setText(text);
     }
 
     private Label getLabel(String labelText) {
-        Label labelObj = new Label(ANSI.Helper.stripAnsi(labelText)); // Using the parameter instead of the field
+        Label labelObj = new Label(ANSI.sanitizeCLIText(labelText)); // Using the parameter instead of the field
         labelObj.setWrapText(true);
         labelObj.setStyle("-fx-font-weight: bold; -fx-text-fill: black;"); // Changed to black text
         labelObj.setViewOrder(-1);
