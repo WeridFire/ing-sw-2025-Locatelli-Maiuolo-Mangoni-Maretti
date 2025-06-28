@@ -34,7 +34,7 @@ public class OpenSpaceCard extends Card{
 				// exit flight if no thrust power is given
 				p.requestEndFlight();
 			} else {
-				game.movePlayerForward(p, steps);
+				PIRUtils.runPlayerMovementForward(p, steps, game);
 			}
 		}
 	}

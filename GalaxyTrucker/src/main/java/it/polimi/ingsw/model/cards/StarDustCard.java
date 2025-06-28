@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.cards;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.playerInput.PIRUtils;
 import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.cli.CLIFrame;
 
@@ -29,7 +30,7 @@ public class StarDustCard extends Card{
 	public void playEffect(GameData game) {
 		for(Player p : game.getPlayersInFlight().reversed()){
 			int exposedConnectors = countExposedConnectors(p);
-			game.movePlayerBackward(p, exposedConnectors);
+			PIRUtils.runPlayerMovementBackward(p, exposedConnectors, game);
 		}
 	}
 

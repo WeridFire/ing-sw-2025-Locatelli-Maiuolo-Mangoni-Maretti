@@ -47,31 +47,14 @@ public class PiratesCard extends EnemyCard{
         boolean wantToAccept = gameData.getPIRHandler().setAndRunTurn(pirYesOrNoChoice);
         if(wantToAccept){
             player.addCredits(prizeBounty);
-            gameData.movePlayerBackward(player, getLostDays());
+            PIRUtils.runPlayerMovementBackward(player, getLostDays(), gameData);
         }
     }
 
     @Override
-    public void applyPunishment(Player player, GameData game) {
+    public void applyPunishment(Player player, GameData game) throws InterruptedException {
         for(Projectile proj : punishHits){
-
-            game.getPIRHandler().setAndRunTurn(new PIRMultipleChoice(
-                    player,
-                    Default.PIR_SECONDS,
-                    "Pirates: Do you want to roll the dice?",
-					new String[]{"Yes"},
-                    0
-            ));
-
-            proj.roll2D6();
-            boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, game);
-            if(!defended){
-                try {
-                    player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
-                } catch (NoTileFoundException | OutOfBuildingAreaException e) {
-                    throw new RuntimeException(e);  // should never happen -> runtime exception
-                }
-            }
+            PIRUtils.runProjectile(player, proj, game, false, getTitle());
         }
     }
 

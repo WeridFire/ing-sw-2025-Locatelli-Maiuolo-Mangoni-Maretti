@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.cards.exceptions.PlanetsCardException;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.playerInput.PIRUtils;
 import it.polimi.ingsw.model.playerInput.PIRs.*;
 import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.util.Default;
@@ -127,7 +128,7 @@ public class PlanetsCard extends Card {
 								.orElse(null);
 						if(landedPlanet != null){
 							landedPlanet.leavePlanet();
-							game.movePlayerBackward(p, lostDays);
+							PIRUtils.runPlayerMovementBackward(p, lostDays, game);
 						}
 					}
                 }

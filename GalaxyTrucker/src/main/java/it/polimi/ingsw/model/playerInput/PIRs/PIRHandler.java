@@ -174,6 +174,9 @@ public class PIRHandler implements Serializable {
 	public void setAndRunTurn(PIRAddLoadables addLoadables, boolean refreshAllPlayers) {
 		setAndRunGenericTurn(addLoadables, refreshAllPlayers);
 		removePIR(addLoadables.getCurrentPlayer());
+		if (addLoadables.shouldResendRequest()) {
+			setAndRunTurn(new PIRAddLoadables(addLoadables), refreshAllPlayers);
+		}
 	}
 	/**
 	 * Like {@link #setAndRunTurn(PIRAddLoadables, boolean)}, but uses default value for refreshing all players
@@ -240,6 +243,9 @@ public class PIRHandler implements Serializable {
 	public void setAndRunTurn(PIRRemoveLoadables removeLoadables, boolean refreshAllPlayers) {
 		setAndRunGenericTurn(removeLoadables, refreshAllPlayers);
 		removePIR(removeLoadables.getCurrentPlayer());
+		if (removeLoadables.shouldResendRequest()) {
+			setAndRunTurn(new PIRRemoveLoadables(removeLoadables), refreshAllPlayers);
+		}
 	}
 	/**
 	 * Like {@link #setAndRunTurn(PIRRemoveLoadables, boolean)}, but uses default value for refreshing all players

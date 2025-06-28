@@ -45,25 +45,7 @@ public class MeteorSwarmCard extends Card {
 	@Override
 	public void playEffect(GameData game) throws InterruptedException {
 		for(Projectile proj : meteors){
-			proj.roll2D6();
-
-			game.getPIRHandler().broadcastPIR(game.getPlayersInFlight(), (player, pirHandler) -> {
-				// notify hit
-				PIRDelay pirDelay = new PIRDelay(player, Default.PIR_SHORT_SECONDS,
-                        proj.toVerboseString(),
-						proj.getCLIRepresentation(player.getShipBoard()
-						));
-				pirHandler.setAndRunTurn(pirDelay);
-				// actually try to hit
-				boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, game);
-				if(!defended){
-					try {
-						player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
-					} catch (NoTileFoundException | OutOfBuildingAreaException e) {
-						throw new RuntimeException(e);  // should never happen -> runtime exception
-					}
-				}
-			});
+			PIRUtils.runProjectile(game.getPlayersInFlight().getFirst(), proj, game, true, getTitle());
 		}
 	}
 

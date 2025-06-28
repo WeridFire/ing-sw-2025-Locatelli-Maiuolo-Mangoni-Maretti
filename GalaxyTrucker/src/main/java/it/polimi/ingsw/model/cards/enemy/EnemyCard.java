@@ -40,7 +40,7 @@ public abstract class EnemyCard extends Card {
      * Method to punish the player that gets defeated by this enemy
      * @param player player on which the method is currently acting upon
      */
-    public abstract void applyPunishment(Player player, GameData game) ;
+    public abstract void applyPunishment(Player player, GameData game) throws InterruptedException;
 
     /**
      *
@@ -59,7 +59,7 @@ public abstract class EnemyCard extends Card {
     }
 
     @Override
-    public void playEffect(GameData game) {
+    public void playEffect(GameData game) throws InterruptedException {
         for(Player p : game.getPlayersInFlight()){
             float totalFirePower = PIRUtils.runPlayerPowerTilesActivationInteraction(p, game, PowerType.FIRE);
             if(totalFirePower > getFirePower()){

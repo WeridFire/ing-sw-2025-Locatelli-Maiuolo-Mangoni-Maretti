@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.cards.warzone;
 
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.playerInput.PIRUtils;
 import it.polimi.ingsw.view.cli.ANSI;
 
 public class WarPunishmentLoseFlightDays implements WarPunishment {
@@ -19,6 +20,6 @@ public class WarPunishmentLoseFlightDays implements WarPunishment {
 
     @Override
     public void apply(Player player, GameData gameData) {
-        gameData.movePlayerBackward(player, lostDays);
+        PIRUtils.runPlayerMovementBackward(player, lostDays, gameData);
     }
 }

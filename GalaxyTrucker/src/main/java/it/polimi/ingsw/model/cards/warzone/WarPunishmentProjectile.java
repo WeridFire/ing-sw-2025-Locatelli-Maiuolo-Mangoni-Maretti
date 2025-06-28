@@ -4,11 +4,6 @@ import it.polimi.ingsw.model.cards.projectile.Projectile;
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.playerInput.PIRUtils;
-import it.polimi.ingsw.model.playerInput.PIRs.PIRDelay;
-import it.polimi.ingsw.model.playerInput.PIRs.PIRMultipleChoice;
-import it.polimi.ingsw.model.shipboard.exceptions.NoTileFoundException;
-import it.polimi.ingsw.model.shipboard.exceptions.OutOfBuildingAreaException;
-import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.cli.ANSI;
 
 public class WarPunishmentProjectile implements WarPunishment {
@@ -31,23 +26,7 @@ public class WarPunishmentProjectile implements WarPunishment {
     @Override
     public void apply(Player player, GameData gameData) throws InterruptedException {
         for(Projectile proj : projectiles){
-            proj.roll2D6();
-
-            gameData.getPIRHandler().broadcastPIR(gameData.getPlayersInFlight(), (p, pirHandler) -> {
-                PIRDelay pirDelay = new PIRDelay(p, Default.PIR_SHORT_SECONDS,
-                        proj.toVerboseString(),
-                        proj.getCLIRepresentation(p.getShipBoard()
-                        ));
-                pirHandler.setAndRunTurn(pirDelay);
-                boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, gameData);
-                if(!defended) {
-                    try {
-                        player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
-                    } catch (NoTileFoundException | OutOfBuildingAreaException e) {
-                        throw new RuntimeException(e);  // should never happen -> runtime exception
-                    }
-                }
-            });
+            PIRUtils.runProjectile(player, proj, gameData, false, "War Zone Projectiles");
         }
     }
 }

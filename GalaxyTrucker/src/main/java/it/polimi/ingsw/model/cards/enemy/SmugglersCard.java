@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.cards.enemy;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.playerInput.PIRUtils;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRAddLoadables;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.model.shipboard.LoadableType;
@@ -40,7 +41,7 @@ public class SmugglersCard extends EnemyCard {
 	public void givePrize(Player player, GameData game) {
 		PIRYesNoChoice pirYesOrNoChoice = new PIRYesNoChoice(player,
 				Default.PIR_SECONDS,
-				"You will receive the following goods: " + prizeGoods + " but you will lose " + getLostDays() + " travel days.",
+				"You will receive the following goods: " + Arrays.toString(prizeGoods) + " but you will lose " + getLostDays() + " travel days.",
 				true);
 		boolean wantToAccept = game.getPIRHandler().setAndRunTurn(pirYesOrNoChoice);
 		if(wantToAccept){
@@ -69,7 +70,7 @@ public class SmugglersCard extends EnemyCard {
 
 			PIRAddLoadables pirAddLoadables = new PIRAddLoadables(player, Default.PIR_SECONDS, Arrays.stream(prizeGoods).toList());
 			game.getPIRHandler().setAndRunTurn(pirAddLoadables);
-			game.movePlayerBackward(player, getLostDays());
+			PIRUtils.runPlayerMovementBackward(player, getLostDays(), game);
 		}
 	}
 

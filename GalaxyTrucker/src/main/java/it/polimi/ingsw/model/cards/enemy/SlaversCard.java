@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.cards.enemy;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.playerInput.PIRUtils;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRRemoveLoadables;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.model.shipboard.LoadableType;
@@ -52,7 +53,7 @@ public class SlaversCard extends EnemyCard {
 		boolean wantToAccept = game.getPIRHandler().setAndRunTurn(pirYesNoChoice);
 		if(wantToAccept){
 			player.addCredits(prizeBounty);
-			game.movePlayerBackward(player, getLostDays());
+			PIRUtils.runPlayerMovementBackward(player, getLostDays(), game);
 		}
 	}
 

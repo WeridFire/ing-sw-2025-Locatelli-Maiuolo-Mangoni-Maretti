@@ -38,7 +38,6 @@ public class PIRCLIScreen extends CLIScreen {
 	It can't be put inside of the clirepresentation itself of the PIR, because
 	it needs to compute the "locally" allocated or removed cargo vs the total cargo
 	to be handled, and show it dynamically. This part is simply put on top of the add or remove cargo screen.
-	*/
 		if (activePIR.getPIRType() == PIRType.ADD_CARGO) {
 
 			PIRAddLoadables pirAdd = (PIRAddLoadables) activePIR;
@@ -82,6 +81,7 @@ public class PIRCLIScreen extends CLIScreen {
 
 			baseFrame = removeHeader.merge(baseFrame, Direction.SOUTH, 2);
 		}
+	*/
 
 		return baseFrame;
 	}

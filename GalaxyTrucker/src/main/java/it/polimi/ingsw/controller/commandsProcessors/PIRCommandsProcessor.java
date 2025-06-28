@@ -186,6 +186,8 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
 
         // Add to local cargo
         addToLocalCargo(coord, loadableType, amount);
+        return true;
+        /*
 
         // Check if all loadables have been allocated
         int remaining = floatingLoadables.size() - countTotalAllocated();
@@ -197,6 +199,8 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
         }
 
         return true;
+
+         */
     }
     private void executeAllocateCommand() throws RemoteException {
         Map<Coordinates, List<LoadableType>> localCargo = PIRState.getLocalCargo();

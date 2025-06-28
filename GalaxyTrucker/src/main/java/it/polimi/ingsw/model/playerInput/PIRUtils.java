@@ -28,6 +28,8 @@ import it.polimi.ingsw.view.cli.ANSI;
 
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class PIRUtils {
@@ -177,6 +179,64 @@ public class PIRUtils {
         return false;
     }
 
+	public static void runPlayerMovementForward(Player player, int movement, GameData game) {
+		game.getPIRHandler().setAndRunTurn(
+				new PIRDelay(player, Default.PIR_SHORT_SECONDS,
+						"You are going to gain " + movement + " flight days", null)
+		);
+		game.movePlayerForward(player, movement);
+	}
+
+	public static void runPlayerMovementBackward(Player player, int movement, GameData game) {
+		game.getPIRHandler().setAndRunTurn(
+				new PIRDelay(player, Default.PIR_SHORT_SECONDS,
+						"You are going to lose " + movement + " flight days", null)
+		);
+		game.movePlayerBackward(player, movement);
+	}
+
+	private static BiConsumer<Player, PIRHandler> getRunnerProjectileInfo(Player diceTosser, String cause) {
+		Function<Player, String> messageRetriever = (p) -> cause
+				+ (Objects.equals(p.getUsername(), diceTosser.getUsername())
+				? ": The fate is in your hand, toss the dice!"
+                : diceTosser.toColoredString(": ", " is deciding the fate of the flight...")
+        );
+		return (p, pirHandler) -> pirHandler.setAndRunTurn(new PIRDelay(p,
+				Default.PIR_SHORT_SECONDS, messageRetriever.apply(p), null));
+	}
+
+	private static void runPlayerHitAttempt(Player player, Projectile proj, GameData game) {
+		// notify hit
+		PIRDelay pirDelay = new PIRDelay(player, Default.PIR_SHORT_SECONDS,
+				proj.toVerboseString(),
+				proj.getCLIRepresentation(player.getShipBoard()
+				));
+		game.getPIRHandler().setAndRunTurn(pirDelay);
+		// actually try to hit
+		boolean defended = PIRUtils.runPlayerProjectileDefendRequest(player, proj, game);
+		if(!defended){
+			try {
+				player.getShipBoard().hit(proj.getDirection(), proj.getCoord());
+			} catch (NoTileFoundException | OutOfBuildingAreaException e) {
+				throw new RuntimeException(e);  // should never happen -> runtime exception
+			}
+		}
+	}
+
+	public static void runProjectile(Player diceTosser, Projectile proj, GameData game,
+									 boolean broadcastHit, String cause) throws InterruptedException {
+		proj.roll2D6();
+		if (broadcastHit) {
+			game.getPIRHandler().broadcastPIR(game.getPlayersInFlight(), (p, pirHandler) -> {
+				PIRUtils.getRunnerProjectileInfo(diceTosser, cause).accept(p, pirHandler);
+				PIRUtils.runPlayerHitAttempt(p, proj, game);
+			});
+		} else {
+			PIRUtils.getRunnerProjectileInfo(diceTosser, cause).accept(diceTosser, game.getPIRHandler());
+			PIRUtils.runPlayerHitAttempt(diceTosser, proj, game);
+		}
+	}
+
 
 	public static class ShipIntegrityListener implements IShipIntegrityListener {
 		private final Player player;
@@ -251,6 +311,7 @@ public class PIRUtils {
 						.collect(Collectors.toSet()));
 			}
 
+			// prepare colors and options as string
 			List<String> ansiColors = ANSI.getRandomColors(clustersToKeep.size(), false,
 					List.of(ANSI.WHITE, ANSI.BLACK, ANSI.RED));
 			int numOptions = clustersToKeep.size();
@@ -258,7 +319,7 @@ public class PIRUtils {
 			for (int i = 0; i < numOptions; i++) {
 				options[i] = clustersToKeep.get(i).toString(Util.getModularAt(ansiColors, i));
 			}
-
+			// send player input request
 			PIRMultipleChoice pirChoice = new PIRMultipleChoice(player, Default.PIR_SECONDS,
 					"Choose one cluster to keep",
 					playerShip.getCLIRepresentation(coordCluster, ansiColors),

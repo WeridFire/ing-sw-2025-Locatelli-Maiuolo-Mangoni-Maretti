@@ -52,7 +52,9 @@ public class RmiClient extends UnicastRemoteObject implements IClient {
 	 */
 	@Override
 	public void updateClient(ClientUpdate clientUpdate) throws RemoteException {
-		gameClient.updateClient(clientUpdate);
+		synchronized (gameClient) {
+			gameClient.updateClient(clientUpdate);
+		}
 	}
 
 	@Override

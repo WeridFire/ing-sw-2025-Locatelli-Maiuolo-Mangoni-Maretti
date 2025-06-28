@@ -21,6 +21,10 @@ public class PIRAddLoadables extends PIR {
 
 	private final List<LoadableType> floatingLoadables = new ArrayList<>();
 
+	private boolean resendRequest;
+	public boolean shouldResendRequest() {
+		return resendRequest;
+	}
 
 	/**
 	 * This turn will make the game wait for player to specify where they want to allocate cargo on the shipboard.
@@ -33,6 +37,11 @@ public class PIRAddLoadables extends PIR {
 	public PIRAddLoadables(Player currentPlayer, int cooldown, List<LoadableType> allocatedCargo) {
 		super(currentPlayer, cooldown, PIRType.ADD_CARGO);
 		floatingLoadables.addAll(allocatedCargo);
+		resendRequest = false;
+	}
+
+	public PIRAddLoadables(PIRAddLoadables toCopy) {
+		this(toCopy.currentPlayer, toCopy.getCooldown(), toCopy.floatingLoadables);
 	}
 
 	/**
@@ -82,7 +91,6 @@ public class PIRAddLoadables extends PIR {
 		synchronized (lock){
 			lock.wait(getCooldown()* 1000L);
 			//at the end if the cargo is not completely allocated, it gets ignored
-			//TODO: handle the case where ignored cargo is passed onto next player?
 		}
 	}
 
@@ -126,6 +134,11 @@ public class PIRAddLoadables extends PIR {
 				getFloatingLoadables().remove(loadable);
 			}
 		}
+
+		if (!cargoToAdd.isEmpty() && !getFloatingLoadables().isEmpty()) {  // valid interaction and still need interaction
+			resendRequest = true;
+		}
+
 		endTurn();
 	}
 

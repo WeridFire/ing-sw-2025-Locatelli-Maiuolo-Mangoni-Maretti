@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.cards;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.playerInput.PIRUtils;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRRemoveLoadables;
 import it.polimi.ingsw.model.playerInput.PIRs.PIRYesNoChoice;
 import it.polimi.ingsw.model.shipboard.LoadableType;
@@ -63,7 +64,8 @@ public class AbandonedShipCard extends Card{
 					game.getPIRHandler().setAndRunTurn(
 							new PIRRemoveLoadables(p, Default.PIR_SECONDS, LoadableType.CREW_SET, requiredCrew)
 					);
-					game.movePlayerBackward(p, lostDays);
+					PIRUtils.runPlayerMovementBackward(p, lostDays, game);
+					// TODO: gain credits
 					break;
 				}
 			}

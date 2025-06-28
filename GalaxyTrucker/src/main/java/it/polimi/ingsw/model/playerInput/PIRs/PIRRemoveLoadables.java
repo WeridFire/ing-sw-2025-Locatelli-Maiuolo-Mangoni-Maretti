@@ -26,6 +26,11 @@ public class PIRRemoveLoadables extends PIR {
 	private int amountToRemove;
 	private final Set<LoadableType> allowedCargo;
 
+	private boolean resendRequest;
+	public boolean shouldResendRequest() {
+		return resendRequest;
+	}
+
 	public PIRRemoveLoadables(Player currentPlayer, int cooldown, Set<LoadableType> allowedCargo, int amount) {
 		super(currentPlayer, cooldown, PIRType.REMOVE_CARGO);
 		this.allowedCargo = allowedCargo;
@@ -38,6 +43,11 @@ public class PIRRemoveLoadables extends PIR {
 		if(this.targetAmount < 0){
 			this.targetAmount = 0;
 		}
+		resendRequest = false;
+	}
+
+	public PIRRemoveLoadables(PIRRemoveLoadables toCopy) {
+		this(toCopy.currentPlayer, toCopy.getCooldown(), toCopy.getAllowedCargo(), toCopy.amountToRemove);
 	}
 
 	private Map<Coordinates, ContainerTile> getContainerTiles() {
@@ -118,8 +128,14 @@ public class PIRRemoveLoadables extends PIR {
 			}
 			for(LoadableType loadable : entry.getValue()){
 				containerTile.removeItems(loadable, 1);
+				amountToRemove--;
 			}
 		}
+
+		if (!cargoToRemove.isEmpty() && (amountToRemove > 0)) {  // valid interaction and still need interaction
+			resendRequest = true;
+		}
+
 		endTurn();
 	}
 
@@ -137,7 +153,6 @@ public class PIRRemoveLoadables extends PIR {
 
 	@Override
 	public CLIFrame getCLIRepresentation() {
-
 		CLIFrame frame = new CLIFrame(ANSI.BACKGROUND_RED + ANSI.WHITE + " REMOVE CARGO FROM CONTAINERS " + ANSI.RESET)
 				.merge(new CLIFrame(""), Direction.SOUTH);
 
@@ -148,12 +163,16 @@ public class PIRRemoveLoadables extends PIR {
 
 		for (LoadableType type : getAllowedCargo()) {
 			frame = frame.merge(
-					new CLIFrame( "  - " + type.getUnicodeColoredString() + "[" + type.toString() +"]"),
+					new CLIFrame( "  - " + type.getUnicodeColoredString() + "[" + type +"]"),
 					Direction.SOUTH, 0
 			);
 		}
 
-		frame = frame.merge(new CLIFrame(""), Direction.SOUTH, 1);
+		frame = frame.merge(new CLIFrame(new String[] {
+				"",
+				"Remaining to remove: " + ANSI.YELLOW + (getAmountToRemove()) + ANSI.RESET
+		}), Direction.SOUTH, 1);
+
 		frame = frame.merge(
 				new CLIFrame(ANSI.CYAN + " Containers with Removable Cargo: " + ANSI.RESET),
 				Direction.SOUTH, 0
