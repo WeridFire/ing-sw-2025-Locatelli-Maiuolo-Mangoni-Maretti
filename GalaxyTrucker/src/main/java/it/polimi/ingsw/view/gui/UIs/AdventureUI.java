@@ -41,6 +41,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     private LoadableContainer loadableContainer;
     private PIRContainer pirContainer = new PIRContainer();
     private PirDelayContainer pirDelayContainer = new PirDelayContainer();
+    private Button integrityButton;
 
     private Rectangle overlayBackground;
 
@@ -146,6 +147,9 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         cardPane.setCard(CommonState.getLastUpdate().getCurrentGame().getDeck().getCurrentCard());
     }
 
+    public void removeIntegrityButton(){
+        if (this.getCardPane().getChildren().contains(integrityButton)) this.getCardPane().getChildren().remove(integrityButton);
+    }
     /**
      * Provides access to the loadable container.
      * @return The {@link LoadableContainer}.
@@ -203,10 +207,9 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     }
 
     public void addIntegrityButton() {
-        Button integrityButton = new Button("Confirm Integrity Choice");
+        integrityButton = new Button("Confirm Integrity Choice");
         integrityButton.setOnMouseClicked(event -> {
             getShipGrid().confirmIntegrityProblemChoice();
-            getCardPane().getChildren().remove(integrityButton);
         });
         getCardPane().getChildren().add(integrityButton);
     }
