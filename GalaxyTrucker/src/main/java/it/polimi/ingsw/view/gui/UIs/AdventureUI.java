@@ -6,12 +6,14 @@ import it.polimi.ingsw.controller.states.PIRState;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.model.playerInput.PIRType;
 import it.polimi.ingsw.model.playerInput.PIRs.PIR;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.model.shipboard.integrity.IntegrityProblem;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.components.*;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -38,6 +40,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     private CardContainer cardPane;
     private LoadableContainer loadableContainer;
     private PIRContainer pirContainer = new PIRContainer();
+    private PirDelayContainer pirDelayContainer = new PirDelayContainer();
 
     private Rectangle overlayBackground;
 
@@ -91,6 +94,10 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         pirContainer.setMaxSize(WIDTH, HEIGHT);
         pirContainer.setMinSize(WIDTH, HEIGHT);
         pirContainer.setAlignment(Pos.CENTER);
+
+        pirDelayContainer.setMaxSize(WIDTH, HEIGHT);
+        pirDelayContainer.setMinSize(WIDTH, HEIGHT);
+        pirDelayContainer.setAlignment(Pos.CENTER_RIGHT);
 
         GameLevel gameLevel = LobbyState.getGameLevel();
         if (gameLevel == null) {
@@ -168,12 +175,40 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         root.getChildren().add(pirContainer);
     }
 
+    public void showPirDelayContainer() {
+        hidePirDelayContainer();
+
+        overlayBackground = new Rectangle();
+        overlayBackground.setFill(Color.rgb(0, 0, 0, 0.6));
+        overlayBackground.widthProperty().bind(getRoot().widthProperty());
+        overlayBackground.heightProperty().bind(getRoot().heightProperty());
+
+        StackPane.setAlignment(pirDelayContainer, Pos.CENTER_RIGHT);
+
+        root.getChildren().add(overlayBackground);
+        root.getChildren().add(pirDelayContainer);
+    }
+
+    public void hidePirDelayContainer(){
+        getRoot().getChildren().remove(overlayBackground);
+        getRoot().getChildren().remove(pirDelayContainer);
+    }
+
     /**
      * Hides the Player Input Request (PIR) container and its overlay.
      */
     public void hidePirContainer() {
         getRoot().getChildren().remove(overlayBackground);
         getRoot().getChildren().remove(pirContainer);
+    }
+
+    public void addIntegrityButton() {
+        Button integrityButton = new Button("Confirm Integrity Choice");
+        integrityButton.setOnMouseClicked(event -> {
+            getShipGrid().confirmIntegrityProblemChoice();
+            getCardPane().getChildren().remove(integrityButton);
+        });
+        getCardPane().getChildren().add(integrityButton);
     }
 
     /**
@@ -239,10 +274,19 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
                     try {
                         System.out.println("Setting pir to " + lastPIR.getPIRType());
                         if (!handleTaggedPIR(lastPIR)) {
-                            pirContainer.setPir(lastPIR);
-                            if (!root.getChildren().contains(pirContainer)) {
-                                showPirContainer();
+                            if(lastPIR.getPIRType() == PIRType.DELAY){
+                                pirDelayContainer.handlePirDelay((PIRDelay) lastPIR);
+                                if (!root.getChildren().contains(pirDelayContainer)) {
+                                    showPirDelayContainer();
+                                }
                             }
+                            else {
+                                pirContainer.setPir(lastPIR);
+                                if (!root.getChildren().contains(pirContainer)) {
+                                    showPirContainer();
+                                }
+                            }
+
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

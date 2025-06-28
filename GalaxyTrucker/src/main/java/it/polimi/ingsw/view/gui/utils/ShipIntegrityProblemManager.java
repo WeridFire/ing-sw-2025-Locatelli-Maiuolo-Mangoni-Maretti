@@ -40,10 +40,13 @@ public class ShipIntegrityProblemManager {
         mapToChoices.get(cell).add(clusterIndex);
     }
 
-    public void highlightAll() {
+    public boolean highlightAll() {
+        boolean integrityPresent = false;
         for (int i = 0; i < clusters.size(); i++) {
+            integrityPresent = true;
             performSelection(i);
         }
+        return integrityPresent;
     }
     public void unhighlightAll() {
         mapToChoices.keySet().forEach(cell -> {
