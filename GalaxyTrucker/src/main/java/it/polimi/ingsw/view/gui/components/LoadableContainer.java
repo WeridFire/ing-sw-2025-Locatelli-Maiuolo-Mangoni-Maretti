@@ -70,4 +70,8 @@ public class LoadableContainer extends StackPane {
     public void clearLoadableObjects() {
         loadableObjectsLayout.getChildren().clear();
     }
+
+    public boolean isEmpty(){
+        return loadableObjectsLayout.getChildren().isEmpty();
+    }
 }

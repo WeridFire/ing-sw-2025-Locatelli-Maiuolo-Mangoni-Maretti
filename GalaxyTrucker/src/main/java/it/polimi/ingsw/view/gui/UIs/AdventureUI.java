@@ -134,6 +134,10 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         return cardPane;
     }
 
+    public PIRContainer getPirContainer(){
+        return pirContainer;
+    }
+
     /**
      * Updates the displayed adventure card based on the current game state.
      */
@@ -258,7 +262,10 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
                         System.out.println("Setting pir to " + lastPIR.getPIRType());
                         if (!handleTaggedPIR(lastPIR)) {
                             pirContainer.setPir(lastPIR);
-                            if (!root.getChildren().contains(pirContainer) && !newPir.getPIRType().equals(PIRType.DELAY)) {
+                            if (!root.getChildren().contains(pirContainer)
+                                    && !newPir.getPIRType().equals(PIRType.DELAY)
+                                    && !newPir.getPIRType().equals(PIRType.ADD_CARGO)
+                            ) {
                                 showPirContainer();
                             }
                         }

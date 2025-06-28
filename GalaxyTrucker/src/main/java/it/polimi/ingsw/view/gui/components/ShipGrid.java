@@ -264,7 +264,6 @@ public class ShipGrid extends StackPane {
                         cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
                 );
             }
-
         }
 
         // reserved tiles

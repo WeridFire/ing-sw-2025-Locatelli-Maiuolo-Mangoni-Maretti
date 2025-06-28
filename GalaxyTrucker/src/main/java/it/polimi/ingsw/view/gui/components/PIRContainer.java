@@ -21,8 +21,9 @@ public class PIRContainer extends StackPane {
     private PIR pir;
     private PIRType type;
 
+    private boolean placingLoadables = false;
+
     private Label label;
-    private String labelText;
     private final List<Button> buttons = new ArrayList<>();
 
     private final VBox content;
@@ -39,9 +40,17 @@ public class PIRContainer extends StackPane {
         this.getChildren().add(content);
     }
 
+    public boolean isPlacingLoadables() {
+        return placingLoadables;
+    }
+    public void setPlacingLoadables(boolean placingLoadables) {
+        this.placingLoadables = placingLoadables;
+    }
+
     public void setPir(PIR pir) {
         this.pir = pir;
         this.type = pir.getPIRType();
+        AdventureUI.getInstance().getLoadableContainer().clearLoadableObjects();
         Platform.runLater(() -> {
             switch (this.type) {
                 case PIRType.ACTIVATE_TILE -> handleActivateTilePir();
@@ -54,6 +63,7 @@ public class PIRContainer extends StackPane {
     }
 
     public void handleActivateTilePir() {
+        setPlacingLoadables(false);
         content.getChildren().clear();
         content.getChildren().add(getLabel("Activate Tiles!"));
 
@@ -80,16 +90,23 @@ public class PIRContainer extends StackPane {
     }
 
     public void handleAddCargoPir() {
-        content.getChildren().add(getLabel("HANDLEADDCARGO"));
+        this.content.getChildren().clear();
         PIRAddLoadables castedPir = (PIRAddLoadables) pir;
         ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
         shipGrid.setActiveCells(castedPir.getHighlightMask(), true, false);
+        AdventureUI.getInstance().getLoadableContainer().clearLoadableObjects();
         for (LoadableType loadable: castedPir.getFloatingLoadables()){
             AdventureUI.getInstance().getLoadableContainer().addLoadableObject(loadable);
         }
+
+        if (!isPlacingLoadables()) {
+            setPlacingLoadables(true);
+        }
+
     }
 
     public void handleRemoveCargoPir() {
+        setPlacingLoadables(false);
         content.getChildren().clear();
 
         content.getChildren().add(getLabel("HANDLEREMOVECARGO"));
@@ -102,6 +119,7 @@ public class PIRContainer extends StackPane {
     }
 
     public void handleChoicePir() {
+        setPlacingLoadables(false);
         PIRMultipleChoice castedPir = (PIRMultipleChoice) pir;
         label = getLabel(castedPir.getChoiceMessage());
 
