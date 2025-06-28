@@ -48,7 +48,6 @@ public class PIRContainer extends StackPane {
                 case PIRType.ADD_CARGO -> handleAddCargoPir();
                 case PIRType.REMOVE_CARGO -> handleRemoveCargoPir();
                 case PIRType.CHOICE -> handleChoicePir();
-                case PIRType.DELAY -> handleDelayPir();
             }
         });
     }
