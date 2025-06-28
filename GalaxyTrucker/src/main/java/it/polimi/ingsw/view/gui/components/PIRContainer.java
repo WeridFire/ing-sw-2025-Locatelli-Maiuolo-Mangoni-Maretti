@@ -48,6 +48,7 @@ public class PIRContainer extends StackPane {
                 case PIRType.ADD_CARGO -> handleAddCargoPir();
                 case PIRType.REMOVE_CARGO -> handleRemoveCargoPir();
                 case PIRType.CHOICE -> handleChoicePir();
+                case PIRType.DELAY -> handleDelayPir();
             }
         });
     }
@@ -133,12 +134,7 @@ public class PIRContainer extends StackPane {
 
     public void handleDelayPir() {
         PIRDelay castedPir = (PIRDelay) pir;
-        label = getLabel(castedPir.getMessage());
-
-        content.getChildren().clear();
-        content.getChildren().add(label);
-
-        addCloseButton();
+        AdventureUI.getInstance().getPirDelayContainer().setText(castedPir.getMessage());
     }
 
     private Label getLabel(String labelText) {

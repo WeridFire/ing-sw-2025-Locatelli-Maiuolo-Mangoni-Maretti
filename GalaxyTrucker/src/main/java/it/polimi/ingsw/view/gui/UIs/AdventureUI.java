@@ -96,10 +96,6 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         pirContainer.setMinSize(WIDTH, HEIGHT);
         pirContainer.setAlignment(Pos.CENTER);
 
-        pirDelayContainer.setMaxSize(WIDTH, HEIGHT);
-        pirDelayContainer.setMinSize(WIDTH, HEIGHT);
-        pirDelayContainer.setAlignment(Pos.CENTER_RIGHT);
-
         GameLevel gameLevel = LobbyState.getGameLevel();
         if (gameLevel == null) {
             System.err.println("AdventureUI: GameLevel is null, defaulting to TESTFLIGHT for component creation. This might indicate an issue.");
@@ -110,19 +106,17 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
 
         cardPane = new CardContainer();
         updateCard();
-        cardPane.setStyle("-fx-background-color: lightyellow;");
 
         // Create loadable container
         loadableContainer = new LoadableContainer();
 
         // Add components to the grid
-        mainLayout.add(loadableContainer, 0, 0, 2, 1);  // Spanning across both columns at top
+        mainLayout.add(loadableContainer, 0, 0);
+        mainLayout.add(pirDelayContainer, 1, 0);
         mainLayout.add(shipGrid, 0, 2);
         mainLayout.add(cardPane, 1, 2);
         mainLayout.setAlignment(Pos.CENTER);
 
-        // Utile per il debug del layout, mostra le linee della griglia:
-        mainLayout.setGridLinesVisible(true);
 
         root.getChildren().addAll(mainLayout, getDragOverlay());
     }
@@ -165,38 +159,20 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     public void showPirContainer() {
         // Remove any existing instances first to avoid duplicates
         hidePirContainer();
-        
+
         overlayBackground = new Rectangle();
         overlayBackground.setFill(Color.rgb(0, 0, 0, 0.6));
         overlayBackground.widthProperty().bind(getRoot().widthProperty());
         overlayBackground.heightProperty().bind(getRoot().heightProperty());
-        
+
         // Center the PIR container both horizontally and vertically
         StackPane.setAlignment(pirContainer, Pos.CENTER);
-        
+
         // Add elements in the correct order (background first, then PIR container)
         root.getChildren().add(overlayBackground);
         root.getChildren().add(pirContainer);
     }
 
-    public void showPirDelayContainer() {
-        hidePirDelayContainer();
-
-        overlayBackground = new Rectangle();
-        overlayBackground.setFill(Color.rgb(0, 0, 0, 0.6));
-        overlayBackground.widthProperty().bind(getRoot().widthProperty());
-        overlayBackground.heightProperty().bind(getRoot().heightProperty());
-
-        StackPane.setAlignment(pirDelayContainer, Pos.CENTER_RIGHT);
-
-        root.getChildren().add(overlayBackground);
-        root.getChildren().add(pirDelayContainer);
-    }
-
-    public void hidePirDelayContainer(){
-        getRoot().getChildren().remove(overlayBackground);
-        getRoot().getChildren().remove(pirDelayContainer);
-    }
 
     /**
      * Hides the Player Input Request (PIR) container and its overlay.
@@ -212,6 +188,10 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
             getShipGrid().confirmIntegrityProblemChoice();
         });
         getCardPane().getChildren().add(integrityButton);
+    }
+
+    public PirDelayContainer getPirDelayContainer() {
+        return pirDelayContainer;
     }
 
     /**
@@ -277,19 +257,10 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
                     try {
                         System.out.println("Setting pir to " + lastPIR.getPIRType());
                         if (!handleTaggedPIR(lastPIR)) {
-                            if(lastPIR.getPIRType() == PIRType.DELAY){
-                                pirDelayContainer.handlePirDelay((PIRDelay) lastPIR);
-                                if (!root.getChildren().contains(pirDelayContainer)) {
-                                    showPirDelayContainer();
-                                }
+                            pirContainer.setPir(lastPIR);
+                            if (!root.getChildren().contains(pirContainer) && !newPir.getPIRType().equals(PIRType.DELAY)) {
+                                showPirContainer();
                             }
-                            else {
-                                pirContainer.setPir(lastPIR);
-                                if (!root.getChildren().contains(pirContainer)) {
-                                    showPirContainer();
-                                }
-                            }
-
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
