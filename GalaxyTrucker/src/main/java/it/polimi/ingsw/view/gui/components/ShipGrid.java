@@ -198,11 +198,11 @@ public class ShipGrid extends StackPane {
 
         sipManager.start();
     }
-    private void confirmIntegrityProblemChoice() {
+    public void confirmIntegrityProblemChoice() {
         int choice = sipManager.getChoice();
         dropIntegrityProblemChoice();
         Platform.runLater(() -> ClientManager.getInstance()
-                .simulateCommand("choice", String.valueOf(choice)));
+                .simulateCommand("choose", String.valueOf(choice)));
     }
     public void dropIntegrityProblemChoice() {
         if (sipManager == null) return;
@@ -274,7 +274,10 @@ public class ShipGrid extends StackPane {
 
         // highlight integrity problem (if present)
         if (sipManager != null) {
-            sipManager.highlightAll();
+            //note highlihgtall actually triggers the highlight
+            if(sipManager.highlightAll()){
+                AdventureUI.getInstance().addIntegrityButton();
+            }
         }
     }
 
