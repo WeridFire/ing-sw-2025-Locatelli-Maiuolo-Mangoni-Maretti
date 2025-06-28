@@ -58,8 +58,6 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     private ShipGrid leftGrid;
     private CoveredTilesPane rightPane;
     private VBox topRightVBox;
-    private Button integrityButton;
-
 
     private BoardComponent boardComponent; // Field for BoardUI
 
@@ -140,29 +138,11 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         return leftGrid;
     }
 
-    public void hideIntegrityButton() {
-        this.leftGrid.confirmIntegrityProblemChoice();
-        this.integrityButton.setVisible(false);
-    }
-
     /**
      * Creates the ship grid. ShipGrid is responsible for its own fixed dimensions.
      */
     private ShipGrid createShipGrid() {
         return new ShipGrid(LobbyState.getGameLevel());
-    }
-
-    public void addIntegrityButton() {
-        integrityButton = new Button("Confirm Integrity Choice");
-        integrityButton.setOnMouseClicked(event -> {
-            if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE))
-                leftGrid.confirmIntegrityProblemChoice();
-            else
-                AdventureUI.getInstance().getShipGrid().confirmIntegrityProblemChoice();
-
-            integrityButton.setVisible(false);
-        });
-        this.rightPane.getChildren().add(integrityButton);
     }
 
 

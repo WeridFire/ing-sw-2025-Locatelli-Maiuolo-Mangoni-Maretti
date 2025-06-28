@@ -189,11 +189,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     public void addIntegrityButton() {
         integrityButton = new Button("Confirm Integrity Choice");
         integrityButton.setOnMouseClicked(event -> {
-            if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE))
-                AssembleUI.getInstance().getLeftGrid().confirmIntegrityProblemChoice();
-            else
-               getShipGrid().confirmIntegrityProblemChoice();
-
+            getShipGrid().confirmIntegrityProblemChoice();
             integrityButton.setVisible(false);
         });
         getCardPane().getChildren().add(integrityButton);
@@ -235,7 +231,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         if (pir.containsTag(IntegrityProblem.TAG)) {
             // validate multiple choice
             if (pir.getPIRType() != PIRType.CHOICE) {
-                return false;  // unexpected mix of tag and type
+                return false;
             }
             // handle integrity problem
             shipGrid.handleIntegrityProblemChoice();
