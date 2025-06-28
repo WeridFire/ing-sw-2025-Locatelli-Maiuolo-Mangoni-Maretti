@@ -83,7 +83,7 @@ public class MainApp extends Application {
         System.exit(0);
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    public static void createGUI() {
+        launch();
     }
 }

@@ -8,6 +8,7 @@ import it.polimi.ingsw.network.rmi.RmiServer;
 import it.polimi.ingsw.network.socket.SocketServer;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.util.Default;
+import it.polimi.ingsw.util.Logger;
 
 import java.io.IOException;
 import java.net.BindException;
@@ -65,6 +66,7 @@ public class GameServer{
 			throw new AlreadyRunningServerException(errorMessage);
 		} catch (Exception e) { // Catching all exceptions to see what's going wrong
 			e.printStackTrace();
+			return;
 		}
 		// Socket
 		try {
@@ -77,7 +79,11 @@ public class GameServer{
 			throw new AlreadyRunningServerException(errorMessage);
 		} catch (IOException e) {
 			e.printStackTrace();
+			return;
 		}
+
+		// notify server ready
+		Logger.info("Server is ready -> " + getCompleteAddress());
 
 		// NOTE: RMIServer is already "running" since the non-blocking function rebind,
 		// however it needs to be initialized
@@ -204,9 +210,13 @@ public class GameServer{
 		return instance;
 	}
 
-	public static void start() throws AlreadyRunningServerException {
+	public static void start(int rmiPort, int socketPort) throws AlreadyRunningServerException {
 		if (isRunning()) throw new AlreadyRunningServerException("Server is already running.");
-		instance = new GameServer(Default.RMI_PORT, Default.SOCKET_PORT);
+		instance = new GameServer(rmiPort, socketPort);
+	}
+
+	public static void start() throws AlreadyRunningServerException {
+		start(Default.RMI_PORT, Default.SOCKET_PORT);
 	}
 
 	public static void main(String[] args) {

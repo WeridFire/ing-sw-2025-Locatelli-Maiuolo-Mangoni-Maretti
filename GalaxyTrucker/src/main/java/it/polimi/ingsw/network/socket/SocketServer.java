@@ -36,10 +36,12 @@ public class SocketServer {
 			OutputStreamWriter socketTx = new OutputStreamWriter(clientSocket.getOutputStream());
 
 			ClientSocketHandler handler = new ClientSocketHandler(
-																	new BufferedReader(socketRx),
-																	new PrintWriter(socketTx),
-																	clientSocket
+					new BufferedReader(socketRx),
+					new PrintWriter(socketTx),
+					clientSocket
 			);
+			// ensure no problem in socket connection
+			handler.handshake();
 
 			UUID connectionUUID = GameServer.getInstance().registerClient(handler);
 			System.out.println("Detected a new connection: " + connectionUUID);
