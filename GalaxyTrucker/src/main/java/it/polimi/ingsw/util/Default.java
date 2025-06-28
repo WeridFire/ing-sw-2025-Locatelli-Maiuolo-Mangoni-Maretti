@@ -12,6 +12,8 @@ public class Default {
     public static int PORT(boolean useRMI) {
         return useRMI ? RMI_PORT : SOCKET_PORT;
     }
+    public static final String SOCKET_HANDSHAKE_MESSAGE = "GalaxyTruckerSocketServer";
+    public static final int SOCKET_HANDSHAKE_TIMEOUT_MS = 5000;
 
     // client
     public static boolean USE_RMI = false;

@@ -15,6 +15,7 @@ import it.polimi.ingsw.view.gui.style.CSS;
 import it.polimi.ingsw.view.gui.utils.AlertUtils;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -143,13 +144,7 @@ public class ClientManager {
      * Displays the login UI, allowing the user to enter their username and select connection type.
      */
     public void showLoginUI() {
-        LoginUI clientLoginUI = new LoginUI((username, useRmi) -> {
-            if (!username.trim().isEmpty()) {
-                String connectionType = useRmi ? "RMI" : "Socket";
-                System.out.println("Attempting login for '" + username + "' using " + connectionType);
-                attemptConnection(username, useRmi);
-            }
-        });
+        LoginUI clientLoginUI = new LoginUI();
 
         updateScene(clientLoginUI.getLayout());
         primaryStage.setTitle("Client Login");
@@ -170,35 +165,48 @@ public class ClientManager {
      *
      * @param username the username provided by the user
      * @param useRmi   true to use RMI, false to use sockets
+     * @param host     the hostname (localhost, 192.0.0.0, ...)
+     * @param port     the port of the server
      */
-    private void attemptConnection(String username, boolean useRmi) {
+    public void attemptConnection(String username, boolean useRmi, String host, int port) {
         this.username = username;
-        String HOST = Default.HOST;
-        int SOCKET_PORT = Default.SOCKET_PORT;
-        int RMI_PORT = Default.RMI_PORT;
 
-        try {
-            gameClient = GameClient.create(useRmi,
-                    HOST,
-                    useRmi ? RMI_PORT : SOCKET_PORT,
-                    true
-            );
+        String connectionType = useRmi ? "RMI" : "Socket";
+        System.out.println("Attempting login for '" + username + "' using " + connectionType);
 
-            new Thread(() -> {
+        Task<Void> connectionTask = new Task<>() {
+            @Override
+            protected Void call() {
                 try {
-                    GameClient.start(gameClient);
-                } catch (RemoteException e) {
-                    gameClient.getView().showError(e.getMessage());
+                    // TODO: show progress bar, loading circle or something similar + set engage button not-interactable
+
+                    gameClient = GameClient.create(useRmi, host, port, true);
+
+                    // start client on another thread
+                    new Thread(() -> {
+                        try {
+                            GameClient.start(gameClient);
+                        } catch (RemoteException e) {
+                            Platform.runLater(() -> {
+                                gameClient.getView().showError(e.getMessage());
+                            });
+                        }
+                    }).start();
+
+                    // when connection is successful, update the GUI
+                    Platform.runLater(() -> createOrJoinGame(username));
+
+                } catch (IOException | NotBoundException e) {
+                    Platform.runLater(() -> AlertUtils.showError("Connection Error",
+                            "No game server available on " + host + ":" + port));
                 }
-            }).start();
 
-        } catch (IOException | NotBoundException e) {
-            AlertUtils.showError("Connection Error",
-                    "No game server available on " + HOST + ":" + (useRmi ? RMI_PORT : SOCKET_PORT));
-            return;
-        }
+                return null;
+            }
+        };
 
-        Platform.runLater(() -> createOrJoinGame(username));
+        // execute on background thread
+        new Thread(connectionTask).start();
     }
 
     /**
