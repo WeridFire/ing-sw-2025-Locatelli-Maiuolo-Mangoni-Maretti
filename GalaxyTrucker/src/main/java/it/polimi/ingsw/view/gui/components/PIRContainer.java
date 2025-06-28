@@ -157,6 +157,9 @@ public class PIRContainer extends StackPane {
     public void handleDelayPir() {
         PIRDelay castedPir = (PIRDelay) pir;
         setPirDelayContainerContent(castedPir.getMessage());
+
+        if(castedPir.getMessage().startsWith("GG to all, match is over. You will be sent to the menu in 10 seconds..."))
+            AdventureUI.getInstance().setFinished();
     }
 
     private void setPirDelayContainerContent(String text){

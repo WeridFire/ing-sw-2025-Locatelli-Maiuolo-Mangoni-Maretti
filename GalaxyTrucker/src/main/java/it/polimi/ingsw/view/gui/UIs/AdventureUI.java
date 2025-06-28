@@ -10,6 +10,7 @@ import it.polimi.ingsw.model.playerInput.PIRs.PIR;
 import it.polimi.ingsw.model.shipboard.integrity.IntegrityProblem;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.components.*;
+import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -119,6 +120,12 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
 
 
         root.getChildren().addAll(mainLayout, getDragOverlay());
+    }
+
+    public void setFinished(){
+        Platform.runLater(() -> {
+            ClientManager.getInstance().updateScene(new ScoreUI());
+        });
     }
 
     /**
