@@ -203,6 +203,7 @@ public class ShipGrid extends StackPane {
         dropIntegrityProblemChoice();
         Platform.runLater(() -> ClientManager.getInstance()
                 .simulateCommand("choose", String.valueOf(choice)));
+        AdventureUI.getInstance().removeIntegrityButton();
     }
     public void dropIntegrityProblemChoice() {
         if (sipManager == null) return;
@@ -263,7 +264,6 @@ public class ShipGrid extends StackPane {
                         cell.addLoadable(new LoadableObject(AdventureUI.getDragOverlay(), x, cell))
                 );
             }
-
         }
 
         // reserved tiles

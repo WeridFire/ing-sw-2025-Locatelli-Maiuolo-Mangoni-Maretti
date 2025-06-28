@@ -4,22 +4,22 @@ import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.view.gui.helpers.AssetHandler;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 /**
  * Represents a container for a card.
  */
-public class CardContainer extends StackPane {
+public class CardContainer extends VBox {
 
     private Card card;
 
     private ImageView imageView;
-    private static final double FIXED_WIDTH = 220;
+    public static final double FIXED_WIDTH = 220;
     private static final double FIXED_HEIGHT = 400;
-    private static final double PADDING = 20;
+    private static final double PADDING = 10;
 
     private Button endTurnButton;
 
@@ -44,6 +44,7 @@ public class CardContainer extends StackPane {
 
         VBox container = new VBox(10); // Optional spacing
         container.getChildren().addAll(imageView, endTurnButton);
+        container.setAlignment(Pos.CENTER);
         this.getChildren().add(container);
     }
 
