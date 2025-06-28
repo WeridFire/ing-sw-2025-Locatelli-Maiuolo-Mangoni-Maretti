@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.shipboard.tiles;
 import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.model.shipboard.SideType;
 import it.polimi.ingsw.model.shipboard.visitors.TileVisitor;
+import it.polimi.ingsw.view.cli.ANSI;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -58,7 +59,7 @@ public class CargoHoldTile extends ContainerTile {
                 + getLoadedItems().stream()
                 .map(LoadableType::getUnicodeColoredString)
                 .collect(Collectors.joining(" "))
-                + "] / " + getCapacity();
+                + ANSI.RESET + "] / " + getCapacity();
     }
 
 }

@@ -16,7 +16,7 @@ public class Colors {
     );
      */
 
-    private static String fromNameToRGBA(final String colorName, float alpha) {
+    public static String fromNameToRGBA(final String colorName, float alpha) {
         Color color = Color.web(colorName);
         int r = (int) Math.round(color.getRed() * 255);
         int g = (int) Math.round(color.getGreen() * 255);

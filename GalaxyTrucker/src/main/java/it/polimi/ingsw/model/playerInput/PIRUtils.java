@@ -179,20 +179,27 @@ public class PIRUtils {
         return false;
     }
 
-	public static void runPlayerMovementForward(Player player, int movement, GameData game) {
+	public static void runPlayerMovementForward(Player player, int movement, GameData game,
+												Function<Integer, String> messageRetriever) {
 		game.getPIRHandler().setAndRunTurn(
 				new PIRDelay(player, Default.PIR_SHORT_SECONDS,
-						"You are going to gain " + movement + " flight days", null)
+						messageRetriever.apply(movement), null)
 		);
 		game.movePlayerForward(player, movement);
 	}
+	public static void runPlayerMovementForward(Player player, int movement, GameData game) {
+		runPlayerMovementForward(player, movement, game, (m) -> "You are going to gain " + m + " flight days");
+	}
 
-	public static void runPlayerMovementBackward(Player player, int movement, GameData game) {
+	public static void runPlayerMovementBackward(Player player, int movement, GameData game,
+												 Function<Integer, String> messageRetriever) {
 		game.getPIRHandler().setAndRunTurn(
-				new PIRDelay(player, Default.PIR_SHORT_SECONDS,
-						"You are going to lose " + movement + " flight days", null)
+				new PIRDelay(player, Default.PIR_SHORT_SECONDS, messageRetriever.apply(movement), null)
 		);
 		game.movePlayerBackward(player, movement);
+	}
+	public static void runPlayerMovementBackward(Player player, int movement, GameData game) {
+		runPlayerMovementBackward(player, movement, game, (m) -> "You are going to lose " + m + " flight days");
 	}
 
 	private static BiConsumer<Player, PIRHandler> getRunnerProjectileInfo(Player diceTosser, String cause) {

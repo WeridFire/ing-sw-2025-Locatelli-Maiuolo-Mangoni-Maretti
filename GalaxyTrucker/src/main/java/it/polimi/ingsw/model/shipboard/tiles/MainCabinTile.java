@@ -55,6 +55,6 @@ public class MainCabinTile extends CabinTile {
 
     @Override
     public String getName() {
-        return "Main Cabin " + (getCapacity() - getCapacityLeft()) + "/" + getCapacity();
+        return "Main " + super.getName();
     }
 }

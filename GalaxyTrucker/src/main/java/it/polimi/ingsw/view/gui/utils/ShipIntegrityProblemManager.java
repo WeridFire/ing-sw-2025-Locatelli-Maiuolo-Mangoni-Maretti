@@ -12,6 +12,7 @@ public class ShipIntegrityProblemManager {
     private final List<Set<Coordinates>> clusters;
     private final ShipGrid refShipGrid;
     private final List<String> colorsNames;
+    private final String disabledColor;
     private int lastSelected;
 
     public ShipIntegrityProblemManager(ShipGrid shipGrid, int totClusters) {
@@ -19,6 +20,7 @@ public class ShipIntegrityProblemManager {
         clusters = new ArrayList<>(totClusters);
         refShipGrid = shipGrid;
         colorsNames = Colors.getRandomColors(totClusters, List.of("white", "red", "black"), 0.40f);
+        disabledColor = Colors.fromNameToRGBA("lightgray", 0.20f);
         lastSelected = 0;
     }
 
@@ -69,7 +71,7 @@ public class ShipIntegrityProblemManager {
             if (i != clusterIndex) {
                 Set<Coordinates> coordinatesNotIntersected = new HashSet<>(clusters.get(i));
                 coordinatesNotIntersected.removeAll(coordinates);
-                refShipGrid.highlightCells(coordinatesNotIntersected, Util.getModularAt(colorsNames, i));
+                refShipGrid.highlightCells(coordinatesNotIntersected, disabledColor);
             }
         }
         // add this highlight
