@@ -259,19 +259,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
                     lastPIR = newPir;
                     try {
                         System.out.println("Setting pir to " + lastPIR.getPIRType());
-                        if (newPir.getPIRType() == PIRType.DELAY) {
-                            PIRDelay pirDelay = (PIRDelay) newPir;
-                            if (pirDelay.getMessage() != null && pirDelay.getMessage().equals("GG to all, match is over. You will be sent to the menu in 10 seconds...")) {
-
-                                PauseTransition delay = new PauseTransition(Duration.seconds(10));
-                                delay.setOnFinished(event -> {
-                                    System.out.println("10-second delay finished. Returning to Login UI.");
-                                    ClientManager.getInstance().showLoginUI();
-                                });
-                                delay.play();
-                            }
-                        }
-                        else if (!handleTaggedPIR(lastPIR)) {
+                        if (!handleTaggedPIR(lastPIR)) {
                             pirContainer.setPir(lastPIR);
                             if (!root.getChildren().contains(pirContainer) && !newPir.getPIRType().equals(PIRType.DELAY)) {
                                 showPirContainer();
