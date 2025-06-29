@@ -191,9 +191,17 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         SpectateVBox spectateVBox = new SpectateVBox();
         Button boardButton = getBoardButton();
         styleButton(boardButton);
+        Button endF = new Button("End Flight");
+        endF.setOnAction(e -> {
+            Platform.runLater(() -> {
+                ClientManager.getInstance().simulateCommand("endFlight");
+            });
+        });
+        styleButton(endF);
         
         topBar.getChildren().add(spectateVBox);
         topBar.getChildren().add(boardButton);
+        topBar.getChildren().add(endF);
 
         boardComponent = BoardComponent.create(LobbyState.getGameLevel());
         boardComponent.setStyle("-fx-border-color: #4dd0e1; -fx-border-width: 1; -fx-background-color: #1a1c2c;");

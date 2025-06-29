@@ -185,12 +185,6 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         if (root.getScene() != null) {
             root.getScene().getRoot().setStyle("-fx-background-color: #1a1c2c;");
         }
-
-        // TODO: remove these lines when no longer needed
-        Button cheatButton = new Button("cheat");
-        styleButton(cheatButton);
-        cheatButton.setOnMouseClicked(event -> handleCheatButton());
-        root.getChildren().add(cheatButton);
     }
 
     /**
@@ -434,13 +428,6 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
             if (leftGrid != null) {
                 leftGrid.update();
             }
-        });
-    }
-
-    //TODO: Remove this method and the associated button.
-    public void handleCheatButton() {
-        Platform.runLater(() -> {
-            ClientManager.getInstance().simulateCommand("cheat", "standard");
         });
     }
 
