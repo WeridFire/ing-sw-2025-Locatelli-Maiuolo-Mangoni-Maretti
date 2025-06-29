@@ -53,6 +53,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     private PirDelayContainer pirDelayContainer = new PirDelayContainer();
     private Button integrityButton;
     private Button confirmActivationButton;
+    private boolean isSpectating = false;
 
     private Rectangle overlayBackground;
 
@@ -144,6 +145,14 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
 
         root.getChildren().addAll(mainLayout, getDragOverlay());
         setAdventureLayout(AdventurePane.PLAYER_BOARD);
+    }
+
+    public boolean isSpectating() {
+        return isSpectating;
+    }
+
+    public void setSpectating(boolean isSpectating) {
+        this.isSpectating = isSpectating;
     }
 
     public void setFinished(){

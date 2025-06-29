@@ -234,7 +234,6 @@ public class ShipCell extends DropSlot {
                     setStyle(SELECTED_STYLE); // Show selected style
                 }
             });
-            this.setStyle(DEFAULT_CELL_STYLE);
         }
     }
 
@@ -254,6 +253,9 @@ public class ShipCell extends DropSlot {
      */
     @Override
     protected boolean canAccept(String dragId) {
+        if (AdventureUI.getInstance().isSpectating())
+            return false;
+
         if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
             return dragId.startsWith(ShipTile.BASE_ID) && canAcceptTile();
         }
@@ -266,6 +268,9 @@ public class ShipCell extends DropSlot {
      */
     @Override
     protected void acceptDrop(String dragId) {
+        if (AdventureUI.getInstance().isSpectating())
+            return;
+
         if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
             if (isReserveSlot) {
                 ClientManager.getInstance().simulateCommand("reserve");
@@ -291,6 +296,8 @@ public class ShipCell extends DropSlot {
      */
     @Override
     protected void onHover(boolean entering) {
+        if (AdventureUI.getInstance().isSpectating())
+            return;
         if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
             if (isHighlighted) {
                 return;
