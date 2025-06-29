@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.gamePhases.ScoreGamePhase;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.util.Logger;
+import it.polimi.ingsw.view.View;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -46,7 +47,13 @@ public class ScoreUI implements INodeRefreshableOnUpdateUI {
     @Override
     public void refreshOnUpdate(ClientUpdate update) {
         if (update.getCurrentGame() == null) {
-            Platform.runLater(() -> ClientManager.getInstance().createOrJoinGame(ClientManager.getInstance().getUsername()));
+            View view = ClientManager.getInstance().getGameClient().getView();
+            view.unregisterOnUpdateListener(this::refreshOnUpdate);
+            Platform.runLater(() -> {
+                AssembleUI.reset();
+                AdventureUI.reset();
+                ClientManager.getInstance().updateScene(new JoinGameUI(ClientManager.getInstance().getUsername()));
+            });
         } else {
             if (update.getCurrentGame().getCurrentGamePhaseType() == GamePhaseType.ENDGAME) {
                 ScoreGamePhase sgp = (ScoreGamePhase) update.getCurrentGame().getCurrentGamePhase();

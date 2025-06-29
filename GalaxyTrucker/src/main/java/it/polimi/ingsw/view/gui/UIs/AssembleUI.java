@@ -52,6 +52,10 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         return instance;
     }
 
+    public static void reset(){
+        instance = null;
+    }
+
     /**
      * Defines the minimum height for the scrollable area containing drawn tiles.
      */

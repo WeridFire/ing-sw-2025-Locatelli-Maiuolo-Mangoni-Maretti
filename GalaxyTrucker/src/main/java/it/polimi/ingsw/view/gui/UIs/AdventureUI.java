@@ -142,6 +142,10 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         return instance;
     }
 
+    public static void reset(){
+        instance = null;
+    }
+
     /**
      * Constructs the AdventureUI, initializing all its components and layout.
      */
