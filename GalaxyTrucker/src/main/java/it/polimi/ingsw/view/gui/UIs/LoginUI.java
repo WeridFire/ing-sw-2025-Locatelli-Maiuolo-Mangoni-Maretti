@@ -142,7 +142,7 @@ public class LoginUI {
      */
     private void attemptLogin() {
         // retrieve
-        String username = usernameField.getText().trim();
+        String username = usernameField.getText().substring(0, Math.min(usernameField.getText().length(), 10));
         String hostname = serverNameField.getText().trim();
         String portText = serverPortField.getText().trim();
         boolean useRmi = rmiCheckBox.isSelected();
