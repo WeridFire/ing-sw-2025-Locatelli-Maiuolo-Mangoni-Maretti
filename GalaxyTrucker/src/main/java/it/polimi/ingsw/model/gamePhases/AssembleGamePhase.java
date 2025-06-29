@@ -6,6 +6,7 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.controller.commandsProcessors.exceptions.CommandNotAllowedException;
 import it.polimi.ingsw.model.gamePhases.exceptions.TimerIsAlreadyRunningException;
+import it.polimi.ingsw.model.shipboard.ShipBoard;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.util.Default;
@@ -88,9 +89,18 @@ public class AssembleGamePhase extends PlayableGamePhase {
             synchronized (timerLock) {
                 timerLock.wait(timerMilliseconds);  // Wait for a full hourglass time
             }
-            if (howManyTimerRotationsLeft <= 0) {
-                // end playLoop because all players finished assemble during the hourglass time
-                return;
+
+            // Check how many players finished assembly
+            long finishedPlayers = gameData.getPlayersInFlight().stream()
+                    .map(Player::getShipBoard)
+                    .filter(ShipBoard::isEndedAssembly)
+                    .count();
+
+            if (howManyTimerRotationsLeft <= 0 || finishedPlayers > 0) {
+                // End or flip timer immediately if any player finished assembly
+                setTimerRunning(false);
+                howManyTimerRotationsLeft -= 1;
+                continue;
             }
 
             setTimerRunning(false);
@@ -99,28 +109,25 @@ public class AssembleGamePhase extends PlayableGamePhase {
             synchronized (timerLock) {
                 timerLock.wait();
             }
+
             howManyTimerRotationsLeft -= 1;
         }
 
         // if the hourglass is in its stop place (keep this 'if' to not lose the TESTFLIGHT case)
         if (howManyTimerRotationsLeft == 1) {
-
             setTimerRunning(true);  // run for the last time
-            // wait at most a total hourglass time (or get notified earlier by notifyAllPlayersEndedAssembly)
             synchronized (timerLock) {
                 timerLock.wait(timerMilliseconds);
             }
             setTimerRunning(false);  // end for the last time
-            // if here can be because time ended: delegated to the caller to force all the players to end assembly
             howManyTimerRotationsLeft = 0;
-        }
-        else if (howManyTimerRotationsLeft == 0) {  // TESTFLIGHT: forced to wait all the players
+        } else if (howManyTimerRotationsLeft == 0) {  // TESTFLIGHT: forced to wait all the players
             synchronized (timerLock) {
                 timerLock.wait();
             }
         }
-        // else: arrives from previous if and notifyAllPlayersEndedAssembly has been called -> finish assembly directly
     }
+
 
     @Override
     public void startTimer(Player p) throws TimerIsAlreadyRunningException, CommandNotAllowedException {
