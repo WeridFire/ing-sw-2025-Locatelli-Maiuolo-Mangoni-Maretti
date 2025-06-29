@@ -1,14 +1,26 @@
 package it.polimi.ingsw.model.cards.warzone;
 
+import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.view.cli.ANSI;
+
+import java.util.List;
 
 public class WarCriteriaCrew implements WarCriteria {
 
     @Override
     public String getName() {
         return "Fewest " + ANSI.BACKGROUND_BLACK + ANSI.RED + "Crew Figures" + ANSI.RESET;
+    }
+
+    @Override
+    public Player computeCriteria(GameData game) {
+        return game.getPlayersInFlight()
+                .stream()
+                .filter(p -> !p.hasRequestedEndFlight())
+                .max(this)
+                .orElse(null);
     }
 
     @Override
