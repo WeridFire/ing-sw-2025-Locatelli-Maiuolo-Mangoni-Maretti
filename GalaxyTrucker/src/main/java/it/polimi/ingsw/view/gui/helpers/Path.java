@@ -34,12 +34,17 @@ public class Path {
     /**
      * Base URI prefix for all asset files, relative to the application's assets directory.
      */
-    private static final String BASE_PATH = "file:assets/";
+    private static final String BASE_PATH = "/assets/";
+
+    /**
+     * Path for the file that contains a list of all asset files.
+     */
+    public static final String LIST_PATH = BASE_PATH + "list.txt";
 
     /**
      * Prefix indicating a cardboard asset name.
      */
-    private static final String MINIMUM_DIFFERENT_PREFIX_CARDBOARD = "c";
+    private static final String MINIMUM_DIFFERENT_PREFIX_CARDBOARD = "cardboard";
 
     /**
      * Prefix indicating a card asset name.
@@ -70,7 +75,7 @@ public class Path {
             return BASE_PATH + TYPE.CARD.toString() + textureName;
         } else if (textureName.startsWith(MINIMUM_DIFFERENT_PREFIX_TILE)) {
             return BASE_PATH + TYPE.TILE.toString() + textureName;
-        }else{
+        } else {
             return BASE_PATH + TYPE.PIECE.toString() + textureName;
         }
     }

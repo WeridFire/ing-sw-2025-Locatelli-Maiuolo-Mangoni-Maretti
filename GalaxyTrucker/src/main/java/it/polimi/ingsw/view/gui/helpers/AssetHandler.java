@@ -3,118 +3,91 @@ package it.polimi.ingsw.view.gui.helpers;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.*;
 
 /**
  * Utility class for loading and caching image assets as {@link ImageView} instances.
- * <p>
- * Images are loaded from the provided path or URL and stored in an internal cache
- * to avoid reloading the same image multiple times.
+ * Images are loaded from the resource path and cached.
  */
 public class AssetHandler {
 
     /** Cache mapping texture names to loaded {@link Image} objects. */
     private static final Map<String, Image> imageCache = new HashMap<>();
 
-    /** Default width to apply when no explicit size is provided. */
+    /** Default width and height. */
     private static final double DEFAULT_WIDTH = 100;
-
-    /** Default height to apply when no explicit size is provided. */
     private static final double DEFAULT_HEIGHT = 100;
-
-    /** Default flag indicating whether to preserve aspect ratio. */
     private static final boolean DEFAULT_PRESERVE_RATIO = true;
 
     /**
-     * Loads an image with the given texture name, preserving its aspect ratio according to the flag.
-     * The image is cached after the first load.
-     *
-     * @param textureName     Path or URL of the texture to load
-     * @param preserveRatio   whether to preserve the image aspect ratio when resizing
-     * @return an {@link ImageView} displaying the loaded image
+     * Loads an image from a resource path and wraps it in an {@link ImageView}.
+     * @param textureName texture relative to resources root, e.g. "GT-new_tiles_16_for web.jpg"
+     *                    (automatically detects the correct path)
+     * @param preserveRatio whether to preserve aspect ratio
+     * @return ImageView containing the image
      */
     public static ImageView loadImage(String textureName, boolean preserveRatio) {
-        String fullPath = Path.of(textureName);
-
-        // Attempt to retrieve from cache
-        Image image = imageCache.get(fullPath);
-
-        // Load and cache if not present
-        if (image == null) {
-            image = new Image(fullPath);
-            imageCache.put(fullPath, image);
-        }
-
-        ImageView imageView = new ImageView(image);
-        imageView.setPreserveRatio(preserveRatio);
-        return imageView;
-    }
-
-    public static Image loadRawImage(String textureName) {
-        String fullPath = Path.of(textureName);
-
-        // Attempt to retrieve from cache
-        Image image = imageCache.get(fullPath);
-
-        // Load and cache if not present
-        if (image == null) {
-            image = new Image(fullPath);
-            imageCache.put(fullPath, image);
-        }
-
-        return image;
-    }
-
-    public static void preLoadTextures(){
-        new Thread(() -> {
-            List<String> textures = new ArrayList<>();
-
-            File folder = new File("assets/tiles");
-            File[] files = folder.listFiles();
-
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isFile() && (file.getName().endsWith(".png") || file.getName().endsWith(".jpg") || file.getName().endsWith(".jpeg"))) {
-                        System.out.println("Loading " + file.getName());
-                        textures.add(Path.of(file.getName()));
-                    }
-                }
-            }
-
-            for (String textureName : textures) {
-                if (textureName.isEmpty()) break;
-                loadRawImage(textureName);
-            }
-
-            System.out.println("Loaded " + textures.size() + " tile textures.");
-        }).start();
+        ImageView view = new ImageView(loadRawImage(textureName));
+        view.setPreserveRatio(preserveRatio);
+        return view;
     }
 
     /**
-     * Loads an image with the given name and sets both width and height to the specified size.
-     * Preserves the aspect ratio by default.
-     *
-     * @param name  Path or URL of the texture to load
-     * @param size  the width and height to apply
-     * @return an {@link ImageView} with the specified dimensions
+     * Loads an image from resources and returns it raw.
+     * @param textureName e.g. "GT-new_tiles_16_for web.jpg" (automatically detects the correct path)
+     * @return Image
      */
+    public static Image loadRawImage(String textureName) {
+        return imageCache.computeIfAbsent(textureName, key ->
+                new Image(Objects.requireNonNull(AssetHandler.class.getResourceAsStream(textureName)))
+        );
+    }
+
+    /**
+     * Pre-loads tile textures listed in {@link Path#LIST_PATH}.
+     * The file must contain one texture file name per line.
+     */
+    public static void preLoadTextures() {
+        new Thread(() -> {
+            List<String> textures = new ArrayList<>();
+
+            try (InputStream is = AssetHandler.class.getResourceAsStream(Path.LIST_PATH);
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (!line.isBlank()) {
+                        String path = Path.of(line.trim());
+                        textures.add(path);
+                    }
+                }
+
+            } catch (IOException e) {
+                System.err.println("Failed to load tile texture list: " + e.getMessage());
+                return;
+            }
+
+            for (String texture : textures) {
+                try {
+                    loadRawImage(texture);
+                    System.out.println("Loaded asset: " + texture);
+                } catch (Exception e) {
+                    System.err.println("Failed to load asset " + texture + ": " + e.getMessage());
+                }
+            }
+
+            System.out.println("Loaded " + textures.size() + " assets.");
+        }).start();
+    }
+
     public static ImageView loadImage(String name, double size) {
         return loadImage(name, size, size);
     }
 
-    /**
-     * Loads an image with the given name, resizing it to the specified width and height.
-     * Preserves the aspect ratio by default.
-     *
-     * @param name    Path or URL of the texture to load
-     * @param width   the width to apply
-     * @param height  the height to apply
-     * @return an {@link ImageView} with the specified width and height
-     */
     public static ImageView loadImage(String name, double width, double height) {
         ImageView image = loadImage(name);
         image.setFitWidth(width);
@@ -122,12 +95,6 @@ public class AssetHandler {
         return image;
     }
 
-    /**
-     * Loads an image with the given name, using default dimensions and preserving aspect ratio.
-     *
-     * @param name  Path or URL of the texture to load
-     * @return an {@link ImageView} with default size
-     */
     public static ImageView loadImage(String name) {
         return loadImage(name, DEFAULT_PRESERVE_RATIO);
     }
