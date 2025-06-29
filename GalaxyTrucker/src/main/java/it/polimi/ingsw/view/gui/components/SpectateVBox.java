@@ -61,6 +61,7 @@ public class SpectateVBox extends VBox {
         this.setAlignment(Pos.CENTER);
         this.setPadding(new Insets(10));
         this.getChildren().addAll(topRow);
+        checkButtonsAvailability();
     }
 
     private void checkButtonsAvailability(){
