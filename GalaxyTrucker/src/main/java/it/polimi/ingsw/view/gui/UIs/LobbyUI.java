@@ -94,6 +94,13 @@ public class LobbyUI implements INodeRefreshableOnUpdateUI {
                 playerCountBox,
                 gameLevelBox
         );
+
+        //ping for rejoin
+        try{
+            Platform.runLater(() -> {
+                ClientManager.getInstance().simulateCommand("ping");
+            });
+        }catch(Exception e){}
     }
 
     /**
@@ -150,11 +157,6 @@ public class LobbyUI implements INodeRefreshableOnUpdateUI {
             return;
         }
 
-        if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
-            Platform.runLater(() -> ClientManager.getInstance().updateScene(AssembleUI.getInstance()));
-            return;
-        }
-
         boolean canChangeSettings = update.isGameLeader();
 
         Platform.runLater(() -> {
@@ -171,6 +173,14 @@ public class LobbyUI implements INodeRefreshableOnUpdateUI {
             // Riabilita/disabilita secondo canChangeSettings
             playerCountBox.setDisable(!canChangeSettings);
             gameLevelBox.setDisable(!canChangeSettings);
+
+            try{
+                if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)) {
+                    ClientManager.getInstance().updateScene(AssembleUI.getInstance());
+                } else if (CommonState.isCurrentPhase(GamePhaseType.ADVENTURE)) {
+                    ClientManager.getInstance().updateScene(AdventureUI.getInstance());
+                }
+            }catch(Exception e){}
         });
     }
 }
