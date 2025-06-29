@@ -4,6 +4,8 @@ import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.enums.AnchorPoint;
 import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRDelay;
+import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.cli.CLIFrame;
 import it.polimi.ingsw.view.cli.CLIScreen;
 
@@ -33,8 +35,18 @@ public class WarZoneCard extends Card {
 	 */
 	@Override
 	public void playEffect(GameData game) throws InterruptedException {
+		// verify at least two players
+		List<Player> playersInFlight = game.getPlayersInFlight();
+		if (playersInFlight.isEmpty()) return;
+		if (playersInFlight.size() == 1) {
+			game.getPIRHandler().setAndRunTurn(new PIRDelay(playersInFlight.getFirst(),
+					Default.PIR_SHORT_SECONDS, "Since you are the only player still in flight, "
+					+ getTitle() + " has no effects on you!", null));
+			return;
+		}
+		// play war
 		for(WarLevel wl : warLevels){
-			Player p = wl.getWorstPlayer(game);
+			Player p = wl.getWorstPlayer(playersInFlight);
 			if(p != null){
 				wl.applyPunishment(p, game);
 			}

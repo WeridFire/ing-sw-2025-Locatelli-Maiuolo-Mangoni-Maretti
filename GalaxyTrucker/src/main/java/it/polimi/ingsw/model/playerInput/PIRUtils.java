@@ -244,6 +244,14 @@ public class PIRUtils {
 		}
 	}
 
+	public static void runEndFlight(Player player, PIRHandler pirHandler) {
+		boolean ended = player.endFlight();
+		pirHandler.setAndRunTurn(new PIRDelay(player, Default.PIR_SHORT_SECONDS, (ended
+				? "Here your flight falls silent, echoing across the stars..."
+				: "Against all odds, the stars aligned: you're not done yet, continue your flight!"),
+				null));
+	}
+
 
 	public static class ShipIntegrityListener implements IShipIntegrityListener {
 		private final Player player;

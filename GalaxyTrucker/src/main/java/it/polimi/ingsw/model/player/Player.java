@@ -571,14 +571,15 @@ public class Player implements Serializable {
      * If a {@code saveFromEndFlight} predicate is defined and returns {@code true},
      * the end is prevented and the predicate is cleared.
      * Otherwise: the flight is ended, the end request is cleared, and any related data (e.g. position) is reset.
+     * @return {@code true} if flight ended correctly, {@code false} if flight end has been prevented.
      */
-    public void endFlight() {
+    public boolean endFlight() {
         if (saveFromEndFlight != null && saveFromEndFlight.test(this)) {
             // player has been saved from ending the flight
             System.out.println(username + " has requested to end his flight -> saved from ending flight with save way: "
                     + saveFromEndFlight);
             saveFromEndFlight = null;
-            return;
+            return false;
         }
         System.out.println(username + " has requested to end his flight -> flight ended because " + (
                 (saveFromEndFlight != null)
@@ -590,6 +591,7 @@ public class Player implements Serializable {
         requestedEndFlight = false;
         saveFromEndFlight = null;
         position = null;
+        return true;
     }
 
     /**
