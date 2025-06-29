@@ -43,7 +43,7 @@ public class AssetHandler {
      */
     public static Image loadRawImage(String textureName) {
         return imageCache.computeIfAbsent(textureName, key ->
-                new Image(Objects.requireNonNull(AssetHandler.class.getResourceAsStream(textureName)))
+                new Image(Objects.requireNonNull(AssetHandler.class.getResourceAsStream(Path.of(textureName))))
         );
     }
 
@@ -61,8 +61,7 @@ public class AssetHandler {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     if (!line.isBlank()) {
-                        String path = Path.of(line.trim());
-                        textures.add(path);
+                        textures.add(line.trim());
                     }
                 }
 
