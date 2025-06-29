@@ -152,7 +152,14 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     public AdventureUI() {
         root = new StackPane();
         root.setStyle("-fx-background-color: #1a1c2c; -fx-background: #1a1c2c;");
-        root.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        // Bind root size to scene size to ensure it fills the window
+        root.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                root.prefWidthProperty().bind(newScene.widthProperty());
+                root.prefHeightProperty().bind(newScene.heightProperty());
+            }
+        });
 
         mainLayout = new GridPane();
         mainLayout.setStyle("-fx-background-color: #1a1c2c;");
