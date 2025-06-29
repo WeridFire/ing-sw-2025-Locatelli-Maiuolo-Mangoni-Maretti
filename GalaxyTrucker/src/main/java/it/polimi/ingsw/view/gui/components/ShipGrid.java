@@ -175,19 +175,14 @@ public class ShipGrid extends StackPane {
         }
     }
 
-    public void handleIntegrityProblemChoice() {
+    public void handleIntegrityProblemChoice(String[] possibleOptions) {
         if (sipManager != null) return;  // it's already managing integrity problem
 
-        ShipBoard shipBoard = CommonState.getPlayer().getShipBoard();
-        List<TileCluster> clustersToKeep = shipBoard.getVisitorCheckIntegrity()
-                .getProblem(!shipBoard.isFilled())
-                .getClustersToKeep();
-        int totClusters = clustersToKeep.size();
-        sipManager = new ShipIntegrityProblemManager(this, totClusters);
+        sipManager = new ShipIntegrityProblemManager(this, possibleOptions);
+        List<Set<Coordinates>> clustersToKeep = sipManager.getClustersToKeep();
 
-        for (int i = 0; i < totClusters; i++) {
-            TileCluster cluster = clustersToKeep.get(i);
-            Set<Coordinates> coordinates = cluster.getCoordinates();
+        for (int i = 0; i < clustersToKeep.size(); i++) {
+            Set<Coordinates> coordinates = clustersToKeep.get(i);
             sipManager.addCluster(coordinates, i);
 
             for (Coordinates coord : coordinates) {
@@ -199,22 +194,14 @@ public class ShipGrid extends StackPane {
         }
 
         sipManager.start();
-
-        // highlight integrity problem (if present)
-        if (sipManager != null) {
-            if(sipManager.highlightAll()){
-                AdventureUI.getInstance().addIntegrityButton();
-            }
-        }
+        AdventureUI.getInstance().addIntegrityButton();
     }
     public void confirmIntegrityProblemChoice() {
         if (sipManager == null) return;
-
         int choice = sipManager.getChoice();
         dropIntegrityProblemChoice();
         Platform.runLater(() -> ClientManager.getInstance()
                 .simulateCommand("choose", String.valueOf(choice)));
-        AdventureUI.getInstance().removeIntegrityButton();
     }
     public void dropIntegrityProblemChoice() {
         if (sipManager == null) return;
@@ -222,6 +209,7 @@ public class ShipGrid extends StackPane {
         sipManager.unhighlightAll();
         sipManager = null;
         unsetActiveCells();
+        AdventureUI.getInstance().removeIntegrityButton();
     }
 
     /**
@@ -281,6 +269,11 @@ public class ShipGrid extends StackPane {
         TileSkeleton[] reservedTiles = AssembleState.getSpectatedReservedTiles();
         for (int i = 0; i < reserveSlots.length; i++) {
             reserveSlots[i].setTile((i < reservedTiles.length) ? reservedTiles[i] : null);
+        }
+
+        // integrity problem update
+        if (sipManager != null) {
+            sipManager.highlightLastSelected();
         }
 
     }

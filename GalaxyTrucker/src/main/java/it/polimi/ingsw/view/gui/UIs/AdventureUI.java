@@ -6,6 +6,7 @@ import it.polimi.ingsw.controller.states.PIRState;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.model.playerInput.PIRType;
 import it.polimi.ingsw.model.playerInput.PIRs.PIR;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRMultipleChoice;
 import it.polimi.ingsw.model.shipboard.integrity.IntegrityProblem;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.components.*;
@@ -19,6 +20,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+
+import java.util.Arrays;
 
 import static it.polimi.ingsw.view.gui.components.PIRContainer.formatCoordinates;
 
@@ -265,7 +268,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
                 return false;
             }
             // handle integrity problem
-            shipGrid.handleIntegrityProblemChoice();
+            shipGrid.handleIntegrityProblemChoice(((PIRMultipleChoice) pir).getPossibleOptions());
             return true;
         }
 

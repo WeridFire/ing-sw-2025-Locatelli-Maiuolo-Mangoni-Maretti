@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import it.polimi.ingsw.enums.Direction;
+import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -28,6 +29,44 @@ public class Coordinates implements Serializable {
 
     /** A unique identifier for the coordinate, computed based on its position in the grid. */
     private final int id;
+
+    /**
+     * Parse an array of coordinates as strings into a list of {@link Coordinates}
+     * @param coordinatesString the content to parse (e.g. "[(8; 8), (8; 7), (7; 6), (7; 7)]")
+     * @return the list of parsed coordinates (e.g. List.of(new Coordinates(8,8), new Coordinates(8,7), ...))
+     */
+    public static List<Coordinates> parseArray(String coordinatesString) {
+        List<Coordinates> coordinatesList = new ArrayList<>();
+
+        if (coordinatesString == null || coordinatesString.isBlank()) {
+            return coordinatesList;
+        }
+
+        // remove outer brackets and whitespace
+        String cleaned = coordinatesString.trim();
+        if (cleaned.startsWith("[") && cleaned.endsWith("]")) {
+            cleaned = cleaned.substring(1, cleaned.length() - 1);
+        }
+
+        // match pairs like (8; 8)
+        String[] pairs = cleaned.split("\\),\\s*\\(");
+        for (String pair : pairs) {
+            pair = pair.replace("(", "").replace(")", "").trim();
+            String[] parts = pair.split("[;,]");
+            if (parts.length == 2) {
+                try {
+                    int row = Integer.parseInt(parts[0].trim());
+                    int col = Integer.parseInt(parts[1].trim());
+                    coordinatesList.add(new Coordinates(row, col));
+                } catch (NumberFormatException e) {
+                    // skip malformed coordinate
+                }
+            }
+        }
+
+        return coordinatesList;
+    }
+
 
     /**
      * Constructs a coordinate with the specified row and column.
@@ -137,7 +176,6 @@ public class Coordinates implements Serializable {
         }
         return neighbors;
     }
-
 
     public Direction getNeighborDirection(Coordinates neighbor) {
         if (neighbor == null) return null;

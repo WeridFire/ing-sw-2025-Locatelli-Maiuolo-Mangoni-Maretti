@@ -1,7 +1,9 @@
 package it.polimi.ingsw.view.gui.utils;
 
+import it.polimi.ingsw.model.shipboard.TileCluster;
 import it.polimi.ingsw.util.Coordinates;
 import it.polimi.ingsw.util.Util;
+import it.polimi.ingsw.view.cli.ANSI;
 import it.polimi.ingsw.view.gui.components.ShipCell;
 import it.polimi.ingsw.view.gui.components.ShipGrid;
 
@@ -15,13 +17,29 @@ public class ShipIntegrityProblemManager {
     private final String disabledColor;
     private int lastSelected;
 
-    public ShipIntegrityProblemManager(ShipGrid shipGrid, int totClusters) {
+    private static List<Set<Coordinates>> calculateClusters(String[] possibleOptions) {
+        List<Set<Coordinates>> clusters = new ArrayList<>();
+        for (String clusterStringANSIed : possibleOptions) {
+            clusters.add(
+                    new HashSet<>(
+                            Coordinates.parseArray(ANSI.Helper.stripAnsi(clusterStringANSIed))
+                    )
+            );
+        }
+        return clusters;
+    }
+
+    public ShipIntegrityProblemManager(ShipGrid shipGrid, String[] possibleOptions) {
         mapToChoices = new HashMap<>();
-        clusters = new ArrayList<>(totClusters);
+        clusters = calculateClusters(possibleOptions);
         refShipGrid = shipGrid;
-        colorsNames = Colors.getRandomColors(totClusters, List.of("white", "red", "black"), 0.40f);
-        disabledColor = Colors.fromNameToRGBA("lightgray", 0.20f);
+        colorsNames = Colors.getRandomColors(clusters.size(), List.of("white", "red", "black"), 0.40f);
+        disabledColor = Colors.fromNameToRGBA("lightgray", 0.30f);
         lastSelected = 0;
+    }
+
+    public List<Set<Coordinates>> getClustersToKeep() {
+        return Collections.unmodifiableList(clusters);
     }
 
     public void addCluster(Set<Coordinates> cluster, int index) {
@@ -42,14 +60,10 @@ public class ShipIntegrityProblemManager {
         mapToChoices.get(cell).add(clusterIndex);
     }
 
-    public boolean highlightAll() {
-        boolean integrityPresent = false;
-        for (int i = 0; i < clusters.size(); i++) {
-            integrityPresent = true;
-            performSelection(i);
-        }
-        return integrityPresent;
+    public void highlightLastSelected() {
+        performSelection(lastSelected);
     }
+
     public void unhighlightAll() {
         mapToChoices.keySet().forEach(cell -> {
             cell.setHighlight(null);
@@ -59,7 +73,7 @@ public class ShipIntegrityProblemManager {
 
     public void start() {
         mapToChoices.keySet().forEach(k -> k.setOnMouseClicked(_ -> performSelection(k)));
-        highlightAll();
+        performSelection(clusters.size() - 1);
     }
 
     private void performSelection(int clusterIndex) {
@@ -87,6 +101,7 @@ public class ShipIntegrityProblemManager {
     }
 
     public int getChoice() {
+        System.out.println(" <<<<<<<<<< TEST >> choice: " + lastSelected);
         return lastSelected;
     }
 
