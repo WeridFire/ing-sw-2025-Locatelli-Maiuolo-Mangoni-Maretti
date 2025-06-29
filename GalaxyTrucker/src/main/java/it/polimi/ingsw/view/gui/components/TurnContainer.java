@@ -4,6 +4,7 @@ import it.polimi.ingsw.controller.states.PIRState;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
@@ -42,7 +43,8 @@ public class TurnContainer extends StackPane {
             playerText.setFill(MainCabinTile.Color.toPaint(p.getColor()));
 
             label = new TextFlow(normalText, playerText);
-            normalText.setStyle("-fx-font-weight: bold; -fx-text-fill: lightgrey;");
+            normalText.setStyle("-fx-font-weight: bold;");
+            normalText.setFill(Paint.valueOf("white"));
 
             this.getChildren().add(label);
         }

@@ -88,36 +88,26 @@ public class ScoreUI implements INodeRefreshableOnUpdateUI {
                 for (Map.Entry<Player, Float> entry : sortedScores) {
                     HBox scoreRow = new HBox(15);
                     scoreRow.setAlignment(Pos.CENTER);
-                    
+
                     Label rankLabel = new Label("#" + rank);
                     rankLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
                     rankLabel.setTextFill(getPlayerRankColor(rank));
                     rankLabel.setMinWidth(40);
-                    
+
                     Label nameLabel = new Label(entry.getKey().getUsername());
                     nameLabel.setFont(Font.font("Arial", 18));
                     nameLabel.setTextFill(Color.WHITE);
                     nameLabel.setMinWidth(150);
-                    
+
                     Label scoreLabel = new Label(String.format("%.2f", entry.getValue()));
                     scoreLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
                     scoreLabel.setTextFill(Color.web("#4dd0e1"));
-                    
+
                     scoreRow.getChildren().addAll(rankLabel, nameLabel, scoreLabel);
                     leaderboard.getChildren().add(scoreRow);
-                    
+
                     rank++;
                 }
-
-                Label infoLabel = new Label("You will be brought back to the main menu in 10 seconds.");
-                infoLabel.setFont(Font.font("Arial", 16));
-                infoLabel.setTextFill(Color.web("#ff5252"));
-                infoLabel.setPadding(new Insets(15, 0, 0, 0));
-
-                Platform.runLater(() -> {
-                    content.getChildren().removeIf(node -> node != content.getChildren().get(0)); // keep only title
-                    content.getChildren().addAll(leaderboard, infoLabel);
-                });
 
             } else {
                 Logger.error("Attempted to show ScoreUI during a phase different from ENDGAME.");
@@ -131,15 +121,11 @@ public class ScoreUI implements INodeRefreshableOnUpdateUI {
      * @return A Color object representing the rank color.
      */
     private Color getPlayerRankColor(int rank) {
-        switch (rank) {
-            case 1:
-                return Color.web("#ffd700"); // Gold for 1st place
-            case 2:
-                return Color.web("#c0c0c0"); // Silver for 2nd place
-            case 3:
-                return Color.web("#cd7f32"); // Bronze for 3rd place
-            default:
-                return Color.web("#aaaaaa"); // Gray for other places
-        }
+        return switch (rank) {
+            case 1 -> Color.web("#ffd700"); // Gold for 1st place
+            case 2 -> Color.web("#c0c0c0"); // Silver for 2nd place
+            case 3 -> Color.web("#cd7f32"); // Bronze for 3rd place
+            default -> Color.web("#aaaaaa"); // Gray for other places
+        };
     }
 }

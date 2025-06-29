@@ -125,6 +125,8 @@ public class BoardComponent extends VBox {
         });
         this.getChildren().addAll(boardDisplayPane, backButton);
 
+        boardDisplayPane.setMaxHeight(450);
+        boardDisplayPane.setMinHeight(450);
 
         this.setSpacing(200);
         this.setAlignment(Pos.CENTER);

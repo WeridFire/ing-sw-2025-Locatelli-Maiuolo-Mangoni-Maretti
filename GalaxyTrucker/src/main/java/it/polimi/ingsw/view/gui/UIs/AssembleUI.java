@@ -1,6 +1,5 @@
 package it.polimi.ingsw.view.gui.UIs;
 
-import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.model.cards.CardsGroup;
 import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.LobbyState;
@@ -14,7 +13,6 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 
