@@ -76,6 +76,9 @@ public class SmugglersCard extends EnemyCard {
 
 	@Override
 	public void applyPunishment(Player player, GameData game) {
+		if(player.hasRequestedEndFlight()){
+			return;
+		}
 		player.getShipBoard().loseBestGoods(this.punishCargo);
 	}
 

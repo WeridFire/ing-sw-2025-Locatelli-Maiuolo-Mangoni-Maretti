@@ -47,7 +47,7 @@ public class WarZoneCard extends Card {
 		// play war
 		for(WarLevel wl : warLevels){
 			Player p = wl.getWorstPlayer(playersInFlight);
-			if(p != null){
+			if(p != null && !p.hasRequestedEndFlight()){
 				wl.applyPunishment(p, game);
 			}
 		}

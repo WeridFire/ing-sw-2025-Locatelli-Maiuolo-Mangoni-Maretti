@@ -61,6 +61,9 @@ public abstract class EnemyCard extends Card {
     @Override
     public void playEffect(GameData game) throws InterruptedException {
         for(Player p : game.getPlayersInFlight()){
+            if(p.hasRequestedEndFlight()){
+                continue;
+            }
             float totalFirePower = PIRUtils.runPlayerPowerTilesActivationInteraction(p, game, PowerType.FIRE);
             if(totalFirePower > getFirePower()){
                 givePrize(p, game);
