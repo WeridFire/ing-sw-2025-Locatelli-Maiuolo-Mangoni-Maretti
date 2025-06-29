@@ -191,7 +191,6 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
     private void executeAllocateCommand() throws RemoteException {
         Map<Coordinates, List<LoadableType>> localCargo = PIRState.getLocalCargo();
         server.pirAllocateLoadables(client, localCargo);
-        view.showInfo("All requested items marked for allocation. Confirming.");
         localCargo.clear();  // Reset after sending to server
     }
 
@@ -273,7 +272,6 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
     private void executeRemoveCommand() throws RemoteException {
         Map<Coordinates, List<LoadableType>> localCargo = PIRState.getLocalCargo();
         server.pirRemoveLoadables(client, localCargo);
-        view.showInfo("All requested items marked for removal. Confirming.");
         localCargo.clear();  // Reset after sending to server
     }
 

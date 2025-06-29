@@ -35,6 +35,6 @@ public class Default {
     public static int PIR_SECONDS = 60;
     public static int PIR_SHORT_SECONDS = 10;
 
-    public static String STARTING_CARD = "PLANETS";
+    public static String STARTING_CARD = "ABANDONED SHIP";
 
 }

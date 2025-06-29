@@ -68,7 +68,7 @@ public class PIRRemoveLoadables extends PIR {
 	public void run() throws InterruptedException {
 		synchronized (lock){
 			lock.wait(getCooldown()* 1000L);
-			if (amountToRemove > 0) {
+			if (!resendRequest && amountToRemove > 0) {
 				System.out.println("Removing default loadables...");
 				if(this.allowedCargo.containsAll(LoadableType.CREW_SET)){  // crew
 					currentPlayer.getShipBoard().loseCrew(amountToRemove);
@@ -156,7 +156,7 @@ public class PIRRemoveLoadables extends PIR {
 
 		for (LoadableType type : getAllowedCargo()) {
 			frame = frame.merge(
-					new CLIFrame( "  - " + type.getUnicodeColoredString() + "[" + type +"]"),
+					new CLIFrame(type.getUnicodeColoredString() + "[" + type +"]"),
 					Direction.SOUTH, 0
 			);
 		}
