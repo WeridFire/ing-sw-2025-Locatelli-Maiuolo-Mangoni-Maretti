@@ -93,12 +93,6 @@ java -jar client.jar --gui
 * `--gui`: avvia l’interfaccia grafica
 * La scelta tra Socket e RMI, oltre a host e porta, sono richiesti direttamente nell'interfaccia.
 
-**Esempio:**
-
-```bash
-java -jar client-gui.jar --gui
-```
-
 ---
 
 ## Test
