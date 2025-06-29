@@ -11,6 +11,7 @@ import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.model.shipboard.tiles.exceptions.FixedTileException;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.util.Logger;
 import it.polimi.ingsw.view.cli.ANSI;
 
 import java.io.Serializable;
@@ -576,12 +577,12 @@ public class Player implements Serializable {
     public boolean endFlight() {
         if (saveFromEndFlight != null && saveFromEndFlight.test(this)) {
             // player has been saved from ending the flight
-            System.out.println(username + " has requested to end his flight -> saved from ending flight with save way: "
+            Logger.info(username + " has requested to end his flight -> saved from ending flight with save way: "
                     + saveFromEndFlight);
             saveFromEndFlight = null;
             return false;
         }
-        System.out.println(username + " has requested to end his flight -> flight ended because " + (
+        Logger.info(username + " has requested to end his flight -> flight ended because " + (
                 (saveFromEndFlight != null)
                         ? "save way " + saveFromEndFlight + " has not been satisfied"
                         : "save way was not provided"

@@ -50,6 +50,9 @@ public class PIRUtils {
 	 * @return The total power output after activation.
 	 */
 	public static float runPlayerPowerTilesActivationInteraction(Player player, GameData game, PowerType powerType) {
+		if(player.hasRequestedEndFlight()){
+			return 0f;
+		}
 
 		VisitorCalculatePowers.CalculatorPowerInfo powerInfo = player.getShipBoard().getVisitorCalculatePowers().getInfoPower(powerType);
 		if (powerInfo == null) {
@@ -96,6 +99,10 @@ public class PIRUtils {
 	 * @return {@code true} if the side has been protected, {@code false} if the ship will be hit.
 	 */
 	public static boolean runPlayerProjectileDefendRequest(Player player, Projectile projectile, GameData game) {
+		if(player.hasRequestedEndFlight()){
+			return true;
+		}
+
 		ShipBoard playerShip = player.getShipBoard();
 		// check if ship is going to be hit. if not -> no need to defend
 		Coordinates firstTilePlace = playerShip.getFirstTileLocation(projectile.getDirection(), projectile.getCoord());

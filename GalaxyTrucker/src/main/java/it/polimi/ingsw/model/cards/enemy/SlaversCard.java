@@ -63,6 +63,9 @@ public class SlaversCard extends EnemyCard {
 	 */
 	@Override
 	public void applyPunishment(Player player, GameData game) {
+		if(player.hasRequestedEndFlight()){
+			return;
+		}
 		PIRRemoveLoadables pirRemoveLoadables = new PIRRemoveLoadables(player, Default.PIR_SECONDS, LoadableType.CREW_SET, punishCrewAmount);
 		game.getPIRHandler().setAndRunTurn(pirRemoveLoadables);
 	}
