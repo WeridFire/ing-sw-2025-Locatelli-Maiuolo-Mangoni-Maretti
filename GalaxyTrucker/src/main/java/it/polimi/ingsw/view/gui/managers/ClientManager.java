@@ -174,7 +174,6 @@ public class ClientManager {
             @Override
             protected Void call() {
                 try {
-                    // TODO: show progress bar, loading circle or something similar + set engage button not-interactable
 
                     gameClient = GameClient.create(useRmi, host, port, true);
 

@@ -19,7 +19,7 @@ import static it.polimi.ingsw.view.cli.CLIScreen.getScreenFrame;
 
 public class AbandonedStationCard extends Card{
 	/**
-	 * Cargo available on the ship. TODO: consider if to convert to dynamic?
+	 * Cargo available on the ship.
 	 */
 	private LoadableType[] availableCargo;
 	/**

@@ -249,7 +249,6 @@ class GameDataTest {
 
     @Test
     void testGetUncoveredTiles() {
-        // TODO: trova un modo per testarlo inizializzando il game
         List<TileSkeleton> drawnTiles = gameData.getUncoveredTiles();
         assertNotNull(drawnTiles);
         assertTrue(drawnTiles.isEmpty());
@@ -299,8 +298,6 @@ class GameDataTest {
 
     @Test
     void testGetTileWithId() {
-        // TODO: trova un modo per testarlo inizializzando il game
-        // fail perche faila il test 2
 
         List<TileSkeleton> mockTiles = new ArrayList<>();
         TileSkeleton tile1 = createMockTile(1);

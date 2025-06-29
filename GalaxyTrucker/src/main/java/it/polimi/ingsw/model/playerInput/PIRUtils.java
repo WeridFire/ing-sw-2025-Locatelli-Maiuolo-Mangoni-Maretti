@@ -56,7 +56,6 @@ public class PIRUtils {
 
 		VisitorCalculatePowers.CalculatorPowerInfo powerInfo = player.getShipBoard().getVisitorCalculatePowers().getInfoPower(powerType);
 		if (powerInfo == null) {
-			// TODO: throw error invalid power type -> shield or none (remove none?)
 			return 0f;
 		}
 		PIRActivateTiles inputRequest = new PIRActivateTiles(player, Default.PIR_SECONDS, powerType);
@@ -445,7 +444,6 @@ public class PIRUtils {
 			}
 
 			// TOGGLE INTEGRITY CHECK
-			// TODO (issue): error on skipping the delay PIRs: not accepted but also saved and done all after the cooldown (mega error)
 			new Thread(() -> manageIntegrityProblem(integrityProblem)).start();
 		}
 	}

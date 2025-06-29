@@ -11,8 +11,6 @@ import it.polimi.ingsw.view.gui.utils.AlertUtils;
 import java.util.Deque;
 import java.util.LinkedList;
 
-// TODO: create GUI view
-
 /**
  * Represents the graphical user interface view of the game.
  */
@@ -42,11 +40,6 @@ public class GUIView extends View {
      */
     @Override
     public void _onUpdate(ClientUpdate update) {
-        /*
-        System.out.println("GUI function: onUpdate -> " + update.getClientUUID()
-                + " | refresh: " + update.isRefreshRequired());
-        */
-        // TODO: implement (e.g. transform any active YerNoChoice pir into confirmation Alert, and more...)
     }
 
     /**
@@ -81,7 +74,6 @@ public class GUIView extends View {
     @Override
     public void onScreen(String screenName) {
         System.out.println("GUI function: onScreen -> " + screenName);
-        // TODO: implement
         onRefresh();
     }
 
@@ -91,7 +83,6 @@ public class GUIView extends View {
     @Override
     public void onHelp() {
         System.out.println("GUI function: onHelp");
-        // TODO: implement
         onRefresh();
     }
 

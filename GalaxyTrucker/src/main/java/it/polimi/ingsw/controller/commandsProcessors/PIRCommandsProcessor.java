@@ -338,9 +338,6 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
     private void addToLocalCargo(Coordinates coord, LoadableType loadableType, int amount) {
         Map<Coordinates, List<LoadableType>> localCargo = PIRState.getLocalCargo();
         if (!localCargo.containsKey(coord)) {
-            //TODO: before putting, we should cast the tile at the container position to a container tile,
-            // and make sure that the remote content + the local content is not filling up the whole container.
-            // the check already gets done server-side, but might be optimal to add this on the client aswell.
             localCargo.put(coord, new ArrayList<>());
         }
 

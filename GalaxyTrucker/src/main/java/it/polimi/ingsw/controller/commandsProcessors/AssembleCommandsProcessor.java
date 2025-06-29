@@ -96,7 +96,7 @@ public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
         switch (command) {
             case "" : return true;  // valid onVoid
 
-            case "timerflip" : return true;  // TODO: client side checks for timerflip
+            case "timerflip" : return true;
 
             case "draw" :
                 if (validateIsAssemblyEnded()) return false;
@@ -108,12 +108,10 @@ public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
 
             case "discard" :
                 if (validateIsAssemblyEnded()) return false;
-                // TODO: client side checks for discard
                 return true;
 
             case "reserve" :
                 if (validateIsAssemblyEnded()) return false;
-                // TODO: client side checks for reserve
                 return true;
 
             case "rotate" :  // only client side -> always return false, to avoid propagating to the server
@@ -157,7 +155,6 @@ public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
                                 "integer number for both row and column.");
                         return false;
                     }
-                    // TODO: client side checks for place, e.g. coordinates represent valid empty place on the shipboard
                     if (tileInHand == null) {
                         view.showWarning("You have no tile in your hand.");
                         return false;
@@ -178,7 +175,7 @@ public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
                 if (args.length == 1) {
                     Integer id = validateInteger(args[0], "ID");
                     if (id == null) return false;
-                    // TODO: client side checks for pick, e.g. valid id
+
                 }
                 else {
                     view.showWarning("Usage: pick <id>");
@@ -232,7 +229,7 @@ public class AssembleCommandsProcessor extends PhaseCommandsProcessor {
                 if (args.length == 1) {
                     Integer id = validateInteger(args[0], "ID");
                     if (id == null) return false;
-                    // TODO: client side checks for showcg, e.g. valid id
+
                 }
                 else {
                     view.showWarning("Usage: showcg <id>");

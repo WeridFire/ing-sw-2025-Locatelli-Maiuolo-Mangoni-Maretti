@@ -84,10 +84,8 @@ public abstract class CLIScreen implements ICLIPrintable {
 		}
 
 		clear();
-		/* TODO: there are concurrency problems! TWO clears, then two System.out.println(screen...)
-		    note: do not easy fix with a lock, because first of all there shouldn't be two concurrent refreshes
-		    -> find that problem, fix, then eventually if needed fix this concurrency problem
-		 */
+
+
 		// print the screen with popups at the center
 		System.out.println(screen.merge(popups, AnchorPoint.CENTER, AnchorPoint.CENTER));
 
