@@ -115,17 +115,16 @@ public class BoardComponent extends VBox {
 
         boardDisplayPane = new StackPane();
 
-        if (LobbyState.getGameData().getCurrentGamePhaseType() == GamePhaseType.ASSEMBLE) {
-            Button backButton = new Button("Back");
-            backButton.setOnMouseClicked(e -> {
-                if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
-                    AssembleUI.getInstance().setAssembleLayout(AssembleUI.AssemblePane.PLAYER_BOARD);
-                }
-            });
-            this.getChildren().addAll(boardDisplayPane, backButton);
-        }else{
-            this.getChildren().addAll(boardDisplayPane);
-        }
+        Button backButton = new Button("Back");
+        backButton.setOnMouseClicked(e -> {
+            if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
+                AssembleUI.getInstance().setAssembleLayout(AssembleUI.AssemblePane.PLAYER_BOARD);
+            }else{
+                AdventureUI.getInstance().setAdventureLayout(AdventureUI.AdventurePane.PLAYER_BOARD);
+            }
+        });
+        this.getChildren().addAll(boardDisplayPane, backButton);
+
 
         this.setSpacing(200);
         this.setAlignment(Pos.CENTER);
