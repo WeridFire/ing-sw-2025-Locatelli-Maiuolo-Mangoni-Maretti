@@ -19,13 +19,35 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * User interface for joining an existing game.
+ * Allows users to enter a game UUID manually or select from a list of active games.
+ * Provides color selection for the player's main cabin and validates availability.
+ * Implements INodeRefreshableOnUpdateUI to update the list of active games and available colors.
+ */
 public class JoinGameUI implements INodeRefreshableOnUpdateUI {
+    /**
+     * The main layout container for all UI components.
+     */
     private final VBox layout;
+    /**
+     * Text field for manually entering a game UUID.
+     */
     private final TextField gameUUIDField;
+    /**
+     * List view displaying currently active games.
+     */
     private final ListView<String> activeGamesList;
 
+    /**
+     * Toggle group for managing color selection buttons.
+     */
     private final ToggleGroup colorToggleGroup = new ToggleGroup();
 
+    /**
+     * Constructs the join game UI with all necessary components.
+     * @param username The username of the player attempting to join.
+     */
     public JoinGameUI(String username) {
         Label uuidLabel = new Label("Enter game UUID:");
         uuidLabel.getStyleClass().add("label");
@@ -88,11 +110,21 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
         );
     }
 
+    /**
+     * Converts a color enum value to a user-friendly display name.
+     * @param color The color enum value.
+     * @return A capitalized string representation of the color.
+     */
     private String getColorDisplayName(MainCabinTile.Color color) {
         String name = color.toString().toLowerCase();
         return Character.toUpperCase(name.charAt(0)) + name.substring(1);
     }
 
+    /**
+     * Creates and configures the join game button with appropriate event handling.
+     * @param username The username of the player attempting to join.
+     * @return A configured Button for joining the game.
+     */
     private Button createJoinGameButton(String username) {
         Button joinGameButton = new Button("Join Game");
         joinGameButton.getStyleClass().add("button");
@@ -118,10 +150,19 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
         return joinGameButton;
     }
 
+    /**
+     * Updates the list of active games displayed in the ListView.
+     * @param activeGames The updated list of active game UUIDs.
+     */
     private void refreshActiveGamesList(List<String> activeGames) {
         activeGamesList.getItems().setAll(activeGames);
     }
 
+    /**
+     * Updates the availability of color selection buttons based on the current game.
+     * Disables colors that are already taken by other players.
+     * @param availableColors Set of colors that are still available for selection.
+     */
     private void refreshColorsAvailability(Set<MainCabinTile.Color> availableColors) {
         Toggle selectedToggle = colorToggleGroup.getSelectedToggle();
 
@@ -143,6 +184,10 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
         }
     }
 
+    /**
+     * Retrieves the set of available colors for the currently entered game UUID.
+     * @return Set of colors available for selection, or all colors if UUID is invalid.
+     */
     private Set<MainCabinTile.Color> getAvailableColors() {
         MainCabinTile.Color[] availableColors;
         try {
@@ -155,10 +200,19 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
         return new HashSet<>(List.of(availableColors));
     }
 
+    /**
+     * Returns the main layout container for this UI.
+     * @return The VBox containing all UI components.
+     */
     public VBox getLayout() {
         return layout;
     }
 
+    /**
+     * Refreshes the UI components based on a new client update from the server.
+     * Updates the list of active games and refreshes color availability.
+     * @param update The ClientUpdate containing the new game state.
+     */
     @Override
     public void refreshOnUpdate(ClientUpdate update) {
         Platform.runLater(() -> {
