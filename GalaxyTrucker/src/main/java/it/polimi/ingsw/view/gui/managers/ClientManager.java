@@ -7,10 +7,7 @@ import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.util.Default;
 import it.polimi.ingsw.view.View;
-import it.polimi.ingsw.view.gui.UIs.INodeRefreshableOnUpdateUI;
-import it.polimi.ingsw.view.gui.UIs.JoinGameUI;
-import it.polimi.ingsw.view.gui.UIs.LobbyUI;
-import it.polimi.ingsw.view.gui.UIs.LoginUI;
+import it.polimi.ingsw.view.gui.UIs.*;
 import it.polimi.ingsw.view.gui.style.CSS;
 import it.polimi.ingsw.view.gui.utils.AlertUtils;
 import javafx.application.Platform;
@@ -278,7 +275,16 @@ public class ClientManager {
 
 
     private void handleResumeGame(UUID gameId){
-        ClientManager.getInstance().simulateCommand("resume", gameId.toString());
+        Platform.runLater(() -> {
+            ClientManager.getInstance().simulateCommand("resume", gameId.toString());
+            try{
+                if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE))
+                    ClientManager.getInstance().updateScene(AssembleUI.getInstance());
+                else
+                    ClientManager.getInstance().updateScene(AdventureUI.getInstance());
+            } catch (Exception e) {}
+        });
+
     }
 
     /**
@@ -297,6 +303,16 @@ public class ClientManager {
      * @param username the username of the client attempting to join
      */
     public void handleJoinGame(String username) {
+        try{
+            if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)) {
+                updateScene(AssembleUI.getInstance());
+                return;
+            }
+            else if (CommonState.isCurrentPhase(GamePhaseType.ADVENTURE)) {
+                updateScene(AdventureUI.getInstance());
+                return;
+            }
+        }catch (Exception e) {}
         updateScene(new JoinGameUI(username));
     }
 
