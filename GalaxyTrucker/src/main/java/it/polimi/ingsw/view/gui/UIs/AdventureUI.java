@@ -323,6 +323,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
             // Gestisci il PIR
             PIR newPir = PIRState.getActivePIR();
             dropManuallyHandledPIRs(newPir);
+            cardPane.setEndTurnButtonVisible(newPir != null);
             if (newPir != null) {
                 if (lastPIR == null || !lastPIR.getId().equals(newPir.getId())) {
                     lastPIR = newPir;

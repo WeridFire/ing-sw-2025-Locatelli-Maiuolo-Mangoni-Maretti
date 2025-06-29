@@ -68,4 +68,8 @@ public class CardContainer extends VBox {
 
         imageView.setImage(AssetHandler.loadRawImage(card.getTextureName()));
     }
+
+    public void setEndTurnButtonVisible(boolean visible) {
+        endTurnButton.setVisible(visible);
+    }
 }
