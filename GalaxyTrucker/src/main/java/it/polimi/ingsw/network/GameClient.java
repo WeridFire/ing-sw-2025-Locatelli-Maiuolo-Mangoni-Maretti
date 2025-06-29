@@ -166,7 +166,6 @@ public class GameClient implements IClient {
 		// connect the client to the server
 		gameClient.getServer().connect(gameClient.getClient());
         // run the view (blocking function)
-
 		gameClient.getView().run();
 	}
 }
