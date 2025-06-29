@@ -213,7 +213,7 @@ public class ClientManager {
      *
      * @param username the username of the current client
      */
-    private void createOrJoinGame(String username) {
+    public void createOrJoinGame(String username) {
         Label headerLabel = new Label("GALAXY TRUCKER");
         headerLabel.getStyleClass().add("header-label");
 
