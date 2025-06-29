@@ -11,8 +11,10 @@ import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.components.*;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 
@@ -57,7 +59,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     /**
      * Defines the maximum height for the scrollable area containing drawn tiles.
      */
-    private static final double MAX_TOP_SCROLL_PANE_HEIGHT = 500.0;
+    private static final double MAX_TOP_SCROLL_PANE_HEIGHT = 420.0;
 
     /**
      * The overlay pane used for drag-and-drop operations.
@@ -126,31 +128,43 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         // main grid for player own board
         mainGrid = new GridPane();
         mainGrid.setAlignment(Pos.CENTER);
+        
         // Initialize components
         leftGrid = createShipGrid();
         rightPane = createCoveredTilesPane();
         topScrollPane = createDrawnTilesScrollPane();
         topRightVBox = createDecksAndTimerGrid();
+        
         // set equal width
         double calculatedTopScrollPaneWidth = leftGrid.getPrefWidth();
         topScrollPane.setPrefWidth(calculatedTopScrollPaneWidth);
         topScrollPane.setMinWidth(calculatedTopScrollPaneWidth);
         topScrollPane.setMaxWidth(calculatedTopScrollPaneWidth);
+        
         // add elements to main grid
         mainGrid.add(topScrollPane, 0, 0);
         mainGrid.add(leftGrid, 0, 1);
         mainGrid.add(rightPane, 1, 1);
         mainGrid.add(topRightVBox, 1, 0);
 
+        // Apply styling to grid components
+        applyComponentStyles();
+
         // board component for shared board
         boardComponent = BoardComponent.create(LobbyState.getGameLevel());
-        boardComponent.setStyle("-fx-border-color: lightgray; -fx-border-width: 1;");
+        boardComponent.setStyle("-fx-border-color: #4dd0e1; -fx-border-width: 1; -fx-background-color: #1a1c2c;");
 
         // this scene root
         root = new StackPane();
         root.setAlignment(Pos.CENTER);
+        root.setStyle("-fx-background-color: #1a1c2c; -fx-background: #1a1c2c;"); // Assicura lo sfondo completo
+        root.setBackground(new Background(new BackgroundFill(javafx.scene.paint.Color.valueOf("#1a1c2c"), 
+                                     null, null)));
         root.getChildren().addAll(mainGrid, boardComponent, getDragOverlay());
 
+        // Assicura che il StackPane root occupi tutto lo spazio disponibile
+        root.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        
         // set starting view
         setAssembleLayout(AssemblePane.PLAYER_BOARD);
     }
@@ -159,12 +173,18 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
      * Switches the visible layout between the player's board and the shared game board.
      * @param paneToShow The pane to display.
      */
-    public void setAssembleLayout(AssemblePane paneToShow){
+    public void setAssembleLayout(AssemblePane paneToShow) {
         mainGrid.setVisible(paneToShow == AssemblePane.PLAYER_BOARD);
         boardComponent.setVisible(paneToShow == AssemblePane.SHARED_BOARD);
 
-        //TODO: remove these 3 lines
+        // Assicura che lo sfondo sia applicato all'intera scena
+        if (root.getScene() != null) {
+            root.getScene().getRoot().setStyle("-fx-background-color: #1a1c2c;");
+        }
+
+        // TODO: remove these lines when no longer needed
         Button cheatButton = new Button("cheat");
+        styleButton(cheatButton);
         cheatButton.setOnMouseClicked(event -> handleCheatButton());
         root.getChildren().add(cheatButton);
     }
@@ -222,15 +242,38 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     }
 
     /**
+     * Applies futuristic space theme styling to all components
+     */
+    private void applyComponentStyles() {
+        // Style for scroll pane
+        topScrollPane.setStyle("-fx-background: #1a1c2c; -fx-background-color: rgba(0,0,0,0.2); -fx-border-color: #444; -fx-border-width: 1;");
+        
+        // Style VBox
+        topRightVBox.setStyle("-fx-padding: 10; -fx-spacing: 10; -fx-background-color: rgba(0,0,0,0.2); -fx-border-color: #444; -fx-border-width: 1;");
+        
+        // Style the right pane
+        rightPane.setStyle("-fx-background-color: rgba(26, 28, 44, 0.8); -fx-border-color: #444; -fx-border-width: 1;");
+    }
+
+    /**
      * Creates a VBox containing the timer, action buttons, and deck components.
      * @return A configured {@link VBox}.
      */
-    private VBox createDecksAndTimerGrid(){
+    private VBox createDecksAndTimerGrid() {
         VBox decksAndTimerGrid = new VBox();
 
         TimerComponent timerComponent = TimerComponent.getInstance();
-
+        
+        // Aggiunta di uno sfondo al timer per renderlo più leggibile
+        timerComponent.setStyle("-fx-font-family: 'Consolas', monospace; -fx-font-size: 14px; -fx-text-fill: #d0d0e0;");
+        timerComponent.setBackground(new Background(new BackgroundFill(
+                javafx.scene.paint.Color.valueOf("#2a2e42"), // Colore più scuro ma distinguibile
+                new CornerRadii(3), 
+                null)));
+        timerComponent.setPadding(new Insets(10, 15, 10, 15));
+        
         Button flipButton = new Button("Flip Timer");
+        styleButton(flipButton);
         flipButton.setOnMouseClicked(event -> {
             Platform.runLater(() -> {
                 ClientManager.getInstance().simulateCommand("timerflip");
@@ -238,6 +281,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         });
 
         Button finishButton = new Button("Finish Assembling");
+        styleButton(finishButton);
         finishButton.setOnMouseClicked(event -> {
             Platform.runLater(() -> {
                 ClientManager.getInstance().simulateCommand("finish");
@@ -252,13 +296,14 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
 
         decksAndTimerGrid.getChildren().addAll(timerComponent, flipButton, finishButton, boardButton, spectateVBox);
 
-        if (LobbyState.getGameLevel() != GameLevel.TESTFLIGHT){
+        if (LobbyState.getGameLevel() != GameLevel.TESTFLIGHT) {
             DecksComponent decksComponent = new DecksComponent();
+            styleDecksComponent(decksComponent);
             decksAndTimerGrid.getChildren().add(decksComponent);
         }
 
-        decksAndTimerGrid.setSpacing(20);
-        decksAndTimerGrid.setStyle("-fx-padding: 20;");
+        decksAndTimerGrid.setSpacing(15);
+        decksAndTimerGrid.setStyle("-fx-padding: 15; -fx-background-color: rgba(26, 28, 44, 0.8); -fx-border-color: #444; -fx-border-width: 1;");
 
         // start timer
         if (AssembleState.isTimerRunning()) {
@@ -274,11 +319,48 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
      */
     private Button getBoardButton() {
         Button boardButton = new Button("Board");
+        styleButton(boardButton);
         boardButton.setOnMouseClicked(event -> {
             setAssembleLayout(AssemblePane.SHARED_BOARD);
             boardComponent.addPlayers();
         });
         return boardButton;
+    }
+
+    /**
+     * Applies consistent styling to a button
+     * @param button The button to style
+     */
+    private void styleButton(Button button) {
+        button.setStyle("-fx-background-color: transparent; -fx-text-fill: #4dd0e1; -fx-border-color: #4dd0e1; " +
+                       "-fx-border-width: 1px; -fx-padding: 5 12; -fx-font-size: 13px; " +
+                       "-fx-background-radius: 0; -fx-border-radius: 0;");
+        
+        // Add hover effect
+        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #4dd0e1; -fx-text-fill: #1a1c2c; " +
+                                               "-fx-border-color: #4dd0e1; -fx-border-width: 1px; " +
+                                               "-fx-padding: 5 12; -fx-font-size: 13px; " +
+                                               "-fx-background-radius: 0; -fx-border-radius: 0;"));
+        
+        button.setOnMouseExited(e -> button.setStyle("-fx-background-color: transparent; -fx-text-fill: #4dd0e1; " +
+                                              "-fx-border-color: #4dd0e1; -fx-border-width: 1px; " +
+                                              "-fx-padding: 5 12; -fx-font-size: 13px; " +
+                                              "-fx-background-radius: 0; -fx-border-radius: 0;"));
+    }
+
+    /**
+     * Applies styling to the decks component
+     * @param component The DecksComponent to style
+     */
+    private void styleDecksComponent(DecksComponent component) {
+        component.setStyle("-fx-spacing: 10; -fx-padding: 5;");
+        
+        // Style all buttons in the component
+        component.getChildren().forEach(node -> {
+            if (node instanceof Button) {
+                styleButton((Button)node);
+            }
+        });
     }
 
     /**
@@ -351,13 +433,26 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         });
     }
 
-    /**
-     * Handles the action for the cheat button. For debugging purposes.
-     * TODO: Remove this method and the associated button.
-     */
+    //TODO: Remove this method and the associated button.
     public void handleCheatButton() {
         Platform.runLater(() -> {
             ClientManager.getInstance().simulateCommand("cheat", "standard");
         });
+    }
+
+    /**
+     * Applies specific styles to certain components for improved readability and aesthetics.
+     */
+    private void applySpecificStyles() {
+        // Aggiornamenti per il TimerComponent per migliorare la leggibilità
+        TimerComponent timerComponent = TimerComponent.getInstance();
+        timerComponent.setStyle("-fx-font-family: 'Consolas', monospace; -fx-font-size: 14px; -fx-text-fill: #d0d0e0;");
+        
+        // Assicurati che tutto il testo sia visibile
+        timerComponent.setBackground(new Background(new BackgroundFill(
+                javafx.scene.paint.Color.valueOf("#1a1c2c"), 
+                new CornerRadii(5), 
+                null)));
+        timerComponent.setPadding(new Insets(5, 10, 5, 10));
     }
 }

@@ -58,12 +58,14 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
         gameUUIDField.textProperty().addListener((obs, oldText, newText) -> {
             refreshColorsAvailability(getAvailableColors());
         });
+        gameUUIDField.setMaxWidth(200);
 
         Label activeGamesLabel = new Label("Active Games:");
         activeGamesLabel.getStyleClass().add("label");
 
         activeGamesList = new ListView<>(FXCollections.observableArrayList(MenuState.getActiveGamesUUID()));
         activeGamesList.setMaxHeight(150);
+        activeGamesList.setMaxWidth(400);
         activeGamesList.getStyleClass().add("list-view");
         activeGamesList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {

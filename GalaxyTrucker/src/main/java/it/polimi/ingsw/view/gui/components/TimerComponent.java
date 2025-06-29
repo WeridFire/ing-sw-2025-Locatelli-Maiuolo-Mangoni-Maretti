@@ -95,11 +95,14 @@ public class TimerComponent extends TextFlow {
         if (timerSlot == null) {
             texts = new Text[1];
             texts[0] = new Text("Timer not available for this game level");
+            texts[0].setFill(Color.GRAY);
         } else {
             texts = new Text[3 + totalTimerSlots];
             texts[0] = new Text("time left: ");
+            texts[0].setFill(Color.GRAY);
             texts[1] = formatTime(secondsRemaining);
             texts[2] = new Text(" | hourglass slot: ");
+            texts[2].setFill(Color.GRAY);
             int i = 3;
             for (Text slotText: formatSlots(timerSlot)) {
                 texts[i++] = slotText;
