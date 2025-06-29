@@ -1,12 +1,19 @@
 package it.polimi.ingsw.model.cards.warzone;
 
 import it.polimi.ingsw.enums.PowerType;
+import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.playerInput.PIRUtils;
 import it.polimi.ingsw.view.cli.ANSI;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class WarCriteriaPower implements WarCriteria {
 
     private PowerType powerType;
+
+    private Map<Player, Float> powerMap = new HashMap<Player, Float>();
 
     public WarCriteriaPower(PowerType powerType) {
         this.powerType = powerType;
@@ -20,16 +27,27 @@ public class WarCriteriaPower implements WarCriteria {
     }
 
     @Override
+    public Player computeCriteria(GameData game) {
+        game.getPlayersInFlight().stream().filter(p -> !p.hasRequestedEndFlight()).forEach(p -> {
+            float activatedPower = PIRUtils.runPlayerPowerTilesActivationInteraction(p, game, this.powerType);
+            this.powerMap.put(p, activatedPower);
+        });
+		return game.getPlayersInFlight().stream()
+                .max(this).orElse(null);
+    }
+
+
+    @Override
     public int compare(Player p1, Player p2) {
-        // TODO: ask the player to activate cannons/engines if they have not been asked to yet in this WarZone,
-        //  then use the total fire/thrust power
-        float delta = p2.getShipBoard().getVisitorCalculatePowers().getInfoPower(powerType).getBasePower() -
-                p1.getShipBoard().getVisitorCalculatePowers().getInfoPower(powerType).getBasePower();
-        if (delta == 0) {
-            return Integer.compare(p1.getOrder(), p2.getOrder());
-            // order and not position because when a player has a
-            // better position it's like it has worse power (for equal powers)
+        // Use getTotalPower with 0 extraPower for fair comparison
+        float power1 = powerMap.get(p1);
+        float power2 = powerMap.get(p2);
+
+        if (power1 == power2) {
+            // Invert order to break ties: higher order loses to lower order
+            return Integer.compare(p2.getOrder(), p1.getOrder());
         }
-        return (delta > 0) ? 1 : -1;
+
+        return Float.compare(power2, power1); // Descending order: higher power first
     }
 }
