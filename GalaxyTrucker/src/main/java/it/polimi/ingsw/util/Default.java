@@ -29,12 +29,12 @@ public class Default {
 
     //GENRAL
     public static final int TOTAL_TILES_NUMBER = TilesFactory.createPileTiles().size();
-    public static final int HOURGLASS_SECONDS = 10;  // TODO: reset HOURGLASS_SECONDS = 90. This is for debug purposes
+    public static final int HOURGLASS_SECONDS = 90;
 
     // NON-FINAL: "settings" to change during game (used mainly for tests)
     public static int PIR_SECONDS = 60;
     public static int PIR_SHORT_SECONDS = 10;
 
-    public static String STARTING_CARD = "OPEN SPACE";
+    public static String STARTING_CARD = null;
 
 }
