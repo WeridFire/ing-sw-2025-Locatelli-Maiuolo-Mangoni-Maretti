@@ -303,16 +303,6 @@ public class ClientManager {
      * @param username the username of the client attempting to join
      */
     public void handleJoinGame(String username) {
-        try{
-            if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)) {
-                updateScene(AssembleUI.getInstance());
-                return;
-            }
-            else if (CommonState.isCurrentPhase(GamePhaseType.ADVENTURE)) {
-                updateScene(AdventureUI.getInstance());
-                return;
-            }
-        }catch (Exception e) {}
         updateScene(new JoinGameUI(username));
     }
 
