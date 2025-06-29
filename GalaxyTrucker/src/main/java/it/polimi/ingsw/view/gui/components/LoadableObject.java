@@ -77,7 +77,10 @@ public class LoadableObject extends Draggable {
      */
     @Override
     protected boolean canBeDragged() {
-        if (parentCell == null) {
+        if (AdventureUI.getInstance().isSpectating())
+            return false;
+
+        if (parentCell == null ) {
             return true;
         }
         return parentCell.isActiveForAdventureRemove();
@@ -95,7 +98,7 @@ public class LoadableObject extends Draggable {
     @Override
     protected void fallbackDropHandler(){
         if (parentCell != null) {
-            if (parentCell.isActiveForAdventureRemove()){
+            if (parentCell.isActiveForAdventureRemove() && !AdventureUI.getInstance().isSpectating()){
                 Platform.runLater(() -> {
                     ClientManager.getInstance().simulateCommand("remove",  "("+parentCell.getLogicalRow()+","+parentCell.getLogicalColumn()+")", type.toString(), "1");
                     AdventureUI.getInstance().getShipGrid().update();
