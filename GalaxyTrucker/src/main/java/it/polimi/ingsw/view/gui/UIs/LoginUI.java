@@ -65,13 +65,16 @@ public class LoginUI {
         usernameField = new TextField();
         rmiCheckBox = new CheckBox("Use RMI Hyper-Relay");
         serverNameField = new TextField();
+        serverNameField.setMaxWidth(200);
         serverPortField = new TextField();
+        serverPortField.setMaxWidth(200);
         loginButton = new Button("Engage");
 
         // setup components
 
         usernameField.setPromptText("Call Sign");
         usernameField.getStyleClass().add("text-field");
+        usernameField.setMaxWidth(200);
         usernameField.setTextFormatter(new TextFormatter<>(change -> {
             if (change.getText().equals(" ")) change.setText("");
             return change;

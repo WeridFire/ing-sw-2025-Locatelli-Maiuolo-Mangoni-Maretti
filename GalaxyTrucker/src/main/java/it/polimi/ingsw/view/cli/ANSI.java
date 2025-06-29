@@ -51,8 +51,12 @@ public class ANSI {
 
 	public static String sanitizeCLIText(String input) {
 		String out = ANSI.Helper.stripAnsi(input);
+
 		out = out.replaceAll("[^a-zA-Z0-9 \\n]", "");
 		out = out.replaceAll(" {2,}", " ");
+		out = out.replaceAll("\\n{2,}", "\n");
+		out = out.replaceAll("^\\n+", "");
+
 		return out;
 	}
 	public static final String RESET = "\u001B[0m";

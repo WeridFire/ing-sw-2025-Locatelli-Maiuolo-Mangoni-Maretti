@@ -26,7 +26,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.rmi.NotBoundException;
@@ -240,6 +239,7 @@ public class ClientManager {
         javafx.scene.control.TextField uuidField = new javafx.scene.control.TextField();
         uuidField.setPromptText("Enter Convoy UUID");
         uuidField.getStyleClass().add("text-field");
+        uuidField.setMaxWidth(200);
 
         Button resumeButton = new Button("Resume Mission");
         resumeButton.setOnAction(_ -> {

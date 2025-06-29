@@ -108,6 +108,11 @@ public class PIRHandler implements Serializable {
 		// setup the pir
 		if (!isPlayerReadyForInputRequest(pir.getCurrentPlayer())) {
 			Logger.error("Can not start new turn while another turn has not ended itself");
+			try{
+				throw new Exception();
+			}catch (Exception e){
+				e.printStackTrace();
+			}
 			return;
 		}
 		synchronized (activePIRs) {
