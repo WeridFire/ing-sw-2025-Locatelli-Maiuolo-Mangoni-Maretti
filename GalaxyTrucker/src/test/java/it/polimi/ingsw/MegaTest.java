@@ -104,7 +104,7 @@ public class MegaTest {
      */
     @BeforeEach
     public void setup() throws NotBoundException, IOException, InterruptedException {
-        assertDoesNotThrow(GameServer::start);  // start the server
+        assertDoesNotThrow(() -> GameServer.start());  // start the server
         assertThrows(AlreadyRunningServerException.class, GameServer::start);  // can't run multiple servers
 
         // initialize clients and expect their initial refresh
