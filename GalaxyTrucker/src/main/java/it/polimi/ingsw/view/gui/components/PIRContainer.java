@@ -75,17 +75,7 @@ public class PIRContainer extends StackPane {
         addCloseButton();
 
         if(!pir.getHighlightMask().isEmpty()){
-            Button butt = new Button("Confirm Activation");
-            butt.setOnMouseClicked(e -> {
-                Platform.runLater(() -> {
-                    if(!shipGrid.getCellsToActivate().isEmpty()){
-                        ClientManager.getInstance().simulateCommand("activate", formatCoordinates(shipGrid.getCellsToActivate()));
-                        shipGrid.getCellsToActivate().clear();
-                        AdventureUI.getInstance().getCardPane().getChildren().remove(butt);
-                    }
-                });
-            });
-            AdventureUI.getInstance().getCardPane().getChildren().add(butt);
+            AdventureUI.getInstance().addConfirmButton();
         }
     }
 

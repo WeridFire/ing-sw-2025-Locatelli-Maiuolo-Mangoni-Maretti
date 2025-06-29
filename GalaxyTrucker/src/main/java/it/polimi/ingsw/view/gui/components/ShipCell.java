@@ -234,6 +234,7 @@ public class ShipCell extends DropSlot {
                     setStyle(SELECTED_STYLE); // Show selected style
                 }
             });
+            this.setStyle(DEFAULT_CELL_STYLE);
         }
     }
 

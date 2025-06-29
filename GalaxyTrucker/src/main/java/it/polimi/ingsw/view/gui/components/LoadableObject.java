@@ -85,9 +85,11 @@ public class LoadableObject extends Draggable {
 
     @Override
     protected void onEndDrag(boolean dropAccepted) {
-        Pane parent = (Pane) this.getParent();
-        if (parent == null) return;
-        parent.getChildren().remove(this);
+        if (dropAccepted || (parentCell != null && parentCell.isActiveForAdventureRemove())) {
+            Pane parent = (Pane) this.getParent();
+            if (parent == null) return;
+            parent.getChildren().remove(this);
+        }
     }
 
     @Override

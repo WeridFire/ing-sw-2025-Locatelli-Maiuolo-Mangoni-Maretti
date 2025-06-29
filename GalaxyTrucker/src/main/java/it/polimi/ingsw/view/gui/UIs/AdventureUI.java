@@ -4,7 +4,6 @@ import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.controller.states.PIRState;
 import it.polimi.ingsw.enums.GameLevel;
-import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.model.playerInput.PIRType;
 import it.polimi.ingsw.model.playerInput.PIRs.PIR;
 import it.polimi.ingsw.model.shipboard.integrity.IntegrityProblem;
@@ -20,6 +19,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+
+import static it.polimi.ingsw.view.gui.components.PIRContainer.formatCoordinates;
 
 
 /**
@@ -43,6 +44,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     private PIRContainer pirContainer = new PIRContainer();
     private PirDelayContainer pirDelayContainer = new PirDelayContainer();
     private Button integrityButton;
+    private Button confirmActivationButton;
 
     private Rectangle overlayBackground;
 
@@ -126,6 +128,28 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         Platform.runLater(() -> {
             ClientManager.getInstance().updateScene(new ScoreUI());
         });
+    }
+
+    public void addConfirmButton() {
+        if (confirmActivationButton == null){
+            confirmActivationButton = new Button("Confirm Activation");
+            confirmActivationButton.setOnMouseClicked(e -> {
+                Platform.runLater(() -> {
+                    if (!shipGrid.getCellsToActivate().isEmpty()) {
+                        ClientManager.getInstance().simulateCommand("activate", formatCoordinates(shipGrid.getCellsToActivate()));
+                        shipGrid.getCellsToActivate().clear();
+                        removeConfirmButton();
+                    }
+                });
+            });
+            AdventureUI.getInstance().getCardPane().getChildren().add(confirmActivationButton);
+        }
+        confirmActivationButton.setVisible(true);
+    }
+
+    public void removeConfirmButton() {
+        if (confirmActivationButton!=null)
+            confirmActivationButton.setVisible(false);
     }
 
     /**
@@ -266,6 +290,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
             if (newPir != null) {
                 if (lastPIR == null || !lastPIR.getId().equals(newPir.getId())) {
                     lastPIR = newPir;
+                    removeConfirmButton();
                     try {
                         System.out.println("Setting pir to " + lastPIR.getPIRType());
                         if (!handleTaggedPIR(lastPIR)) {
