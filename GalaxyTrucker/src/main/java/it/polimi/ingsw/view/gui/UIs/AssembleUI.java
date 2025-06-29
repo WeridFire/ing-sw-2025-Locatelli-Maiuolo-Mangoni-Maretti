@@ -165,10 +165,13 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         root.setBackground(new Background(new BackgroundFill(javafx.scene.paint.Color.valueOf("#1a1c2c"), 
                                      null, null)));
         root.getChildren().addAll(mainGrid, boardComponent, getDragOverlay());
+        root.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                root.prefWidthProperty().bind(newScene.widthProperty());
+                root.prefHeightProperty().bind(newScene.heightProperty());
+            }
+        });
 
-        // Assicura che il StackPane root occupi tutto lo spazio disponibile
-        root.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        
         // set starting view
         setAssembleLayout(AssemblePane.PLAYER_BOARD);
     }
@@ -429,21 +432,5 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
                 leftGrid.update();
             }
         });
-    }
-
-    /**
-     * Applies specific styles to certain components for improved readability and aesthetics.
-     */
-    private void applySpecificStyles() {
-        // Aggiornamenti per il TimerComponent per migliorare la leggibilità
-        TimerComponent timerComponent = TimerComponent.getInstance();
-        timerComponent.setStyle("-fx-font-family: 'Consolas', monospace; -fx-font-size: 14px; -fx-text-fill: #d0d0e0;");
-        
-        // Assicurati che tutto il testo sia visibile
-        timerComponent.setBackground(new Background(new BackgroundFill(
-                javafx.scene.paint.Color.valueOf("#1a1c2c"), 
-                new CornerRadii(5), 
-                null)));
-        timerComponent.setPadding(new Insets(5, 10, 5, 10));
     }
 }
