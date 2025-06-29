@@ -133,8 +133,3 @@ mvn test
 ---
 
 ```
-
----
-
-Se vuoi, posso anche generarti un file `.md` pronto da scaricare. Fammi sapere!
-```
