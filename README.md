@@ -1,7 +1,22 @@
-Componenti del gruppo:
-Davide Locatelli, Manuel Maiuolo, Adriano Claudio Mangoni, Filippo Maretti
+## Componenti del Gruppo
+- **Davide Locatelli**
+- **Manuel Maiuolo**
+- **Adriano Claudio Mangoni**
+- **Filippo Maretti**
 
-Funzionalità implementate:
-Regole Complete, TUI + GUI, RMI e Socket, Volo di prova, Partite multiple, Persistenza, Resilienza alle disconnessioni
+## Funzionalità Implementate ✅
 
-Copertura dei test ~75%
+| Funzionalità                          | Completata |
+|--------------------------------------|:----------:|
+| Regole Complete                      | ✅         |
+| TUI + GUI                            | ✅         |
+| RMI e Socket                         | ✅         |
+| Volo di prova                        | ✅         |
+| Partite multiple                     | ✅         |
+| Persistenza                          | ✅         |
+| Resilienza alle disconnessioni      | ✅         |
+
+## Copertura dei Test
+**75% Copertura**
+
+🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜ 75%
