@@ -130,6 +130,3 @@ mvn test
 * Il sistema è progettato per reggere disconnessioni temporanee e ripristini automatici.
 * GUI e TUI possono essere usate contemporaneamente con lo stesso server.
 
----
-
-```
