@@ -47,7 +47,11 @@ public class AdventureCommandsProcessor extends PhaseCommandsProcessor {
         switch (command) {
             case "" : return true;  // valid onVoid
 
-            case "endFlight" :
+            case "endTurn":  // not allowed: it is from PIRs propagation
+                view.showInfo("Command not allowed at the moment",
+                        "Hold tight: waiting for another player's cosmic maneuvers...");
+                return false;
+            case "endFlight":
                 Player player = CommonState.getPlayer();
                 if (player.isEndedFlight()) {
                     view.showWarning("You have already ended the flight.");
