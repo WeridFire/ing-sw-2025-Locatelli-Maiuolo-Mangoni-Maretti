@@ -14,3 +14,4 @@ Partite multiple
 Persistenza
 Resilienza alle disconnessioni
 
+Copertura dei test ~75%
