@@ -187,20 +187,6 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
         // Add to local cargo
         addToLocalCargo(coord, loadableType, amount);
         return true;
-        /*
-
-        // Check if all loadables have been allocated
-        int remaining = floatingLoadables.size() - countTotalAllocated();
-
-        if (remaining > 0) {
-            view.showInfo("Added " + amount + " " + loadableType + " to " + coord + ". " +
-                    remaining + " loadables remaining to allocate. Use >confirm to confirm the choice.");
-            return false;
-        }
-
-        return true;
-
-         */
     }
     private void executeAllocateCommand() throws RemoteException {
         Map<Coordinates, List<LoadableType>> localCargo = PIRState.getLocalCargo();
@@ -281,19 +267,6 @@ public class PIRCommandsProcessor extends PhaseCommandsProcessor {
 
         // Add to local cargo for removal
         addToLocalCargo(removeCoord, removeLoadableType, removeAmount);
-
-        view.showInfo("Marked " + removeAmount + " " + removeLoadableType + " at coordinate " + removeCoord + " for removal.");
-
-        // Check if we've reached the total amount to remove
-        currentTotalRemoval += removeAmount;
-        int remaining = amountToRemove - currentTotalRemoval;
-
-        if (remaining > 0) {
-            view.showInfo("Marked " + removeAmount + " " + removeLoadableType + " at " + removeCoord + " for removal. " +
-                    remaining + " more items need to be selected for removal. Use >confirm to confirm the choice.");
-            return false;
-        }
-
         return true;
     }
 

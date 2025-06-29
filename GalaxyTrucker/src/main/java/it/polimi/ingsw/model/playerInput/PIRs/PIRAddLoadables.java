@@ -48,7 +48,6 @@ public class PIRAddLoadables extends PIR {
 	 * Checks that all the items the player wants to add are actually present in the list of cargo that can be added.
 	 * This prevents duplicates or generation of items that the game hasn't awarded.
 	 * @param cargoToAdd
-	 * @return
 	 */
 	public void areAllCargoItemsAvailable(Map<Coordinates, List<LoadableType>> cargoToAdd) throws UnsupportedLoadableItemException {
 		// Convert floatingLoadables to a HashSet for faster lookups
@@ -123,12 +122,17 @@ public class PIRAddLoadables extends PIR {
 		}
 		areAllCargoItemsAvailable(cargoToAdd);
 
+		Map<Coordinates, ContainerTile> containerTiles = currentPlayer.getShipBoard()
+				.getVisitorCalculateCargoInfo()
+				.getInfoAllContainers()
+				.getLocations();
+
 		for(Map.Entry<Coordinates, List<LoadableType>> entry : cargoToAdd.entrySet()){
-			ContainerTile container = currentPlayer.getShipBoard()
-											.getVisitorCalculateCargoInfo()
-											.getInfoAllContainers()
-											.getLocations()
-											.get(entry.getKey());
+			ContainerTile container = containerTiles.get(entry.getKey());
+			if(container == null){
+				//shouldn't really happen tbh
+				throw new TileNotAvailableException(entry.getKey(), getPIRType());
+			}
 			for(LoadableType loadable : entry.getValue()){
 				container.loadItems(loadable, 1);
 				getFloatingLoadables().remove(loadable);

@@ -206,7 +206,7 @@ public class PIRUtils {
 		Function<Player, String> messageRetriever = (p) -> cause
 				+ (Objects.equals(p.getUsername(), diceTosser.getUsername())
 				? ": The fate is in your hand, toss the dice!"
-                : diceTosser.toColoredString(": ", " is deciding the fate of the flight...")
+                : ": " + diceTosser.toColoredString() + " is deciding the fate of the flight..."
         );
 		return (p, pirHandler) -> pirHandler.setAndRunTurn(new PIRDelay(p,
 				Default.PIR_SHORT_SECONDS, messageRetriever.apply(p), null));
