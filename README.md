@@ -111,9 +111,7 @@ mvn test
 ```
 
 ### Copertura
-La copertura del modulo model si attesta intorno al 75%,
-un valore coerente con quanto indicato dai responsabili e compatibile con una strategia
-di testing sostenibile.
+La copertura del modulo model si attesta intorno al 75%
 
 Abbiamo adottato buone pratiche progettuali, come l'uso di checked exceptions
 e validazioni preventive, che rendono molti blocchi catch formalmente necessari
@@ -125,7 +123,7 @@ Il controller è stato testato in modo selettivo, focalizzandoci sulle parti pi�
 come raccomandato.
 
 Abbiamo quindi privilegiato la qualità e la significatività dei test,
-garantendo la stabilità del sistema senza forzare una copertura totale.
+garantendo la stabilità del sistema.
 
 
 ## 📌 Note Finali
