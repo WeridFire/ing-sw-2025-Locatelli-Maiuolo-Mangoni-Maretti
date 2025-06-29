@@ -22,7 +22,6 @@ import java.util.Set;
 
 public class PIRRemoveLoadables extends PIR {
 
-	private int targetAmount;
 	private int amountToRemove;
 	private final Set<LoadableType> allowedCargo;
 
@@ -34,15 +33,8 @@ public class PIRRemoveLoadables extends PIR {
 	public PIRRemoveLoadables(Player currentPlayer, int cooldown, Set<LoadableType> allowedCargo, int amount) {
 		super(currentPlayer, cooldown, PIRType.REMOVE_CARGO);
 		this.allowedCargo = allowedCargo;
-
-		this.targetAmount = currentPlayer
-						.getShipBoard()
-						.getVisitorCalculateCargoInfo()
-						.getInfoAllContainers().countAll(allowedCargo) - amount;
 		this.amountToRemove = amount;
-		if(this.targetAmount < 0){
-			this.targetAmount = 0;
-		}
+
 		resendRequest = false;
 	}
 
@@ -76,7 +68,7 @@ public class PIRRemoveLoadables extends PIR {
 	public void run() throws InterruptedException {
 		synchronized (lock){
 			lock.wait(getCooldown()* 1000L);
-			if(getCargoAmount() > targetAmount){
+			if (!resendRequest && amountToRemove > 0) {
 				System.out.println("Removing default loadables...");
 				if(this.allowedCargo.containsAll(LoadableType.CREW_SET)){  // crew
 					currentPlayer.getShipBoard().loseCrew(amountToRemove);
@@ -113,15 +105,17 @@ public class PIRRemoveLoadables extends PIR {
 		for(Coordinates c : cargoToRemove.keySet()){
 			checkForTileMask(c);
 		}
+
+		Map<Coordinates, ContainerTile> containerTiles = currentPlayer.getShipBoard()
+				.getVisitorCalculateCargoInfo()
+				.getInfoAllContainers()
+				.getLocations();
+
 		for(Map.Entry<Coordinates, List<LoadableType>> entry : cargoToRemove.entrySet()){
 			if(!allowedCargo.containsAll(entry.getValue())){
 				throw new UnsupportedLoadableItemException(new HashSet<>(entry.getValue()), allowedCargo);
 			}
-			ContainerTile containerTile = currentPlayer.getShipBoard()
-											.getVisitorCalculateCargoInfo()
-											.getInfoAllContainers()
-											.getLocations()
-											.get(entry.getKey());
+			ContainerTile containerTile = containerTiles.get(entry.getKey());
 			if(containerTile == null){
 				//shouldn't really happen tbh
 				throw new TileNotAvailableException(entry.getKey(), getPIRType());
@@ -140,7 +134,6 @@ public class PIRRemoveLoadables extends PIR {
 	}
 
 	/**
-	 * Returns the amount of loadable items to remove from the shipboard.
 	 * @return The amount of loadable items to remove from the shipboard.
 	 */
 	public int getAmountToRemove() {
@@ -163,19 +156,19 @@ public class PIRRemoveLoadables extends PIR {
 
 		for (LoadableType type : getAllowedCargo()) {
 			frame = frame.merge(
-					new CLIFrame( "  - " + type.getUnicodeColoredString() + "[" + type +"]"),
+					new CLIFrame(type.getUnicodeColoredString() + "[" + type +"]"),
 					Direction.SOUTH, 0
 			);
 		}
 
-		frame = frame.merge(new CLIFrame(new String[] {
-				"",
-				"Remaining to remove: " + ANSI.YELLOW + (getAmountToRemove()) + ANSI.RESET
-		}), Direction.SOUTH, 1);
+		frame = frame.merge(
+				new CLIFrame("Remaining to remove: " + ANSI.YELLOW + (getAmountToRemove()) + ANSI.RESET),
+				Direction.SOUTH, 1
+		);
 
 		frame = frame.merge(
 				new CLIFrame(ANSI.CYAN + " Containers with Removable Cargo: " + ANSI.RESET),
-				Direction.SOUTH, 0
+				Direction.SOUTH, 1
 		);
 
 		Map<Coordinates, ContainerTile> containers = getContainerTiles();

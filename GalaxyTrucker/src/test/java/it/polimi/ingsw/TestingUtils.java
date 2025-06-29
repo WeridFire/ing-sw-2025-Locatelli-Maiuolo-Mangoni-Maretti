@@ -41,7 +41,7 @@ public class TestingUtils {
 	 * @return The array of clients instances.
 	 */
 	public static GameClientMock[] setupServerAndClients(int clientsAmount, AtomicReference<Throwable> error){
-		assertDoesNotThrow(GameServer::start);
+		assertDoesNotThrow(() -> GameServer.start());
 		GameClientMock[] clients = new GameClientMock[clientsAmount];
 		for (int i = 0; i < clientsAmount; i++) {
 			clients[i] = new GameClientMock(getCoolName(i), error).assertRefresh();

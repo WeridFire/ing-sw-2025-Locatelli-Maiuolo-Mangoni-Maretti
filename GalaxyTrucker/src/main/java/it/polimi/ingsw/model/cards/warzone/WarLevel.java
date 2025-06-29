@@ -8,6 +8,7 @@ import it.polimi.ingsw.view.cli.CLIFrame;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
 
 public class WarLevel implements Serializable {
 
@@ -32,12 +33,12 @@ public class WarLevel implements Serializable {
 	}
 
 	/**
-	 * Selects the worst player out of the players in the game instance. Uses the warcriteria declared in building
+	 * Selects the worst player out of the players in the list. Uses the warcriteria declared in building
 	 * of the instance
 	 * @return
 	 */
-	public Player getWorstPlayer(GameData game) {
-		return game.getPlayersInFlight().stream()
+	public Player getWorstPlayer(List<Player> players) {
+		return players.stream()
 				.filter(p -> !p.hasRequestedEndFlight())
 				.min(warCriteria).orElse(null);
 	}

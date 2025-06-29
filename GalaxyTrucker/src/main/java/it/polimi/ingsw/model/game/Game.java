@@ -13,6 +13,7 @@ import it.polimi.ingsw.model.gamePhases.AssembleGamePhase;
 import it.polimi.ingsw.model.gamePhases.LobbyGamePhase;
 import it.polimi.ingsw.model.gamePhases.ScoreGamePhase;
 import it.polimi.ingsw.model.gamePhases.exceptions.IllegalStartingPositionIndexException;
+import it.polimi.ingsw.model.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.network.GameServer;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.model.player.Player;
@@ -24,9 +25,11 @@ import it.polimi.ingsw.model.shipboard.exceptions.AlreadyEndedAssemblyException;
 import it.polimi.ingsw.model.gamePhases.exceptions.AlreadyPickedPosition;
 import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
+import it.polimi.ingsw.util.Default;
 
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.concurrent.Delayed;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -273,7 +276,7 @@ public class Game {
 
             // end flight for players that requested it
             for (Player player : getGameData().getPlayers(Player::hasRequestedEndFlight)) {
-                player.endFlight();
+                PIRUtils.runEndFlight(player, gameData.getPIRHandler());
             }
 
             gameData.saveGameState();

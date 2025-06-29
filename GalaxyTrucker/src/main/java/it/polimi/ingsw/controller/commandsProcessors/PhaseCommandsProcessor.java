@@ -31,7 +31,8 @@ public abstract class PhaseCommandsProcessor implements ICommandsProcessor {
             try {
                 performCommand(command, args);
             } catch (RemoteException e) {
-                view.showError(e.getMessage());
+                view.showError("The server abandoned you in deep space\n "
+                        + "Please exit and connect to a new server instance\n " + e.getMessage());
             }
         }
     }

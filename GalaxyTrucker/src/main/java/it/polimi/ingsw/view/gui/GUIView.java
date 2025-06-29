@@ -103,7 +103,7 @@ public class GUIView extends View {
     @Override
     public void showInfo(String title, String content) {
         // System.out.println("GUI function: showInfo -> [" + title + "] >> " + content);
-        //AlertUtils.showInfo(title, content);
+        AlertUtils.showInfo(title, content);
         onRefresh();
     }
 

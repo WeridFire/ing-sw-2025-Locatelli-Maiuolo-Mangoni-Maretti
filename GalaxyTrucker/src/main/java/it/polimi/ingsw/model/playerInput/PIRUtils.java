@@ -206,7 +206,7 @@ public class PIRUtils {
 		Function<Player, String> messageRetriever = (p) -> cause
 				+ (Objects.equals(p.getUsername(), diceTosser.getUsername())
 				? ": The fate is in your hand, toss the dice!"
-                : diceTosser.toColoredString(": ", " is deciding the fate of the flight...")
+                : ": " + diceTosser.toColoredString() + " is deciding the fate of the flight..."
         );
 		return (p, pirHandler) -> pirHandler.setAndRunTurn(new PIRDelay(p,
 				Default.PIR_SHORT_SECONDS, messageRetriever.apply(p), null));
@@ -242,6 +242,14 @@ public class PIRUtils {
 			PIRUtils.getRunnerProjectileInfo(diceTosser, cause).accept(diceTosser, game.getPIRHandler());
 			PIRUtils.runPlayerHitAttempt(diceTosser, proj, game);
 		}
+	}
+
+	public static void runEndFlight(Player player, PIRHandler pirHandler) {
+		boolean ended = player.endFlight();
+		pirHandler.setAndRunTurn(new PIRDelay(player, Default.PIR_SHORT_SECONDS, (ended
+				? "Here your flight falls silent, echoing across the stars..."
+				: "Against all odds, the stars aligned: you're not done yet, continue your flight!"),
+				null));
 	}
 
 

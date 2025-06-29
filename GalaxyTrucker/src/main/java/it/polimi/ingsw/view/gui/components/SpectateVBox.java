@@ -3,6 +3,7 @@ package it.polimi.ingsw.view.gui.components;
 import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.view.gui.UIs.AdventureUI;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -22,11 +23,13 @@ public class SpectateVBox extends VBox {
     private ArrayList<Player> players;
     private int playerIndex;
     private String playerName;
+    private String actualPlayerName;
 
     public SpectateVBox() {
         players = new ArrayList<>(LobbyState.getPlayers());
 
         playerName = CommonState.getPlayer().getUsername();
+        actualPlayerName = CommonState.getPlayer().getUsername();
         playerIndex = players.indexOf(CommonState.getPlayer());
 
         leftButton = new Button("<");
@@ -61,9 +64,13 @@ public class SpectateVBox extends VBox {
         this.setAlignment(Pos.CENTER);
         this.setPadding(new Insets(10));
         this.getChildren().addAll(topRow);
+        checkButtonsAvailability();
     }
 
     private void checkButtonsAvailability(){
+        players.clear();
+        players.addAll(LobbyState.getPlayers());
+
         if(playerIndex >= players.size()-1){
             rightButton.setDisable(true);
             leftButton.setDisable(false);
@@ -92,5 +99,10 @@ public class SpectateVBox extends VBox {
         Platform.runLater(() -> {
             ClientManager.getInstance().simulateCommand("spectate", players.get(playerIndex).getUsername());
         });
+        if (players.get(playerIndex).getUsername().equals(actualPlayerName)){
+            AdventureUI.getInstance().setSpectating(false);
+            return;
+        }
+        AdventureUI.getInstance().setSpectating(true);
     }
 }
