@@ -15,6 +15,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -30,6 +31,10 @@ import static it.polimi.ingsw.view.gui.components.PIRContainer.formatCoordinates
  * It follows a singleton pattern.
  */
 public class AdventureUI implements INodeRefreshableOnUpdateUI {
+
+    public enum AdventurePane {
+        PLAYER_BOARD, SHARED_BOARD
+    }
 
     private final double WIDTH = 400;
     private final double HEIGHT = 400;
@@ -113,21 +118,49 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         // Create loadable container
         loadableContainer = new LoadableContainer();
 
+        // Create the top HBox
+        HBox topBar = new HBox();
+        topBar.setPrefHeight(100);
+        topBar.setAlignment(Pos.CENTER);
+
+        topBar.getChildren().add(new SpectateVBox());
+        topBar.getChildren().add(getBoardButton());
+
+        boardComponent = BoardComponent.create(LobbyState.getGameLevel());
+        boardComponent.setStyle("-fx-border-color: lightgray; -fx-border-width: 1;");
+        root.getChildren().add(boardComponent);
+
         // Add components to the grid
-        mainLayout.add(loadableContainer, 0, 0);
-        mainLayout.add(pirDelayContainer, 1, 0);
+        mainLayout.add(topBar, 0, 0, 2, 1); // Add topBar at row 0, spanning 2 columns
+        mainLayout.add(loadableContainer, 0, 1);
+        mainLayout.add(pirDelayContainer, 1, 1);
         mainLayout.add(shipGrid, 0, 2);
         mainLayout.add(cardPane, 1, 2);
         mainLayout.setAlignment(Pos.CENTER);
 
 
         root.getChildren().addAll(mainLayout, getDragOverlay());
+        setAdventureLayout(AdventurePane.PLAYER_BOARD);
     }
 
     public void setFinished(){
         Platform.runLater(() -> {
             ClientManager.getInstance().updateScene(new ScoreUI());
         });
+    }
+
+    private Button getBoardButton() {
+        Button boardButton = new Button("Board");
+        boardButton.setOnMouseClicked(event -> {
+            setAdventureLayout(AdventureUI.AdventurePane.SHARED_BOARD);
+            boardComponent.addPlayers();
+        });
+        return boardButton;
+    }
+
+    public void setAdventureLayout(AdventureUI.AdventurePane paneToShow){
+        mainLayout.setVisible(paneToShow == AdventureUI.AdventurePane.PLAYER_BOARD);
+        boardComponent.setVisible(paneToShow == AdventureUI.AdventurePane.SHARED_BOARD);
     }
 
     public void addConfirmButton() {
