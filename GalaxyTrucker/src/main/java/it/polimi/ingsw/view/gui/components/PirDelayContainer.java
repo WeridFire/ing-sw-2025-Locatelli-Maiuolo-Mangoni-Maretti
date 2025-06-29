@@ -22,7 +22,7 @@ public class PirDelayContainer extends VBox {
         labelObj.setWrapText(true);
         labelObj.setMaxWidth(CardContainer.FIXED_WIDTH);
         labelObj.setMaxHeight(LoadableContainer.CONTAINER_HEIGHT);
-        labelObj.setStyle("-fx-font-weight: bold; -fx-text-fill: black;"); // Changed to black text
+        labelObj.setStyle("-fx-font-weight: bold; -fx-text-fill: lightgrey;");
         labelObj.setViewOrder(-1);
         return labelObj;
     }

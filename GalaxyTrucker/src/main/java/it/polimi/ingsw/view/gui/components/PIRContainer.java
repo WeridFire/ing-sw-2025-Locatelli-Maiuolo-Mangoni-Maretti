@@ -159,7 +159,7 @@ public class PIRContainer extends StackPane {
     private Label getLabel(String labelText) {
         Label labelObj = new Label(ANSI.sanitizeCLIText(labelText)); // Using the parameter instead of the field
         labelObj.setWrapText(true);
-        labelObj.setStyle("-fx-font-weight: bold; -fx-text-fill: black;"); // Changed to black text
+        labelObj.setStyle("-fx-font-weight: bold; -fx-text-fill: lightgrey;"); // Changed to black text
         labelObj.setViewOrder(-1);
         return labelObj;
     }

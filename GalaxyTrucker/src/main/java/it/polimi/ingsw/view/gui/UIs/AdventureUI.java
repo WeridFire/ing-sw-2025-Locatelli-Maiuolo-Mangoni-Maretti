@@ -12,6 +12,7 @@ import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.components.*;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -146,12 +147,19 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
      */
     public AdventureUI() {
         root = new StackPane();
+        root.setStyle("-fx-background-color: #1a1c2c; -fx-background: #1a1c2c;");
+        root.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         mainLayout = new GridPane();
+        mainLayout.setStyle("-fx-background-color: #1a1c2c;");
+        mainLayout.setHgap(10);
+        mainLayout.setVgap(10);
+        mainLayout.setPadding(new Insets(15));
 
         pirContainer.setMaxSize(WIDTH, HEIGHT);
         pirContainer.setMinSize(WIDTH, HEIGHT);
         pirContainer.setAlignment(Pos.CENTER);
+        pirContainer.setStyle("-fx-background-color: rgba(26, 28, 44, 0.9); -fx-border-color: #4dd0e1; -fx-border-width: 1; -fx-padding: 10;");
 
         GameLevel gameLevel = LobbyState.getGameLevel();
         if (gameLevel == null) {
@@ -160,24 +168,34 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         }
 
         shipGrid = new ShipGrid(gameLevel);
+        shipGrid.setStyle("-fx-border-color: #4dd0e1; -fx-border-width: 1;");
 
         cardPane = new CardContainer();
+        cardPane.setStyle("-fx-background-color: rgba(0,0,0,0.2); -fx-border-color: #444; -fx-border-width: 1; -fx-padding: 10;");
         updateCard();
 
         // Create loadable container
         loadableContainer = new LoadableContainer();
+        loadableContainer.setStyle("-fx-background-color: rgba(0,0,0,0.2); -fx-border-color: #444; -fx-border-width: 1; -fx-padding: 10;");
 
         // Create the top HBox
-        HBox topBar = new HBox();
+        HBox topBar = new HBox(10);
         topBar.setPrefHeight(100);
         topBar.setAlignment(Pos.CENTER);
+        topBar.setStyle("-fx-padding: 10; -fx-background-color: rgba(0,0,0,0.2); -fx-border-color: #444; -fx-border-width: 1;");
 
-        topBar.getChildren().add(new SpectateVBox());
-        topBar.getChildren().add(getBoardButton());
+        SpectateVBox spectateVBox = new SpectateVBox();
+        Button boardButton = getBoardButton();
+        styleButton(boardButton);
+        
+        topBar.getChildren().add(spectateVBox);
+        topBar.getChildren().add(boardButton);
 
         boardComponent = BoardComponent.create(LobbyState.getGameLevel());
-        boardComponent.setStyle("-fx-border-color: lightgray; -fx-border-width: 1;");
+        boardComponent.setStyle("-fx-border-color: #4dd0e1; -fx-border-width: 1; -fx-background-color: #1a1c2c;");
         root.getChildren().add(boardComponent);
+
+        pirDelayContainer.setStyle("-fx-background-color: rgba(0,0,0,0.2); -fx-border-color: #444; -fx-border-width: 1; -fx-padding: 10;");
 
         // Add components to the grid
         mainLayout.add(topBar, 0, 0, 2, 1); // Add topBar at row 0, spanning 2 columns
@@ -187,9 +205,28 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         mainLayout.add(cardPane, 1, 2);
         mainLayout.setAlignment(Pos.CENTER);
 
-
         root.getChildren().addAll(mainLayout, getDragOverlay());
         setAdventureLayout(AdventurePane.PLAYER_BOARD);
+    }
+
+    /**
+     * Applies consistent styling to a button
+     * @param button The button to style
+     */
+    private void styleButton(Button button) {
+        button.setStyle("-fx-background-color: transparent; -fx-text-fill: #4dd0e1; -fx-border-color: #4dd0e1; " +
+                       "-fx-border-width: 1px; -fx-padding: 5 12; -fx-font-size: 13px; " +
+                       "-fx-background-radius: 0; -fx-border-radius: 0;");
+        
+        // Add hover effect
+        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #4dd0e1; -fx-text-fill: #1a1c2c; " +
+                                           "-fx-border-color: #4dd0e1; -fx-border-width: 1px; " +
+                                           "-fx-padding: 5 12; -fx-font-size: 13px; " +
+                                           "-fx-background-radius: 0; -fx-border-radius: 0;"));
+        button.setOnMouseExited(e -> button.setStyle("-fx-background-color: transparent; -fx-text-fill: #4dd0e1; " +
+                                          "-fx-border-color: #4dd0e1; -fx-border-width: 1px; " +
+                                          "-fx-padding: 5 12; -fx-font-size: 13px; " +
+                                          "-fx-background-radius: 0; -fx-border-radius: 0;"));
     }
 
     /**
@@ -246,6 +283,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     public void addConfirmButton() {
         if (confirmActivationButton == null){
             confirmActivationButton = new Button("Confirm Activation");
+            styleButton(confirmActivationButton);
             confirmActivationButton.setOnMouseClicked(e -> {
                 Platform.runLater(() -> {
                     if (!shipGrid.getCellsToActivate().isEmpty()) {
@@ -326,6 +364,10 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         overlayBackground.widthProperty().bind(getRoot().widthProperty());
         overlayBackground.heightProperty().bind(getRoot().heightProperty());
 
+        // Style the PIR container for better visibility over the overlay
+        pirContainer.setStyle("-fx-background-color: rgba(26, 28, 44, 0.95); -fx-border-color: #4dd0e1; " +
+                         "-fx-border-width: 2; -fx-padding: 15; -fx-effect: dropshadow(gaussian, #4dd0e1, 5, 0, 0, 0);");
+
         // Center the PIR container both horizontally and vertically
         StackPane.setAlignment(pirContainer, Pos.CENTER);
 
@@ -349,6 +391,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
      */
     public void addIntegrityButton() {
         integrityButton = new Button("Confirm Integrity Choice");
+        styleButton(integrityButton);
         integrityButton.setOnMouseClicked(event -> {
             getShipGrid().confirmIntegrityProblemChoice();
             integrityButton.setVisible(false);

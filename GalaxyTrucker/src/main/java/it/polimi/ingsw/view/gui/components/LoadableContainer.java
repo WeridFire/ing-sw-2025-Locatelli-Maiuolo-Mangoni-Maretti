@@ -27,8 +27,7 @@ public class LoadableContainer extends StackPane {
         
         // Create background rectangle
         Rectangle background = new Rectangle(CONTAINER_WIDTH, CONTAINER_HEIGHT);
-        background.setFill(Color.LIGHTGRAY);
-        background.setStroke(Color.DARKGRAY);
+        background.setFill(Color.DARKGRAY);
         background.setStrokeWidth(2);
         
         // Create horizontal layout for loadable objects

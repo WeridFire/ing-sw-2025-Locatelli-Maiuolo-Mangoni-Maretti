@@ -42,6 +42,7 @@ public class TurnContainer extends StackPane {
             playerText.setFill(MainCabinTile.Color.toPaint(p.getColor()));
 
             label = new TextFlow(normalText, playerText);
+            normalText.setStyle("-fx-font-weight: bold; -fx-text-fill: lightgrey;");
 
             this.getChildren().add(label);
         }
