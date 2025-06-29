@@ -5,8 +5,8 @@ import it.polimi.ingsw.model.cards.CardsGroup;
 import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.LobbyState;
 import it.polimi.ingsw.enums.GameLevel;
-import it.polimi.ingsw.enums.GamePhaseType; // Import GamePhaseType
-import it.polimi.ingsw.model.game.GameData; // Import GameData
+import it.polimi.ingsw.enums.GamePhaseType;
+import it.polimi.ingsw.model.game.GameData;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.components.*;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
@@ -20,16 +20,29 @@ import java.util.Optional;
 
 /**
  * UI component for the ship assembly phase of the game.
- * This UI is intended to be displayed full screen, with its internal components having fixed sizes.
+ * This UI is intended to be displayed full-screen, with its internal components having fixed sizes.
+ * It follows a singleton pattern to ensure a single instance throughout the application lifecycle.
  */
 public class AssembleUI implements INodeRefreshableOnUpdateUI {
 
+    /**
+     * Defines the different views available within the AssembleUI,
+     * such as the player's personal board or the shared game board.
+     */
     public enum AssemblePane {
         PLAYER_BOARD, SHARED_BOARD
     }
 
+    /**
+     * The singleton instance of the AssembleUI.
+     */
     public static AssembleUI instance;
 
+    /**
+     * Returns the singleton instance of the AssembleUI.
+     * If the instance does not exist, it is created.
+     * @return The single instance of this class.
+     */
     public static AssembleUI getInstance() {
         if(instance == null) {
             instance = new AssembleUI();
@@ -37,11 +50,25 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         return instance;
     }
 
-    // Define fixed dimensions for components
-    private static final double TOP_SCROLL_PANE_HEIGHT = 200.0; // Fixed height for the scrollable area
+    /**
+     * Defines the minimum height for the scrollable area containing drawn tiles.
+     */
+    private static final double TOP_SCROLL_PANE_HEIGHT = 200.0;
+    /**
+     * Defines the maximum height for the scrollable area containing drawn tiles.
+     */
     private static final double MAX_TOP_SCROLL_PANE_HEIGHT = 500.0;
 
+    /**
+     * The overlay pane used for drag-and-drop operations.
+     */
     private static Pane dragOverlay;
+
+    /**
+     * Returns the singleton overlay pane used for drag-and-drop operations.
+     * This pane sits on top of all other components to render dragged items.
+     * @return The drag overlay pane.
+     */
     public static Pane getDragOverlay() {
         if (dragOverlay == null) {
             dragOverlay = new Pane(); // Transparent pane above everything
@@ -50,18 +77,44 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         return dragOverlay;
     }
 
+    /**
+     * The root container for the entire Assemble UI.
+     */
     private final StackPane root;
 
+    /**
+     * The main grid layout for the player-specific view.
+     */
     private final GridPane mainGrid;
-    private ScrollPane topScrollPane; // Changed to ScrollPane
-    private UncoveredTilesGrid uncoveredTilesGrid; // Maintain a reference to DrawnTilesGrid
+    /**
+     * The scrollable pane displaying the uncovered tiles available to the player.
+     */
+    private ScrollPane topScrollPane;
+    /**
+     * The grid component containing the uncovered tiles.
+     */
+    private UncoveredTilesGrid uncoveredTilesGrid;
+    /**
+     * The component displaying the player's ship grid.
+     */
     private ShipGrid leftGrid;
+    /**
+     * The pane displaying the face-down covered tiles.
+     */
     private CoveredTilesPane rightPane;
+    /**
+     * The vertical box containing decks, timer, and action buttons.
+     */
     private VBox topRightVBox;
 
-    private BoardComponent boardComponent; // Field for BoardUI
+    /**
+     * The component that displays the shared game board.
+     */
+    private BoardComponent boardComponent;
 
-    // Overlays
+    /**
+     * The overlay grid for showing the contents of a drawn card group.
+     */
     private ShowDeckGrid showDeckGrid;
 
 
@@ -102,6 +155,10 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         setAssembleLayout(AssemblePane.PLAYER_BOARD);
     }
 
+    /**
+     * Switches the visible layout between the player's board and the shared game board.
+     * @param paneToShow The pane to display.
+     */
     public void setAssembleLayout(AssemblePane paneToShow){
         mainGrid.setVisible(paneToShow == AssemblePane.PLAYER_BOARD);
         boardComponent.setVisible(paneToShow == AssemblePane.SHARED_BOARD);
@@ -113,7 +170,8 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     }
 
     /**
-     * Creates the scrollable pane for displaying drawn tiles with a fixed height.
+     * Creates the scrollable pane for displaying drawn tiles with a dynamic height.
+     * @return A configured {@link ScrollPane}.
      */
     private ScrollPane createDrawnTilesScrollPane() {
         uncoveredTilesGrid = new UncoveredTilesGrid(); // Create the instance of DrawnTilesGrid
@@ -122,7 +180,7 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        // Impostazioni per l'altezza dinamica
+        // Settings for dynamic height
         scrollPane.setMinHeight(TOP_SCROLL_PANE_HEIGHT);
         scrollPane.setPrefHeight(TOP_SCROLL_PANE_HEIGHT);
         scrollPane.setMaxHeight(MAX_TOP_SCROLL_PANE_HEIGHT);
@@ -130,16 +188,25 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         return scrollPane;
     }
 
+    /**
+     * Returns the root StackPane of this UI.
+     * @return The root {@link StackPane}.
+     */
     public StackPane getRoot() {
         return root;
     }
 
+    /**
+     * Returns the ship grid component.
+     * @return The {@link ShipGrid}.
+     */
     public ShipGrid getLeftGrid() {
         return leftGrid;
     }
 
     /**
-     * Creates the ship grid. ShipGrid is responsible for its own fixed dimensions.
+     * Creates the ship grid component based on the current game level.
+     * @return A new {@link ShipGrid} instance.
      */
     private ShipGrid createShipGrid() {
         return new ShipGrid(LobbyState.getGameLevel());
@@ -147,12 +214,17 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
 
 
     /**
-     * Creates the pane containing covered tiles. CoveredTilesPane is responsible for its own fixed dimensions.
+     * Creates the pane containing the face-down covered tiles.
+     * @return A new {@link CoveredTilesPane} instance.
      */
     private CoveredTilesPane createCoveredTilesPane() {
         return new CoveredTilesPane();
     }
 
+    /**
+     * Creates a VBox containing the timer, action buttons, and deck components.
+     * @return A configured {@link VBox}.
+     */
     private VBox createDecksAndTimerGrid(){
         VBox decksAndTimerGrid = new VBox();
 
@@ -196,6 +268,10 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         return decksAndTimerGrid;
     }
 
+    /**
+     * Creates and returns a button to switch to the shared board view.
+     * @return A configured {@link Button}.
+     */
     private Button getBoardButton() {
         Button boardButton = new Button("Board");
         boardButton.setOnMouseClicked(event -> {
@@ -205,6 +281,10 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         return boardButton;
     }
 
+    /**
+     * Refreshes the overlay that shows the contents of a drawn card group.
+     * It creates or removes the overlay based on whether a card group is in the player's hand.
+     */
     private void refreshDeckOverlay(){
         Optional<CardsGroup> cardsGroup = AssembleState.getCardGroupInHand();
         if (cardsGroup.isPresent() == (showDeckGrid == null)) {
@@ -221,13 +301,17 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     }
 
     /**
-     * Returns the main layout for this UI.
-     * This GridPane is intended to be the root of a full-screen scene.
+     * Returns the main layout node for this UI.
+     * This StackPane is intended to be the root of a full-screen scene.
+     * @return The root {@link StackPane} of the UI.
      */
     public StackPane getLayout() {
         return root;
     }
 
+    /**
+     * Transitions the UI to the adventure phase screen.
+     */
     public void setFinished(){
         Platform.runLater(() -> {
             ClientManager.getInstance().updateScene(AdventureUI.getInstance());
@@ -235,9 +319,10 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
     }
 
     /**
-     * Updates the UI based on client updates.
-     * Recreates the drawn tiles scroll pane, ensuring its fixed size is maintained.
-     * Transitions to AdventureUI if the game phase changes to ADVENTURE.
+     * Updates the UI based on a new client update from the server.
+     * If the game phase changes to ADVENTURE, it transitions to the AdventureUI.
+     * Otherwise, it refreshes the components of the assembly screen.
+     * @param update The {@link ClientUpdate} containing the new game state.
      */
     @Override
     public void refreshOnUpdate(ClientUpdate update) {
@@ -266,7 +351,10 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         });
     }
 
-    //TODO: remove this
+    /**
+     * Handles the action for the cheat button. For debugging purposes.
+     * TODO: Remove this method and the associated button.
+     */
     public void handleCheatButton() {
         Platform.runLater(() -> {
             ClientManager.getInstance().simulateCommand("cheat", "standard");

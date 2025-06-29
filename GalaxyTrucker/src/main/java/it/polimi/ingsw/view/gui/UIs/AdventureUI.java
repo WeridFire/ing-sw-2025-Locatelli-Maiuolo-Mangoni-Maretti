@@ -22,7 +22,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-import java.util.Arrays;
 
 import static it.polimi.ingsw.view.gui.components.PIRContainer.formatCoordinates;
 
@@ -35,33 +34,79 @@ import static it.polimi.ingsw.view.gui.components.PIRContainer.formatCoordinates
  */
 public class AdventureUI implements INodeRefreshableOnUpdateUI {
 
+    /**
+     * Defines the different views available within the AdventureUI,
+     * such as the player's personal board or the shared game board.
+     */
     public enum AdventurePane {
         PLAYER_BOARD, SHARED_BOARD
     }
 
+    /**
+     * Defines the default width for certain UI components.
+     */
     private final double WIDTH = 400;
+    /**
+     * Defines the default height for certain UI components.
+     */
     private final double HEIGHT = 400;
 
+    /**
+     * Stores the last Player Input Request received to avoid reprocessing.
+     */
     private PIR lastPIR;
 
+    /**
+     * The main grid layout for the player-specific view.
+     */
     private GridPane mainLayout;
+    /**
+     * The component that displays the shared game board.
+     */
     private BoardComponent boardComponent;
+    /**
+     * The component displaying the player's ship grid.
+     */
     private ShipGrid shipGrid;
+    /**
+     * The container for the current adventure card.
+     */
     private CardContainer cardPane;
+    /**
+     * The container for displaying player's loadable items (cargo, crew, etc.).
+     */
     private LoadableContainer loadableContainer;
+    /**
+     * The container for handling generic Player Input Requests.
+     */
     private PIRContainer pirContainer = new PIRContainer();
+    /**
+     * The container specifically for handling PIRs of type DELAY.
+     */
     private PirDelayContainer pirDelayContainer = new PirDelayContainer();
+    /**
+     * Button to confirm choices related to ship integrity problems.
+     */
     private Button integrityButton;
+    /**
+     * Button to confirm the activation of ship components.
+     */
     private Button confirmActivationButton;
+    /**
+     * Flag indicating if the current user is spectating the game.
+     */
     private boolean isSpectating = false;
 
+    /**
+     * A semi-transparent background used as an overlay for modal dialogs like the PIR container.
+     */
     private Rectangle overlayBackground;
 
     private static Pane dragOverlay;
     /**
-     * Gets the overlay pane used for drag-and-drop operations.
+     * Returns the singleton overlay pane used for drag-and-drop operations.
      * This pane sits on top of all other components to render dragged items.
-     * @return The singleton drag overlay pane.
+     * @return The drag overlay pane.
      */
     public static Pane getDragOverlay() {
         if (dragOverlay == null) {
@@ -74,8 +119,8 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
 
     private static StackPane root;
     /**
-     * Gets the root container for the entire Adventure UI.
-     * @return The singleton root StackPane.
+     * Returns the root StackPane container for the entire Adventure UI.
+     * @return The root pane.
      */
     public static StackPane getRoot() {
         if (root == null) {
@@ -86,7 +131,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
 
     private static AdventureUI instance;
     /**
-     * Gets the singleton instance of the AdventureUI.
+     * Returns the singleton instance of the AdventureUI.
      * @return The single instance of this class.
      */
     public static AdventureUI getInstance() {
@@ -147,20 +192,35 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         setAdventureLayout(AdventurePane.PLAYER_BOARD);
     }
 
+    /**
+     * Checks if the current user is in spectating mode.
+     * @return {@code true} if spectating, {@code false} otherwise.
+     */
     public boolean isSpectating() {
         return isSpectating;
     }
 
+    /**
+     * Sets the spectating mode for the UI.
+     * @param isSpectating {@code true} to enable spectating mode, {@code false} to disable it.
+     */
     public void setSpectating(boolean isSpectating) {
         this.isSpectating = isSpectating;
     }
 
+    /**
+     * Transitions the UI to the score screen when the adventure phase is finished.
+     */
     public void setFinished(){
         Platform.runLater(() -> {
             ClientManager.getInstance().updateScene(new ScoreUI());
         });
     }
 
+    /**
+     * Creates and returns a button to switch to the shared board view.
+     * @return A configured {@link Button}.
+     */
     private Button getBoardButton() {
         Button boardButton = new Button("Board");
         boardButton.setOnMouseClicked(event -> {
@@ -170,11 +230,19 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         return boardButton;
     }
 
+    /**
+     * Switches the visible layout between the player's board and the shared game board.
+     * @param paneToShow The pane to display.
+     */
     public void setAdventureLayout(AdventureUI.AdventurePane paneToShow){
         mainLayout.setVisible(paneToShow == AdventureUI.AdventurePane.PLAYER_BOARD);
         boardComponent.setVisible(paneToShow == AdventureUI.AdventurePane.SHARED_BOARD);
     }
 
+    /**
+     * Adds and displays the 'Confirm Activation' button on the card pane.
+     * This button is used to finalize component activation choices.
+     */
     public void addConfirmButton() {
         if (confirmActivationButton == null){
             confirmActivationButton = new Button("Confirm Activation");
@@ -192,24 +260,34 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         confirmActivationButton.setVisible(true);
     }
 
+    /**
+     * Hides the 'Confirm Activation' button.
+     */
     public void removeConfirmButton() {
         if (confirmActivationButton!=null)
             confirmActivationButton.setVisible(false);
     }
 
     /**
-     * Provides access to the ship grid component.
+     * Returns the ship grid component.
      * @return The {@link ShipGrid}.
      */
     public ShipGrid getShipGrid(){
         return shipGrid;
     }
 
-
+    /**
+     * Returns the container for the adventure card.
+     * @return The {@link CardContainer}.
+     */
     public CardContainer getCardPane(){
         return cardPane;
     }
 
+    /**
+     * Returns the container for Player Input Requests.
+     * @return The {@link PIRContainer}.
+     */
     public PIRContainer getPirContainer(){
         return pirContainer;
     }
@@ -221,11 +299,14 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         cardPane.setCard(CommonState.getLastUpdate().getCurrentGame().getDeck().getCurrentCard());
     }
 
+    /**
+     * Removes the integrity confirmation button from the card pane if it exists.
+     */
     public void removeIntegrityButton(){
         if (this.getCardPane().getChildren().contains(integrityButton)) this.getCardPane().getChildren().remove(integrityButton);
     }
     /**
-     * Provides access to the loadable container.
+     * Returns the container for loadable items.
      * @return The {@link LoadableContainer}.
      */
     public LoadableContainer getLoadableContainer() {
@@ -262,6 +343,10 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         getRoot().getChildren().remove(pirContainer);
     }
 
+    /**
+     * Adds the 'Confirm Integrity Choice' button to the card pane.
+     * This button allows the player to confirm their selection for an integrity problem.
+     */
     public void addIntegrityButton() {
         integrityButton = new Button("Confirm Integrity Choice");
         integrityButton.setOnMouseClicked(event -> {
@@ -271,6 +356,10 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         getCardPane().getChildren().add(integrityButton);
     }
 
+    /**
+     * Returns the container for handling DELAY type PIRs.
+     * @return The {@link PirDelayContainer}.
+     */
     public PirDelayContainer getPirDelayContainer() {
         return pirDelayContainer;
     }
@@ -285,11 +374,9 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     }
 
     /**
-     * Handles cleanup of any previously handled PIR.
-     * <p>
-     * This prevents the same PIR from being re-processed or conflicting with new updates.
-     *
-     * @param lastPIR the most recently received PIR to inspect. can be null.
+     * Cleans up choices related to manually handled PIRs, such as integrity problems,
+     * to prevent state conflicts on new updates.
+     * @param lastPIR The most recently received PIR to inspect. Can be null.
      */
     private void dropManuallyHandledPIRs(PIR lastPIR) {
         if (lastPIR == null
@@ -300,8 +387,10 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     }
 
     /**
-     * @return {@code true} if the pir has already been handled with this function thanks to its tags,
-     * {@code false} otherwise (it needs propagation to pirContainer)
+     * Handles specific PIRs based on their tags before they are sent to the generic PIR container.
+     * For example, it directs integrity-related PIRs to the ShipGrid.
+     * @param pir The PIR to handle.
+     * @return {@code true} if the PIR was handled by this method, {@code false} if it needs to be propagated to the generic PIR container.
      */
     private boolean handleTaggedPIR(PIR pir) {
         if (pir.containsTag(IntegrityProblem.TAG)) {
