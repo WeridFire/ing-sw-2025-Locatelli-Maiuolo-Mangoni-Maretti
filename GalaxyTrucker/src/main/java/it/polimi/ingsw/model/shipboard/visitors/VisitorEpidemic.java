@@ -79,7 +79,12 @@ public class VisitorEpidemic implements TileVisitor {
 			}
 		}
 		for(Coordinates c : result){
-			CabinTile targetCabin = ((CabinTile) shipBoard.get(c));
+			CabinTile targetCabin;
+			try {
+				targetCabin = ((CabinTile) shipBoard.get(c));
+			} catch (ClassCastException e) {
+				return;  // happens only when wrong shipboard is passed as parameter
+			}
 			try{
 				if (targetCabin == null) return;
 				if(targetCabin.getLoadedItems().contains(LoadableType.HUMAN)){

@@ -21,8 +21,9 @@ public class PIRContainer extends StackPane {
     private PIR pir;
     private PIRType type;
 
+    private boolean placingLoadables = false;
+
     private Label label;
-    private String labelText;
     private final List<Button> buttons = new ArrayList<>();
 
     private final VBox content;
@@ -39,9 +40,17 @@ public class PIRContainer extends StackPane {
         this.getChildren().add(content);
     }
 
+    public boolean isPlacingLoadables() {
+        return placingLoadables;
+    }
+    public void setPlacingLoadables(boolean placingLoadables) {
+        this.placingLoadables = placingLoadables;
+    }
+
     public void setPir(PIR pir) {
         this.pir = pir;
         this.type = pir.getPIRType();
+        AdventureUI.getInstance().getLoadableContainer().clearLoadableObjects();
         Platform.runLater(() -> {
             switch (this.type) {
                 case PIRType.ACTIVATE_TILE -> handleActivateTilePir();
@@ -54,6 +63,7 @@ public class PIRContainer extends StackPane {
     }
 
     public void handleActivateTilePir() {
+        setPlacingLoadables(false);
         content.getChildren().clear();
         content.getChildren().add(getLabel("Activate Tiles!"));
 
@@ -65,43 +75,44 @@ public class PIRContainer extends StackPane {
         addCloseButton();
 
         if(!pir.getHighlightMask().isEmpty()){
-            Button butt = new Button("Confirm Activation");
-            butt.setOnMouseClicked(e -> {
-                Platform.runLater(() -> {
-                    if(!shipGrid.getCellsToActivate().isEmpty()){
-                        ClientManager.getInstance().simulateCommand("activate", formatCoordinates(shipGrid.getCellsToActivate()));
-                        shipGrid.getCellsToActivate().clear();
-                        AdventureUI.getInstance().getCardPane().getChildren().remove(butt);
-                    }
-                });
-            });
-            AdventureUI.getInstance().getCardPane().getChildren().add(butt);
+            AdventureUI.getInstance().addConfirmButton();
         }
     }
 
     public void handleAddCargoPir() {
-        content.getChildren().add(getLabel("HANDLEADDCARGO"));
+        this.content.getChildren().clear();
         PIRAddLoadables castedPir = (PIRAddLoadables) pir;
         ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
+        shipGrid.unsetActiveCells();
         shipGrid.setActiveCells(castedPir.getHighlightMask(), true, false);
+        AdventureUI.getInstance().getLoadableContainer().clearLoadableObjects();
         for (LoadableType loadable: castedPir.getFloatingLoadables()){
             AdventureUI.getInstance().getLoadableContainer().addLoadableObject(loadable);
         }
+
+        if (!isPlacingLoadables()) {
+            setPlacingLoadables(true);
+        }
+
     }
 
     public void handleRemoveCargoPir() {
+        setPlacingLoadables(false);
         content.getChildren().clear();
-
-        content.getChildren().add(getLabel("HANDLEREMOVECARGO"));
+        AdventureUI.getInstance().hidePirContainer();
 
         PIRRemoveLoadables castedPir = (PIRRemoveLoadables) pir;
+        Label text = getLabel(castedPir.getCLIRepresentation().toString());
+        AdventureUI.getInstance().getPirDelayContainer().setText(text.getText());
 
         ShipGrid shipGrid = AdventureUI.getInstance().getShipGrid();
+        shipGrid.unsetActiveCells();
         shipGrid.setActiveCells(castedPir.getHighlightMask(), false, true);
         addCloseButton();
     }
 
     public void handleChoicePir() {
+        setPlacingLoadables(false);
         PIRMultipleChoice castedPir = (PIRMultipleChoice) pir;
         label = getLabel(castedPir.getChoiceMessage());
 
@@ -132,13 +143,21 @@ public class PIRContainer extends StackPane {
         content.getChildren().addAll(buttons);
     }
 
+
     public void handleDelayPir() {
         PIRDelay castedPir = (PIRDelay) pir;
-        AdventureUI.getInstance().getPirDelayContainer().setText(castedPir.getMessage());
+        setPirDelayContainerContent(castedPir.getMessage());
+
+        if(castedPir.getMessage().startsWith("GG to all, match is over. You will be sent to the menu in 10 seconds..."))
+            AdventureUI.getInstance().setFinished();
+    }
+
+    private void setPirDelayContainerContent(String text){
+        AdventureUI.getInstance().getPirDelayContainer().setText(text);
     }
 
     private Label getLabel(String labelText) {
-        Label labelObj = new Label(ANSI.Helper.stripAnsi(labelText)); // Using the parameter instead of the field
+        Label labelObj = new Label(ANSI.sanitizeCLIText(labelText)); // Using the parameter instead of the field
         labelObj.setWrapText(true);
         labelObj.setStyle("-fx-font-weight: bold; -fx-text-fill: black;"); // Changed to black text
         labelObj.setViewOrder(-1);

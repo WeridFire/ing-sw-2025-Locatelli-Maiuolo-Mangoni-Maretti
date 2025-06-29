@@ -4,11 +4,14 @@ import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.network.GameClient;
 import it.polimi.ingsw.network.IClient;
 import it.polimi.ingsw.network.IServer;
+import it.polimi.ingsw.util.Default;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.rmi.RemoteException;
 import java.util.Base64;
 
@@ -45,6 +48,27 @@ public class SocketClient implements IClient {
 		this.gameClient = gameClient;
 	}
 
+
+	/**
+	 * Blocking function that waits initial handshake from the server to ensure the connection begun correctly.
+	 * @throws IOException timeout reached, or other incompatibility errors
+	 */
+	public void handshake(Socket socket) throws IOException {
+		try {
+			socket.setSoTimeout(Default.SOCKET_HANDSHAKE_TIMEOUT_MS);
+			String line = input.readLine();  // wait server handshake
+			if (line == null) {
+				throw new IOException("Server closed connection");
+			}
+			if (!line.equals(Default.SOCKET_HANDSHAKE_MESSAGE)) {
+				throw new IOException("Client is not compatible with Server");
+			}
+		} catch (SocketTimeoutException e) {
+			throw new IOException("Timed out waiting for server handshake", e);
+		} finally {
+			socket.setSoTimeout(0);  // reset no timeout
+		}
+	}
 
 	/**
 	 * Blocking function that constantly reads input from the server, if present, and then parses it and forwards

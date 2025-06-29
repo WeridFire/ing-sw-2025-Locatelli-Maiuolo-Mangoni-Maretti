@@ -12,6 +12,8 @@ public class Default {
     public static int PORT(boolean useRMI) {
         return useRMI ? RMI_PORT : SOCKET_PORT;
     }
+    public static final String SOCKET_HANDSHAKE_MESSAGE = "GalaxyTruckerSocketServer";
+    public static final int SOCKET_HANDSHAKE_TIMEOUT_MS = 5000;
 
     // client
     public static boolean USE_RMI = false;
@@ -31,7 +33,7 @@ public class Default {
 
     // NON-FINAL: "settings" to change during game (used mainly for tests)
     public static int PIR_SECONDS = 60;
-    public static int PIR_SHORT_SECONDS = 6;
+    public static int PIR_SHORT_SECONDS = 10;
 
     public static String STARTING_CARD = "PLANETS";
 

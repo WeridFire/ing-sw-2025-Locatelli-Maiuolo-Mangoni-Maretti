@@ -6,12 +6,10 @@ import it.polimi.ingsw.controller.states.PIRState;
 import it.polimi.ingsw.enums.GameLevel;
 import it.polimi.ingsw.model.playerInput.PIRType;
 import it.polimi.ingsw.model.playerInput.PIRs.PIR;
-import it.polimi.ingsw.model.playerInput.PIRs.PIRDelay;
 import it.polimi.ingsw.model.shipboard.integrity.IntegrityProblem;
 import it.polimi.ingsw.network.messages.ClientUpdate;
 import it.polimi.ingsw.view.gui.components.*;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
-import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -21,7 +19,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.util.Duration;
+
+import static it.polimi.ingsw.view.gui.components.PIRContainer.formatCoordinates;
 
 
 /**
@@ -45,6 +44,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
     private PIRContainer pirContainer = new PIRContainer();
     private PirDelayContainer pirDelayContainer = new PirDelayContainer();
     private Button integrityButton;
+    private Button confirmActivationButton;
 
     private Rectangle overlayBackground;
 
@@ -124,6 +124,34 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         root.getChildren().addAll(mainLayout, getDragOverlay());
     }
 
+    public void setFinished(){
+        Platform.runLater(() -> {
+            ClientManager.getInstance().updateScene(new ScoreUI());
+        });
+    }
+
+    public void addConfirmButton() {
+        if (confirmActivationButton == null){
+            confirmActivationButton = new Button("Confirm Activation");
+            confirmActivationButton.setOnMouseClicked(e -> {
+                Platform.runLater(() -> {
+                    if (!shipGrid.getCellsToActivate().isEmpty()) {
+                        ClientManager.getInstance().simulateCommand("activate", formatCoordinates(shipGrid.getCellsToActivate()));
+                        shipGrid.getCellsToActivate().clear();
+                        removeConfirmButton();
+                    }
+                });
+            });
+            AdventureUI.getInstance().getCardPane().getChildren().add(confirmActivationButton);
+        }
+        confirmActivationButton.setVisible(true);
+    }
+
+    public void removeConfirmButton() {
+        if (confirmActivationButton!=null)
+            confirmActivationButton.setVisible(false);
+    }
+
     /**
      * Provides access to the ship grid component.
      * @return The {@link ShipGrid}.
@@ -135,6 +163,10 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
 
     public CardContainer getCardPane(){
         return cardPane;
+    }
+
+    public PIRContainer getPirContainer(){
+        return pirContainer;
     }
 
     /**
@@ -189,6 +221,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         integrityButton = new Button("Confirm Integrity Choice");
         integrityButton.setOnMouseClicked(event -> {
             getShipGrid().confirmIntegrityProblemChoice();
+            integrityButton.setVisible(false);
         });
         getCardPane().getChildren().add(integrityButton);
     }
@@ -229,7 +262,7 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
         if (pir.containsTag(IntegrityProblem.TAG)) {
             // validate multiple choice
             if (pir.getPIRType() != PIRType.CHOICE) {
-                return false;  // unexpected mix of tag and type
+                return false;
             }
             // handle integrity problem
             shipGrid.handleIntegrityProblemChoice();
@@ -257,11 +290,15 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
             if (newPir != null) {
                 if (lastPIR == null || !lastPIR.getId().equals(newPir.getId())) {
                     lastPIR = newPir;
+                    removeConfirmButton();
                     try {
                         System.out.println("Setting pir to " + lastPIR.getPIRType());
                         if (!handleTaggedPIR(lastPIR)) {
                             pirContainer.setPir(lastPIR);
-                            if (!root.getChildren().contains(pirContainer) && !newPir.getPIRType().equals(PIRType.DELAY)) {
+                            if (!root.getChildren().contains(pirContainer)
+                                    && !newPir.getPIRType().equals(PIRType.DELAY)
+                                    && !newPir.getPIRType().equals(PIRType.ADD_CARGO)
+                            ) {
                                 showPirContainer();
                             }
                         }
@@ -272,4 +309,5 @@ public class AdventureUI implements INodeRefreshableOnUpdateUI {
             }
         });
     }
+
 }

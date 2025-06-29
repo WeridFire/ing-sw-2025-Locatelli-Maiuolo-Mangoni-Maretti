@@ -6,12 +6,11 @@ import it.polimi.ingsw.enums.GamePhaseType;
 import it.polimi.ingsw.model.shipboard.tiles.TileSkeleton;
 import it.polimi.ingsw.util.BoardCoordinates;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.view.gui.UIs.AdventureUI;
 import it.polimi.ingsw.view.gui.helpers.DragDropManager;
 import it.polimi.ingsw.view.gui.helpers.DropSlot;
 import it.polimi.ingsw.view.gui.managers.ClientManager;
-import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -235,6 +234,7 @@ public class ShipCell extends DropSlot {
                     setStyle(SELECTED_STYLE); // Show selected style
                 }
             });
+            this.setStyle(DEFAULT_CELL_STYLE);
         }
     }
 
@@ -257,10 +257,7 @@ public class ShipCell extends DropSlot {
         if (CommonState.isCurrentPhase(GamePhaseType.ASSEMBLE)){
             return dragId.startsWith(ShipTile.BASE_ID) && canAcceptTile();
         }
-        else if (isActiveForAdventureDrop()) {
-            return dragId.startsWith(LoadableObject.BASE_ID);
-        }
-        return false;
+        else return isActiveForAdventureDrop();
     }
 
     /**
@@ -281,9 +278,11 @@ public class ShipCell extends DropSlot {
                 ClientManager.getInstance().simulateCommand("allocate",  "("+logicalRow+","+logicalColumn+")",
                         DragDropManager.getCurrentDraggable().getType().toString(), "1");
                 addLoadable((LoadableObject) DragDropManager.getCurrentDraggable());
+                if (AdventureUI.getInstance().getLoadableContainer().isEmpty()){
+                    AdventureUI.getInstance().getPirContainer().setPlacingLoadables(false);
+                }
             }
         }
-
     }
 
     /**

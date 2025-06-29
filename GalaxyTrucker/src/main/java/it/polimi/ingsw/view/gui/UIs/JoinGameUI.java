@@ -96,13 +96,19 @@ public class JoinGameUI implements INodeRefreshableOnUpdateUI {
     private Button createJoinGameButton(String username) {
         Button joinGameButton = new Button("Join Game");
         joinGameButton.getStyleClass().add("button");
-        joinGameButton.setOnAction(e -> {
+        joinGameButton.setOnAction(_ -> {
             String uuid = gameUUIDField.getText().trim();
             if (!uuid.isEmpty()) {
                 ClientManager clientManager = ClientManager.getInstance();
 
-                clientManager.simulateCommand("join", uuid, username,
-                        "--color", colorToggleGroup.getSelectedToggle().getUserData().toString());
+                try {
+                    String desiredColor = colorToggleGroup.getSelectedToggle().getUserData().toString();
+                    clientManager.simulateCommand("join", uuid, username,
+                            "--color", desiredColor);
+                } catch (NullPointerException e) {
+                    clientManager.simulateCommand("join", uuid, username);
+                }
+
                 clientManager.updateScene(new LobbyUI());
 
             } else {

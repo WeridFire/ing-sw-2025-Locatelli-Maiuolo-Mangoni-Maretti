@@ -9,11 +9,13 @@ import it.polimi.ingsw.model.player.kpf.KeepPlayerFlyingPredicate;
 import it.polimi.ingsw.model.shipboard.LoadableType;
 import it.polimi.ingsw.model.shipboard.tiles.MainCabinTile;
 import it.polimi.ingsw.util.Coordinates;
+import it.polimi.ingsw.util.Default;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.rmi.RemoteException;
 import java.util.*;
 
@@ -37,6 +39,13 @@ public class ClientSocketHandler implements IClient {
 		this.input = input;
 		this.output = output;
 		this.socket = clientSocket;
+	}
+
+	/**
+	 * Send initial handshake to the client to ensure the connection begun correctly.
+	 */
+	public void handshake() {
+		output.println(Default.SOCKET_HANDSHAKE_MESSAGE);
 	}
 
 	/**

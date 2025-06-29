@@ -82,6 +82,9 @@ public class GameClient implements IClient {
 			gc = new GameClient(socketClient, view, state);
 			// init low level client (Socket)
 			socketClient.init(new BufferedReader(socketRx), new BufferedWriter(socketTx), gc);
+			// ensure no problem in socket connection
+			socketClient.handshake(serverSocket);
+			// main management
 			new Thread(() -> {
 				try {
 					socketClient.runVirtualServer();

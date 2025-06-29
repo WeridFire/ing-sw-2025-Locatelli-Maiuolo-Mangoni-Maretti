@@ -3,10 +3,9 @@ package it.polimi.ingsw.view.gui.components;
 import it.polimi.ingsw.view.cli.ANSI;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
-public class PirDelayContainer extends StackPane {
-
+public class PirDelayContainer extends VBox {
 
     public PirDelayContainer() {
         this.setPadding(new Insets(10));
@@ -15,6 +14,7 @@ public class PirDelayContainer extends StackPane {
     public void setText(String text) {
         this.getChildren().clear();
         this.getChildren().add(getLabel(text));
+        this.getChildren().add(TurnContainer.getInstance());
     }
 
     private Label getLabel(String labelText) {

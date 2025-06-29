@@ -60,10 +60,17 @@ public class MenuCommandsProcessor extends PhaseCommandsProcessor {
 
     @Override
     protected boolean validateCommand(String command, String[] args) throws CommandNotAllowedException {
-        HashMap<String, String> cmdWithOptionColor = CommandOptionsParser.parse(command, args, List.of(
-                new CommandOptionsParser.OptionFinder(Set.of("-c", "--color"),
-                        "color", null)
-        ));
+        HashMap<String, String> cmdWithOptionColor;
+        try {
+            cmdWithOptionColor = CommandOptionsParser.parse(command, args, List.of(
+                    new CommandOptionsParser.OptionFinder(Set.of("-c", "--color"),
+                            "color", null)
+            ));
+        } catch (CommandOptionsParser.IllegalFormatException e) {
+            view.showWarning("Illegal Format Exception", e.getMessage());
+            return false;
+        }
+
         int cmdWithOptionColorArgsLength = CommandOptionsParser.getCommandArgs(cmdWithOptionColor).length;
         String lastOptionsColorString = cmdWithOptionColor.get("color");
 

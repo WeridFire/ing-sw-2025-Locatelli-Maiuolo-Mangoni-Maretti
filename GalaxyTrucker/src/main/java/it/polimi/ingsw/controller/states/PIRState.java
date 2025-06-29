@@ -1,5 +1,6 @@
 package it.polimi.ingsw.controller.states;
 
+import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.playerInput.PIRType;
 import it.polimi.ingsw.model.playerInput.PIRs.PIR;
 import it.polimi.ingsw.model.shipboard.LoadableType;
@@ -30,6 +31,14 @@ public class PIRState extends CommonState {
     public static PIRType getActivePIRType() {
         PIR activePIR = getActivePIR();
         return (activePIR == null) ? null : activePIR.getPIRType();
+    }
+
+    public static Player getTurnPlayer() {
+        if (getLastUpdate().getCurrentGame().getPIRHandler().isPlayerTurnActive(getPlayer())) return getPlayer();
+        for (Player p: getGameData().getPlayers()) {
+            if (getLastUpdate().getCurrentGame().getPIRHandler().isPlayerTurnActive(p)) return p;
+        }
+        return null;
     }
 
 }

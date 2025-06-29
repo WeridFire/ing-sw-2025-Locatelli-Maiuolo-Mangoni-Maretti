@@ -32,7 +32,6 @@ public class EpidemicCard extends Card{
 	 */
 	@Override
 	public void playEffect(GameData game) throws InterruptedException {
-		VisitorEpidemic visitor = new VisitorEpidemic();
 		game.getPIRHandler().broadcastPIR(
 				game.getPlayersInFlight(),
 				(player, pirHandler) -> {
@@ -44,6 +43,7 @@ public class EpidemicCard extends Card{
 					pirHandler.setAndRunTurn(pirDelay);
 				});
 		for (Player p : game.getPlayersInFlight()) {
+			VisitorEpidemic visitor = new VisitorEpidemic();
 			ShipBoard shipBoard = p.getShipBoard();
 			Map<Coordinates, TileSkeleton> board = shipBoard.getTilesOnBoard();
 			board.values().forEach(tile -> {

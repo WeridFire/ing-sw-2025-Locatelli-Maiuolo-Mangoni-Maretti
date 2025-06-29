@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.gui.UIs;
 
+import it.polimi.ingsw.controller.states.CommonState;
 import it.polimi.ingsw.model.cards.CardsGroup;
 import it.polimi.ingsw.controller.states.AssembleState;
 import it.polimi.ingsw.controller.states.LobbyState;
@@ -133,12 +134,17 @@ public class AssembleUI implements INodeRefreshableOnUpdateUI {
         return root;
     }
 
+    public ShipGrid getLeftGrid() {
+        return leftGrid;
+    }
+
     /**
      * Creates the ship grid. ShipGrid is responsible for its own fixed dimensions.
      */
     private ShipGrid createShipGrid() {
         return new ShipGrid(LobbyState.getGameLevel());
     }
+
 
     /**
      * Creates the pane containing covered tiles. CoveredTilesPane is responsible for its own fixed dimensions.
