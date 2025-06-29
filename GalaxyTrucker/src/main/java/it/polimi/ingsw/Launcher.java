@@ -110,12 +110,12 @@ public class Launcher {
             MainApp.createGUI();
         } else {
             try {
-                GameClient.create(
+                GameClient.start(GameClient.create(
                         CommandOptionsParser.toBoolean(options, OPT_RMI),
                         options.get(OPT_HOST),
                         Integer.parseInt(options.get(OPT_CLIENT_PORT)),
                         false
-                );
+                ));
             } catch (IOException | NotBoundException e) {
                 System.err.println(e.getMessage());
             }

@@ -84,7 +84,9 @@ public class GameServer{
 
 		// notify server ready
 		Logger.info("Server is ready -> " + getCompleteAddress());
+	}
 
+	private void init() {
 		// NOTE: RMIServer is already "running" since the non-blocking function rebind,
 		// however it needs to be initialized
 		executor.submit(() -> rmiServer.init());
@@ -213,6 +215,7 @@ public class GameServer{
 	public static void start(int rmiPort, int socketPort) throws AlreadyRunningServerException {
 		if (isRunning()) throw new AlreadyRunningServerException("Server is already running.");
 		instance = new GameServer(rmiPort, socketPort);
+		instance.init();
 	}
 
 	public static void start() throws AlreadyRunningServerException {
