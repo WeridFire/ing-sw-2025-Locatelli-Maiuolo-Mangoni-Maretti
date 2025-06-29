@@ -121,18 +121,19 @@ public class PlanetsCard extends Card {
 				game.getPlayers(p -> getPlanetByPlayer(p) != null),
 				(player, pirHandler) -> {
 					addLoadablesInteraction(player, pirHandler);
-					for(Player p : game.getPlayersInFlight().reversed()){
-						Planet landedPlanet = Arrays.stream(planets)
-								.filter(pl -> Objects.equals(pl.getCurrentPlayer(), p))
-								.findFirst()
-								.orElse(null);
-						if(landedPlanet != null){
-							landedPlanet.leavePlanet();
-							PIRUtils.runPlayerMovementBackward(p, lostDays, game);
-						}
-					}
                 }
 		);
+
+		for(Player p : game.getPlayersInFlight().reversed()){
+			Planet landedPlanet = Arrays.stream(planets)
+					.filter(pl -> Objects.equals(pl.getCurrentPlayer(), p))
+					.findFirst()
+					.orElse(null);
+			if(landedPlanet != null){
+				landedPlanet.leavePlanet();
+				PIRUtils.runPlayerMovementBackward(p, lostDays, game);
+			}
+		}
 
 	}
 

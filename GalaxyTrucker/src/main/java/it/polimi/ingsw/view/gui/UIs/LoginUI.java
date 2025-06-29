@@ -10,17 +10,50 @@ import javafx.scene.layout.VBox;
 
 import java.util.function.BiConsumer;
 
+/**
+ * User interface for the login screen where users enter their credentials and connection settings.
+ * This class provides input fields for username, server hostname, port, and connection type (RMI/Socket).
+ * It validates user input and initiates the connection process through the ClientManager.
+ */
 public class LoginUI {
+    /**
+     * The main layout container for all UI components.
+     */
     private final VBox layout;
+    /**
+     * Text field for entering the username/call sign.
+     */
     private final TextField usernameField;
+    /**
+     * Checkbox to toggle between RMI and Socket connection types.
+     */
     private final CheckBox rmiCheckBox;
+    /**
+     * Text field for entering the server hostname.
+     */
     private final TextField serverNameField;
+    /**
+     * Text field for entering the server port number.
+     */
     private final TextField serverPortField;
+    /**
+     * Button to initiate the login/connection process.
+     */
     private final Button loginButton;
 
+    /**
+     * Stores the previously entered RMI port value for restoration when switching connection types.
+     */
     private String previousServerPortValueRMI = String.valueOf(Default.RMI_PORT);
+    /**
+     * Stores the previously entered Socket port value for restoration when switching connection types.
+     */
     private String previousServerPortValueSocket = String.valueOf(Default.SOCKET_PORT);
 
+    /**
+     * Constructs the login UI with all necessary components and event handlers.
+     * Sets up form validation, default values, and styling.
+     */
     public LoginUI() {
         Label headerLabel = new Label("GALAXY TRUCKER");
         headerLabel.getStyleClass().add("header-label");
@@ -91,10 +124,19 @@ public class LoginUI {
         VBox.setVgrow(layout, Priority.ALWAYS);
     }
 
+    /**
+     * Returns the main layout container for this UI.
+     * @return The VBox containing all UI components.
+     */
     public VBox getLayout() {
         return layout;
     }
 
+    /**
+     * Validates user input and attempts to establish a connection to the server.
+     * Performs validation on username, hostname, and port before delegating to ClientManager.
+     * Shows appropriate error messages for invalid input.
+     */
     private void attemptLogin() {
         // retrieve
         String username = usernameField.getText().trim();
