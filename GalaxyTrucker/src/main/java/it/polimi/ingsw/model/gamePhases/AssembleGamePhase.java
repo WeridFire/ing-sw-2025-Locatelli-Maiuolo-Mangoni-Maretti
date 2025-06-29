@@ -24,6 +24,7 @@ public class AssembleGamePhase extends PlayableGamePhase {
     private final int totalTimerRotations;
     private int howManyTimerRotationsLeft;
     private boolean timerRunning;
+    private boolean autoTimerSequence;
 
     /**
      * Constructs a new PlayableGamePhase as {@link GamePhaseType#ASSEMBLE}.
@@ -75,8 +76,18 @@ public class AssembleGamePhase extends PlayableGamePhase {
         }
     }
 
-    public void playLoop() throws RemoteException, InterruptedException {
+    @Override
+    public void setAutoTimerSequence(boolean autoTimerSequence) {
+        this.autoTimerSequence = autoTimerSequence;
+        // If enabling auto sequence and timer isn't running, trigger the next timer
+        if (autoTimerSequence && !timerRunning && howManyTimerRotationsLeft > 0) {
+            synchronized (timerLock) {
+                timerLock.notifyAll();
+            }
+        }
+    }
 
+    public void playLoop() throws RemoteException, InterruptedException {
         if (gameData.getCurrentGamePhase() != this) {
             throw new RuntimeException("Trying to run a game phase which is not active on the game.");
         }
@@ -86,51 +97,54 @@ public class AssembleGamePhase extends PlayableGamePhase {
             setTimerRunning(true);
 
             synchronized (timerLock) {
-                timerLock.wait(timerMilliseconds);  // Wait for a full hourglass time
+                timerLock.wait(timerMilliseconds);
             }
             if (howManyTimerRotationsLeft <= 0) {
-                // end playLoop because all players finished assemble during the hourglass time
                 return;
             }
 
             setTimerRunning(false);
 
-            // wait for a player to restart the timer
-            synchronized (timerLock) {
-                timerLock.wait();
+            if (!autoTimerSequence) {
+                // Manual mode: wait for player input
+                synchronized (timerLock) {
+                    timerLock.wait();
+                }
+            } else {
+                // Auto mode: immediately proceed to next timer
+                Thread.sleep(100); // Small delay between timers
             }
+
             howManyTimerRotationsLeft -= 1;
         }
 
-        // if the hourglass is in its stop place (keep this 'if' to not lose the TESTFLIGHT case)
+        // Last timer handling
         if (howManyTimerRotationsLeft == 1) {
-
-            setTimerRunning(true);  // run for the last time
-            // wait at most a total hourglass time (or get notified earlier by notifyAllPlayersEndedAssembly)
+            setTimerRunning(true);
             synchronized (timerLock) {
                 timerLock.wait(timerMilliseconds);
             }
-            setTimerRunning(false);  // end for the last time
-            // if here can be because time ended: delegated to the caller to force all the players to end assembly
+            setTimerRunning(false);
             howManyTimerRotationsLeft = 0;
         }
-        else if (howManyTimerRotationsLeft == 0) {  // TESTFLIGHT: forced to wait all the players
+        else if (howManyTimerRotationsLeft == 0) {
             synchronized (timerLock) {
                 timerLock.wait();
             }
         }
-        // else: arrives from previous if and notifyAllPlayersEndedAssembly has been called -> finish assembly directly
     }
 
     @Override
     public void startTimer(Player p) throws TimerIsAlreadyRunningException, CommandNotAllowedException {
+        if (autoTimerSequence) {
+            throw new CommandNotAllowedException("start timer", "Timer is in automatic sequence mode");
+        }
         if (timerRunning) {
             throw new TimerIsAlreadyRunningException("You must wait for the hourglass to finish before flipping it.");
         }
         if (gameData.getLevel() == GameLevel.TESTFLIGHT) {
             throw new CommandNotAllowedException("start timer", "Time constraints are not present in a TESTFLIGHT game!");
         }
-        // stop place is howManyTimerRotationsLeft == 1 -> last flip is howManyTimerRotationsLeft == 2
         if (howManyTimerRotationsLeft == 2 && !p.getShipBoard().isEndedAssembly()) {
             throw new CommandNotAllowedException("start timer",
                     "You must have first finished assembling the ship before performing the last flip.");

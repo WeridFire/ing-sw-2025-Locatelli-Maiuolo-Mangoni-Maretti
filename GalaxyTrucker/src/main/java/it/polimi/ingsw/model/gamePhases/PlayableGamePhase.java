@@ -63,4 +63,8 @@ public abstract class PlayableGamePhase implements Serializable {
                 "The timer is not available for an phase of type " + getGamePhaseType()
         );
     }
+
+    public void setAutoTimerSequence(boolean autoTimerSequence){
+
+    }
 }

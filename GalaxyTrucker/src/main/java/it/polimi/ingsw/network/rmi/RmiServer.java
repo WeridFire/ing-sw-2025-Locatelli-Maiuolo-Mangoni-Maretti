@@ -372,6 +372,7 @@ public class RmiServer implements IServer {
 
 		try {
 			pg.game.getGameData().endAssembly(pg.player, false, preferredPosition);
+			pg.game.getGameData().getCurrentGamePhase().setAutoTimerSequence(true);
 			// note: here no broadcast/update because is already managed by endAssembly
 		} catch (NoShipboardException | AlreadyEndedAssemblyException | TooManyItemsInHandException |
                  AlreadyPickedPosition | IllegalStartingPositionIndexException e) {
