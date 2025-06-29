@@ -65,7 +65,7 @@ public class AbandonedShipCard extends Card{
 							new PIRRemoveLoadables(p, Default.PIR_SECONDS, LoadableType.CREW_SET, requiredCrew)
 					);
 					PIRUtils.runPlayerMovementBackward(p, lostDays, game);
-					// TODO: gain credits
+					p.addCredits(sellPrice);
 					break;
 				}
 			}

@@ -50,10 +50,12 @@ public class PIRUtils {
 	 * @return The total power output after activation.
 	 */
 	public static float runPlayerPowerTilesActivationInteraction(Player player, GameData game, PowerType powerType) {
+		if(player.hasRequestedEndFlight()){
+			return 0f;
+		}
 
 		VisitorCalculatePowers.CalculatorPowerInfo powerInfo = player.getShipBoard().getVisitorCalculatePowers().getInfoPower(powerType);
 		if (powerInfo == null) {
-			// TODO: throw error invalid power type -> shield or none (remove none?)
 			return 0f;
 		}
 		PIRActivateTiles inputRequest = new PIRActivateTiles(player, Default.PIR_SECONDS, powerType);
@@ -96,6 +98,10 @@ public class PIRUtils {
 	 * @return {@code true} if the side has been protected, {@code false} if the ship will be hit.
 	 */
 	public static boolean runPlayerProjectileDefendRequest(Player player, Projectile projectile, GameData game) {
+		if(player.hasRequestedEndFlight()){
+			return true;
+		}
+
 		ShipBoard playerShip = player.getShipBoard();
 		// check if ship is going to be hit. if not -> no need to defend
 		Coordinates firstTilePlace = playerShip.getFirstTileLocation(projectile.getDirection(), projectile.getCoord());
@@ -438,7 +444,6 @@ public class PIRUtils {
 			}
 
 			// TOGGLE INTEGRITY CHECK
-			// TODO (issue): error on skipping the delay PIRs: not accepted but also saved and done all after the cooldown (mega error)
 			new Thread(() -> manageIntegrityProblem(integrityProblem)).start();
 		}
 	}

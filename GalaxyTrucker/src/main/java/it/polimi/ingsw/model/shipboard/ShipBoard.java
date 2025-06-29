@@ -645,8 +645,6 @@ public class ShipBoard implements ICLIPrintable, Serializable {
 
 		// here this shipboard is completely filled
 		filled = true;
-		
-		// TODO: issue on refresh of the shipboard to empty crew when just main cabin
 	}
 
 	/**

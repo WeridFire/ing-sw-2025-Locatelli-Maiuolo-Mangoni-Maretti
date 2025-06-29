@@ -53,6 +53,9 @@ public class PiratesCard extends EnemyCard{
 
     @Override
     public void applyPunishment(Player player, GameData game) throws InterruptedException {
+        if(player.hasRequestedEndFlight()){
+            return;
+        }
         for(Projectile proj : punishHits){
             PIRUtils.runProjectile(player, proj, game, false, getTitle());
         }

@@ -178,7 +178,7 @@ public class BoardComponent extends VBox {
     private void setBackgroundImage() {
         Image image = AssetHandler.loadRawImage(Asset.BOARD.toString());
         BackgroundSize backgroundSize = new BackgroundSize(
-                100, 100, true, true, true, false);  // TODO: adjust here for resize issue
+                100, 100, true, true, true, false);
         BackgroundImage backgroundImage = new BackgroundImage(
                 image,
                 BackgroundRepeat.NO_REPEAT,

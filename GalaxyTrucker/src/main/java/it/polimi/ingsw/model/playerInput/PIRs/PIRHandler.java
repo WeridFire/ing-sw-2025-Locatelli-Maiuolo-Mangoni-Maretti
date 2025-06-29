@@ -345,7 +345,7 @@ public class PIRHandler implements Serializable {
 				try {
 					activePIRs.wait();
 				} catch (InterruptedException e) {
-					return;  // TODO: check if it's ok to do so
+					return;
 				}
 			}
 		}
@@ -362,7 +362,7 @@ public class PIRHandler implements Serializable {
 				try {
 					activePIRs.wait();
 				} catch (InterruptedException e) {
-					return;  // TODO: check if it's ok to do so
+					return;
 				}
 			}
 		}
@@ -383,7 +383,7 @@ public class PIRHandler implements Serializable {
 					try {
 						activePIRs.wait();
 					} catch (InterruptedException e) {
-						return;  // TODO: check if it's ok to do so
+						return;
 					}
 				}
 			}
