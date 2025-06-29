@@ -36,6 +36,7 @@ public class CardContainer extends VBox {
         imageView.setPreserveRatio(true);
         imageView.setFitWidth(FIXED_WIDTH - PADDING);
         imageView.setFitHeight(FIXED_HEIGHT - PADDING);
+        this.setAlignment(Pos.CENTER);
 
         endTurnButton = new Button("End Turn");
         endTurnButton.setOnMouseClicked(e -> Platform.runLater(() -> {
