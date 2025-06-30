@@ -8,7 +8,7 @@
 
 ## Funzionalità implementate
 
-| Functionality                 | State |
+| Funzionalità                  | Stato |
 |:------------------------------|:-----:|
 | Regole **complete** del gioco | ✔️ |
 | Interfaccia **TUI**           | ✔️ |
@@ -68,7 +68,7 @@ java -jar client.jar --tui [--socket-client|--rmi-client] [--host <ip>] [--port 
 **Parametri opzionali:**
 
 * `--host`, `-h`: IP del server (default: localhost)
-* `--port`, `-p`: porta del server (default: 1099 per RMI, 1337 per socket)
+* `--port`, `-p`: porta del server (default: 1234 per Socket, dato che è default)
 * `--socket-client`, `-sc`: connessione via Socket
 * `--rmi-client`, `-rmic`: connessione via RMI
 
