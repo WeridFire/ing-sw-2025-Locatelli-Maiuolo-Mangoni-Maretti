@@ -1,10 +1,11 @@
 # Progetto di Ingegneria del Software
+## Valutazione 30L/30
 
 ## Componenti del gruppo
-- [10827999] Davide Locatelli ([@Dere-Wah](https://github.com/Dere-Wah)) <br> davide8.locatelli@mail.polimi.it
-- [10837526] Manuel Maiuolo ([@BestPlayerMMIII](https://github.com/BestPlayerMMIII)) <br> manuel.maiuolo@mail.polimi.it
-- [10850354] Adriano Claudio Mangoni ([@AdriCman](https://github.com/AdriCman)) <br> adrianoclaudio.mangoni@mail.polimi.it
-- [10923173] Filippo Maretti ([@WeridFire](https://github.com/WeridFire)) <br> filippo.maretti@mail.polimi.it
+- Davide Locatelli ([@Dere-Wah](https://github.com/Dere-Wah))
+- Manuel Maiuolo ([@BestPlayerMMIII](https://github.com/BestPlayerMMIII))
+- Adriano Claudio Mangoni ([@AdriCman](https://github.com/AdriCman))
+- Filippo Maretti ([@WeridFire](https://github.com/WeridFire))
 
 ## Funzionalità implementate
 
